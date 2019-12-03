@@ -32,9 +32,9 @@ func NewABRequest(src string, dest string) SearchABRequest {
 
 // SearchABResponse is the struct
 type SearchABResponse struct {
-	Total_time_cost  int32
-	Engine_time_cost int32
-	Paths            pkg.Paths
+	TotalCost  int32
+	EngineCost int32
+	Paths      pkg.Paths
 }
 
 // SearchAB returns paths of two points
@@ -52,8 +52,8 @@ func SearchAB(client ultipa.UltipaRpcsClient, request SearchABRequest) SearchABR
 	paths := pkg.FormatPaths(msg.Paths)
 
 	return SearchABResponse{
-		Total_time_cost:  msg.TotalTimeCost,
-		Engine_time_cost: msg.EngineTimeCost,
-		Paths:            paths,
+		msg.TotalTimeCost,
+		msg.EngineTimeCost,
+		paths,
 	}
 }

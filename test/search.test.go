@@ -33,7 +33,20 @@ func main() {
 		fmt.Print("\n\n--------------------------------------\n\n")
 	}
 
-	fmt.Printf("engine cost %v ms, total const %v ms \n", abMsg.Engine_time_cost, abMsg.Total_time_cost)
+	fmt.Printf("engine cost %v ms, total cost %v ms \n", abMsg.EngineCost, abMsg.TotalCost)
 
 	fmt.Print("\n======================================\n")
+
+	fmt.Print("\n=================Search Khop=====================\n\n")
+
+	khopReq := sdk.NewKhopRequest("123")
+	khopMsg := sdk.SearchKhop(client, khopReq)
+
+	for _, n := range khopMsg.Nodes {
+		fmt.Printf(" [%v] ", n["name"])
+	}
+
+	fmt.Print("\n\n--------------------------------------\n\n")
+	fmt.Printf("engine cost %v ms, total cost %v ms , total num : %v \n", khopMsg.EngineCost, khopMsg.TotalCost, khopMsg.Count)
+
 }
