@@ -17,7 +17,7 @@ import (
 
 type searchNodesRequest struct {
 	ID         string
-	NodeFilter pkg.Filter
+	NodeFilter ultipa.Filter
 	Limit      int32
 	Select     []string
 }
@@ -29,7 +29,7 @@ type searchNodesResponse struct {
 }
 
 func NewSearchNodesRequest() searchNodesRequest {
-	return searchNodesRequest{"", pkg.NewFilter(), 10, []string{"name"}}
+	return searchNodesRequest{"", ultipa.Filter{}, 10, []string{"name"}}
 }
 
 func SearchNodes(client ultipa.UltipaRpcsClient, request searchNodesRequest) searchNodesResponse {
@@ -39,7 +39,6 @@ func SearchNodes(client ultipa.UltipaRpcsClient, request searchNodesRequest) sea
 	msg, err := client.SearchNodes(ctx, &ultipa.SearchNodesRequest{
 		BeginId:       request.ID,
 		Limit:         request.Limit,
-		NodeFilter:    request.NodeFilter.ToRpc(),
 		SelectColumns: request.Select,
 	})
 
