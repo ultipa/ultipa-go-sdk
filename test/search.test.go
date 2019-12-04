@@ -1,7 +1,10 @@
 package main
 
-import "ultipa-go-sdk/sdk"
-import "fmt"
+import (
+	"fmt"
+	// "ultipa-go-sdk/pkg"
+	"ultipa-go-sdk/sdk"
+)
 
 // import "encoding/json"
 
@@ -49,8 +52,56 @@ func main() {
 	// fmt.Print("\n\n--------------------------------------\n\n")
 	// fmt.Printf("engine cost %v ms, total cost %v ms , total num : %v \n", khopMsg.EngineCost, khopMsg.TotalCost, khopMsg.Count)
 
-	fmt.Print("\n=================Search Nodes=====================\n\n")
-	
-	// nodeReq := sdk.
-	// filter = pkg.
+	// fmt.Print("\n=================Search Nodes=====================\n\n")
+
+	// nodeReq := sdk.NewSearchNodesRequest()
+	// // nodeReq.ID = "123"
+
+	// filterConds := pkg.NewFilterCondition("age", ">", []string{"20"})
+
+	// // fmt.Printf("%v \n", filterConds)
+
+	// filter := pkg.NewFilter("AND", filterConds)
+
+	// nodeReq.NodeFilter = filter
+
+	// nodeReq.Select = []string{"name", "age"}
+
+	// nodeReq.Limit = 100
+
+	// nodeMsg := sdk.SearchNodes(client, nodeReq)
+
+	// for _, v := range nodeMsg.Nodes {
+	// 	fmt.Printf(" [%v | %v]", v["name"], v["age"])
+	// }
+
+	// fmt.Print("\n\n--------------------------------------\n\n")
+	// fmt.Printf("total cost %v ms , total num : %v \n", nodeMsg.TotalCost, nodeMsg.Count)
+
+	// fmt.Print("\n=================Search Edges=====================\n\n")
+
+	// edgeReq := sdk.NewSearchEdgesRequest()
+	// // edgeReq.ID = "123"
+
+	// filterConds := pkg.NewFilterCondition("name", "=", []string{"Like"})
+
+	// // fmt.Printf("%v \n", filterConds)
+
+	// filter := pkg.NewFilter("AND", filterConds)
+
+	// edgeReq.EdgeFilter = filter
+
+	// edgeReq.Select = []string{"name", "age"}
+
+	// edgeReq.Limit = 100
+
+	// edgeMsg := sdk.SearchEdges(client, edgeReq)
+
+	// for _, v := range edgeMsg.Edges {
+	// 	fmt.Printf(" [ id: %v | type: %v] ", v["_id"], v["name"])
+	// }
+
+	// fmt.Print("\n\n--------------------------------------\n\n")
+	// fmt.Printf("total cost %v ms , total num : %v \n", edgeMsg.TotalCost, edgeMsg.Count)
+
 }

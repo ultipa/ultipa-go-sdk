@@ -6,8 +6,8 @@ import (
 	// "fmt"
 	"log"
 	"time"
-	"ultipa-go-sdk/pkg"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/utils"
 )
 
 // SearchABRes is the SearchAB value struct
@@ -23,7 +23,7 @@ type SearchABRequest struct {
 	Limit    int32
 	Depth    int32
 	shortest bool
-	Selects []string
+	Selects  []string
 	Turbo    bool
 }
 
@@ -35,7 +35,7 @@ func NewABRequest(src string, dest string) SearchABRequest {
 type SearchABResponse struct {
 	TotalCost  int32
 	EngineCost int32
-	Paths      pkg.Paths
+	Paths      utils.Paths
 }
 
 // SearchAB returns paths of two points
@@ -45,10 +45,10 @@ func SearchAB(client ultipa.UltipaRpcsClient, request SearchABRequest) SearchABR
 	defer cancel()
 
 	msg, err := client.SearchAB(ctx, &ultipa.SearchABRequest{
-		Source: request.Src, 
-		Dest: request.Dest, 
-		Limit: request.Limit, 
-		Depth: request.Depth,
+		Source:        request.Src,
+		Dest:          request.Dest,
+		Limit:         request.Limit,
+		Depth:         request.Depth,
 		SelectColumns: request.Selects,
 	})
 
@@ -56,7 +56,7 @@ func SearchAB(client ultipa.UltipaRpcsClient, request SearchABRequest) SearchABR
 		log.Fatalf("ab search error %v", err)
 	}
 
-	paths := pkg.FormatPaths(msg.Paths)
+	paths := utils.FormatPaths(msg.Paths)
 
 	return SearchABResponse{
 		msg.TotalTimeCost,

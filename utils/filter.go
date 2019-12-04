@@ -1,10 +1,12 @@
-package pkg
+package utils
 
 import (
 	// "google.golang.org/grpc"
 	// "fmt"
 	// "ultipa-go-sdk/pkg"
 	ultipa "ultipa-go-sdk/rpc"
+
+	"strconv"
 )
 
 // message Filter {
@@ -36,7 +38,9 @@ func NewFilterCondition(key string, operator string, value []string) []filterCon
 	var conditions []filterCondition
 	var condition filterCondition
 	condition.Key = key
-	const MaxInt = int(^uint(0) >> 1)
+	const MaxInt = int(^uint32(0) >> 1)
+
+	// fmt.Println(MaxInt)
 	switch operator {
 	case "=":
 		condition.Left = value[0]
@@ -45,11 +49,11 @@ func NewFilterCondition(key string, operator string, value []string) []filterCon
 		break
 	case ">":
 		condition.Left = value[0]
-		condition.Right = string(MaxInt)
+		condition.Right = strconv.Itoa(MaxInt)
 		conditions = append(conditions, condition)
 		break
 	case "<":
-		condition.Left = string(-MaxInt - 1)
+		condition.Left = strconv.Itoa(-MaxInt - 1)
 		condition.Right = value[0]
 		conditions = append(conditions, condition)
 		break
@@ -62,7 +66,7 @@ func NewFilterCondition(key string, operator string, value []string) []filterCon
 		for _, v := range value {
 			cond := NewFilterCondition(key, "=", []string{v})
 			conditions = append(conditions, cond[0])
-		} 
+		}
 		break
 	}
 	return conditions

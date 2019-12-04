@@ -6,7 +6,7 @@ import (
 	// "fmt"
 	"log"
 	"time"
-	"ultipa-go-sdk/pkg"
+	"ultipa-go-sdk/utils"
 	ultipa "ultipa-go-sdk/rpc"
 )
 
@@ -25,7 +25,7 @@ type searchNodesRequest struct {
 type searchNodesResponse struct {
 	TotalCost int32
 	Count     int32
-	Nodes     []pkg.Node
+	Nodes     []utils.Node
 }
 
 func NewSearchNodesRequest() searchNodesRequest {
@@ -39,6 +39,7 @@ func SearchNodes(client ultipa.UltipaRpcsClient, request searchNodesRequest) sea
 	msg, err := client.SearchNodes(ctx, &ultipa.SearchNodesRequest{
 		BeginId:       request.ID,
 		Limit:         request.Limit,
+		NodeFilter:    &request.NodeFilter,
 		SelectColumns: request.Select,
 	})
 
@@ -46,8 +47,8 @@ func SearchNodes(client ultipa.UltipaRpcsClient, request searchNodesRequest) sea
 		log.Fatalf("ab search error %v", err)
 	}
 
-	// paths := pkg.FormatPaths(msg.Paths)
-	nodes := pkg.FormatNodes(msg.Nodes)
+	// paths := utils.FormatPaths(msg.Paths)
+	nodes := utils.FormatNodes(msg.Nodes)
 
 	return searchNodesResponse{
 		msg.TimeCost,

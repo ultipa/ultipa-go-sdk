@@ -6,7 +6,7 @@ import (
 	// "fmt"
 	"log"
 	"time"
-	// "ultipa-go-sdk/pkg"
+	// "ultipa-go-sdk/utils"
 	ultipa "ultipa-go-sdk/rpc"
 )
 
