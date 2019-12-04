@@ -63,7 +63,7 @@ func NewFilterCondition(key string, operator string, value []string) []filterCon
 		for _, v := range value {
 			cond := NewFilterCondition(key, "=", []string{v})
 			conditions = append(conditions, cond[0])
-		}
+		} 
 		break
 	}
 	return conditions
