@@ -18,25 +18,25 @@ func main() {
 	msg := sdk.Statistic(client)
 
 	fmt.Printf("%+v\n", msg)
-	// fmt.Print("\n=================AB Search=====================\n\n")
+	fmt.Print("\n=================AB Search=====================\n\n")
 
-	// abReq := sdk.NewABRequest("123", "321")
-	// abReq.Depth = 7
-	// abReq.Limit = 1
-	// abMsg := sdk.SearchAB(client, abReq)
-	// for i, path := range abMsg.Paths {
-	// 	fmt.Printf("Path[%v] : ", i)
-	// 	for i := 0; i < len(path.Nodes); i++ {
-	// 		fmt.Printf("%v", path.Nodes[i]["name"])
+	abReq := sdk.NewABRequest("123", "321")
+	abReq.Depth = 7
+	abReq.Limit = 1
+	abMsg := sdk.SearchAB(client, abReq)
+	for i, path := range abMsg.Paths {
+		fmt.Printf("Path[%v] : ", i)
+		for i := 0; i < len(path.Nodes); i++ {
+			fmt.Printf("%v", path.Nodes[i]["name"])
 
-	// 		if i < len(path.Nodes)-1 {
-	// 			fmt.Printf(" - [%v] - ", path.Edges[i]["name"])
-	// 		}
-	// 	}
-	// 	fmt.Print("\n\n--------------------------------------\n\n")
-	// }
+			if i < len(path.Nodes)-1 {
+				fmt.Printf(" - [%v] - ", path.Edges[i]["name"])
+			}
+		}
+		fmt.Print("\n\n--------------------------------------\n\n")
+	}
 
-	// fmt.Printf("engine cost %v ms, total cost %v ms \n", abMsg.EngineCost, abMsg.TotalCost)
+	fmt.Printf("engine cost %v ms, total cost %v ms \n", abMsg.EngineCost, abMsg.TotalCost)
 
 	// fmt.Print("\n======================================\n")
 
@@ -103,5 +103,28 @@ func main() {
 
 	// fmt.Print("\n\n--------------------------------------\n\n")
 	// fmt.Printf("total cost %v ms , total num : %v \n", edgeMsg.TotalCost, edgeMsg.Count)
+
+	fmt.Print("\n=================Spread Node=====================\n\n")
+
+	spreadRequest := sdk.NewSpreadRequest("123")
+	spreadRequest.Limit = 20
+	spreadRequest.Depth = 3
+	spreadMsg := sdk.Spread(client, spreadRequest)
+
+	for i, path := range spreadMsg.Paths {
+		fmt.Printf("Path[%v] : ", i)
+		for i := 0; i < len(path.Nodes); i++ {
+			fmt.Printf("%v", path.Nodes[i]["name"])
+
+			if i < len(path.Nodes)-1 {
+				fmt.Printf(" - [%v] - ", path.Edges[i]["name"])
+			}
+		}
+		fmt.Print("\n\n--------------------------------------\n\n")
+	}
+
+	fmt.Printf("total cost %v ms , engine cost : %v \n", spreadMsg.TotalCost, spreadMsg.EngineCost)
+
+	fmt.Print("\n======================================\n\n")
 
 }

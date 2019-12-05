@@ -28,6 +28,15 @@ service UltipaRpcs{
   rpc AnalyticJaccardSimilarity (AnalyticJaccardSimilarityRequest) returns (AnalyticJaccardSimilarityReply) {}
   rpc AnalyticCosineSimilarity (AnalyticCosineSimilarityRequest) returns (AnalyticCosineSimilarityReply) {}
   rpc AnalyticDegree (AnalyticDegreeRequest) returns (AnalyticDegreeReply) {}
+  rpc AnalyticLouvain (AnalyticLouvainRequest) returns (AnalyticLouvainReply) {}
+  rpc AnalyticSybilRank (AnalyticSybilRankRequest) returns (AnalyticSybilRankReply) {}
+  rpc LouvainStream (LouvainStreamRequest) returns ( stream LouvainStreamReply) {}
+
+  rpc UserSetting (UserSettingRequest) returns (UserSettingReply) {}
+
+  rpc Task (TaskRequest) returns (TaskReply){}
+
+  rpc SubNet (SubNetRequest)  returns (SubNetReply){}
 }
 
 /*------------------------1.SayHello------------------------------*/
@@ -65,6 +74,7 @@ message SearchABRequest {
   SortType sort_type = 15;
   string original_source = 16;
   string original_dest = 17;
+  int32 edge_direction = 18;
 }
 
 // The response message containing the greetings
@@ -95,7 +105,7 @@ message SearchKhopRequest {
   Filter node_filter = 4;
   Filter edge_filter = 5;
   repeated string select_columns = 6;
-  string original_source = 16;
+  string original_source = 7;
 }
 
 // The response message containing the greetings
@@ -415,6 +425,7 @@ message GetIndexColumnReply {
 message AnalyticLPARequest {
   int32 loop_num = 1;
   string node_column_name = 2;
+  bool save_to_db = 3;    //是否保存到数据库
 }
 
 message AnalyticLPAReply {
@@ -431,6 +442,7 @@ message AnalyticPRRequest {
   int32 loop_num = 1;
   float page_rank_damping = 2;
   int32 page_rank_default = 3;
+  bool save_to_db = 4;    //是否保存到数据库
 }
 
 message AnalyticPRReply {
@@ -541,7 +553,173 @@ message AnalyticDegreeReply {
 }
 /*------------------------AnalyticCosineSimilarity------------------------------*/
 
+/*------------------------23.UserSetting------------------------------*/
+message UserSettingRequest {
+  enum OPTION{
+    OPT_GET = 0;
+    OPT_SET = 1;
+  }
 
+  string user_name = 1;
+  OPTION opt = 2;
+  string type = 3;
+  string data = 4;
+}
+
+message UserSettingReply {
+  string  data = 1;
+}
+/*--------------------------UserSetting------------------------------*/
+
+/*------------------------23.AnalyticLouvain------------------------------*/
+//鲁汶算法 计算网络层次结构
+message AnalyticLouvainRequest {
+  string edge_column_name = 1;
+  double min_modularity_increase = 2;
+  int32 phase1_loop = 3;
+  bool save_to_db = 4;
+}
+
+message AnalyticLouvainReply {
+  int32 community_num = 1;
+  int32 engine_time_cost = 2;
+  double modularity = 3;
+}
+/*--------------------------AnalyticLouvain------------------------------*/
+
+/*------------------------24.AnalyticSybilRank------------------------------*/
+//识别大型网络中虚假账户
+message AnalyticSybilRankRequest {
+  int32 loop_num = 1;
+  int32 sybil_num = 2;
+  bool save_to_db = 3;
+}
+
+message AnalyticSybilRankReply {
+  int32 engine_time_cost = 1;
+}
+/*--------------------------AnalyticSybilRank------------------------------*/
+
+/*------------------------25.AnalyticLouvainStream----------------------------*/
+//鲁汶算法 计算网络层次结构
+message LouvainStreamRequest {
+  string edge_column_name = 1;
+  double min_modularity_increase = 2;
+  int32 phase1_loop = 3;
+  int32 community_num = 4;
+  int32 node_num = 5;
+  int32 edge_num = 6;
+}
+
+message LouvainStreamReply{
+  enum RET_TYPE{
+    NODE = 0;
+    EDGE = 1;
+  }
+
+  RET_TYPE ret_type = 1;
+  repeated LouvainStreamNode node = 2;
+  repeated LouvainStreamEdge edge = 3;
+  double modularity = 4;
+  int32 engine_time_cost = 5;
+  int32 total_time_cost = 6;
+  int32 total_community_num = 7;
+//  int32 from_id = 3;
+//  int32 to_id = 4;
+}
+message LouvainStreamNode{
+  int32 community_id =1;
+  int32 node_id = 2;
+}
+
+message LouvainStreamEdge{
+  int32 id =1;
+  int32 from_id = 2;
+  int32 to_id = 3;
+}
+/*--------------------------AnalyticLouvainStream------------------------------*/
+
+/*------------------------26.Task----------------------------*/
+//任务管理, 启动,查询任务
+message TaskRequest {
+  enum TASK_OPTION{
+    OPT_SEARCH = 0;
+    OPT_START = 1;
+  }
+  enum TASK_TYPE{
+    TASK_TEST = 0;
+    TASK_LOUVAIN = 1;
+    TASK_PAGERANK = 2;
+  }
+
+  TASK_OPTION task_opt = 1;
+  TASK_TYPE task_type = 2;
+}
+
+message TaskReply{
+  //status 启动成功返回true 其他情况返回false，查询不以此值作为参考
+  bool status = 1;
+  repeated Task tasks = 2;
+}
+
+message Task{
+  enum TASK_STATUS{
+    TASK_WAITTING = 0;
+    TASK_PROCESSING =1;
+    TASK_DONE = 2;
+    TASK_FAILED = 3;
+    TASK_UNKNOWN = 4;
+  };
+  string m_task_name = 1;
+  int32 m_task_id = 2;
+  int32 m_task_start_time = 3;
+  int32 m_task_end_time = 4;
+  int32 m_last_time = 5;
+  TASK_STATUS m_task_status = 6;
+}
+/*--------------------------AnalyticLouvain------------------------------*/
+
+/*------------------------27.SubNet----------------------------*/
+//组网
+message SubNetRequest {
+  enum OPTION{
+    OPT_O_N = 0; // 1对多
+    OPT_M_N = 1; // 多对多
+    OPT_M_N2 = 2; // 多对多 ab路径
+    OPT_O_N2 = 3; // 1对多 ab路径
+  }
+  OPTION opt = 1;
+  repeated int32 src_nodes = 2;
+  repeated int32 dst_nodes = 3;
+  int32 depth = 4;
+  int32 limit = 5;
+  bool pass_super_node = 6;
+  bool no_circle = 7;
+  Filter node_filter = 8;
+  Filter edge_filter = 9;
+  repeated string select_columns = 12;
+  bool by_short_search = 13;
+}
+
+message SubNetReply{
+  int32 total_time_cost = 1;
+  int32 engine_time_cost = 2;
+  repeated SubNetPath paths = 3;
+}
+
+message SubNetPath {
+  repeated SubNetRow nodes = 1;
+  repeated SubNetRow edges = 2;
+}
+message SubNetRow {
+  repeated SubNetValues values = 1;
+}
+//
+message SubNetValues {
+  string key = 1;
+  string value = 2;
+}
+/*--------------------------SubNet------------------------------*/
 
 /*------------------------public message-----------------------*/
 message Filter {

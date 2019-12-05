@@ -56,7 +56,7 @@ func SearchAB(client ultipa.UltipaRpcsClient, request SearchABRequest) SearchABR
 		log.Fatalf("ab search error %v", err)
 	}
 
-	paths := utils.FormatPaths(msg.Paths)
+	paths := utils.FormatPathsFromAB(msg.Paths)
 
 	return SearchABResponse{
 		msg.TotalTimeCost,
