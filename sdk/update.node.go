@@ -9,25 +9,22 @@ import (
 	"ultipa-go-sdk/utils"
 )
 
-type updateNodeReturns struct {
-}
-
 // UpdateNodes update node data to db
-func UpdateNodes(client ultipa.UltipaRpcsClient, nodes []utils.Node) updateNodeReturns {
+func UpdateNodes(client ultipa.UltipaRpcsClient, nodes []utils.Node) *ultipa.ModifyReply {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	newNodes := utils.ToRpcNodes(nodes)
+	newNodes := utils.ToRPCNodes(nodes)
 
-	var Nodes []*ultipa.ModifyNode
+	var Nodes []*ultipa.Node
 
 	for _, n := range newNodes {
-		var Node ultipa.ModifyNode
+		var Node ultipa.Node
 
 		Node.Id = n.Id
 		for _, v := range n.Values {
-			var value ultipa.ModifyValues
+			var value ultipa.Value
 			value.Key = v.Key
 			value.Value = v.Value
 			Node.Values = append(Node.Values, &value)
@@ -47,5 +44,5 @@ func UpdateNodes(client ultipa.UltipaRpcsClient, nodes []utils.Node) updateNodeR
 
 	fmt.Printf("%v", msg)
 
-	return updateNodeReturns{}
+	return msg
 }

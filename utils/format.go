@@ -25,13 +25,13 @@ type RpcEdge struct {
 }
 
 type Path struct {
-	Nodes []Node
-	Edges []Edge
+	Nodes []*Node
+	Edges []*Edge
 }
 
-type Paths []Path
+type Paths []*Path
 
-func FormatPathsFromAB(paths []*ultipa.ABPath) Paths {
+func FormatPaths(paths []*ultipa.Path) Paths {
 	var ps Paths
 
 	for _, v := range paths {
@@ -40,7 +40,7 @@ func FormatPathsFromAB(paths []*ultipa.ABPath) Paths {
 
 		for _, nv := range v.Nodes {
 			newNode := make(Node)
-			newPath.Nodes = append(newPath.Nodes, newNode)
+			newPath.Nodes = append(newPath.Nodes, &newNode)
 			for _, nvv := range nv.Values {
 				newNode[nvv.Key] = nvv.Value
 			}
@@ -48,113 +48,83 @@ func FormatPathsFromAB(paths []*ultipa.ABPath) Paths {
 
 		for _, ev := range v.Edges {
 			newEdge := make(Edge)
-			newPath.Edges = append(newPath.Edges, newEdge)
+			newPath.Edges = append(newPath.Edges, &newEdge)
 			for _, evv := range ev.Values {
 				newEdge[evv.Key] = evv.Value
 			}
 		}
 
-		ps = append(ps, newPath)
-		// fmt.Printf("%v,%v\n", i, newPath)
-	}
-
-	return ps
-}
-
-func FormatPathsFromSpread(paths []*ultipa.NodeSpreadPath) Paths {
-	var ps Paths
-
-	for _, v := range paths {
-
-		var newPath Path
-
-		for _, nv := range v.Nodes {
-			newNode := make(Node)
-			newPath.Nodes = append(newPath.Nodes, newNode)
-			for _, nvv := range nv.Values {
-				newNode[nvv.Key] = nvv.Value
-			}
-		}
-
-		for _, ev := range v.Edges {
-			newEdge := make(Edge)
-			newPath.Edges = append(newPath.Edges, newEdge)
-			for _, evv := range ev.Values {
-				newEdge[evv.Key] = evv.Value
-			}
-		}
-
-		ps = append(ps, newPath)
-		// fmt.Printf("%v,%v\n", i, newPath)
+		ps = append(ps, &newPath)
 	}
 
 	return ps
 }
 
 // FormatNodes return beautiful nodes array instead of rpc
-func FormatNodes(nodes []*ultipa.SearchNode) []Node {
-	newNodes := []Node{}
+func FormatNodes(nodes []*ultipa.Node) []*Node {
+	newNodes := []*Node{}
 
 	for _, n := range nodes {
 
 		newNode := Node{}
-		newNode["_id"] = n.XId
+		newNode["_id"] = n.Id
 
 		for _, v := range n.Values {
 			newNode[v.Key] = v.Value
 		}
 
-		newNodes = append(newNodes, newNode)
+		newNodes = append(newNodes, &newNode)
 	}
 
 	return newNodes
 }
 
-func FormatEdges(edges []*ultipa.SearchEdge) []Edge {
-	newEdges := []Edge{}
+func FormatEdges(edges []*ultipa.Edge) []*Edge {
+	newEdges := []*Edge{}
 
 	for _, n := range edges {
 
 		newEdge := Edge{}
-		newEdge["_id"] = n.XId
-		newEdge["_from_id"] = n.XFromId
-		newEdge["_to_id"] = n.XToId
+		newEdge["_id"] = n.Id
+		newEdge["_from_id"] = n.FromId
+		newEdge["_to_id"] = n.ToId
 
 		for _, v := range n.Values {
 			newEdge[v.Key] = v.Value
 		}
 
-		newEdges = append(newEdges, newEdge)
+		newEdges = append(newEdges, &newEdge)
 	}
 
 	return newEdges
 }
 
-func ToRpcNodes(nodes []Node) []RpcNode {
+func ToRPCNodes(nodes []Node) []*ultipa.Node {
 
-	var newNodes []RpcNode
+	var newNodes []*ultipa.Node
 
 	for _, n := range nodes {
-		var newNode RpcNode
+		var newNode ultipa.Node
 		for k, v := range n {
 			if k == "_id" {
 				newNode.Id = v
 			} else {
-				newNode.Values = append(newNode.Values, Value{Key: k, Value: v})
+				newNode.Values = append(newNode.Values, &ultipa.Value{Key: k, Value: v})
 			}
 		}
-		newNodes = append(newNodes, newNode)
+		newNodes = append(newNodes, &newNode)
 	}
 
 	return newNodes
 }
 
-func ToRpcEdges(edges []Edge) []RpcEdge {
+// ToRPCEdges return []ultipa.Edge
+func ToRPCEdges(edges []Edge) []*ultipa.Edge {
 
-	var newEdges []RpcEdge
+	var newEdges []*ultipa.Edge
 
 	for _, n := range edges {
-		var newEdge RpcEdge
+		var newEdge ultipa.Edge
 		for k, v := range n {
 			if k == "_id" {
 				newEdge.Id = v
@@ -163,10 +133,10 @@ func ToRpcEdges(edges []Edge) []RpcEdge {
 			} else if k == "_to_id" {
 				newEdge.ToId = v
 			} else {
-				newEdge.Values = append(newEdge.Values, Value{Key: k, Value: v})
+				newEdge.Values = append(newEdge.Values, &ultipa.Value{Key: k, Value: v})
 			}
 		}
-		newEdges = append(newEdges, newEdge)
+		newEdges = append(newEdges, &newEdge)
 	}
 
 	return newEdges

@@ -31,15 +31,15 @@ func CreateNodes(client ultipa.UltipaRpcsClient, nodes []utils.Node) *ultipa.Ins
 
 	defer cancel()
 
-	newNodes := utils.ToRpcNodes(nodes)
+	newNodes := utils.ToRPCNodes(nodes)
 
-	var Nodes []*ultipa.InsertNode
+	var Nodes []*ultipa.Node
 
 	for _, n := range newNodes {
-		var Node ultipa.InsertNode
+		var Node ultipa.Node
 
 		for _, v := range n.Values {
-			var value ultipa.InsertValues
+			var value ultipa.Value
 			value.Key = v.Key
 			value.Value = v.Value
 			Node.Values = append(Node.Values, &value)

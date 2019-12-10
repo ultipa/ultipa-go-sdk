@@ -6,8 +6,8 @@ import (
 	// "fmt"
 	"log"
 	"time"
-	"ultipa-go-sdk/utils"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/utils"
 )
 
 // string begin_id = 1;
@@ -16,16 +16,16 @@ import (
 // repeated string select_columns = 4;
 
 type searchNodesRequest struct {
-	ID         string
-	NodeFilter ultipa.Filter
-	Limit      int32
-	Select     []string
+	ID                   string
+	NodeFilter           ultipa.Filter
+	Limit                int32
+	SelectNodeProperties []string
 }
 
 type searchNodesResponse struct {
 	TotalCost int32
 	Count     int32
-	Nodes     []utils.Node
+	Nodes     []*utils.Node
 }
 
 func NewSearchNodesRequest() searchNodesRequest {
@@ -37,14 +37,14 @@ func SearchNodes(client ultipa.UltipaRpcsClient, request searchNodesRequest) sea
 	defer cancel()
 
 	msg, err := client.SearchNodes(ctx, &ultipa.SearchNodesRequest{
-		BeginId:       request.ID,
-		Limit:         request.Limit,
-		NodeFilter:    &request.NodeFilter,
-		SelectColumns: request.Select,
+		BeginId:          request.ID,
+		Limit:            request.Limit,
+		NodeFilter:       &request.NodeFilter,
+		SelectProperties: request.SelectNodeProperties,
 	})
 
 	if err != nil {
-		log.Fatalf("ab search error %v", err)
+		log.Fatalf("node search error %v", err)
 	}
 
 	// paths := utils.FormatPaths(msg.Paths)

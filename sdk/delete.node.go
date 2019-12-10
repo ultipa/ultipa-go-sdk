@@ -10,7 +10,7 @@ import (
 
 type deleteNodesResponse struct {
 	TimeCost int32
-	Status   string
+	Status   *ultipa.Status
 }
 
 // DeleteNodes update node data to db
@@ -21,7 +21,7 @@ func DeleteNodes(client ultipa.UltipaRpcsClient, ids []string) deleteNodesRespon
 	defer cancel()
 
 	msg, err := client.Delete(ctx, &ultipa.DeleteRequest{
-		Type:      ultipa.DeleteRequest_DBNODE,
+		Type:      ultipa.DBType_DBNODE,
 		DeleteIds: ids,
 	})
 
@@ -29,13 +29,8 @@ func DeleteNodes(client ultipa.UltipaRpcsClient, ids []string) deleteNodesRespon
 		log.Fatalf("[Error] delete node error: %v", err)
 	}
 
-	status := "ok"
-
-	if msg.Status == ultipa.DeleteReply_FAILED {
-		status = "failed"
-	}
 	return deleteNodesResponse{
 		TimeCost: msg.TimeCost,
-		Status:   status,
+		Status:   msg.Status,
 	}
 }

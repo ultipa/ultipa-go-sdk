@@ -2,395 +2,313 @@ syntax = "proto3";
 
 package ultipa;
 
-// The greeting service definition.
-service UltipaRpcs{
-  // Sends a greeting
-  rpc SayHello (HelloUltipaRequest) returns (HelloUltipaReply) {}
-  rpc SearchAB (SearchABRequest) returns (SearchABReply) {}
-  rpc SearchKhop (SearchKhopRequest) returns (SearchKhopReply) {}
-  rpc CreateIndex (CreateIndexRequest) returns (CreateIndexReply) {}
-  rpc Modify (ModifyRequest) returns (ModifyReply) {}
-  rpc SearchNodes (SearchNodesRequest) returns (SearchNodesReply) {}
-  rpc SearchEdges (SearchEdgesRequest) returns (SearchEdgesReply) {}
-  rpc Delete (DeleteRequest) returns (DeleteReply) {}
-  rpc GetPropertyInfo (GetPropertyInfoRequest) returns (GetPropertyInfoReply) {}
-  rpc CreateProperty (CreatePropertyRequest) returns (CreatePropertyReply) {}
-  rpc Insert (InsertRequest) returns (InsertReply) {}
-  rpc NodeSpread (NodeSpreadRequest) returns (NodeSpreadReply) {}
-  rpc DeleteColumn (DeleteColumnRequest) returns (DeleteColumnReply) {}
-  rpc DbInformation (DbInformationRequest) returns (DbInformationReply) {}
-  rpc GetIndexColumn (GetIndexColumnRequest) returns (GetIndexColumnReply) {}
+// The ultipa service definition.
+service UltipaRpcs {
+    // 1.Sends a greeting
+    rpc SayHello (HelloUltipaRequest) returns (HelloUltipaReply) {
+    }
+    //2.AB路径搜索
+    rpc SearchAB (SearchABRequest) returns (SearchABReply) {
+    }
+    //3.k层邻居搜索
+    rpc SearchKhop (SearchKhopRequest) returns (SearchKhopReply) {
+    }
+    //4.创建索引,行为:属性load到内存,参与搜索过程的计算.
+    rpc CreateIndex (CreateIndexRequest) returns (CreateIndexReply) {
+    }
+    //5.修改点或边
+    rpc Modify (ModifyRequest) returns (ModifyReply) {
+    }
+    //6.查找点
+    rpc SearchNodes (SearchNodesRequest) returns (SearchNodesReply) {
+    }
+    //7.查找边
+    rpc SearchEdges (SearchEdgesRequest) returns (SearchEdgesReply) {
+    }
+    //8.删除点或边
+    rpc Delete (DeleteRequest) returns (DeleteReply) {
+    }
+    //9.获取点或边的属性
+    rpc GetPropertyInfo (GetPropertyInfoRequest) returns (GetPropertyInfoReply) {
+    }
+    //10.创建一个属性
+    rpc CreateProperty (CreatePropertyRequest) returns (CreatePropertyReply) {
+    }
+    //11.插入点或边
+    rpc Insert (InsertRequest) returns (InsertReply) {
+    }
+    //12.点展开(点的一维邻居)
+    rpc NodeSpread (NodeSpreadRequest) returns (NodeSpreadReply) {
+    }
+    //13.删除属性
+    rpc DeleteProperty (DeletePropertyRequest) returns (DeletePropertyReply) {
+    }
+    //14.数据库信息
+    rpc DbInformation (DbInformationRequest) returns (DbInformationReply) {
+    }
 
-  rpc AnalyticLPA (AnalyticLPARequest) returns (AnalyticLPAReply) {}
-  rpc AnalyticPR (AnalyticPRRequest) returns (AnalyticPRReply) {}
-  rpc AnalyticClusteringCoefficient (AnalyticClusteringCoefficientRequest) returns (AnalyticClusteringCoefficientReply) {}
-  rpc AnalyticTriangleCounting (AnalyticTriangleCountingRequest) returns (AnalyticTriangleCountingReply) {}
-  rpc AnalyticJaccardSimilarity (AnalyticJaccardSimilarityRequest) returns (AnalyticJaccardSimilarityReply) {}
-  rpc AnalyticCosineSimilarity (AnalyticCosineSimilarityRequest) returns (AnalyticCosineSimilarityReply) {}
-  rpc AnalyticDegree (AnalyticDegreeRequest) returns (AnalyticDegreeReply) {}
-  rpc AnalyticLouvain (AnalyticLouvainRequest) returns (AnalyticLouvainReply) {}
-  rpc AnalyticSybilRank (AnalyticSybilRankRequest) returns (AnalyticSybilRankReply) {}
-  rpc LouvainStream (LouvainStreamRequest) returns ( stream LouvainStreamReply) {}
+    //算法
+    //15.标签传播算法
+    rpc AnalyticLPA (AnalyticLPARequest) returns (AnalyticLPAReply) {
+    }
+    //16.页面排名算法
+    rpc AnalyticPR (AnalyticPRRequest) returns (AnalyticPRReply) {
+    }
+    //17.聚类系数(集聚系数)
+    rpc AnalyticClusteringCoefficient (AnalyticClusteringCoefficientRequest) returns (AnalyticClusteringCoefficientReply) {
+    }
+    //18.三角计数
+    rpc AnalyticTriangleCounting (AnalyticTriangleCountingRequest) returns (AnalyticTriangleCountingReply) {
+    }
+    //19.jaccard 相似度
+    rpc AnalyticJaccardSimilarity (AnalyticJaccardSimilarityRequest) returns (AnalyticJaccardSimilarityReply) {
+    }
+    //20.余弦相似度
+    rpc AnalyticCosineSimilarity (AnalyticCosineSimilarityRequest) returns (AnalyticCosineSimilarityReply) {
+    }
+    //21.度计算
+    rpc AnalyticDegree (AnalyticDegreeRequest) returns (AnalyticDegreeReply) {
+    }
+    //22.鲁汶算法
+    rpc AnalyticLouvain (AnalyticLouvainRequest) returns (AnalyticLouvainReply) {
+    }
+    //23.sybil排名算法
+    rpc AnalyticSybilRank (AnalyticSybilRankRequest) returns (AnalyticSybilRankReply) {
+    }
+    //24.鲁汶算法(stream,可以返回全部结果)
+    rpc LouvainStream (LouvainStreamRequest) returns (stream LouvainStreamReply) {
+    }
+    //25.用户设置(用于存储用户配置信息,用户自主控制)
+    rpc UserSetting (UserSettingRequest) returns (UserSettingReply) {
+    }
+    //26.启动/查询 任务
+    rpc Task (TaskRequest) returns (TaskReply) {
+    }
+    //27.组网
+    rpc SubNet (SubNetRequest) returns (SubNetReply) {
+    }
 
-  rpc UserSetting (UserSettingRequest) returns (UserSettingReply) {}
+    //邦盛 POC 定制化需求 28,29
+    rpc FuzzySearchNode (FuzzySearchNodeRequest) returns (FuzzySearchNodeReply){}
+    rpc FuzzySearchPair (FuzzySearchPairRequest) returns(FuzzySearchPairReply){}
 
-  rpc Task (TaskRequest) returns (TaskReply){}
-
-  rpc SubNet (SubNetRequest)  returns (SubNetReply){}
 }
 
 /*------------------------1.SayHello------------------------------*/
 // The request message containing the user's name.
 message HelloUltipaRequest {
-  string name = 1;
+    string name = 1;
 }
 
 // The response message containing the greetings
 message HelloUltipaReply {
-  string message = 1;
+    string message = 1;
 }
 /*--------------------------SayHello----------------------------*/
 //p0
 /*------------------------2.SearchAB------------------------------*/
 message SearchABRequest {
-  enum SortType{
-    ASC = 0;
-    DESC = 1;
-  }
-  string source = 1;
-  string dest = 2;
-  int32 depth = 3;
-  int32 limit = 4;
-  bool pass_super_node = 5;
-  Filter node_filter = 6 ;
-  Filter edge_filter = 7;
-  bool by_short_search = 8;
-  bool by_weight_search = 9;
-  string weight_column_name = 10;
-  bool no_circle = 11;
-  repeated string select_columns = 12;
-  bool by_sort_search = 13;
-  string sort_column_name = 14;
-  SortType sort_type = 15;
-  string original_source = 16;
-  string original_dest = 17;
-  int32 edge_direction = 18;
+    enum SortType {
+        ASC = 0;
+        DESC = 1;
+    }
+    string source = 1;
+    string dest = 2;
+    int32 depth = 3;
+    int32 limit = 4;
+    bool pass_super_node = 5;
+    Filter node_filter = 6;
+    Filter edge_filter = 7;
+    bool by_short_search = 8;
+    bool by_weight_search = 9;
+    string weight_property_name = 10;
+    bool no_circle = 11;
+    repeated string select_node_properties = 12;
+    repeated string select_edge_properties = 13;
+    bool by_sort_search = 14;
+    string sort_property_name = 15;
+    SortType sort_type = 16;
+    string original_source = 17;
+    string original_dest = 18;
+    int32 edge_direction = 19;
 }
 
 // The response message containing the greetings
 message SearchABReply {
-  int32 total_time_cost = 1;
-  int32 engine_time_cost = 2;
-  repeated ABPath paths = 3;
+    int32 total_time_cost = 1;
+    int32 engine_time_cost = 2;
+    repeated Path paths = 3;
 }
-message ABPath {
-  repeated ABRow nodes = 1;
-  repeated ABRow edges = 2;
-}
-message ABRow {
-  repeated ABValues values = 1;
-}
-//
-message ABValues {
-  string key = 1;
-  string value = 2;
-}
+
 /*------------------------SearchAB------------------------------*/
 
 /*------------------------3.SearchKhop------------------------------*/
 message SearchKhopRequest {
-  string source = 1;
-  int32 depth = 2;
-  int32 limit = 3;
-  Filter node_filter = 4;
-  Filter edge_filter = 5;
-  repeated string select_columns = 6;
-  string original_source = 7;
+    string source = 1;
+    int32 depth = 2;
+    int32 limit = 3;
+    Filter node_filter = 4;
+    Filter edge_filter = 5;
+    string original_source = 6;
+    repeated string select_node_properties = 7;
 }
 
 // The response message containing the greetings
 message SearchKhopReply {
-  int32 total_time_cost = 1;
-  int32 engine_time_cost = 2;
-  int32 total_number = 3;
-  repeated KhopRow nodes = 4;
-}
-
-message KhopRow {
-  repeated KhopValues values = 1;
-}
-//
-message KhopValues {
-  string key = 1;
-  string value = 2;
+    int32 total_time_cost = 1;
+    int32 engine_time_cost = 2;
+    int32 total_number = 3;
+    repeated Node nodes = 4;
 }
 /*------------------------SearchKhop------------------------------*/
 
-
 /*------------------------4.CreateIndex------------------------------*/
 message CreateIndexRequest {
-  enum DBType{
-    DBNODE = 0;
-    DBEDGE = 1;
-  }
-  DBType type = 1;
-  string column_name = 2;
+    DBType type = 1;
+    string property_name = 2;
 }
 
 // The response message containing the greetings
 message CreateIndexReply {
-  enum STATUS{
-    OK = 0;
-    NOTFOUND = 1;
-    FAILED = 2;
-  }
-  STATUS status = 1;
-  int32 time_cost = 2;
+    Status status = 1;
+    int32 time_cost = 2;
 }
 /*------------------------CreateIndex------------------------------*/
 
 /*------------------------5.Modify------------------------------*/
 message ModifyRequest {
-  repeated ModifyNode nodes = 1;
-  repeated ModifyEdge edges = 2;
+    repeated Node nodes = 1;
+    repeated Edge edges = 2;
 }
 
 message ModifyReply {
-  enum STATUS{
-    OK = 0;
-    FAILED = 1;
-  }
-  STATUS status = 1;
-  int32 time_cost = 2;
-}
-
-message ModifyNode {
-  string id = 1;
-  repeated ModifyValues values = 2;
-}
-message ModifyEdge {
-  string id                 = 1;
-  string from_id            = 2;
-  string to_id              = 3;
-  repeated ModifyValues values  = 4;
-}
-//
-message ModifyValues {
-  string key = 1;
-  string value = 2;
+    Status status = 1;
+    int32 time_cost = 2;
 }
 /*------------------------Modify------------------------------*/
-
 
 //p1
 /*------------------------6.SearchNodes------------------------------*/
 message SearchNodesRequest {
-  string begin_id = 1;
-  int32 limit  = 2;
-  Filter node_filter = 3;
-  repeated string select_columns = 4;
+    string begin_id = 1;
+    int32 limit = 2;
+    Filter node_filter = 3;
+    repeated string select_properties = 4;
 }
 
 message SearchNodesReply {
-  int32 time_cost = 1;
-  repeated SearchNode nodes = 2;
-  int32 total_counts = 3;
-}
-
-message SearchNode {
-  string _id = 1;
-  repeated SearchNodeValues values = 2;
-}
-
-message SearchNodeValues {
-  string key = 1;
-  string value = 2;
+    int32 time_cost = 1;
+    repeated Node nodes = 2;
+    int32 total_counts = 3;
 }
 /*------------------------SearchNodes------------------------------*/
 
 //p1
 /*------------------------7.SearchEdges------------------------------*/
 message SearchEdgesRequest {
-  string begin_id = 1;
-  int32 limit  = 2;
-  Filter edge_filter = 3;
-  repeated string select_columns = 4;
+    string begin_id = 1;
+    int32 limit = 2;
+    Filter edge_filter = 3;
+    repeated string select_properties = 4;
 }
 
 message SearchEdgesReply {
-  int32 time_cost = 1;
-  repeated SearchEdge edges = 2;
-  int32 total_counts = 3;
-}
-
-message SearchEdge {
-  string _id = 1;
-  string _from_id            = 2;
-  string _to_id              = 3;
-  repeated SearchEdgeValues values = 4;
-}
-
-message SearchEdgeValues {
-  string key = 1;
-  string value = 2;
+    int32 time_cost = 1;
+    repeated Edge edges = 2;
+    int32 total_counts = 3;
 }
 /*------------------------SearchEdges------------------------------*/
 
-
 /*------------------------8.Delete------------------------------*/
 message DeleteRequest {
-  enum DBType{
-    DBNODE = 0;
-    DBEDGE = 1;
-  }
-  DBType type = 1;
-  repeated string delete_ids = 2;
+    DBType type = 1;
+    repeated string delete_ids = 2;
 }
 
 message DeleteReply {
-  enum STATUS{
-    OK = 0;
-    FAILED = 1;
-  }
-  STATUS status = 1;
-  int32 time_cost = 2;
+    Status status = 1;
+    int32 time_cost = 2;
 }
-
-//message DeleteIds {
-//  repeated string ids = 1;
-//}
 /*------------------------Delete------------------------------*/
 
 /*------------------------9.GetPropertyInfo---------------------*/
 message GetPropertyInfoRequest {
-  enum DBType{
-    DBNODE = 0;
-    DBEDGE = 1;
-  }
-  DBType type = 1;
+    DBType type = 1;
 }
 
 message GetPropertyInfoReply {
-  repeated GetPropertyInfoValues properties = 1;
+    repeated GetPropertyInfoValues properties = 1;
 }
 
 message GetPropertyInfoValues {
 
-  string column_name = 1;
-  UltipaColumnType column_type = 2;
-  bool is_index = 3;
+    string property_name = 1;
+    UltipaPropertyType property_type = 2;
+    bool is_index = 3;
 }
 /*------------------------GetPropertyInfo----------------------*/
 
 /*------------------------10.CreateProperty---------------------*/
 message CreatePropertyRequest {
-  enum DBType{
-    DBNODE = 0;
-    DBEDGE = 1;
-  }
-  DBType type = 1;
-  repeated CreatePropertyValues properties = 2;
+    DBType type = 1;
+    repeated CreatePropertyValues properties = 2;
 }
 
 message CreatePropertyReply {
-  bool status = 1;
+    Status status = 1;
 }
 message CreatePropertyValues {
-//  enum ColumnType{
-//    STRING = 0;
-//    INT = 1;
-//  }
-  string column_name = 1;
-  UltipaColumnType column_type = 2;
+    string property_name = 1;
+    UltipaPropertyType property_type = 2;
 }
 /*------------------------CreateProperty----------------------*/
 
 /*------------------------11.Insert------------------------------*/
 message InsertRequest {
-  repeated InsertNode nodes = 1;
-  repeated InsertEdge edges = 2;
+    repeated Node nodes = 1;
+    repeated Edge edges = 2;
 }
 
 message InsertReply {
-  enum STATUS{
-    OK = 0;
-    FAILED = 1;
-  }
-  STATUS status = 1;
-  int32 time_cost = 2;
-  repeated int32 ids = 3;
-}
-
-message InsertNode {
-  string id = 1;
-  repeated InsertValues values = 2;
-}
-message InsertEdge {
-  string id                 = 1;
-  string from_id            = 2;
-  string to_id              = 3;
-  repeated InsertValues values  = 4;
-}
-//
-message InsertValues {
-  string key = 1;
-  string value = 2;
+    Status status = 1;
+    int32 time_cost = 2;
+    repeated int32 ids = 3;
 }
 /*------------------------Insert------------------------------*/
 
 /*------------------------12.NodeSpread------------------------------*/
 message NodeSpreadRequest {
-  enum SPREAD_TYPE{
-    DFS = 0;
-    BFS = 1;
-  }
-  string source = 1;
-  int32 depth = 2;
-  int32 limit = 3;
-  bool pass_super_node = 4;
-  SPREAD_TYPE spread_type = 5;
-  Filter node_filter = 6;
-  Filter edge_filter = 7;
-  repeated string select_columns = 8;
+    enum SPREAD_TYPE {
+        DFS = 0;
+        BFS = 1;
+    }
+    string source = 1;
+    int32 depth = 2;
+    int32 limit = 3;
+    bool pass_super_node = 4;
+    SPREAD_TYPE spread_type = 5;
+    Filter node_filter = 6;
+    Filter edge_filter = 7;
+    repeated string select_node_properties = 8;
+    repeated string select_edge_properties = 9;
 }
 
 message NodeSpreadReply {
-  int32 total_time_cost = 1;
-  int32 engine_time_cost = 2;
-  repeated NodeSpreadPath paths = 3;
+    int32 total_time_cost = 1;
+    int32 engine_time_cost = 2;
+    repeated Path paths = 3;
 }
-message NodeSpreadPath {
-  repeated NodeSpreadRow nodes = 1;
-  repeated NodeSpreadRow edges = 2;
-}
-message NodeSpreadRow {
-  repeated NodeSpreadValues values = 1;
-}
-//
-message NodeSpreadValues {
-  string key = 1;
-  string value = 2;
-}
-
 /*------------------------NodeSpread------------------------------*/
 
-/*------------------------13.DeleteColumn--------------------------*/
-message DeleteColumnRequest {
-  enum DBType{
-    DBNODE = 0;
-    DBEDGE = 1;
-  }
-  DBType type = 1;
-  string column_name = 2;
+/*------------------------13.DeleteProperty--------------------------*/
+message DeletePropertyRequest {
+    DBType type = 1;
+    string property_name = 2;
 }
 
-message DeleteColumnReply {
-  enum STATUS{
-    OK = 0;
-    FAILED = 1;
-  }
-  STATUS status = 1;
-  int32 time_cost = 2;
+message DeletePropertyReply {
+    Status status = 1;
+    int32 time_cost = 2;
 }
 /*------------------------Delete------------------------------*/
 /*------------------------14.DbInfomation------------------------------*/
@@ -398,77 +316,57 @@ message DbInformationRequest {
 }
 
 message DbInformationReply {
-  int32 total_nodes = 1;
-  int32 total_edges = 2;
-  int32 memory      = 3;
-  int32 disk        = 4;
-  int32 cpu         = 5;
-}
-/*------------------------DbInfomation------------------------------*/
-
-/*------------------------15.GetIndexColumn------------------------------*/
-message GetIndexColumnRequest {
-  enum DBType{
-    DBNODE = 0;
-    DBEDGE = 1;
-  }
-
-  DBType db_type = 1;
-}
-
-message GetIndexColumnReply {
-  repeated string column_names = 1;
+    int32 total_nodes = 1;
+    int32 total_edges = 2;
+    int32 memory = 3;
+    int32 disk = 4;
+    int32 cpu = 5;
 }
 /*------------------------DbInfomation------------------------------*/
 
 /*------------------------16.AnalyticLPA------------------------------*/
 message AnalyticLPARequest {
-  int32 loop_num = 1;
-  string node_column_name = 2;
-  bool save_to_db = 3;    //是否保存到数据库
+    int32 loop_num = 1;
+    string node_property_name = 2;
+    bool save_to_db = 3; //是否保存到数据库
 }
 
 message AnalyticLPAReply {
-//  repeated AnalyticLPAValue values = 1;
-  int32 engine_time_cost = 1;
-  int32 total_number = 2;
-  string result_path = 3;
+    //  repeated AnalyticLPAValue values = 1;
+    int32 engine_time_cost = 1;
+    int32 total_number = 2;
+    string result_path = 3;
 }
-
 /*------------------------AnalyticLPA------------------------------*/
 
 /*------------------------17.AnalyticPR------------------------------*/
 message AnalyticPRRequest {
-  int32 loop_num = 1;
-  float page_rank_damping = 2;
-  int32 page_rank_default = 3;
-  bool save_to_db = 4;    //是否保存到数据库
+    int32 loop_num = 1;
+    float page_rank_damping = 2;
+    int32 page_rank_default = 3;
+    bool save_to_db = 4; //是否保存到数据库
 }
 
 message AnalyticPRReply {
-//  repeated AnalyticPRValue column_names = 1;
-  int32 engine_time_cost = 1;
-  int32 total_number = 2;
-  string result_path = 3;
+    int32 engine_time_cost = 1;
+    int32 total_number = 2;
+    string result_path = 3;
 }
-
 /*------------------------AnalyticPR------------------------------*/
 
 /*------------------------18.AnalyticClusteringCoefficient------------------------------*/
 //聚类系数(集聚系数)
 message AnalyticClusteringCoefficientRequest {
 
-  int32 node_id = 1;
-
+    int32 node_id = 1;
 }
 
 message AnalyticClusteringCoefficientReply {
 
-  int32 engine_time_cost = 1;
-  double result = 2;
+    int32 engine_time_cost = 1;
+    double result = 2;
 
 }
-
 /*------------------------AnalyticClusteringCoefficient------------------------------*/
 
 /*------------------------19.AnalyticTriangleCounting------------------------------*/
@@ -478,33 +376,29 @@ message AnalyticTriangleCountingRequest {
 }
 
 message AnalyticTriangleCountingReply {
-  //  repeated AnalyticPRValue column_names = 1;
-  int32 engine_time_cost = 1;
-  int32 triangle_count = 2;
+    int32 engine_time_cost = 1;
+    int32 triangle_count = 2;
 
 }
 /*------------------------AnalyticTriangleCounting------------------------------*/
-
 
 /*------------------------20.AnalyticJaccardSimilarity------------------------------*/
 //jaccard相似度计算
 message AnalyticJaccardSimilarityRequest {
 
-  int32 node_id1 = 1;
-  int32 node_id2 = 2;
-  //jaccard 如果>0 某一个点的top n最大jaccard值点
-  int32 top_n = 3;
+    int32 node_id1 = 1;
+    int32 node_id2 = 2;
+    //jaccard 如果>0 某一个点的top n最大jaccard值点
+    int32 top_n = 3;
 }
 
 message AnalyticJaccardSimilarityReply {
-  //  repeated AnalyticPRValue column_names = 1;
-  int32 engine_time_cost = 1;
-  repeated AnalyticJaccardValue Values = 3;
+    int32 engine_time_cost = 1;
+    repeated AnalyticJaccardValue Values = 3;
 }
 message AnalyticJaccardValue {
-  //  repeated AnalyticPRValue column_names = 1;
-  int32 id = 1;
-  float jaccard = 2;
+    int32 id = 1;
+    float jaccard = 2;
 }
 /*------------------------AnalyticJaccardSimilarity------------------------------*/
 
@@ -512,251 +406,315 @@ message AnalyticJaccardValue {
 //cosine相似度计算
 message AnalyticCosineSimilarityRequest {
 
-  int32 node_id1 = 1;
-  int32 node_id2 = 2;
-  //属性名
-  repeated string column_names = 4;
+    int32 node_id1 = 1;
+    int32 node_id2 = 2;
+    //属性名
+    repeated string property_names = 4;
 }
 
 message AnalyticCosineSimilarityReply {
 
-  int32 engine_time_cost = 1;
-  double cosine = 2;
+    int32 engine_time_cost = 1;
+    double cosine = 2;
 }
 /*------------------------AnalyticCosineSimilarity------------------------------*/
 
 /*------------------------22.AnalyticDegree------------------------------*/
 //节点度计算
 message AnalyticDegreeRequest {
-  enum CalculateType{
-    OUT_DEGREE = 0;
-    IN_DEGREE = 1;
-    CLOSENESS_CENTRALITY_DEGREE = 2; //计算某个节点的紧密中心度
-    OUT_CLOSENESS_CENTRALITY_DEGREE = 3;
-    IN_CLOSENESS_CENTRALITY_DEGREE = 4;
-    DEGREE_CENTRALITY_DEGREE = 5;  //度中心度
-    OUT_DEGREE_CENTRALITY_DEGREE = 6;
-    IN_DEGREE_CENTRALITY_DEGREE = 7;
-    GRAPH_CENTRALITY_DEGREE = 8; //图中心度
-  }
+    enum CalculateType {
+        OUT_DEGREE = 0;
+        IN_DEGREE = 1;
+        CLOSENESS_CENTRALITY_DEGREE = 2; //计算某个节点的紧密中心度
+        OUT_CLOSENESS_CENTRALITY_DEGREE = 3;
+        IN_CLOSENESS_CENTRALITY_DEGREE = 4;
+        DEGREE_CENTRALITY_DEGREE = 5; //度中心度
+        OUT_DEGREE_CENTRALITY_DEGREE = 6;
+        IN_DEGREE_CENTRALITY_DEGREE = 7;
+        GRAPH_CENTRALITY_DEGREE = 8; //图中心度
+    }
 
-  int32 node_id = 1;
-  CalculateType calculate_type = 2;
-  //度中心度计算,可以选择传入列属性
-  string edge_column_name = 3;
+    int32 node_id = 1;
+    CalculateType calculate_type = 2;
+    //度中心度计算,可以选择传入列属性
+    string edge_property_name = 3;
 }
 
 message AnalyticDegreeReply {
 
-  int32 engine_time_cost = 1;
-  double degree = 2;
+    int32 engine_time_cost = 1;
+    double degree = 2;
 }
 /*------------------------AnalyticCosineSimilarity------------------------------*/
 
 /*------------------------23.UserSetting------------------------------*/
 message UserSettingRequest {
-  enum OPTION{
-    OPT_GET = 0;
-    OPT_SET = 1;
-  }
+    enum OPTION {
+        OPT_GET = 0;
+        OPT_SET = 1;
+    }
 
-  string user_name = 1;
-  OPTION opt = 2;
-  string type = 3;
-  string data = 4;
+    string user_name = 1;
+    OPTION opt = 2;
+    string type = 3;
+    string data = 4;
 }
 
 message UserSettingReply {
-  string  data = 1;
+    string data = 1;
 }
 /*--------------------------UserSetting------------------------------*/
 
 /*------------------------23.AnalyticLouvain------------------------------*/
 //鲁汶算法 计算网络层次结构
 message AnalyticLouvainRequest {
-  string edge_column_name = 1;
-  double min_modularity_increase = 2;
-  int32 phase1_loop = 3;
-  bool save_to_db = 4;
+    string edge_property_name = 1;
+    double min_modularity_increase = 2;
+    int32 phase1_loop = 3;
+    bool save_to_db = 4;
 }
 
 message AnalyticLouvainReply {
-  int32 community_num = 1;
-  int32 engine_time_cost = 2;
-  double modularity = 3;
+    int32 community_num = 1;
+    int32 engine_time_cost = 2;
+    double modularity = 3;
 }
 /*--------------------------AnalyticLouvain------------------------------*/
 
 /*------------------------24.AnalyticSybilRank------------------------------*/
 //识别大型网络中虚假账户
 message AnalyticSybilRankRequest {
-  int32 loop_num = 1;
-  int32 sybil_num = 2;
-  bool save_to_db = 3;
+    int32 loop_num = 1;
+    int32 sybil_num = 2;
+    bool save_to_db = 3;
 }
 
 message AnalyticSybilRankReply {
-  int32 engine_time_cost = 1;
+    int32 engine_time_cost = 1;
 }
 /*--------------------------AnalyticSybilRank------------------------------*/
 
 /*------------------------25.AnalyticLouvainStream----------------------------*/
 //鲁汶算法 计算网络层次结构
 message LouvainStreamRequest {
-  string edge_column_name = 1;
-  double min_modularity_increase = 2;
-  int32 phase1_loop = 3;
-  int32 community_num = 4;
-  int32 node_num = 5;
-  int32 edge_num = 6;
+    string edge_property_name = 1;
+    double min_modularity_increase = 2;
+    int32 phase1_loop = 3;
+    int32 community_num = 4;
+    int32 node_num = 5;
+    int32 edge_num = 6;
 }
 
-message LouvainStreamReply{
-  enum RET_TYPE{
-    NODE = 0;
-    EDGE = 1;
-  }
+message LouvainStreamReply {
+    enum RET_TYPE {
+        NODE = 0;
+        EDGE = 1;
+    }
 
-  RET_TYPE ret_type = 1;
-  repeated LouvainStreamNode node = 2;
-  repeated LouvainStreamEdge edge = 3;
-  double modularity = 4;
-  int32 engine_time_cost = 5;
-  int32 total_time_cost = 6;
-  int32 total_community_num = 7;
-//  int32 from_id = 3;
-//  int32 to_id = 4;
+    RET_TYPE ret_type = 1;
+    repeated LouvainStreamNode node = 2;
+    repeated LouvainStreamEdge edge = 3;
+    double modularity = 4;
+    int32 engine_time_cost = 5;
+    int32 total_time_cost = 6;
+    int32 total_community_num = 7;
 }
-message LouvainStreamNode{
-  int32 community_id =1;
-  int32 node_id = 2;
+message LouvainStreamNode {
+    int32 community_id = 1;
+    int32 node_id = 2;
 }
 
-message LouvainStreamEdge{
-  int32 id =1;
-  int32 from_id = 2;
-  int32 to_id = 3;
+message LouvainStreamEdge {
+    int32 id = 1;
+    int32 from_id = 2;
+    int32 to_id = 3;
 }
 /*--------------------------AnalyticLouvainStream------------------------------*/
 
 /*------------------------26.Task----------------------------*/
 //任务管理, 启动,查询任务
 message TaskRequest {
-  enum TASK_OPTION{
-    OPT_SEARCH = 0;
-    OPT_START = 1;
-  }
-  enum TASK_TYPE{
-    TASK_TEST = 0;
-    TASK_LOUVAIN = 1;
-    TASK_PAGERANK = 2;
-  }
+    enum TASK_OPTION {
+        OPT_SEARCH = 0;
+        OPT_START = 1;
+    }
+    enum TASK_TYPE {
+        TASK_TEST = 0;
+        TASK_LOUVAIN = 1;
+        TASK_PAGERANK = 2;
+        TASK_CC = 3;
+        TASK_LPA = 4;
+    }
 
-  TASK_OPTION task_opt = 1;
-  TASK_TYPE task_type = 2;
+    TASK_OPTION task_opt = 1;
+    TASK_TYPE task_type = 2;
 }
 
-message TaskReply{
-  //status 启动成功返回true 其他情况返回false，查询不以此值作为参考
-  bool status = 1;
-  repeated Task tasks = 2;
+message TaskReply {
+    //status 启动成功返回true 其他情况返回false，查询不以此值作为参考
+    Status status = 1;
+    repeated Task tasks = 2;
 }
 
-message Task{
-  enum TASK_STATUS{
-    TASK_WAITTING = 0;
-    TASK_PROCESSING =1;
-    TASK_DONE = 2;
-    TASK_FAILED = 3;
-    TASK_UNKNOWN = 4;
-  };
-  string m_task_name = 1;
-  int32 m_task_id = 2;
-  int32 m_task_start_time = 3;
-  int32 m_task_end_time = 4;
-  int32 m_last_time = 5;
-  TASK_STATUS m_task_status = 6;
+message Task {
+    enum TASK_STATUS {
+        TASK_WAITTING = 0;
+        TASK_PROCESSING = 1;
+        TASK_DONE = 2;
+        TASK_FAILED = 3;
+        TASK_UNKNOWN = 4;
+    };
+    string m_task_name = 1;
+    uint32 m_task_id = 2;
+    uint32 m_task_start_time = 3;
+    uint32 m_task_end_time = 4;
+    uint32 m_last_time = 5;
+    TASK_STATUS m_task_status = 6;
 }
 /*--------------------------AnalyticLouvain------------------------------*/
 
 /*------------------------27.SubNet----------------------------*/
 //组网
 message SubNetRequest {
-  enum OPTION{
-    OPT_O_N = 0; // 1对多
-    OPT_M_N = 1; // 多对多
-    OPT_M_N2 = 2; // 多对多 ab路径
-    OPT_O_N2 = 3; // 1对多 ab路径
-  }
-  OPTION opt = 1;
-  repeated int32 src_nodes = 2;
-  repeated int32 dst_nodes = 3;
-  int32 depth = 4;
-  int32 limit = 5;
-  bool pass_super_node = 6;
-  bool no_circle = 7;
-  Filter node_filter = 8;
-  Filter edge_filter = 9;
-  repeated string select_columns = 12;
-  bool by_short_search = 13;
+    enum OPTION {
+        OPT_O_N = 0; // 1对多
+        OPT_M_N = 1; // 多对多
+        OPT_M_N2 = 2; // 多对多 ab路径
+        OPT_O_N2 = 3; // 1对多 ab路径
+    }
+    OPTION opt = 1;
+    repeated int32 src_nodes = 2;
+    repeated int32 dst_nodes = 3;
+    int32 depth = 4;
+    int32 limit = 5;
+    bool pass_super_node = 6;
+    bool no_circle = 7;
+    Filter node_filter = 8;
+    Filter edge_filter = 9;
+    bool by_short_search = 10;
+    repeated string select_node_properties = 11;
+    repeated string select_edge_properties = 12;
 }
 
-message SubNetReply{
-  int32 total_time_cost = 1;
-  int32 engine_time_cost = 2;
-  repeated SubNetPath paths = 3;
-}
-
-message SubNetPath {
-  repeated SubNetRow nodes = 1;
-  repeated SubNetRow edges = 2;
-}
-message SubNetRow {
-  repeated SubNetValues values = 1;
-}
-//
-message SubNetValues {
-  string key = 1;
-  string value = 2;
+message SubNetReply {
+    int32 total_time_cost = 1;
+    int32 engine_time_cost = 2;
+    repeated Path paths = 3;
 }
 /*--------------------------SubNet------------------------------*/
 
+/*------------------------28.FuzzySearchNode------------------------------*/
+message FuzzySearchNodeRequest {
+    string property_name = 1;
+    string property_value  = 2;
+    int32 repeated_count = 3;
+    int32 limit = 4;
+    string neigh_property_name = 5;
+    string neigh_property_value  = 6;
+    repeated string select_node_properties = 7;
+}
+
+message FuzzySearchNodeReply {
+    int32 time_cost = 1;
+    repeated FuzzySearchNodeResult result = 2;
+    int32 total_counts = 3;
+}
+
+message FuzzySearchNodeResult {
+    string id = 1;
+    repeated Value values = 2;
+    int32 count = 3;
+}
+
+/*------------------------FuzzySearchNode------------------------------*/
+
+/*------------------------29.FuzzySearchPair------------------------------*/
+message FuzzySearchPairRequest {
+    string property_name = 1;
+    repeated string property_value  = 2;
+    string apply_type = 3;
+    int32 limit = 4;
+    repeated string select_node_properties = 5;
+}
+
+message FuzzySearchPairReply {
+    int32 time_cost = 1;
+    repeated FuzzySearchPairResult result = 2;
+    int32 total_counts = 3;
+}
+
+message FuzzySearchPairResult {
+    string id_first = 1;
+    repeated Value first_values = 2;
+    string id_second = 3;
+    repeated Value second_values = 4;
+}
+
+/*------------------------FuzzySearchPair------------------------------*/
+
 /*------------------------public message-----------------------*/
 message Filter {
-  enum OPTION{
-    FILTER_OPT_AND = 0;
-    FILTER_OPT_OR = 1;
-  }
-  OPTION filter_option = 1;
-  repeated FilterValue values = 2;
- }
- message FilterValue {
-  string column_name =  1;
-  string left_value  =  2;
-  string right_value =  3;
+    enum OPTION {
+        FILTER_OPT_AND = 0;
+        FILTER_OPT_OR = 1;
+    }
+    OPTION filter_option = 1;
+    repeated FilterValue values = 2;
 }
 
-enum UltipaColumnType{
-  COLUMN_INT =  0;
-  COLUMN_STRING = 1;
-  COLUMN_FLOAT = 2;
-  COLUMN_TEXT = 3;
-  COLUMN_BOOLEAN = 4;
-  COLUMN_UNKNOWN = 5;
+message FilterValue {
+    string property_name = 1;
+    string left_value = 2;
+    string right_value = 3;
 }
 
-enum RpcStatus{
-  RPC_SUCCESS =  0;
-  RPC_FAILED = 1;
-  RPC_PARAM_ERROR = 2;
-  RPC_BASE_DB_ERROR = 3;
-  RPC_ENGINE_ERROR = 4;
-  RPC_SYSTEM_ERROR = 5;
+enum UltipaPropertyType {
+    PROPERTY_INT = 0;
+    PROPERTY_STRING = 1;
+    PROPERTY_FLOAT = 2;
+    PROPERTY_TEXT = 3;
+    PROPERTY_BOOLEAN = 4;
+    PROPERTY_UNKNOWN = 5;
 }
 
-message RpcResultStatus{
-  RpcStatus rpc_status = 1;
-  string msg = 2;
+enum ErrorCode {
+    SUCCESS = 0;
+    FAILED = 1;
+    PARAM_ERROR = 2;
+    BASE_DB_ERROR = 3;
+    ENGINE_ERROR = 4;
+    SYSTEM_ERROR = 5;
 }
 
+message Status {
+    ErrorCode error_code = 1;
+    string msg = 2;
+}
+
+enum DBType {
+    DBNODE = 0;
+    DBEDGE = 1;
+}
+
+message Path {
+    repeated Node nodes = 1;
+    repeated Edge edges = 2;
+}
+
+message Node {
+    string id = 1;
+    repeated Value values = 2;
+}
+
+message Edge {
+    string id = 1;
+    string from_id = 2;
+    string to_id = 3;
+    repeated Value values = 4;
+}
+
+message Value {
+    string key = 1;
+    string value = 2;
+}
 /*------------------------public message-----------------------*/

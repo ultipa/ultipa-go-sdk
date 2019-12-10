@@ -14,16 +14,17 @@ import (
 
 // SearchABRequest is the struct
 type spreadRequest struct {
-	Src     string
-	Limit   int32
-	Depth   int32
-	Selects []string
-	Type    string
-	Turbo   bool //BFS or DFS
+	Src                  string
+	Limit                int32
+	Depth                int32
+	Type                 string
+	Turbo                bool //BFS or DFS
+	SelectNodeProperties []string
+	SelectEdgeProperties []string
 }
 
 func NewSpreadRequest(src string) spreadRequest {
-	return spreadRequest{src, 3, 2, []string{"name"}, "BFS", false}
+	return spreadRequest{src, 3, 2, "BFS", false, []string{"name"}, []string{"name"}}
 }
 
 // SpreadResponse is the struct
@@ -40,17 +41,18 @@ func Spread(client ultipa.UltipaRpcsClient, request spreadRequest) SpreadRespons
 	defer cancel()
 
 	msg, err := client.NodeSpread(ctx, &ultipa.NodeSpreadRequest{
-		Source:        request.Src,
-		Limit:         request.Limit,
-		Depth:         request.Depth,
-		SelectColumns: request.Selects,
+		Source:               request.Src,
+		Limit:                request.Limit,
+		Depth:                request.Depth,
+		SelectNodeProperties: request.SelectNodeProperties,
+		SelectEdgeProperties: request.SelectEdgeProperties,
 	})
 
 	if err != nil {
-		log.Fatalf("ab search error %v", err)
+		log.Fatalf("spread search error %v", err)
 	}
 
-	paths := utils.FormatPathsFromSpread(msg.Paths)
+	paths := utils.FormatPaths(msg.Paths)
 
 	return SpreadResponse{
 		msg.TotalTimeCost,

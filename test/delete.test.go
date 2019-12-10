@@ -9,7 +9,7 @@ import (
 func main() {
 	fmt.Println("test delete sdk")
 
-	client, conn := sdk.Connect("root", "password", "poc02.ultipa.com:60062")
+	client, conn := sdk.Connect("root", "password", "poc02.ultipa.com:60064")
 
 	defer conn.Close()
 

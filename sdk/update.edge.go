@@ -18,18 +18,18 @@ func UpdateEdges(client ultipa.UltipaRpcsClient, edges []utils.Edge) updateEdgeR
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	newEdges := utils.ToRpcEdges(edges)
+	newEdges := utils.ToRPCEdges(edges)
 
-	var Edges []*ultipa.ModifyEdge
+	var Edges []*ultipa.Edge
 
 	for _, n := range newEdges {
-		var Edge ultipa.ModifyEdge
+		var Edge ultipa.Edge
 
 		Edge.Id = n.Id
 		Edge.FromId = n.FromId
 		Edge.ToId = n.ToId
 		for _, v := range n.Values {
-			var value ultipa.ModifyValues
+			var value ultipa.Value
 			value.Key = v.Key
 			value.Value = v.Value
 			Edge.Values = append(Edge.Values, &value)

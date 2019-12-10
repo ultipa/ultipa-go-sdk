@@ -88,7 +88,7 @@ func NewFilter(option string, conditions []filterCondition) ultipa.Filter {
 	}
 
 	for _, c := range conditions {
-		uConditions = append(uConditions, &ultipa.FilterValue{ColumnName: c.Key, LeftValue: c.Left, RightValue: c.Right})
+		uConditions = append(uConditions, &ultipa.FilterValue{PropertyName: c.Key, LeftValue: c.Left, RightValue: c.Right})
 	}
 
 	return ultipa.Filter{

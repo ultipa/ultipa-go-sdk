@@ -10,19 +10,19 @@ import (
 
 type CreateIndexResponse struct {
 	TimeCost int32
-	Status   ultipa.CreateIndexReply_STATUS
+	Status   *ultipa.Status
 }
 
 // DeleteNodes update node data to db
-func createIndex(client ultipa.UltipaRpcsClient, dbType ultipa.CreateIndexRequest_DBType, propertyName string) CreateIndexResponse {
+func createIndex(client ultipa.UltipaRpcsClient, dbType ultipa.DBType, propertyName string) CreateIndexResponse {
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Hour)
 
 	defer cancel()
 
 	msg, err := client.CreateIndex(ctx, &ultipa.CreateIndexRequest{
-		Type:       dbType,
-		ColumnName: propertyName,
+		Type:         dbType,
+		PropertyName: propertyName,
 	})
 
 	if err != nil {
@@ -37,10 +37,10 @@ func createIndex(client ultipa.UltipaRpcsClient, dbType ultipa.CreateIndexReques
 
 // CreateNodeIndex create index for node
 func CreateNodeIndex(client ultipa.UltipaRpcsClient, propertyName string) CreateIndexResponse {
-	return createIndex(client, ultipa.CreateIndexRequest_DBNODE, propertyName)
+	return createIndex(client, ultipa.DBType_DBNODE, propertyName)
 }
 
 // CreateEdgeIndex create index for Edge
 func CreateEdgeIndex(client ultipa.UltipaRpcsClient, propertyName string) CreateIndexResponse {
-	return createIndex(client, ultipa.CreateIndexRequest_DBEDGE, propertyName)
+	return createIndex(client, ultipa.DBType_DBEDGE, propertyName)
 }

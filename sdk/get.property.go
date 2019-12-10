@@ -10,10 +10,10 @@ import (
 
 type Property struct {
 	Name string
-	Type ultipa.UltipaColumnType
+	Type ultipa.UltipaPropertyType
 }
 
-func getPropertyInfo(client ultipa.UltipaRpcsClient, _type ultipa.GetPropertyInfoRequest_DBType) []Property {
+func getPropertyInfo(client ultipa.UltipaRpcsClient, _type ultipa.DBType) []Property {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 
 	defer cancel()
@@ -25,8 +25,8 @@ func getPropertyInfo(client ultipa.UltipaRpcsClient, _type ultipa.GetPropertyInf
 	var properties []Property
 	for _, v := range msg.Properties {
 		properties = append(properties, Property{
-			Name: v.ColumnName,
-			Type: v.ColumnType,
+			Name: v.PropertyName,
+			Type: v.PropertyType,
 		})
 	}
 
@@ -38,9 +38,9 @@ func getPropertyInfo(client ultipa.UltipaRpcsClient, _type ultipa.GetPropertyInf
 }
 
 func GetNodePropertyInfo(client ultipa.UltipaRpcsClient) []Property {
-	return getPropertyInfo(client, ultipa.GetPropertyInfoRequest_DBNODE)
+	return getPropertyInfo(client, ultipa.DBType_DBNODE)
 }
 
 func GetEdgePropertyInfo(client ultipa.UltipaRpcsClient) []Property {
-	return getPropertyInfo(client, ultipa.GetPropertyInfoRequest_DBEDGE)
+	return getPropertyInfo(client, ultipa.DBType_DBEDGE)
 }

@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	// "ultipa-go-sdk/pkg"
 	"ultipa-go-sdk/sdk"
+	"ultipa-go-sdk/utils"
 )
 
 // import "encoding/json"
@@ -11,7 +11,7 @@ import (
 // import ultipa "ultipa-go-sdk/rpc"
 
 func main() {
-	client, conn := sdk.Connect("root", "password", "poc02.ultipa.com:60062")
+	client, conn := sdk.Connect("root", "password", "poc02.ultipa.com:60064")
 
 	defer conn.Close()
 
@@ -27,10 +27,12 @@ func main() {
 	for i, path := range abMsg.Paths {
 		fmt.Printf("Path[%v] : ", i)
 		for i := 0; i < len(path.Nodes); i++ {
-			fmt.Printf("%v", path.Nodes[i]["name"])
+			node := *path.Nodes[i]
+			fmt.Printf("%v", node["name"])
 
 			if i < len(path.Nodes)-1 {
-				fmt.Printf(" - [%v] - ", path.Edges[i]["name"])
+				edge := *path.Edges[i]
+				fmt.Printf(" - [%v] - ", edge["name"])
 			}
 		}
 		fmt.Print("\n\n--------------------------------------\n\n")
@@ -38,71 +40,74 @@ func main() {
 
 	fmt.Printf("engine cost %v ms, total cost %v ms \n", abMsg.EngineCost, abMsg.TotalCost)
 
-	// fmt.Print("\n======================================\n")
+	fmt.Print("\n======================================\n")
 
-	// fmt.Print("\n=================Search Khop=====================\n\n")
+	fmt.Print("\n=================Search Khop=====================\n\n")
 
-	// khopReq := sdk.NewKhopRequest("123")
-	// khopMsg := sdk.SearchKhop(client, khopReq)
+	khopReq := sdk.NewKhopRequest("123")
+	khopMsg := sdk.SearchKhop(client, khopReq)
 
-	// for _, n := range khopMsg.Nodes {
-	// 	fmt.Printf(" [%v] ", n["name"])
-	// }
+	for _, n := range khopMsg.Nodes {
+		node := *n
+		fmt.Printf(" [%v] ", node["name"])
+	}
 
-	// fmt.Print("\n\n--------------------------------------\n\n")
-	// fmt.Printf("engine cost %v ms, total cost %v ms , total num : %v \n", khopMsg.EngineCost, khopMsg.TotalCost, khopMsg.Count)
+	fmt.Print("\n\n--------------------------------------\n\n")
+	fmt.Printf("engine cost %v ms, total cost %v ms , total num : %v ms\n ", khopMsg.EngineCost, khopMsg.TotalCost, khopMsg.Count)
 
-	// fmt.Print("\n=================Search Nodes=====================\n\n")
+	fmt.Print("\n=================Search Nodes=====================\n\n")
 
-	// nodeReq := sdk.NewSearchNodesRequest()
-	// // nodeReq.ID = "123"
+	nodeReq := sdk.NewSearchNodesRequest()
+	// nodeReq.ID = "123"
 
-	// filterConds := pkg.NewFilterCondition("age", ">", []string{"20"})
+	filterConds := utils.NewFilterCondition("age", ">", []string{"20"})
 
-	// // fmt.Printf("%v \n", filterConds)
+	fmt.Printf("%v \n", filterConds)
 
-	// filter := pkg.NewFilter("AND", filterConds)
+	filter := utils.NewFilter("AND", filterConds)
 
-	// nodeReq.NodeFilter = filter
+	nodeReq.NodeFilter = filter
 
-	// nodeReq.Select = []string{"name", "age"}
+	nodeReq.SelectNodeProperties = []string{"name", "age"}
 
-	// nodeReq.Limit = 100
+	nodeReq.Limit = 100
 
-	// nodeMsg := sdk.SearchNodes(client, nodeReq)
+	nodeMsg := sdk.SearchNodes(client, nodeReq)
 
-	// for _, v := range nodeMsg.Nodes {
-	// 	fmt.Printf(" [%v | %v]", v["name"], v["age"])
-	// }
+	for _, v := range nodeMsg.Nodes {
+		node := *v
+		fmt.Printf(" [%v | %v]", node["name"], node["age"])
+	}
 
-	// fmt.Print("\n\n--------------------------------------\n\n")
-	// fmt.Printf("total cost %v ms , total num : %v \n", nodeMsg.TotalCost, nodeMsg.Count)
+	fmt.Print("\n\n--------------------------------------\n\n")
+	fmt.Printf("total cost %v ms , total num : %v \n", nodeMsg.TotalCost, nodeMsg.Count)
 
-	// fmt.Print("\n=================Search Edges=====================\n\n")
+	fmt.Print("\n=================Search Edges=====================\n\n")
 
-	// edgeReq := sdk.NewSearchEdgesRequest()
-	// // edgeReq.ID = "123"
+	edgeReq := sdk.NewSearchEdgesRequest()
+	// edgeReq.ID = "123"
 
-	// filterConds := pkg.NewFilterCondition("name", "=", []string{"Like"})
+	filterConds = utils.NewFilterCondition("name", "=", []string{"Like"})
 
-	// // fmt.Printf("%v \n", filterConds)
+	fmt.Printf("%v \n", filterConds)
 
-	// filter := pkg.NewFilter("AND", filterConds)
+	filter = utils.NewFilter("AND", filterConds)
 
-	// edgeReq.EdgeFilter = filter
+	edgeReq.EdgeFilter = filter
 
-	// edgeReq.Select = []string{"name", "age"}
+	edgeReq.SelectEdgeProperties = []string{"name"}
 
-	// edgeReq.Limit = 100
+	edgeReq.Limit = 100
 
-	// edgeMsg := sdk.SearchEdges(client, edgeReq)
+	edgeMsg := sdk.SearchEdges(client, edgeReq)
 
-	// for _, v := range edgeMsg.Edges {
-	// 	fmt.Printf(" [ id: %v | type: %v] ", v["_id"], v["name"])
-	// }
+	for _, v := range edgeMsg.Edges {
+		edge := *v
+		fmt.Printf(" [ id: %v | type: %v] ", edge["_id"], edge["name"])
+	}
 
-	// fmt.Print("\n\n--------------------------------------\n\n")
-	// fmt.Printf("total cost %v ms , total num : %v \n", edgeMsg.TotalCost, edgeMsg.Count)
+	fmt.Print("\n\n--------------------------------------\n\n")
+	fmt.Printf("total cost %v ms , total num : %v \n", edgeMsg.TotalCost, edgeMsg.Count)
 
 	fmt.Print("\n=================Spread Node=====================\n\n")
 
@@ -114,10 +119,12 @@ func main() {
 	for i, path := range spreadMsg.Paths {
 		fmt.Printf("Path[%v] : ", i)
 		for i := 0; i < len(path.Nodes); i++ {
-			fmt.Printf("%v", path.Nodes[i]["name"])
+			node := *path.Nodes[i]
+			fmt.Printf("%v", node["name"])
 
 			if i < len(path.Nodes)-1 {
-				fmt.Printf(" - [%v] - ", path.Edges[i]["name"])
+				edge := *path.Edges[i]
+				fmt.Printf(" - [%v] - ", edge["name"])
 			}
 		}
 		fmt.Print("\n\n--------------------------------------\n\n")

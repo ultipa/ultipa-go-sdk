@@ -18,17 +18,18 @@ type SearchABRes struct {
 
 // SearchABRequest is the struct
 type SearchABRequest struct {
-	Src      string
-	Dest     string
-	Limit    int32
-	Depth    int32
-	shortest bool
-	Selects  []string
-	Turbo    bool
+	Src                  string
+	Dest                 string
+	Limit                int32
+	Depth                int32
+	shortest             bool
+	SelectNodeProperties []string
+	SelectEdgeProperties []string
+	Turbo                bool
 }
 
 func NewABRequest(src string, dest string) SearchABRequest {
-	return SearchABRequest{src, dest, 3, 2, false, []string{"name"}, false}
+	return SearchABRequest{src, dest, 3, 2, false, []string{"name"}, []string{"name"}, false}
 }
 
 // SearchABResponse is the struct
@@ -45,18 +46,19 @@ func SearchAB(client ultipa.UltipaRpcsClient, request SearchABRequest) SearchABR
 	defer cancel()
 
 	msg, err := client.SearchAB(ctx, &ultipa.SearchABRequest{
-		Source:        request.Src,
-		Dest:          request.Dest,
-		Limit:         request.Limit,
-		Depth:         request.Depth,
-		SelectColumns: request.Selects,
+		Source:               request.Src,
+		Dest:                 request.Dest,
+		Limit:                request.Limit,
+		Depth:                request.Depth,
+		SelectNodeProperties: request.SelectNodeProperties,
+		SelectEdgeProperties: request.SelectEdgeProperties,
 	})
 
 	if err != nil {
 		log.Fatalf("ab search error %v", err)
 	}
 
-	paths := utils.FormatPathsFromAB(msg.Paths)
+	paths := utils.FormatPaths(msg.Paths)
 
 	return SearchABResponse{
 		msg.TotalTimeCost,

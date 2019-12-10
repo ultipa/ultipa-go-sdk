@@ -16,16 +16,16 @@ import (
 // repeated string select_columns = 4;
 
 type searchEdgesRequest struct {
-	ID         string
-	EdgeFilter ultipa.Filter
-	Limit      int32
-	Select     []string
+	ID                   string
+	EdgeFilter           ultipa.Filter
+	Limit                int32
+	SelectEdgeProperties []string
 }
 
 type searchEdgesResponse struct {
 	TotalCost int32
 	Count     int32
-	Edges     []utils.Edge
+	Edges     []*utils.Edge
 }
 
 func NewSearchEdgesRequest() searchEdgesRequest {
@@ -38,10 +38,10 @@ func SearchEdges(client ultipa.UltipaRpcsClient, request searchEdgesRequest) sea
 	defer cancel()
 
 	msg, err := client.SearchEdges(ctx, &ultipa.SearchEdgesRequest{
-		BeginId:       request.ID,
-		Limit:         request.Limit,
-		EdgeFilter:    &request.EdgeFilter,
-		SelectColumns: request.Select,
+		BeginId:          request.ID,
+		Limit:            request.Limit,
+		EdgeFilter:       &request.EdgeFilter,
+		SelectProperties: request.SelectEdgeProperties,
 	})
 
 	if err != nil {
