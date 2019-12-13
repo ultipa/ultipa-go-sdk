@@ -8,7 +8,7 @@ import (
 	"ultipa-go-sdk/rpc"
 )
 
-type PropertyType ultipa.UltipaPropertyType
+type PropertyType = ultipa.UltipaPropertyType
 
 const (
 	PROPERTY_TYPE_INT     ultipa.UltipaPropertyType = ultipa.UltipaPropertyType_PROPERTY_INT
@@ -16,13 +16,9 @@ const (
 	PROPERTY_TYPE_UNKNOWN ultipa.UltipaPropertyType = ultipa.UltipaPropertyType_PROPERTY_UNKNOWN
 )
 
-// type PropertyType struct {
-// 	STRING ultipa.UltipaColumnType_COLUMN_STRING
-// 	INT ultipa.UltipaColumnType_COLUMN_INT
-// 	UNKNOWN ultipa.UltipaColumnType_COLUMN_UNKNOWN
-// }
+type CreatePropertyResponse = ultipa.CreatePropertyReply
 
-func createProperty(client ultipa.UltipaRpcsClient, dbType ultipa.DBType, propertyName string, propertyType ultipa.UltipaPropertyType) *ultipa.CreatePropertyReply {
+func createProperty(client ultipa.UltipaRpcsClient, dbType ultipa.DBType, propertyName string, propertyType PropertyType) *CreatePropertyResponse {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
@@ -44,10 +40,10 @@ func createProperty(client ultipa.UltipaRpcsClient, dbType ultipa.DBType, proper
 	return msg
 }
 
-func CreateNodeProperty(client ultipa.UltipaRpcsClient, propertyName string, propertyType ultipa.UltipaPropertyType) *ultipa.CreatePropertyReply {
+func CreateNodeProperty(client ultipa.UltipaRpcsClient, propertyName string, propertyType PropertyType) *CreatePropertyResponse {
 	return createProperty(client, ultipa.DBType_DBNODE, propertyName, propertyType)
 }
 
-func CreateEdgeProperty(client ultipa.UltipaRpcsClient, propertyName string, propertyType ultipa.UltipaPropertyType) *ultipa.CreatePropertyReply {
+func CreateEdgeProperty(client ultipa.UltipaRpcsClient, propertyName string, propertyType PropertyType) *CreatePropertyResponse {
 	return createProperty(client, ultipa.DBType_DBEDGE, propertyName, propertyType)
 }

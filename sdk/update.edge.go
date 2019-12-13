@@ -2,18 +2,15 @@ package sdk
 
 import (
 	"context"
-	"fmt"
+	// "fmt"
 	"log"
 	"time"
 	"ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/utils"
 )
 
-type updateEdgeReturns struct {
-}
-
 // UpdateEdges update Edge data to db
-func UpdateEdges(client ultipa.UltipaRpcsClient, edges []utils.Edge) updateEdgeReturns {
+func UpdateEdges(client ultipa.UltipaRpcsClient, edges []utils.Edge) (reply *ultipa.ModifyReply, err error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
@@ -47,7 +44,5 @@ func UpdateEdges(client ultipa.UltipaRpcsClient, edges []utils.Edge) updateEdgeR
 		log.Fatalf("update edge error %v", err)
 	}
 
-	fmt.Printf("%v", msg)
-
-	return updateEdgeReturns{}
+	return msg, err
 }

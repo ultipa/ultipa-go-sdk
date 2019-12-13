@@ -10,7 +10,7 @@ import (
 
 type Property struct {
 	Name string
-	Type ultipa.UltipaPropertyType
+	Type PropertyType
 }
 
 func getPropertyInfo(client ultipa.UltipaRpcsClient, _type ultipa.DBType) []Property {

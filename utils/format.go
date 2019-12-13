@@ -41,6 +41,7 @@ func FormatPaths(paths []*ultipa.Path) Paths {
 		for _, nv := range v.Nodes {
 			newNode := make(Node)
 			newPath.Nodes = append(newPath.Nodes, &newNode)
+			newNode["id"] = nv.Id
 			for _, nvv := range nv.Values {
 				newNode[nvv.Key] = nvv.Value
 			}
@@ -48,6 +49,9 @@ func FormatPaths(paths []*ultipa.Path) Paths {
 
 		for _, ev := range v.Edges {
 			newEdge := make(Edge)
+			newEdge["id"] = ev.Id
+			newEdge["from_id"] = ev.FromId
+			newEdge["to_id"] = ev.ToId
 			newPath.Edges = append(newPath.Edges, &newEdge)
 			for _, evv := range ev.Values {
 				newEdge[evv.Key] = evv.Value

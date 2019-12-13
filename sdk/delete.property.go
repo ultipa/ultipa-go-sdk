@@ -8,7 +8,9 @@ import (
 	"ultipa-go-sdk/rpc"
 )
 
-func deleteProperty(client ultipa.UltipaRpcsClient, _type ultipa.DBType, name string) *ultipa.DeletePropertyReply {
+type DeletePropertyResponse = ultipa.DeletePropertyReply
+
+func deleteProperty(client ultipa.UltipaRpcsClient, _type ultipa.DBType, name string) *DeletePropertyResponse {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
@@ -25,10 +27,10 @@ func deleteProperty(client ultipa.UltipaRpcsClient, _type ultipa.DBType, name st
 	return msg
 }
 
-func DeleteNodeProperty(client ultipa.UltipaRpcsClient, name string) *ultipa.DeletePropertyReply {
+func DeleteNodeProperty(client ultipa.UltipaRpcsClient, name string) *DeletePropertyResponse {
 	return deleteProperty(client, ultipa.DBType_DBNODE, name)
 }
 
-func DeleteEdgeProperty(client ultipa.UltipaRpcsClient, name string) *ultipa.DeletePropertyReply {
+func DeleteEdgeProperty(client ultipa.UltipaRpcsClient, name string) *DeletePropertyResponse {
 	return deleteProperty(client, ultipa.DBType_DBEDGE, name)
 }

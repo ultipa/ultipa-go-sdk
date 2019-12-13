@@ -21,10 +21,12 @@ type spreadRequest struct {
 	Turbo                bool //BFS or DFS
 	SelectNodeProperties []string
 	SelectEdgeProperties []string
+	NodeFilter           utils.Filter
+	EdgeFilter           utils.Filter
 }
 
 func NewSpreadRequest(src string) spreadRequest {
-	return spreadRequest{src, 3, 2, "BFS", false, []string{"name"}, []string{"name"}}
+	return spreadRequest{src, 3, 2, "BFS", false, []string{"name"}, []string{"name"}, utils.Filter{}, utils.Filter{}}
 }
 
 // SpreadResponse is the struct
@@ -46,6 +48,8 @@ func Spread(client ultipa.UltipaRpcsClient, request spreadRequest) SpreadRespons
 		Depth:                request.Depth,
 		SelectNodeProperties: request.SelectNodeProperties,
 		SelectEdgeProperties: request.SelectEdgeProperties,
+		NodeFilter:           &request.NodeFilter,
+		EdgeFilter:           &request.EdgeFilter,
 	})
 
 	if err != nil {

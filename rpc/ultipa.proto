@@ -533,6 +533,11 @@ message LouvainStreamEdge {
 
 /*------------------------26.Task----------------------------*/
 //任务管理, 启动,查询任务
+//params:
+//pr:loop_num page_rank_damping page_rank_default"
+//lpa: loop_num node_property_name;
+//louvain: edge_property_name min_modularity_increase phase1_loop;
+//khop depth;
 message TaskRequest {
     enum TASK_OPTION {
         OPT_SEARCH = 0;
@@ -544,10 +549,12 @@ message TaskRequest {
         TASK_PAGERANK = 2;
         TASK_CC = 3;
         TASK_LPA = 4;
+        TASK_KHOP = 5;
     }
 
     TASK_OPTION task_opt = 1;
     TASK_TYPE task_type = 2;
+    repeated Value params = 3;
 }
 
 message TaskReply {
@@ -564,12 +571,12 @@ message Task {
         TASK_FAILED = 3;
         TASK_UNKNOWN = 4;
     };
-    string m_task_name = 1;
-    uint32 m_task_id = 2;
-    uint32 m_task_start_time = 3;
-    uint32 m_task_end_time = 4;
-    uint32 m_last_time = 5;
-    TASK_STATUS m_task_status = 6;
+    string task_name = 1;
+    uint32 task_id = 2;
+    uint32 task_start_time = 3;
+    uint32 task_end_time = 4;
+    uint32 last_time = 5;
+    TASK_STATUS task_status = 6;
 }
 /*--------------------------AnalyticLouvain------------------------------*/
 

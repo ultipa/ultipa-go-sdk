@@ -22,14 +22,16 @@ type SearchABRequest struct {
 	Dest                 string
 	Limit                int32
 	Depth                int32
-	shortest             bool
+	Shortest             bool
 	SelectNodeProperties []string
 	SelectEdgeProperties []string
+	NodeFilter           utils.Filter
+	EdgeFilter           utils.Filter
 	Turbo                bool
 }
 
 func NewABRequest(src string, dest string) SearchABRequest {
-	return SearchABRequest{src, dest, 3, 2, false, []string{"name"}, []string{"name"}, false}
+	return SearchABRequest{src, dest, 5, 1, false, []string{"name"}, []string{"name"}, utils.Filter{}, utils.Filter{}, false}
 }
 
 // SearchABResponse is the struct
@@ -52,6 +54,10 @@ func SearchAB(client ultipa.UltipaRpcsClient, request SearchABRequest) SearchABR
 		Depth:                request.Depth,
 		SelectNodeProperties: request.SelectNodeProperties,
 		SelectEdgeProperties: request.SelectEdgeProperties,
+		NodeFilter:           &request.NodeFilter,
+		EdgeFilter:           &request.EdgeFilter,
+		ByShortSearch:        request.Shortest,
+		PassSuperNode:        request.Turbo,
 	})
 
 	if err != nil {

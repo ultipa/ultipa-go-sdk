@@ -22,7 +22,7 @@ type searchNodesRequest struct {
 	SelectNodeProperties []string
 }
 
-type searchNodesResponse struct {
+type SearchNodesResponse struct {
 	TotalCost int32
 	Count     int32
 	Nodes     []*utils.Node
@@ -32,7 +32,7 @@ func NewSearchNodesRequest() searchNodesRequest {
 	return searchNodesRequest{"", ultipa.Filter{}, 10, []string{"name"}}
 }
 
-func SearchNodes(client ultipa.UltipaRpcsClient, request searchNodesRequest) searchNodesResponse {
+func SearchNodes(client ultipa.UltipaRpcsClient, request searchNodesRequest) SearchNodesResponse {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
@@ -50,7 +50,7 @@ func SearchNodes(client ultipa.UltipaRpcsClient, request searchNodesRequest) sea
 	// paths := utils.FormatPaths(msg.Paths)
 	nodes := utils.FormatNodes(msg.Nodes)
 
-	return searchNodesResponse{
+	return SearchNodesResponse{
 		msg.TimeCost,
 		msg.TotalCounts,
 		nodes,

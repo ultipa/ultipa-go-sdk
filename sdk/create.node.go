@@ -24,28 +24,14 @@ import (
 //   repeated int32 ids = 3;
 // }
 
-// DeleteNodes update node data to db
+// CreateNodes creates node data to db
 func CreateNodes(client ultipa.UltipaRpcsClient, nodes []utils.Node) *ultipa.InsertReply {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 
 	defer cancel()
 
-	newNodes := utils.ToRPCNodes(nodes)
-
-	var Nodes []*ultipa.Node
-
-	for _, n := range newNodes {
-		var Node ultipa.Node
-
-		for _, v := range n.Values {
-			var value ultipa.Value
-			value.Key = v.Key
-			value.Value = v.Value
-			Node.Values = append(Node.Values, &value)
-		}
-		Nodes = append(Nodes, &Node)
-	}
+	Nodes := utils.ToRPCNodes(nodes)
 
 	msg, err := client.Insert(ctx, &ultipa.InsertRequest{
 		Nodes: Nodes,

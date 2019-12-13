@@ -2,8 +2,13 @@ package utils
 
 import (
 	// "google.golang.org/grpc"
-	// "fmt"
+	"encoding/json"
+	"fmt"
+	"reflect"
+	// "strings"
 	// "ultipa-go-sdk/pkg"
+	"github.com/robertkrimen/otto"
+
 	ultipa "ultipa-go-sdk/rpc"
 
 	"strconv"
@@ -23,20 +28,22 @@ import (
 //   string right_value =  3;
 // }
 
-type filterCondition struct {
+type FilterCondition struct {
 	Key   string
 	Left  string
 	Right string
 }
 
-type filter struct {
-	FilterOption string
-	Conditions   []filterCondition
-}
+type Filter = ultipa.Filter
 
-func NewFilterCondition(key string, operator string, value []string) []filterCondition {
-	var conditions []filterCondition
-	var condition filterCondition
+// type Filter struct {
+// 	FilterOption string
+// 	Conditions   []FilterCondition
+// }
+
+func NewFilterCondition(key string, operator string, value []string) []FilterCondition {
+	var conditions []FilterCondition
+	var condition FilterCondition
 	condition.Key = key
 	const MaxInt = int(^uint32(0) >> 1)
 
@@ -73,7 +80,7 @@ func NewFilterCondition(key string, operator string, value []string) []filterCon
 }
 
 // NewFilter return Filter for filter things, AND | OR,
-func NewFilter(option string, conditions []filterCondition) ultipa.Filter {
+func NewFilter(option string, conditions []FilterCondition) ultipa.Filter {
 
 	var uOption ultipa.Filter_OPTION
 	var uConditions []*ultipa.FilterValue
@@ -95,4 +102,60 @@ func NewFilter(option string, conditions []filterCondition) ultipa.Filter {
 		FilterOption: uOption,
 		Values:       uConditions,
 	}
+}
+
+// StringToFilters return filters from a string like {"name":"ultipa"}
+func StringToFilters(str string) []FilterCondition {
+
+	var filters []FilterCondition
+
+	if len(str) < 1 {
+		return filters
+	}
+
+	vm := otto.New()
+
+	value, _ := vm.Run("JSON.stringify(" + str + ")")
+	{
+		// value is an int64 with a value of 16
+		value, _ := value.ToString()
+		var dat map[string]interface{}
+		j := []byte(value)
+
+		json.Unmarshal(j, &dat)
+
+		fmt.Printf("%#v \n", dat)
+		for k, v := range dat {
+
+			arr := reflect.ValueOf(v)
+			values := []string{}
+			var filter []FilterCondition
+
+			if arr.Kind() == reflect.Array {
+				vArr := v.([]interface{})
+
+				for _, v2 := range vArr {
+					values = append(values, fmt.Sprint(v2))
+				}
+
+				filter = NewFilterCondition(k, "<>", values)
+			} else {
+
+				values = append(values, fmt.Sprint(v))
+				filter = NewFilterCondition(k, "=", values)
+
+			}
+
+			filters = append(filters, filter...)
+		}
+
+	}
+
+	fmt.Printf(" %v \n", filters)
+
+	return filters
+}
+
+func allTOString(item interface{}) {
+
 }
