@@ -38,7 +38,7 @@ func CreateNodes(client ultipa.UltipaRpcsClient, nodes []utils.Node) *ultipa.Ins
 	})
 
 	if err != nil {
-		log.Fatalf("[Error] create Node error: %v", err)
+		log.Printf("[Error] create Node error: %v", err)
 	}
 
 	return msg

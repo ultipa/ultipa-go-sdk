@@ -53,7 +53,7 @@ func Spread(client ultipa.UltipaRpcsClient, request spreadRequest) SpreadRespons
 	})
 
 	if err != nil {
-		log.Fatalf("spread search error %v", err)
+		log.Printf("spread search error %v", err)
 	}
 
 	paths := utils.FormatPaths(msg.Paths)

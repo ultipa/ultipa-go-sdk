@@ -38,7 +38,7 @@ func CreateEdges(client ultipa.UltipaRpcsClient, edges []utils.Edge) *ultipa.Ins
 	})
 
 	if err != nil {
-		log.Fatalf("[Error] create Edge error: %v", err)
+		log.Printf("[Error] create Edge error: %v", err)
 	}
 
 	return msg

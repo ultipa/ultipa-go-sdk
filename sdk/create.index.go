@@ -26,7 +26,7 @@ func createIndex(client ultipa.UltipaRpcsClient, dbType ultipa.DBType, propertyN
 	})
 
 	if err != nil {
-		log.Fatalf("[Error] delete node error: %v", err)
+		log.Printf("[Error] delete node error: %v", err)
 	}
 
 	return CreateIndexResponse{

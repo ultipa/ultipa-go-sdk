@@ -61,7 +61,7 @@ func SearchAB(client ultipa.UltipaRpcsClient, request SearchABRequest) SearchABR
 	})
 
 	if err != nil {
-		log.Fatalf("ab search error %v", err)
+		log.Printf("ab search error %v", err)
 	}
 
 	paths := utils.FormatPaths(msg.Paths)

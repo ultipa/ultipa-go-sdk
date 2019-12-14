@@ -46,7 +46,7 @@ func SearchKhop(client ultipa.UltipaRpcsClient, request khopRequest) KHopRespons
 	})
 
 	if err != nil {
-		log.Fatalf("khop search error %v", err)
+		log.Printf("khop search error %v", err)
 	}
 
 	var newNodes []*utils.Node

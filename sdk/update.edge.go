@@ -41,7 +41,7 @@ func UpdateEdges(client ultipa.UltipaRpcsClient, edges []utils.Edge) (reply *ult
 	})
 
 	if err != nil {
-		log.Fatalf("update edge error %v", err)
+		log.Printf("update edge error %v", err)
 	}
 
 	return msg, err

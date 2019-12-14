@@ -20,7 +20,7 @@ func Statistic(client ultipa.UltipaRpcsClient) *StatisticRes {
 	defer cancel()
 	msg, err := client.DbInformation(ctx, &ultipa.DbInformationRequest{})
 	if err != nil {
-		log.Fatalf("db info error %v", err)
+		log.Printf("db info error %v", err)
 	}
 
 	return &StatisticRes{

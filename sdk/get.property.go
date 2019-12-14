@@ -31,7 +31,7 @@ func getPropertyInfo(client ultipa.UltipaRpcsClient, _type ultipa.DBType) []Prop
 	}
 
 	if err != nil {
-		log.Fatalf("[Error] get property error: %v", err)
+		log.Printf("[Error] get property error: %v", err)
 	}
 
 	return properties

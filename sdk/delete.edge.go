@@ -26,7 +26,7 @@ func DeleteEdges(client ultipa.UltipaRpcsClient, ids []string) deleteEdgesRespon
 	})
 
 	if err != nil {
-		log.Fatalf("[Error] delete edge error: %v", err)
+		log.Printf("[Error] delete edge error: %v", err)
 	}
 
 	return deleteEdgesResponse{

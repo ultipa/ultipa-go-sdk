@@ -22,7 +22,7 @@ func Connect(username, password, host string) (_client Client, _conn *ClientConn
 	conn, err := grpc.Dial(host, opts...)
 
 	if err != nil {
-		log.Fatalf("fail to dial: %v", err)
+		log.Printf("fail to dial: %v", err)
 		return nil, nil, err
 	}
 

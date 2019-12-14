@@ -555,6 +555,7 @@ message TaskRequest {
     TASK_OPTION task_opt = 1;
     TASK_TYPE task_type = 2;
     repeated Value params = 3;
+    uint32 limit = 4;   //返回的任务数量
 }
 
 message TaskReply {

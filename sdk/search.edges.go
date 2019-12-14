@@ -45,7 +45,7 @@ func SearchEdges(client ultipa.UltipaRpcsClient, request searchEdgesRequest) sea
 	})
 
 	if err != nil {
-		log.Fatalf("ab search error %v", err)
+		log.Printf("ab search error %v", err)
 	}
 
 	// paths := utils.FormatPaths(msg.Paths)

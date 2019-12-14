@@ -21,7 +21,7 @@ func deleteProperty(client ultipa.UltipaRpcsClient, _type ultipa.DBType, name st
 	})
 
 	if err != nil {
-		log.Fatalf("[Error] delete property error: %v", err)
+		log.Printf("[Error] delete property error: %v", err)
 	}
 
 	return msg

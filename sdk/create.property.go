@@ -34,7 +34,7 @@ func createProperty(client ultipa.UltipaRpcsClient, dbType ultipa.DBType, proper
 	})
 
 	if err != nil {
-		log.Fatalf("[Error] create node property error: %v", err)
+		log.Printf("[Error] create node property error: %v", err)
 	}
 
 	return msg

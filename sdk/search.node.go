@@ -44,7 +44,7 @@ func SearchNodes(client ultipa.UltipaRpcsClient, request searchNodesRequest) Sea
 	})
 
 	if err != nil {
-		log.Fatalf("node search error %v", err)
+		log.Printf("node search error %v", err)
 	}
 
 	// paths := utils.FormatPaths(msg.Paths)

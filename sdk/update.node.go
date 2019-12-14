@@ -39,7 +39,7 @@ func UpdateNodes(client ultipa.UltipaRpcsClient, nodes []utils.Node) *ultipa.Mod
 	})
 
 	if err != nil {
-		log.Fatalf("update node error %v", err)
+		log.Printf("update node error %v", err)
 	}
 
 	fmt.Printf("%v", msg)

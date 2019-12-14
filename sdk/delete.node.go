@@ -26,7 +26,7 @@ func DeleteNodes(client ultipa.UltipaRpcsClient, ids []string) deleteNodesRespon
 	})
 
 	if err != nil {
-		log.Fatalf("[Error] delete node error: %v", err)
+		log.Printf("[Error] delete node error: %v", err)
 	}
 
 	return deleteNodesResponse{
