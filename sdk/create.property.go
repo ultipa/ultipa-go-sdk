@@ -11,9 +11,11 @@ import (
 type PropertyType = ultipa.UltipaPropertyType
 
 const (
-	PROPERTY_TYPE_INT     ultipa.UltipaPropertyType = ultipa.UltipaPropertyType_PROPERTY_INT
-	PROPERTY_TYPE_STRING  ultipa.UltipaPropertyType = ultipa.UltipaPropertyType_PROPERTY_STRING
-	PROPERTY_TYPE_UNKNOWN ultipa.UltipaPropertyType = ultipa.UltipaPropertyType_PROPERTY_UNKNOWN
+	PROPERTY_TYPE_INT     PropertyType = ultipa.UltipaPropertyType_PROPERTY_INT
+	PROPERTY_TYPE_STRING  PropertyType = ultipa.UltipaPropertyType_PROPERTY_STRING
+	PROPERTY_TYPE_TEXT    PropertyType = ultipa.UltipaPropertyType_PROPERTY_TEXT
+	PROPERTY_TYPE_BOOLEAN PropertyType = ultipa.UltipaPropertyType_PROPERTY_BOOLEAN
+	PROPERTY_TYPE_UNKNOWN PropertyType = ultipa.UltipaPropertyType_PROPERTY_UNKNOWN
 )
 
 type CreatePropertyResponse = ultipa.CreatePropertyReply

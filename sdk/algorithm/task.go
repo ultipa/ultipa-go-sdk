@@ -11,21 +11,27 @@ import (
 type TaskValues map[string]string
 
 // TaskType includes TaskLouvain, TaskCC, TaskLPA, TaskPageRank
-type TaskType = ultipa.TaskRequest_TASK_TYPE
+type TaskType = ultipa.TASK_TYPE
 
 type TaskReply = ultipa.TaskReply
 
 const (
 	// TaskLouvain runs louvain algorithm
-	TaskLouvain TaskType = ultipa.TaskRequest_TASK_LOUVAIN
+	TaskLouvain TaskType = ultipa.TASK_TYPE_TASK_LOUVAIN
 	// TaskCC runs Connected Component algorithm
-	TaskCC TaskType = ultipa.TaskRequest_TASK_CC
+	TaskCC TaskType = ultipa.TASK_TYPE_TASK_CC
 	// TaskLPA runs Label Propagation algorithm
-	TaskLPA TaskType = ultipa.TaskRequest_TASK_LPA
+	TaskLPA TaskType = ultipa.TASK_TYPE_TASK_LPA
 	// TaskPageRank runs Page rank algorithm
-	TaskPageRank TaskType = ultipa.TaskRequest_TASK_PAGERANK
+	TaskPageRank TaskType = ultipa.TASK_TYPE_TASK_PAGERANK
 	// TaskKHop runs KHop algorithm
-	TaskKHop TaskType = ultipa.TaskRequest_TASK_KHOP
+	TaskKHop TaskType = ultipa.TASK_TYPE_TASK_KHOP
+	// TaskTriangleCounting  runs	TaskTriangleCounting  algorithm
+	TaskTriangleCounting TaskType = ultipa.TASK_TYPE_TASK_TRIANGLE_COUNTING
+	// TaskFindNodeByNeigh runs TaskFindNodeByNeigh algorithm
+	TaskFindNodeByNeigh TaskType = ultipa.TASK_TYPE_TASK_BS_FIND_NODES_BY_NEIGHBOR
+	// TaskFindPairByThough runs TaskFindPairByThough algorithm
+	TaskFindPairByThough TaskType = ultipa.TASK_TYPE_TASK_BS_FIND_PAIR_BY_NEIGHBOR
 )
 
 //StartTask runs a user defined task by algorithm.[TaskName]
@@ -55,13 +61,14 @@ func StartTask(client ultipa.UltipaRpcsClient, taskName TaskType, params map[str
 }
 
 //GetTask run a query to get the tasks status
-func GetTask(client ultipa.UltipaRpcsClient) *ultipa.TaskReply {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+func GetTask(client ultipa.UltipaRpcsClient, limit uint32) *ultipa.TaskReply {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 
 	defer cancel()
 
 	msg, err := client.Task(ctx, &ultipa.TaskRequest{
 		TaskOpt: ultipa.TaskRequest_OPT_SEARCH,
+		Limit:   limit,
 	})
 
 	if err != nil {

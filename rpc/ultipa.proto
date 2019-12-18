@@ -89,9 +89,20 @@ service UltipaRpcs {
     }
 
     //邦盛 POC 定制化需求 28,29
-    rpc FuzzySearchNode (FuzzySearchNodeRequest) returns (FuzzySearchNodeReply){}
-    rpc FuzzySearchPair (FuzzySearchPairRequest) returns(FuzzySearchPairReply){}
-
+    rpc FuzzySearchNode (FuzzySearchNodeRequest) returns (FuzzySearchNodeReply) {
+    }
+    rpc FuzzySearchPair (FuzzySearchPairRequest) returns (FuzzySearchPairReply) {
+    }
+    //30.算法元数据查询
+    rpc AlgorithmMeta (AlgorithmMetaRequest) returns (AlgorithmMetaReply) {
+    }
+    //31.创建索引(持久化层)
+    rpc CreatePropertyIndex (CreatePropertyIndexRequest) returns (CreatePropertyIndexReply) {
+    }
+    //32.查询算法生成文件
+    rpc SearchFiles (SearchFilesRequest) returns (SearchFilesReply) {}
+    //33.下载算法生成文件
+    rpc DownloadFile(DownloadFileRequest) returns (stream DownloadFileReply) {}
 }
 
 /*------------------------1.SayHello------------------------------*/
@@ -534,51 +545,49 @@ message LouvainStreamEdge {
 /*------------------------26.Task----------------------------*/
 //任务管理, 启动,查询任务
 //params:
-//pr:loop_num page_rank_damping page_rank_default"
+//pr:loop_num page_rank_damping page_rank_default;
 //lpa: loop_num node_property_name;
 //louvain: edge_property_name min_modularity_increase phase1_loop;
-//khop depth;
+//khop: depth;
+//find_nodes_by_neighbor: node_property_name node_property_val node_property_neigh_name node_property_neigh_val node_repeated_count;
+//find_pair_by_neighbor: pair_property_name pair_property_val pair_apply_type pair_limit;
+
 message TaskRequest {
     enum TASK_OPTION {
         OPT_SEARCH = 0;
         OPT_START = 1;
     }
-    enum TASK_TYPE {
-        TASK_TEST = 0;
-        TASK_LOUVAIN = 1;
-        TASK_PAGERANK = 2;
-        TASK_CC = 3;
-        TASK_LPA = 4;
-        TASK_KHOP = 5;
-    }
 
     TASK_OPTION task_opt = 1;
     TASK_TYPE task_type = 2;
     repeated Value params = 3;
-    uint32 limit = 4;   //返回的任务数量
+    uint32 limit = 4; //返回的任务数量
 }
 
 message TaskReply {
     //status 启动成功返回true 其他情况返回false，查询不以此值作为参考
     Status status = 1;
-    repeated Task tasks = 2;
+    repeated string tasks = 2;
 }
 
-message Task {
-    enum TASK_STATUS {
-        TASK_WAITTING = 0;
-        TASK_PROCESSING = 1;
-        TASK_DONE = 2;
-        TASK_FAILED = 3;
-        TASK_UNKNOWN = 4;
-    };
-    string task_name = 1;
-    uint32 task_id = 2;
-    uint32 task_start_time = 3;
-    uint32 task_end_time = 4;
-    uint32 last_time = 5;
-    TASK_STATUS task_status = 6;
-}
+//message Task {
+////    enum TASK_STATUS {
+////        TASK_WAITTING = 0;
+////        TASK_PROCESSING = 1;
+////        TASK_DONE = 2;
+////        TASK_FAILED = 3;
+////        TASK_UNKNOWN = 4;
+////    };
+////    string task_name = 1;
+////    uint32 task_id = 2;
+////    uint32 task_start_time = 3;
+////    uint32 task_end_time = 4;
+////    uint32 last_time = 5;
+////    TASK_STATUS task_status = 6;
+//    int32 task_id = 1;
+//    TASK_TYPE task_type = 2;
+//    string task_meta = 3;
+//}
 /*--------------------------AnalyticLouvain------------------------------*/
 
 /*------------------------27.SubNet----------------------------*/
@@ -614,11 +623,11 @@ message SubNetReply {
 /*------------------------28.FuzzySearchNode------------------------------*/
 message FuzzySearchNodeRequest {
     string property_name = 1;
-    string property_value  = 2;
+    string property_value = 2;
     int32 repeated_count = 3;
     int32 limit = 4;
     string neigh_property_name = 5;
-    string neigh_property_value  = 6;
+    string neigh_property_value = 6;
     repeated string select_node_properties = 7;
 }
 
@@ -639,7 +648,7 @@ message FuzzySearchNodeResult {
 /*------------------------29.FuzzySearchPair------------------------------*/
 message FuzzySearchPairRequest {
     string property_name = 1;
-    repeated string property_value  = 2;
+    repeated string property_value = 2;
     string apply_type = 3;
     int32 limit = 4;
     repeated string select_node_properties = 5;
@@ -659,6 +668,59 @@ message FuzzySearchPairResult {
 }
 
 /*------------------------FuzzySearchPair------------------------------*/
+
+/*------------------------30.AlgorithmMeta------------------------------*/
+message AlgorithmMetaRequest {
+    string algorithm_name = 1;
+}
+
+message AlgorithmMetaReply {
+    string algorithm_meta = 1;
+}
+/*------------------------AlgorithmMeta------------------------------*/
+
+/*------------------------31.CreatePropertyIndex------------------------------*/
+message CreatePropertyIndexRequest {
+    string property_name = 1;
+}
+
+message CreatePropertyIndexReply {
+    Status status = 1;
+    int32 time_cost = 2;
+}
+/*------------------------CreatePropertyIndex------------------------------*/
+
+/*------------------------32.SearchFiles------------------------------*/
+//查询算法生成文件
+message SearchFilesRequest {
+
+}
+
+message SearchFilesReply {
+    repeated File files = 1;
+}
+
+message File {
+    string name = 1;
+    int64 size = 2;
+    uint32 last_write_time = 3;
+}
+
+/*------------------------SearchFiles------------------------------*/
+
+/*------------------------32.Download------------------------------*/
+//下载算法生成文件
+message DownloadFileRequest {
+    string file_path_name = 1;
+}
+
+message DownloadFileReply {
+    Status status = 1;
+    int32 total_size = 2;
+    bytes chunk = 3;
+}
+/*------------------------Download------------------------------*/
+
 
 /*------------------------public message-----------------------*/
 message Filter {
@@ -724,5 +786,17 @@ message Edge {
 message Value {
     string key = 1;
     string value = 2;
+}
+
+enum TASK_TYPE {
+    TASK_TEST = 0;
+    TASK_LOUVAIN = 1;
+    TASK_PAGERANK = 2;
+    TASK_CC = 3;
+    TASK_LPA = 4;
+    TASK_KHOP = 5;
+    TASK_TRIANGLE_COUNTING = 6;
+    TASK_BS_FIND_NODES_BY_NEIGHBOR = 7;
+    TASK_BS_FIND_PAIR_BY_NEIGHBOR = 8;
 }
 /*------------------------public message-----------------------*/
