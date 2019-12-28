@@ -103,6 +103,8 @@ service UltipaRpcs {
     rpc SearchFiles (SearchFilesRequest) returns (SearchFilesReply) {}
     //33.下载算法生成文件
     rpc DownloadFile(DownloadFileRequest) returns (stream DownloadFileReply) {}
+    //34.导出点,边数据
+    rpc Export(ExportRequest) returns (stream ExportReply) {}
 }
 
 /*------------------------1.SayHello------------------------------*/
@@ -550,7 +552,7 @@ message LouvainStreamEdge {
 //louvain: edge_property_name min_modularity_increase phase1_loop;
 //khop: depth;
 //find_nodes_by_neighbor: node_property_name node_property_val node_property_neigh_name node_property_neigh_val node_repeated_count;
-//find_pair_by_neighbor: pair_property_name pair_property_val pair_apply_type pair_limit;
+//find_pair_by_neighbor: pair_property_name pair_property_val pair_apply_type;
 
 message TaskRequest {
     enum TASK_OPTION {
@@ -721,6 +723,20 @@ message DownloadFileReply {
 }
 /*------------------------Download------------------------------*/
 
+/*------------------------33.Export------------------------------*/
+//导出数据
+//limit <= 0 全量导出
+message ExportRequest {
+    DBType db_type = 1;
+    int32 limit = 2;
+    repeated string select_properties = 3;
+}
+
+message ExportReply {
+    repeated Node nodes = 2;
+    repeated Edge edges = 3;
+}
+/*------------------------33.Export------------------------------*/
 
 /*------------------------public message-----------------------*/
 message Filter {
@@ -798,5 +814,14 @@ enum TASK_TYPE {
     TASK_TRIANGLE_COUNTING = 6;
     TASK_BS_FIND_NODES_BY_NEIGHBOR = 7;
     TASK_BS_FIND_PAIR_BY_NEIGHBOR = 8;
+}
+
+enum TASK_STATUS {
+    TASK_WAITTING = 0;
+    TASK_COMPUTING =1;
+    TASK_WRITEBACKING = 2;
+    TASK_DONE = 3;
+    TASK_FAILED = 4;
+    TASK_UNKNOWN = 5;
 }
 /*------------------------public message-----------------------*/
