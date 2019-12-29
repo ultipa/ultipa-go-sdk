@@ -124,7 +124,7 @@ func StringToFilters(str string) []FilterCondition {
 
 		json.Unmarshal(j, &dat)
 
-		fmt.Printf("%#v \n", dat)
+		// fmt.Printf("%#v \n", dat)
 		for k, v := range dat {
 
 			arr := reflect.ValueOf(v)
@@ -151,7 +151,7 @@ func StringToFilters(str string) []FilterCondition {
 
 	}
 
-	fmt.Printf(" %v \n", filters)
+	// fmt.Printf(" %v \n", filters)
 
 	return filters
 }

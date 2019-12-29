@@ -13,7 +13,7 @@ require (
 	github.com/ulule/deepcopier v0.0.0-20171107155558-ca99b135e50f // indirect
 	github.com/vbauerster/mpb v3.4.0+incompatible // indirect
 	github.com/vbauerster/mpb/v4 v4.11.2
-	golang.org/x/tools/gopls v0.2.1 // indirect
+	golang.org/x/tools/gopls v0.2.2 // indirect
 	google.golang.org/grpc v1.25.1
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 )

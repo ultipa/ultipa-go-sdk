@@ -6,14 +6,16 @@ package sdk
 import (
 	"context"
 	"fmt"
-	"github.com/cheggaaa/pb/v3"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
+
+	"github.com/cheggaaa/pb/v3"
+
 	// "strings"
 	"time"
-	"ultipa-go-sdk/rpc"
+	ultipa "ultipa-go-sdk/rpc"
 )
 
 func Download(client Client, path string, outPath string) {

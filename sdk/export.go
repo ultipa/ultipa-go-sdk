@@ -6,15 +6,18 @@ package sdk
 import (
 	"context"
 	"fmt"
-	"github.com/cheggaaa/pb/v3"
 	"io"
+
+	"github.com/cheggaaa/pb/v3"
+
 	// "io/ioutil"
 	"encoding/csv"
 	"log"
 	"os"
+
 	// "strings"
 	"time"
-	"ultipa-go-sdk/rpc"
+	ultipa "ultipa-go-sdk/rpc"
 	// "ultipa-go-sdk/utils"
 )
 
@@ -139,9 +142,7 @@ func exportData(client Client, propNames []string, outPath string, _type ultipa.
 
 }
 
-func Export(client Client, nodePropNames []string, edgePropNames []string, outPath string) {
-
-	// create wait
+func ExportNode(client Client, nodePropNames []string, outPath string) {
 
 	statistic := Statistic(client)
 
@@ -149,23 +150,42 @@ func Export(client Client, nodePropNames []string, edgePropNames []string, outPa
 
 	nodebar := pb.Full.Start(0)
 	nodebar.SetTotal(int64(statistic.NodeCount))
-	nodeProperties := GetNodePropertyInfo(client)
-	for _, p := range nodeProperties {
-		nodePropNames = append(nodePropNames, p.Name)
-	}
 
 	exportData(client, nodePropNames, outPath, ultipa.DBType_DBNODE, nodebar)
 	nodebar.SetCurrent(int64(statistic.NodeCount))
 	nodebar.Finish()
+}
+
+func ExportEdge(client Client, edgePropNames []string, outPath string) {
+
+	statistic := Statistic(client)
 
 	edgebar := pb.Full.Start(0)
 	edgebar.SetTotal(int64(statistic.EdgeCount))
+
+	exportData(client, edgePropNames, outPath, ultipa.DBType_DBEDGE, edgebar)
+	edgebar.SetCurrent(int64(statistic.EdgeCount))
+	edgebar.Finish()
+}
+
+func ExportAll(client Client, outPath string) {
+
+	nodePropNames := []string{}
+
+	nodeProperties := GetEdgePropertyInfo(client)
+	for _, p := range nodeProperties {
+		nodePropNames = append(nodePropNames, p.Name)
+	}
+
+	ExportEdge(client, nodePropNames, outPath)
+
+	edgePropNames := []string{}
+
 	edgeProperties := GetEdgePropertyInfo(client)
 	for _, p := range edgeProperties {
 		edgePropNames = append(edgePropNames, p.Name)
 	}
 
-	exportData(client, edgePropNames, outPath, ultipa.DBType_DBEDGE, edgebar)
-	edgebar.SetCurrent(int64(statistic.EdgeCount))
-	edgebar.Finish()
+	ExportEdge(client, edgePropNames, outPath)
+
 }

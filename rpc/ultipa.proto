@@ -100,11 +100,23 @@ service UltipaRpcs {
     rpc CreatePropertyIndex (CreatePropertyIndexRequest) returns (CreatePropertyIndexReply) {
     }
     //32.查询算法生成文件
-    rpc SearchFiles (SearchFilesRequest) returns (SearchFilesReply) {}
+    rpc SearchFiles (SearchFilesRequest) returns (SearchFilesReply) {
+    }
     //33.下载算法生成文件
-    rpc DownloadFile(DownloadFileRequest) returns (stream DownloadFileReply) {}
+    rpc DownloadFile (DownloadFileRequest) returns (stream DownloadFileReply) {
+    }
     //34.导出点,边数据
-    rpc Export(ExportRequest) returns (stream ExportReply) {}
+    rpc Export (ExportRequest) returns (stream ExportReply) {
+    }
+    //35.删除内存里的一列属性
+    rpc DeleteIndex (DeleteIndexRequest) returns (DeleteIndexReply) {
+    }
+    //36.环路模板匹配
+    rpc CircleTemplate (CircleTemplateRequest) returns (CircleTemplateReply) {
+    }
+    //37.khop模板匹配
+    rpc KhopTemplate (KhopTemplateRequest) returns (KhopTemplateReply) {
+    }
 }
 
 /*------------------------1.SayHello------------------------------*/
@@ -710,7 +722,7 @@ message File {
 
 /*------------------------SearchFiles------------------------------*/
 
-/*------------------------32.Download------------------------------*/
+/*------------------------33.Download------------------------------*/
 //下载算法生成文件
 message DownloadFileRequest {
     string file_path_name = 1;
@@ -723,7 +735,7 @@ message DownloadFileReply {
 }
 /*------------------------Download------------------------------*/
 
-/*------------------------33.Export------------------------------*/
+/*------------------------34.Export------------------------------*/
 //导出数据
 //limit <= 0 全量导出
 message ExportRequest {
@@ -733,10 +745,55 @@ message ExportRequest {
 }
 
 message ExportReply {
-    repeated Node nodes = 2;
-    repeated Edge edges = 3;
+    repeated Node nodes = 1;
+    repeated Edge edges = 2;
 }
 /*------------------------33.Export------------------------------*/
+
+/*------------------------35.DeleteIndex------------------------------*/
+message DeleteIndexRequest {
+    DBType db_type = 1;
+    string property_name = 2;
+}
+
+message DeleteIndexReply {
+    Status status = 1;
+}
+/*------------------------35.DeleteIndex------------------------------*/
+
+/*------------------------36.CircleTemplate------------------------------*/
+message CircleTemplateRequest {
+    int32 limit = 1;
+    Filter filter = 2;
+    repeated string select_node_properties = 3;
+    repeated string select_edge_properties = 4;
+}
+
+message CircleTemplateReply {
+    Status status = 1;
+    int32 total_time_cost = 2;
+    int32 engine_time_cost = 3;
+    repeated Path paths = 4;
+}
+/*------------------------36.CircleTemplate------------------------------*/
+
+/*------------------------37.khopemplate------------------------------*/
+message KhopTemplateRequest {
+    string source = 1;
+    int32 limit = 2;
+    string original_source = 3;
+    Filter filter_template = 4;
+    repeated string select_node_properties = 5;
+}
+
+message KhopTemplateReply {
+    Status status = 1;
+    int32 total_time_cost = 2;
+    int32 engine_time_cost = 3;
+    int32 total_number = 4;
+    repeated Node nodes = 5;
+}
+/*------------------------37.khopemplate------------------------------*/
 
 /*------------------------public message-----------------------*/
 message Filter {
@@ -818,7 +875,7 @@ enum TASK_TYPE {
 
 enum TASK_STATUS {
     TASK_WAITTING = 0;
-    TASK_COMPUTING =1;
+    TASK_COMPUTING = 1;
     TASK_WRITEBACKING = 2;
     TASK_DONE = 3;
     TASK_FAILED = 4;
