@@ -8,12 +8,6 @@ import (
 	ultipa "ultipa-go-sdk/rpc"
 )
 
-// Client keep the connection to ultipa db host
-type Client = ultipa.UltipaRpcsClient
-
-// ClientConn is the connection , you can close it
-type ClientConn = grpc.ClientConn
-
 // Connect a ultipa db host by hostname or ip
 func Connect(username, password, host string) (_client Client, _conn *ClientConn, _err error) {
 	// ultipa.SayHello()

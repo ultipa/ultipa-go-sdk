@@ -32,6 +32,7 @@ const (
 	TaskFindNodeByNeigh TaskType = ultipa.TASK_TYPE_TASK_BS_FIND_NODES_BY_NEIGHBOR
 	// TaskFindPairByThough runs TaskFindPairByThough algorithm
 	TaskFindPairByThough TaskType = ultipa.TASK_TYPE_TASK_BS_FIND_PAIR_BY_NEIGHBOR
+	TaskEmbedding        TaskType = ultipa.TASK_TYPE_TASK_GRAPH_EMBEDDING
 )
 
 //StartTask runs a user defined task by algorithm.[TaskName]

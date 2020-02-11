@@ -5,13 +5,8 @@ import (
 	// "fmt"
 	"log"
 	"time"
-	"ultipa-go-sdk/rpc"
+	ultipa "ultipa-go-sdk/rpc"
 )
-
-type Property struct {
-	Name string
-	Type PropertyType
-}
 
 func getPropertyInfo(client ultipa.UltipaRpcsClient, _type ultipa.DBType) []Property {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)

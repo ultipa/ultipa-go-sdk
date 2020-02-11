@@ -117,6 +117,15 @@ service UltipaRpcs {
     //37.khop模板匹配
     rpc KhopTemplate (KhopTemplateRequest) returns (KhopTemplateReply) {
     }
+//    //38.登陆
+//    rpc Login (LoginRequest) returns (LoginReply) {
+//    }
+    //39.用户管理
+    rpc Admin (AdminRequest) returns (AdminReply) {
+    }
+    //40.uql
+    rpc Uql (UqlRequest) returns (stream UqlReply) {
+    }
 }
 
 /*------------------------1.SayHello------------------------------*/
@@ -478,7 +487,6 @@ message UserSettingRequest {
         OPT_GET = 0;
         OPT_SET = 1;
     }
-
     string user_name = 1;
     OPTION opt = 2;
     string type = 3;
@@ -565,7 +573,26 @@ message LouvainStreamEdge {
 //khop: depth;
 //find_nodes_by_neighbor: node_property_name node_property_val node_property_neigh_name node_property_neigh_val node_repeated_count;
 //find_pair_by_neighbor: pair_property_name pair_property_val pair_apply_type;
+//graph embedding:
+/**
+ * ----------parameters for n2v walk----------
+ * walk_num : number of the walk for each node
+ * walk_length : step number for each walk
+ * p : Return parameter , p越大，往回走的概率越小，反之越高
+ * q : In-out papameter , 控制着游走是向外还是向内，若 [q>1] ，随机游走倾向于访问和当前点接近的顶点(偏向BFS)。若 [q<1] ，倾向于访问远离当前点的顶点(偏向DFS)
+ *
+ * ----------parameters for embedding---------
+ * context_size : window size for the word2vec
+ * dimension_word_vector : dimension of the embedded vector , 10~n100  (e.g : 100)
+ * learning_rate : for SGD in the word2vec, 0.025 recommended
+ * min_learning_rate : learning_rate * 0.0001 recommended;
+ * min_frequency : used to remove words that occur fewer than 'min_frequency' times in the training text , ps : 0 or 1 means no removing and 0 is recommended
+ * sample : -1 default,  ps : can be 0.001 in word2vec, the equation is (sqrt(x / 0.001) + 1) * (0.001 / x)
+ * resolution : resolution * vocab_size is the size of the unigramTable   (10 or 100 recommended)
+ * neg_number : number of words in negative sampling phrase
+ * iter_num : iteration number of the main loop in the word2vec
 
+ */
 message TaskRequest {
     enum TASK_OPTION {
         OPT_SEARCH = 0;
@@ -583,25 +610,6 @@ message TaskReply {
     Status status = 1;
     repeated string tasks = 2;
 }
-
-//message Task {
-////    enum TASK_STATUS {
-////        TASK_WAITTING = 0;
-////        TASK_PROCESSING = 1;
-////        TASK_DONE = 2;
-////        TASK_FAILED = 3;
-////        TASK_UNKNOWN = 4;
-////    };
-////    string task_name = 1;
-////    uint32 task_id = 2;
-////    uint32 task_start_time = 3;
-////    uint32 task_end_time = 4;
-////    uint32 last_time = 5;
-////    TASK_STATUS task_status = 6;
-//    int32 task_id = 1;
-//    TASK_TYPE task_type = 2;
-//    string task_meta = 3;
-//}
 /*--------------------------AnalyticLouvain------------------------------*/
 
 /*------------------------27.SubNet----------------------------*/
@@ -795,6 +803,70 @@ message KhopTemplateReply {
 }
 /*------------------------37.khopemplate------------------------------*/
 
+/*------------------------38.Login------------------------------*/
+//message LoginRequest {
+//    string user_name = 1;
+//    string password = 2;
+//}
+////返回密钥
+//message LoginReply {
+//    string crt = 1;
+//}
+/*------------------------38.Login------------------------------*/
+
+/*------------------------39.Admin------------------------------*/
+//用户管理
+message AdminRequest {
+    enum ADMIN_OPTION {
+        OPT_GET = 0;
+        OPT_UPDATE = 1;
+        OPT_DEL = 2;
+        OPT_ADD = 3;
+    }
+    ADMIN_OPTION opt = 1;
+    string user_name = 2;
+    string password = 3;
+}
+
+message AdminReply {
+    repeated string users =1;
+    Status status = 2;
+}
+/*------------------------39.Admin------------------------------*/
+
+/*------------------------40.Uql------------------------------*/
+//Uql
+message UqlRequest {
+    string uql = 1;
+}
+
+message UqlReply {
+    Status status = 1;
+    repeated Path paths = 2;
+    repeated NodeAlias nodes = 3;
+    repeated EdgeAlias edges = 4;
+    repeated AttrAlias attrs = 5;
+    int32 total_time_cost = 6;
+    int32 engine_time_cost = 7;
+}
+
+message EdgeAlias{
+    repeated Edge edges = 1;
+    string alias = 2;
+}
+
+message NodeAlias{
+    repeated Node nodes = 1;
+    string alias = 2;
+}
+//key = alias.name, value = ly
+message AttrAlias{
+    string alias = 1;
+   repeated string values = 2;
+}
+/*------------------------40.Uql------------------------------*/
+
+
 /*------------------------public message-----------------------*/
 message Filter {
     enum OPTION {
@@ -871,6 +943,7 @@ enum TASK_TYPE {
     TASK_TRIANGLE_COUNTING = 6;
     TASK_BS_FIND_NODES_BY_NEIGHBOR = 7;
     TASK_BS_FIND_PAIR_BY_NEIGHBOR = 8;
+    TASK_GRAPH_EMBEDDING = 9;
 }
 
 enum TASK_STATUS {

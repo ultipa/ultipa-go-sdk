@@ -131,11 +131,13 @@ func StringToFilters(str string) []FilterCondition {
 			values := []string{}
 			var filter []FilterCondition
 
-			if arr.Kind() == reflect.Array {
+			// fmt.Println(arr.Kind())
+			if arr.Kind() == reflect.Slice {
 				vArr := v.([]interface{})
 
 				for _, v2 := range vArr {
 					values = append(values, fmt.Sprint(v2))
+					// fmt.Println("values", values)
 				}
 
 				filter = NewFilterCondition(k, "<>", values)
