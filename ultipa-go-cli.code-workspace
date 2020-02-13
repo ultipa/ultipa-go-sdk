@@ -1,11 +1,14 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "/Users/zhangjiansong/work/ultipa-cli"
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "/Users/zhangjiansong/work/ultipa-cli"
+    },
+    {
+      "path": "/Users/zhangjiansong/work/ultipa-reset-root"
+    }
+  ],
+  "settings": {}
 }

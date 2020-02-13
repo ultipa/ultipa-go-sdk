@@ -2,8 +2,10 @@ package sdk
 
 import (
 	"context"
+	"errors"
 	"google.golang.org/grpc"
 	"log"
+	"strings"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
 )
@@ -38,6 +40,9 @@ func TestConnect(client Client) (bool, error) {
 	})
 
 	if err != nil {
+		if strings.Contains(err.Error(), "code = Unavailable") {
+			return false, errors.New("Unavailable")
+		}
 		return false, err
 	}
 	return true, nil
