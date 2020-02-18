@@ -63,6 +63,7 @@ func SetUser(client Client, username string, password string, hosts []string) (*
 	expire := (time.Now().UnixNano() + int64(time.Second*60*60*24*30)) / int64(time.Millisecond)
 
 	data, errj := json.Marshal(map[string]interface{}{
+		"username": username,
 		"password": base64.StdEncoding.EncodeToString(macPass),
 		"isAdmin":  false,
 		"hosts":    hosts,
