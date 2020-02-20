@@ -136,7 +136,8 @@ message HelloUltipaRequest {
 
 // The response message containing the greetings
 message HelloUltipaReply {
-    string message = 1;
+    Status status = 1;
+    string message = 2;
 }
 /*--------------------------SayHello----------------------------*/
 //p0
@@ -169,9 +170,10 @@ message SearchABRequest {
 
 // The response message containing the greetings
 message SearchABReply {
-    int32 total_time_cost = 1;
-    int32 engine_time_cost = 2;
-    repeated Path paths = 3;
+    Status status = 1;
+    int32 total_time_cost = 2;
+    int32 engine_time_cost = 3;
+    repeated Path paths = 4;
 }
 
 /*------------------------SearchAB------------------------------*/
@@ -189,10 +191,11 @@ message SearchKhopRequest {
 
 // The response message containing the greetings
 message SearchKhopReply {
-    int32 total_time_cost = 1;
-    int32 engine_time_cost = 2;
-    int32 total_number = 3;
-    repeated Node nodes = 4;
+    Status status = 1;
+    int32 total_time_cost = 2;
+    int32 engine_time_cost = 3;
+    int32 total_number = 4;
+    repeated Node nodes = 5;
 }
 /*------------------------SearchKhop------------------------------*/
 
@@ -231,9 +234,10 @@ message SearchNodesRequest {
 }
 
 message SearchNodesReply {
-    int32 time_cost = 1;
-    repeated Node nodes = 2;
-    int32 total_counts = 3;
+    Status status = 1;
+    int32 time_cost = 2;
+    repeated Node nodes = 3;
+    int32 total_counts = 4;
 }
 /*------------------------SearchNodes------------------------------*/
 
@@ -247,9 +251,10 @@ message SearchEdgesRequest {
 }
 
 message SearchEdgesReply {
-    int32 time_cost = 1;
-    repeated Edge edges = 2;
-    int32 total_counts = 3;
+    Status status = 1;
+    int32 time_cost = 2;
+    repeated Edge edges = 3;
+    int32 total_counts = 4;
 }
 /*------------------------SearchEdges------------------------------*/
 
@@ -271,7 +276,8 @@ message GetPropertyInfoRequest {
 }
 
 message GetPropertyInfoReply {
-    repeated GetPropertyInfoValues properties = 1;
+    Status status = 1;
+    repeated GetPropertyInfoValues properties = 2;
 }
 
 message GetPropertyInfoValues {
@@ -328,9 +334,10 @@ message NodeSpreadRequest {
 }
 
 message NodeSpreadReply {
-    int32 total_time_cost = 1;
-    int32 engine_time_cost = 2;
-    repeated Path paths = 3;
+    Status status = 1;
+    int32 total_time_cost = 2;
+    int32 engine_time_cost = 3;
+    repeated Path paths = 4;
 }
 /*------------------------NodeSpread------------------------------*/
 
@@ -350,11 +357,12 @@ message DbInformationRequest {
 }
 
 message DbInformationReply {
-    int32 total_nodes = 1;
-    int32 total_edges = 2;
-    int32 memory = 3;
-    int32 disk = 4;
-    int32 cpu = 5;
+    Status status = 1;
+    int32 total_nodes = 2;
+    int32 total_edges = 3;
+    int32 memory = 4;
+    int32 disk = 5;
+    int32 cpu = 6;
 }
 /*------------------------DbInfomation------------------------------*/
 
@@ -366,10 +374,10 @@ message AnalyticLPARequest {
 }
 
 message AnalyticLPAReply {
-    //  repeated AnalyticLPAValue values = 1;
-    int32 engine_time_cost = 1;
-    int32 total_number = 2;
-    string result_path = 3;
+    Status status = 1;
+    int32 engine_time_cost = 2;
+    int32 total_number = 3;
+    string result_path = 4;
 }
 /*------------------------AnalyticLPA------------------------------*/
 
@@ -382,23 +390,23 @@ message AnalyticPRRequest {
 }
 
 message AnalyticPRReply {
-    int32 engine_time_cost = 1;
-    int32 total_number = 2;
-    string result_path = 3;
+    Status status = 1;
+    int32 engine_time_cost = 2;
+    int32 total_number = 3;
+    string result_path = 4;
 }
 /*------------------------AnalyticPR------------------------------*/
 
 /*------------------------18.AnalyticClusteringCoefficient------------------------------*/
 //聚类系数(集聚系数)
 message AnalyticClusteringCoefficientRequest {
-
     int32 node_id = 1;
 }
 
 message AnalyticClusteringCoefficientReply {
-
-    int32 engine_time_cost = 1;
-    double result = 2;
+    Status status = 1;
+    int32 engine_time_cost = 2;
+    double result = 3;
 
 }
 /*------------------------AnalyticClusteringCoefficient------------------------------*/
@@ -410,8 +418,9 @@ message AnalyticTriangleCountingRequest {
 }
 
 message AnalyticTriangleCountingReply {
-    int32 engine_time_cost = 1;
-    int32 triangle_count = 2;
+    Status status = 1;
+    int32 engine_time_cost = 2;
+    int32 triangle_count = 3;
 
 }
 /*------------------------AnalyticTriangleCounting------------------------------*/
@@ -427,7 +436,8 @@ message AnalyticJaccardSimilarityRequest {
 }
 
 message AnalyticJaccardSimilarityReply {
-    int32 engine_time_cost = 1;
+    Status status = 1;
+    int32 engine_time_cost = 2;
     repeated AnalyticJaccardValue Values = 3;
 }
 message AnalyticJaccardValue {
@@ -447,9 +457,9 @@ message AnalyticCosineSimilarityRequest {
 }
 
 message AnalyticCosineSimilarityReply {
-
-    int32 engine_time_cost = 1;
-    double cosine = 2;
+    Status status = 1;
+    int32 engine_time_cost = 2;
+    double cosine = 3;
 }
 /*------------------------AnalyticCosineSimilarity------------------------------*/
 
@@ -475,9 +485,9 @@ message AnalyticDegreeRequest {
 }
 
 message AnalyticDegreeReply {
-
-    int32 engine_time_cost = 1;
-    double degree = 2;
+    Status status = 1;
+    int32 engine_time_cost = 2;
+    double degree = 3;
 }
 /*------------------------AnalyticCosineSimilarity------------------------------*/
 
@@ -494,7 +504,8 @@ message UserSettingRequest {
 }
 
 message UserSettingReply {
-    string data = 1;
+    Status status = 1;
+    string data = 2;
 }
 /*--------------------------UserSetting------------------------------*/
 
@@ -508,9 +519,10 @@ message AnalyticLouvainRequest {
 }
 
 message AnalyticLouvainReply {
-    int32 community_num = 1;
-    int32 engine_time_cost = 2;
-    double modularity = 3;
+    Status status = 1;
+    int32 community_num = 2;
+    int32 engine_time_cost = 3;
+    double modularity = 4;
 }
 /*--------------------------AnalyticLouvain------------------------------*/
 
@@ -523,7 +535,8 @@ message AnalyticSybilRankRequest {
 }
 
 message AnalyticSybilRankReply {
-    int32 engine_time_cost = 1;
+    Status status = 1;
+    int32 engine_time_cost = 2;
 }
 /*--------------------------AnalyticSybilRank------------------------------*/
 
@@ -544,13 +557,14 @@ message LouvainStreamReply {
         EDGE = 1;
     }
 
-    RET_TYPE ret_type = 1;
-    repeated LouvainStreamNode node = 2;
-    repeated LouvainStreamEdge edge = 3;
-    double modularity = 4;
-    int32 engine_time_cost = 5;
-    int32 total_time_cost = 6;
-    int32 total_community_num = 7;
+    Status status = 1;
+    RET_TYPE ret_type = 2;
+    repeated LouvainStreamNode node = 3;
+    repeated LouvainStreamEdge edge = 4;
+    double modularity = 5;
+    int32 engine_time_cost = 6;
+    int32 total_time_cost = 7;
+    int32 total_community_num = 8;
 }
 message LouvainStreamNode {
     int32 community_id = 1;
@@ -636,9 +650,10 @@ message SubNetRequest {
 }
 
 message SubNetReply {
-    int32 total_time_cost = 1;
-    int32 engine_time_cost = 2;
-    repeated Path paths = 3;
+    Status status = 1;
+    int32 total_time_cost = 2;
+    int32 engine_time_cost = 3;
+    repeated Path paths = 4;
 }
 /*--------------------------SubNet------------------------------*/
 
@@ -654,9 +669,10 @@ message FuzzySearchNodeRequest {
 }
 
 message FuzzySearchNodeReply {
-    int32 time_cost = 1;
-    repeated FuzzySearchNodeResult result = 2;
-    int32 total_counts = 3;
+    Status status = 1;
+    int32 time_cost = 2;
+    repeated FuzzySearchNodeResult result = 3;
+    int32 total_counts = 4;
 }
 
 message FuzzySearchNodeResult {
@@ -677,9 +693,10 @@ message FuzzySearchPairRequest {
 }
 
 message FuzzySearchPairReply {
-    int32 time_cost = 1;
-    repeated FuzzySearchPairResult result = 2;
-    int32 total_counts = 3;
+    Status status = 1;
+    int32 time_cost = 2;
+    repeated FuzzySearchPairResult result = 3;
+    int32 total_counts = 4;
 }
 
 message FuzzySearchPairResult {
@@ -697,7 +714,8 @@ message AlgorithmMetaRequest {
 }
 
 message AlgorithmMetaReply {
-    string algorithm_meta = 1;
+    Status status = 1;
+    string algorithm_meta = 2;
 }
 /*------------------------AlgorithmMeta------------------------------*/
 
@@ -719,7 +737,8 @@ message SearchFilesRequest {
 }
 
 message SearchFilesReply {
-    repeated File files = 1;
+    Status status = 1;
+    repeated File files = 2;
 }
 
 message File {
@@ -753,8 +772,9 @@ message ExportRequest {
 }
 
 message ExportReply {
-    repeated Node nodes = 1;
-    repeated Edge edges = 2;
+    Status status = 1;
+    repeated Node nodes = 2;
+    repeated Edge edges = 3;
 }
 /*------------------------33.Export------------------------------*/
 
@@ -829,8 +849,8 @@ message AdminRequest {
 }
 
 message AdminReply {
-    repeated string users =1;
-    Status status = 2;
+    Status status = 1;
+    repeated string users = 2;
 }
 /*------------------------39.Admin------------------------------*/
 
@@ -842,12 +862,13 @@ message UqlRequest {
 
 message UqlReply {
     Status status = 1;
-    repeated Path paths = 2;
-    repeated NodeAlias nodes = 3;
-    repeated EdgeAlias edges = 4;
-    repeated AttrAlias attrs = 5;
-    int32 total_time_cost = 6;
-    int32 engine_time_cost = 7;
+    int32 total_time_cost = 2;
+    int32 engine_time_cost = 3;
+    repeated Path paths = 4;
+    repeated NodeAlias nodes = 5;
+    repeated EdgeAlias edges = 6;
+    repeated AttrAlias attrs = 7;
+    repeated Table tables = 8;
 }
 
 message EdgeAlias{
@@ -863,6 +884,16 @@ message NodeAlias{
 message AttrAlias{
     string alias = 1;
    repeated string values = 2;
+}
+
+message Table{
+    string table_name = 1;
+    repeated string headers = 2;
+    repeated TableRow table_rows = 3;
+}
+
+message TableRow{
+    repeated string values = 1;
 }
 /*------------------------40.Uql------------------------------*/
 
@@ -899,11 +930,20 @@ enum ErrorCode {
     BASE_DB_ERROR = 3;
     ENGINE_ERROR = 4;
     SYSTEM_ERROR = 5;
+    RAFT_REDIRECT = 6;
+    RAFT_NO_LEADER = 7;
+    RAFT_LOG_ERROR = 8;
 }
 
 message Status {
     ErrorCode error_code = 1;
     string msg = 2;
+    ClusterInfo cluster_info = 3;
+}
+
+message ClusterInfo {
+    string redirect = 1;
+    string raft_peers = 2;
 }
 
 enum DBType {

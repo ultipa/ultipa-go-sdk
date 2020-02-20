@@ -33,3 +33,19 @@ const (
 	DBType_DBNODE DBType = ultipa.DBType_DBNODE
 	DBType_DBEDGE DBType = ultipa.DBType_DBEDGE
 )
+
+type Status struct {
+	ErrorCode ErrorCode
+	Msg       string
+}
+
+type ErrorCode = ultipa.ErrorCode
+
+const (
+	ErrorCodeSuccess ErrorCode = ultipa.ErrorCode_SUCCESS
+	ErrorCodeFailed  ErrorCode = ultipa.ErrorCode_FAILED
+	ErrorCodeSystem  ErrorCode = ultipa.ErrorCode_SYSTEM_ERROR
+	ErrorCodeParam   ErrorCode = ultipa.ErrorCode_PARAM_ERROR
+	ErrorCodeEngine  ErrorCode = ultipa.ErrorCode_ENGINE_ERROR
+	ErrorCodeBaseDB  ErrorCode = ultipa.ErrorCode_BASE_DB_ERROR
+)

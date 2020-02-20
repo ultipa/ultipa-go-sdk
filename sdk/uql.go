@@ -25,13 +25,21 @@ type EdgeGroup struct {
 	Alias string
 }
 
+type TableGroup struct {
+	TableName string
+	Headers   []string
+	Rows      [][]string
+}
+
 type UQLReply struct {
 	Paths      []*utils.Path
 	Nodes      []*NodeGroup
 	Edges      []*EdgeGroup
 	Attrs      []*AttrGroup
+	Tables     []*TableGroup
 	EngineCost int32
 	TotalCost  int32
+	Status     Status
 }
 
 func UQL(client ultipa.UltipaRpcsClient, uql string) UQLReply {
@@ -102,12 +110,32 @@ func UQL(client ultipa.UltipaRpcsClient, uql string) UQLReply {
 			res.Attrs = append(res.Attrs, &at)
 		}
 
+		for _, table := range c.Tables {
+			tb := TableGroup{
+				TableName: table.TableName,
+				Headers:   table.Headers,
+			}
+
+			for _, row := range table.TableRows {
+				tb.Rows = append(tb.Rows, row.Values)
+			}
+
+			res.Tables = append(res.Tables, &tb)
+		}
+
 		if res.EngineCost == 0 {
 			res.EngineCost = c.EngineTimeCost
 		}
 
 		if res.TotalCost == 0 {
 			res.TotalCost = c.TotalTimeCost
+		}
+
+		if c.Status != nil {
+			res.Status = Status{
+				ErrorCode: c.Status.ErrorCode,
+				Msg:       c.Status.Msg,
+			}
 		}
 
 	}

@@ -4,7 +4,9 @@ go 1.13
 
 require (
 	github.com/cheggaaa/pb/v3 v3.0.3
+	github.com/go-openapi/strfmt v0.19.4 // indirect
 	github.com/golang/protobuf v1.3.2
+	github.com/jedib0t/go-pretty v4.3.0+incompatible // indirect
 	github.com/kless/term v0.0.0-20161130133337-e551c64f56c0 // indirect
 	github.com/robertkrimen/otto v0.0.0-20180617131154-15f95af6e78d
 	github.com/sethgrid/curse v0.0.0-20181231162520-d4ee583ebf0f // indirect
