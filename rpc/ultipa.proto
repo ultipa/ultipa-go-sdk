@@ -7,270 +7,91 @@ service UltipaRpcs {
     // 1.Sends a greeting
     rpc SayHello (HelloUltipaRequest) returns (HelloUltipaReply) {
     }
-    //2.AB路径搜索
-    rpc SearchAB (SearchABRequest) returns (SearchABReply) {
+
+    //2.uql
+    rpc Uql (UqlRequest) returns (stream UqlReply) {
     }
-    //3.k层邻居搜索
-    rpc SearchKhop (SearchKhopRequest) returns (SearchKhopReply) {
-    }
-    //4.创建索引,行为:属性load到内存,参与搜索过程的计算.
-    rpc CreateIndex (CreateIndexRequest) returns (CreateIndexReply) {
-    }
-    //5.修改点或边
-    rpc Modify (ModifyRequest) returns (ModifyReply) {
-    }
-    //6.查找点
-    rpc SearchNodes (SearchNodesRequest) returns (SearchNodesReply) {
-    }
-    //7.查找边
-    rpc SearchEdges (SearchEdgesRequest) returns (SearchEdgesReply) {
-    }
-    //8.删除点或边
-    rpc Delete (DeleteRequest) returns (DeleteReply) {
-    }
-    //9.获取点或边的属性
+
+    //3.获取点或边的属性
     rpc GetPropertyInfo (GetPropertyInfoRequest) returns (GetPropertyInfoReply) {
     }
-    //10.创建一个属性
-    rpc CreateProperty (CreatePropertyRequest) returns (CreatePropertyReply) {
-    }
-    //11.插入点或边
-    rpc Insert (InsertRequest) returns (InsertReply) {
-    }
-    //12.点展开(点的一维邻居)
-    rpc NodeSpread (NodeSpreadRequest) returns (NodeSpreadReply) {
-    }
-    //13.删除属性
-    rpc DeleteProperty (DeletePropertyRequest) returns (DeletePropertyReply) {
-    }
-    //14.数据库信息
+
+    //4.数据库信息
     rpc DbInformation (DbInformationRequest) returns (DbInformationReply) {
     }
 
-    //算法
-    //15.标签传播算法
-    rpc AnalyticLPA (AnalyticLPARequest) returns (AnalyticLPAReply) {
-    }
-    //16.页面排名算法
-    rpc AnalyticPR (AnalyticPRRequest) returns (AnalyticPRReply) {
-    }
-    //17.聚类系数(集聚系数)
-    rpc AnalyticClusteringCoefficient (AnalyticClusteringCoefficientRequest) returns (AnalyticClusteringCoefficientReply) {
-    }
-    //18.三角计数
-    rpc AnalyticTriangleCounting (AnalyticTriangleCountingRequest) returns (AnalyticTriangleCountingReply) {
-    }
-    //19.jaccard 相似度
-    rpc AnalyticJaccardSimilarity (AnalyticJaccardSimilarityRequest) returns (AnalyticJaccardSimilarityReply) {
-    }
-    //20.余弦相似度
-    rpc AnalyticCosineSimilarity (AnalyticCosineSimilarityRequest) returns (AnalyticCosineSimilarityReply) {
-    }
-    //21.度计算
-    rpc AnalyticDegree (AnalyticDegreeRequest) returns (AnalyticDegreeReply) {
-    }
-    //22.鲁汶算法
-    rpc AnalyticLouvain (AnalyticLouvainRequest) returns (AnalyticLouvainReply) {
-    }
-    //23.sybil排名算法
-    rpc AnalyticSybilRank (AnalyticSybilRankRequest) returns (AnalyticSybilRankReply) {
-    }
-    //24.鲁汶算法(stream,可以返回全部结果)
+    //5.鲁汶算法(可视化)
     rpc LouvainStream (LouvainStreamRequest) returns (stream LouvainStreamReply) {
     }
-    //25.用户设置(用于存储用户配置信息,用户自主控制)
+
+    //6.用户设置(用于存储用户配置信息,用户自主控制)
     rpc UserSetting (UserSettingRequest) returns (UserSettingReply) {
     }
-    //26.启动/查询 任务
-    rpc Task (TaskRequest) returns (TaskReply) {
-    }
-    //27.组网
-    rpc SubNet (SubNetRequest) returns (SubNetReply) {
-    }
 
-    //邦盛 POC 定制化需求 28,29
-    rpc FuzzySearchNode (FuzzySearchNodeRequest) returns (FuzzySearchNodeReply) {
-    }
-    rpc FuzzySearchPair (FuzzySearchPairRequest) returns (FuzzySearchPairReply) {
-    }
-    //30.算法元数据查询
-    rpc AlgorithmMeta (AlgorithmMetaRequest) returns (AlgorithmMetaReply) {
-    }
-    //31.创建索引(持久化层)
-    rpc CreatePropertyIndex (CreatePropertyIndexRequest) returns (CreatePropertyIndexReply) {
-    }
-    //32.查询算法生成文件
-    rpc SearchFiles (SearchFilesRequest) returns (SearchFilesReply) {
-    }
-    //33.下载算法生成文件
+    //7.下载算法生成文件
     rpc DownloadFile (DownloadFileRequest) returns (stream DownloadFileReply) {
     }
-    //34.导出点,边数据
+    //8.导出点,边数据
     rpc Export (ExportRequest) returns (stream ExportReply) {
     }
-    //35.删除内存里的一列属性
-    rpc DeleteIndex (DeleteIndexRequest) returns (DeleteIndexReply) {
-    }
-    //36.环路模板匹配
-    rpc CircleTemplate (CircleTemplateRequest) returns (CircleTemplateReply) {
-    }
-    //37.khop模板匹配
-    rpc KhopTemplate (KhopTemplateRequest) returns (KhopTemplateReply) {
-    }
-//    //38.登陆
-//    rpc Login (LoginRequest) returns (LoginReply) {
-//    }
-    //39.用户管理
-    rpc Admin (AdminRequest) returns (AdminReply) {
-    }
-    //40.uql
-    rpc Uql (UqlRequest) returns (stream UqlReply) {
-    }
+
 }
 
 /*------------------------1.SayHello------------------------------*/
-// The request message containing the user's name.
 message HelloUltipaRequest {
     string name = 1;
 }
 
-// The response message containing the greetings
 message HelloUltipaReply {
     Status status = 1;
     string message = 2;
 }
 /*--------------------------SayHello----------------------------*/
-//p0
-/*------------------------2.SearchAB------------------------------*/
-message SearchABRequest {
-    enum SortType {
-        ASC = 0;
-        DESC = 1;
-    }
-    string source = 1;
-    string dest = 2;
-    int32 depth = 3;
-    int32 limit = 4;
-    bool pass_super_node = 5;
-    Filter node_filter = 6;
-    Filter edge_filter = 7;
-    bool by_short_search = 8;
-    bool by_weight_search = 9;
-    string weight_property_name = 10;
-    bool no_circle = 11;
-    repeated string select_node_properties = 12;
-    repeated string select_edge_properties = 13;
-    bool by_sort_search = 14;
-    string sort_property_name = 15;
-    SortType sort_type = 16;
-    string original_source = 17;
-    string original_dest = 18;
-    int32 edge_direction = 19;
+
+/*------------------------2.Uql------------------------------*/
+message UqlRequest {
+    string uql = 1;
 }
 
-// The response message containing the greetings
-message SearchABReply {
+message UqlReply {
     Status status = 1;
     int32 total_time_cost = 2;
     int32 engine_time_cost = 3;
     repeated Path paths = 4;
+    repeated NodeAlias nodes = 5;
+    repeated EdgeAlias edges = 6;
+    repeated AttrAlias attrs = 7;
+    repeated Table tables = 8;
+    repeated Value values = 9;
 }
 
-/*------------------------SearchAB------------------------------*/
-
-/*------------------------3.SearchKhop------------------------------*/
-message SearchKhopRequest {
-    string source = 1;
-    int32 depth = 2;
-    int32 limit = 3;
-    Filter node_filter = 4;
-    Filter edge_filter = 5;
-    string original_source = 6;
-    repeated string select_node_properties = 7;
+message EdgeAlias {
+    repeated Edge edges = 1;
+    string alias = 2;
 }
 
-// The response message containing the greetings
-message SearchKhopReply {
-    Status status = 1;
-    int32 total_time_cost = 2;
-    int32 engine_time_cost = 3;
-    int32 total_number = 4;
-    repeated Node nodes = 5;
-}
-/*------------------------SearchKhop------------------------------*/
-
-/*------------------------4.CreateIndex------------------------------*/
-message CreateIndexRequest {
-    DBType type = 1;
-    string property_name = 2;
-}
-
-// The response message containing the greetings
-message CreateIndexReply {
-    Status status = 1;
-    int32 time_cost = 2;
-}
-/*------------------------CreateIndex------------------------------*/
-
-/*------------------------5.Modify------------------------------*/
-message ModifyRequest {
+message NodeAlias {
     repeated Node nodes = 1;
-    repeated Edge edges = 2;
+    string alias = 2;
+}
+//key = alias.name, value = ly
+message AttrAlias {
+    string alias = 1;
+    repeated string values = 2;
 }
 
-message ModifyReply {
-    Status status = 1;
-    int32 time_cost = 2;
-}
-/*------------------------Modify------------------------------*/
-
-//p1
-/*------------------------6.SearchNodes------------------------------*/
-message SearchNodesRequest {
-    string begin_id = 1;
-    int32 limit = 2;
-    Filter node_filter = 3;
-    repeated string select_properties = 4;
+message Table {
+    string table_name = 1;
+    repeated string headers = 2;
+    repeated TableRow table_rows = 3;
 }
 
-message SearchNodesReply {
-    Status status = 1;
-    int32 time_cost = 2;
-    repeated Node nodes = 3;
-    int32 total_counts = 4;
+message TableRow {
+    repeated string values = 1;
 }
-/*------------------------SearchNodes------------------------------*/
+/*------------------------2.Uql------------------------------*/
 
-//p1
-/*------------------------7.SearchEdges------------------------------*/
-message SearchEdgesRequest {
-    string begin_id = 1;
-    int32 limit = 2;
-    Filter edge_filter = 3;
-    repeated string select_properties = 4;
-}
-
-message SearchEdgesReply {
-    Status status = 1;
-    int32 time_cost = 2;
-    repeated Edge edges = 3;
-    int32 total_counts = 4;
-}
-/*------------------------SearchEdges------------------------------*/
-
-/*------------------------8.Delete------------------------------*/
-message DeleteRequest {
-    DBType type = 1;
-    repeated string delete_ids = 2;
-}
-
-message DeleteReply {
-    Status status = 1;
-    int32 time_cost = 2;
-}
-/*------------------------Delete------------------------------*/
-
-/*------------------------9.GetPropertyInfo---------------------*/
+/*------------------------3.GetPropertyInfo---------------------*/
 message GetPropertyInfoRequest {
     DBType type = 1;
 }
@@ -284,75 +105,12 @@ message GetPropertyInfoValues {
 
     string property_name = 1;
     UltipaPropertyType property_type = 2;
-    bool is_index = 3;
+    bool is_lte = 3;
+    bool is_index = 4;
 }
 /*------------------------GetPropertyInfo----------------------*/
 
-/*------------------------10.CreateProperty---------------------*/
-message CreatePropertyRequest {
-    DBType type = 1;
-    repeated CreatePropertyValues properties = 2;
-}
-
-message CreatePropertyReply {
-    Status status = 1;
-}
-message CreatePropertyValues {
-    string property_name = 1;
-    UltipaPropertyType property_type = 2;
-}
-/*------------------------CreateProperty----------------------*/
-
-/*------------------------11.Insert------------------------------*/
-message InsertRequest {
-    repeated Node nodes = 1;
-    repeated Edge edges = 2;
-}
-
-message InsertReply {
-    Status status = 1;
-    int32 time_cost = 2;
-    repeated int32 ids = 3;
-}
-/*------------------------Insert------------------------------*/
-
-/*------------------------12.NodeSpread------------------------------*/
-message NodeSpreadRequest {
-    enum SPREAD_TYPE {
-        DFS = 0;
-        BFS = 1;
-    }
-    string source = 1;
-    int32 depth = 2;
-    int32 limit = 3;
-    bool pass_super_node = 4;
-    SPREAD_TYPE spread_type = 5;
-    Filter node_filter = 6;
-    Filter edge_filter = 7;
-    repeated string select_node_properties = 8;
-    repeated string select_edge_properties = 9;
-}
-
-message NodeSpreadReply {
-    Status status = 1;
-    int32 total_time_cost = 2;
-    int32 engine_time_cost = 3;
-    repeated Path paths = 4;
-}
-/*------------------------NodeSpread------------------------------*/
-
-/*------------------------13.DeleteProperty--------------------------*/
-message DeletePropertyRequest {
-    DBType type = 1;
-    string property_name = 2;
-}
-
-message DeletePropertyReply {
-    Status status = 1;
-    int32 time_cost = 2;
-}
-/*------------------------Delete------------------------------*/
-/*------------------------14.DbInfomation------------------------------*/
+/*------------------------4.DbInfomation------------------------------*/
 message DbInformationRequest {
 }
 
@@ -366,132 +124,7 @@ message DbInformationReply {
 }
 /*------------------------DbInfomation------------------------------*/
 
-/*------------------------16.AnalyticLPA------------------------------*/
-message AnalyticLPARequest {
-    int32 loop_num = 1;
-    string node_property_name = 2;
-    bool save_to_db = 3; //是否保存到数据库
-}
-
-message AnalyticLPAReply {
-    Status status = 1;
-    int32 engine_time_cost = 2;
-    int32 total_number = 3;
-    string result_path = 4;
-}
-/*------------------------AnalyticLPA------------------------------*/
-
-/*------------------------17.AnalyticPR------------------------------*/
-message AnalyticPRRequest {
-    int32 loop_num = 1;
-    float page_rank_damping = 2;
-    int32 page_rank_default = 3;
-    bool save_to_db = 4; //是否保存到数据库
-}
-
-message AnalyticPRReply {
-    Status status = 1;
-    int32 engine_time_cost = 2;
-    int32 total_number = 3;
-    string result_path = 4;
-}
-/*------------------------AnalyticPR------------------------------*/
-
-/*------------------------18.AnalyticClusteringCoefficient------------------------------*/
-//聚类系数(集聚系数)
-message AnalyticClusteringCoefficientRequest {
-    int32 node_id = 1;
-}
-
-message AnalyticClusteringCoefficientReply {
-    Status status = 1;
-    int32 engine_time_cost = 2;
-    double result = 3;
-
-}
-/*------------------------AnalyticClusteringCoefficient------------------------------*/
-
-/*------------------------19.AnalyticTriangleCounting------------------------------*/
-//三角计算
-message AnalyticTriangleCountingRequest {
-
-}
-
-message AnalyticTriangleCountingReply {
-    Status status = 1;
-    int32 engine_time_cost = 2;
-    int32 triangle_count = 3;
-
-}
-/*------------------------AnalyticTriangleCounting------------------------------*/
-
-/*------------------------20.AnalyticJaccardSimilarity------------------------------*/
-//jaccard相似度计算
-message AnalyticJaccardSimilarityRequest {
-
-    int32 node_id1 = 1;
-    int32 node_id2 = 2;
-    //jaccard 如果>0 某一个点的top n最大jaccard值点
-    int32 top_n = 3;
-}
-
-message AnalyticJaccardSimilarityReply {
-    Status status = 1;
-    int32 engine_time_cost = 2;
-    repeated AnalyticJaccardValue Values = 3;
-}
-message AnalyticJaccardValue {
-    int32 id = 1;
-    float jaccard = 2;
-}
-/*------------------------AnalyticJaccardSimilarity------------------------------*/
-
-/*------------------------21.AnalyticCosineSimilarity------------------------------*/
-//cosine相似度计算
-message AnalyticCosineSimilarityRequest {
-
-    int32 node_id1 = 1;
-    int32 node_id2 = 2;
-    //属性名
-    repeated string property_names = 4;
-}
-
-message AnalyticCosineSimilarityReply {
-    Status status = 1;
-    int32 engine_time_cost = 2;
-    double cosine = 3;
-}
-/*------------------------AnalyticCosineSimilarity------------------------------*/
-
-/*------------------------22.AnalyticDegree------------------------------*/
-//节点度计算
-message AnalyticDegreeRequest {
-    enum CalculateType {
-        OUT_DEGREE = 0;
-        IN_DEGREE = 1;
-        CLOSENESS_CENTRALITY_DEGREE = 2; //计算某个节点的紧密中心度
-        OUT_CLOSENESS_CENTRALITY_DEGREE = 3;
-        IN_CLOSENESS_CENTRALITY_DEGREE = 4;
-        DEGREE_CENTRALITY_DEGREE = 5; //度中心度
-        OUT_DEGREE_CENTRALITY_DEGREE = 6;
-        IN_DEGREE_CENTRALITY_DEGREE = 7;
-        GRAPH_CENTRALITY_DEGREE = 8; //图中心度
-    }
-
-    int32 node_id = 1;
-    CalculateType calculate_type = 2;
-    //度中心度计算,可以选择传入列属性
-    string edge_property_name = 3;
-}
-
-message AnalyticDegreeReply {
-    Status status = 1;
-    int32 engine_time_cost = 2;
-    double degree = 3;
-}
-/*------------------------AnalyticCosineSimilarity------------------------------*/
-
-/*------------------------23.UserSetting------------------------------*/
+/*------------------------5.UserSetting------------------------------*/
 message UserSettingRequest {
     enum OPTION {
         OPT_GET = 0;
@@ -509,38 +142,7 @@ message UserSettingReply {
 }
 /*--------------------------UserSetting------------------------------*/
 
-/*------------------------23.AnalyticLouvain------------------------------*/
-//鲁汶算法 计算网络层次结构
-message AnalyticLouvainRequest {
-    string edge_property_name = 1;
-    double min_modularity_increase = 2;
-    int32 phase1_loop = 3;
-    bool save_to_db = 4;
-}
-
-message AnalyticLouvainReply {
-    Status status = 1;
-    int32 community_num = 2;
-    int32 engine_time_cost = 3;
-    double modularity = 4;
-}
-/*--------------------------AnalyticLouvain------------------------------*/
-
-/*------------------------24.AnalyticSybilRank------------------------------*/
-//识别大型网络中虚假账户
-message AnalyticSybilRankRequest {
-    int32 loop_num = 1;
-    int32 sybil_num = 2;
-    bool save_to_db = 3;
-}
-
-message AnalyticSybilRankReply {
-    Status status = 1;
-    int32 engine_time_cost = 2;
-}
-/*--------------------------AnalyticSybilRank------------------------------*/
-
-/*------------------------25.AnalyticLouvainStream----------------------------*/
+/*------------------------6.AnalyticLouvainStream----------------------------*/
 //鲁汶算法 计算网络层次结构
 message LouvainStreamRequest {
     string edge_property_name = 1;
@@ -578,178 +180,7 @@ message LouvainStreamEdge {
 }
 /*--------------------------AnalyticLouvainStream------------------------------*/
 
-/*------------------------26.Task----------------------------*/
-//任务管理, 启动,查询任务
-//params:
-//pr:loop_num page_rank_damping page_rank_default;
-//lpa: loop_num node_property_name;
-//louvain: edge_property_name min_modularity_increase phase1_loop;
-//khop: depth;
-//find_nodes_by_neighbor: node_property_name node_property_val node_property_neigh_name node_property_neigh_val node_repeated_count;
-//find_pair_by_neighbor: pair_property_name pair_property_val pair_apply_type;
-//graph embedding:
-/**
- * ----------parameters for n2v walk----------
- * walk_num : number of the walk for each node
- * walk_length : step number for each walk
- * p : Return parameter , p越大，往回走的概率越小，反之越高
- * q : In-out papameter , 控制着游走是向外还是向内，若 [q>1] ，随机游走倾向于访问和当前点接近的顶点(偏向BFS)。若 [q<1] ，倾向于访问远离当前点的顶点(偏向DFS)
- *
- * ----------parameters for embedding---------
- * context_size : window size for the word2vec
- * dimension_word_vector : dimension of the embedded vector , 10~n100  (e.g : 100)
- * learning_rate : for SGD in the word2vec, 0.025 recommended
- * min_learning_rate : learning_rate * 0.0001 recommended;
- * min_frequency : used to remove words that occur fewer than 'min_frequency' times in the training text , ps : 0 or 1 means no removing and 0 is recommended
- * sample : -1 default,  ps : can be 0.001 in word2vec, the equation is (sqrt(x / 0.001) + 1) * (0.001 / x)
- * resolution : resolution * vocab_size is the size of the unigramTable   (10 or 100 recommended)
- * neg_number : number of words in negative sampling phrase
- * iter_num : iteration number of the main loop in the word2vec
-
- */
-message TaskRequest {
-    enum TASK_OPTION {
-        OPT_SEARCH = 0;
-        OPT_START = 1;
-    }
-
-    TASK_OPTION task_opt = 1;
-    TASK_TYPE task_type = 2;
-    repeated Value params = 3;
-    uint32 limit = 4; //返回的任务数量
-}
-
-message TaskReply {
-    //status 启动成功返回true 其他情况返回false，查询不以此值作为参考
-    Status status = 1;
-    repeated string tasks = 2;
-}
-/*--------------------------AnalyticLouvain------------------------------*/
-
-/*------------------------27.SubNet----------------------------*/
-//组网
-message SubNetRequest {
-    enum OPTION {
-        OPT_O_N = 0; // 1对多
-        OPT_M_N = 1; // 多对多
-        OPT_M_N2 = 2; // 多对多 ab路径
-        OPT_O_N2 = 3; // 1对多 ab路径
-    }
-    OPTION opt = 1;
-    repeated int32 src_nodes = 2;
-    repeated int32 dst_nodes = 3;
-    int32 depth = 4;
-    int32 limit = 5;
-    bool pass_super_node = 6;
-    bool no_circle = 7;
-    Filter node_filter = 8;
-    Filter edge_filter = 9;
-    bool by_short_search = 10;
-    repeated string select_node_properties = 11;
-    repeated string select_edge_properties = 12;
-}
-
-message SubNetReply {
-    Status status = 1;
-    int32 total_time_cost = 2;
-    int32 engine_time_cost = 3;
-    repeated Path paths = 4;
-}
-/*--------------------------SubNet------------------------------*/
-
-/*------------------------28.FuzzySearchNode------------------------------*/
-message FuzzySearchNodeRequest {
-    string property_name = 1;
-    string property_value = 2;
-    int32 repeated_count = 3;
-    int32 limit = 4;
-    string neigh_property_name = 5;
-    string neigh_property_value = 6;
-    repeated string select_node_properties = 7;
-}
-
-message FuzzySearchNodeReply {
-    Status status = 1;
-    int32 time_cost = 2;
-    repeated FuzzySearchNodeResult result = 3;
-    int32 total_counts = 4;
-}
-
-message FuzzySearchNodeResult {
-    string id = 1;
-    repeated Value values = 2;
-    int32 count = 3;
-}
-
-/*------------------------FuzzySearchNode------------------------------*/
-
-/*------------------------29.FuzzySearchPair------------------------------*/
-message FuzzySearchPairRequest {
-    string property_name = 1;
-    repeated string property_value = 2;
-    string apply_type = 3;
-    int32 limit = 4;
-    repeated string select_node_properties = 5;
-}
-
-message FuzzySearchPairReply {
-    Status status = 1;
-    int32 time_cost = 2;
-    repeated FuzzySearchPairResult result = 3;
-    int32 total_counts = 4;
-}
-
-message FuzzySearchPairResult {
-    string id_first = 1;
-    repeated Value first_values = 2;
-    string id_second = 3;
-    repeated Value second_values = 4;
-}
-
-/*------------------------FuzzySearchPair------------------------------*/
-
-/*------------------------30.AlgorithmMeta------------------------------*/
-message AlgorithmMetaRequest {
-    string algorithm_name = 1;
-}
-
-message AlgorithmMetaReply {
-    Status status = 1;
-    string algorithm_meta = 2;
-}
-/*------------------------AlgorithmMeta------------------------------*/
-
-/*------------------------31.CreatePropertyIndex------------------------------*/
-message CreatePropertyIndexRequest {
-    string property_name = 1;
-}
-
-message CreatePropertyIndexReply {
-    Status status = 1;
-    int32 time_cost = 2;
-}
-/*------------------------CreatePropertyIndex------------------------------*/
-
-/*------------------------32.SearchFiles------------------------------*/
-//查询算法生成文件
-message SearchFilesRequest {
-
-}
-
-message SearchFilesReply {
-    Status status = 1;
-    repeated File files = 2;
-}
-
-message File {
-    string name = 1;
-    int64 size = 2;
-    uint32 last_write_time = 3;
-}
-
-/*------------------------SearchFiles------------------------------*/
-
-/*------------------------33.Download------------------------------*/
+/*------------------------7.Download------------------------------*/
 //下载算法生成文件
 message DownloadFileRequest {
     string file_path_name = 1;
@@ -762,7 +193,7 @@ message DownloadFileReply {
 }
 /*------------------------Download------------------------------*/
 
-/*------------------------34.Export------------------------------*/
+/*------------------------8.Export------------------------------*/
 //导出数据
 //limit <= 0 全量导出
 message ExportRequest {
@@ -776,151 +207,41 @@ message ExportReply {
     repeated Node nodes = 2;
     repeated Edge edges = 3;
 }
-/*------------------------33.Export------------------------------*/
+/*------------------------Export------------------------------*/
 
-/*------------------------35.DeleteIndex------------------------------*/
-message DeleteIndexRequest {
-    DBType db_type = 1;
-    string property_name = 2;
+/*------------------------9.LTE------------------------------*/
+message LTERequest {
+    string property_name = 1;
+    DBType type = 2;
 }
-
-message DeleteIndexReply {
+message LTEReply {
     Status status = 1;
+    int32 time_cost = 2;
 }
-/*------------------------35.DeleteIndex------------------------------*/
+/*--------------------------LTE------------------------------*/
 
-/*------------------------36.CircleTemplate------------------------------*/
-message CircleTemplateRequest {
-    int32 limit = 1;
-    Filter filter = 2;
-    repeated string select_node_properties = 3;
-    repeated string select_edge_properties = 4;
+/*------------------------10.UFE------------------------------*/
+message UFERequest {
+    string property_name = 1;
+    DBType type = 2;
 }
-
-message CircleTemplateReply {
+message UFEReply {
     Status status = 1;
-    int32 total_time_cost = 2;
-    int32 engine_time_cost = 3;
-    repeated Path paths = 4;
+    int32 time_cost = 2;
 }
-/*------------------------36.CircleTemplate------------------------------*/
-
-/*------------------------37.khopemplate------------------------------*/
-message KhopTemplateRequest {
-    string source = 1;
-    int32 limit = 2;
-    string original_source = 3;
-    Filter filter_template = 4;
-    repeated string select_node_properties = 5;
-}
-
-message KhopTemplateReply {
-    Status status = 1;
-    int32 total_time_cost = 2;
-    int32 engine_time_cost = 3;
-    int32 total_number = 4;
-    repeated Node nodes = 5;
-}
-/*------------------------37.khopemplate------------------------------*/
-
-/*------------------------38.Login------------------------------*/
-//message LoginRequest {
-//    string user_name = 1;
-//    string password = 2;
-//}
-////返回密钥
-//message LoginReply {
-//    string crt = 1;
-//}
-/*------------------------38.Login------------------------------*/
-
-/*------------------------39.Admin------------------------------*/
-//用户管理
-message AdminRequest {
-    enum ADMIN_OPTION {
-        OPT_GET = 0;
-        OPT_UPDATE = 1;
-        OPT_DEL = 2;
-        OPT_ADD = 3;
-    }
-    ADMIN_OPTION opt = 1;
-    string user_name = 2;
-    string password = 3;
-}
-
-message AdminReply {
-    Status status = 1;
-    repeated string users = 2;
-}
-/*------------------------39.Admin------------------------------*/
-
-/*------------------------40.Uql------------------------------*/
-//Uql
-message UqlRequest {
-    string uql = 1;
-}
-
-message UqlReply {
-    Status status = 1;
-    int32 total_time_cost = 2;
-    int32 engine_time_cost = 3;
-    repeated Path paths = 4;
-    repeated NodeAlias nodes = 5;
-    repeated EdgeAlias edges = 6;
-    repeated AttrAlias attrs = 7;
-    repeated Table tables = 8;
-}
-
-message EdgeAlias{
-    repeated Edge edges = 1;
-    string alias = 2;
-}
-
-message NodeAlias{
-    repeated Node nodes = 1;
-    string alias = 2;
-}
-//key = alias.name, value = ly
-message AttrAlias{
-    string alias = 1;
-   repeated string values = 2;
-}
-
-message Table{
-    string table_name = 1;
-    repeated string headers = 2;
-    repeated TableRow table_rows = 3;
-}
-
-message TableRow{
-    repeated string values = 1;
-}
-/*------------------------40.Uql------------------------------*/
-
+/*--------------------------UFE------------------------------*/
 
 /*------------------------public message-----------------------*/
-message Filter {
-    enum OPTION {
-        FILTER_OPT_AND = 0;
-        FILTER_OPT_OR = 1;
-    }
-    OPTION filter_option = 1;
-    repeated FilterValue values = 2;
-}
-
-message FilterValue {
-    string property_name = 1;
-    string left_value = 2;
-    string right_value = 3;
-}
 
 enum UltipaPropertyType {
-    PROPERTY_INT = 0;
+    PROPERTY_INT32 = 0;
     PROPERTY_STRING = 1;
     PROPERTY_FLOAT = 2;
-    PROPERTY_TEXT = 3;
-    PROPERTY_BOOLEAN = 4;
-    PROPERTY_UNKNOWN = 5;
+    PROPERTY_DOUBLE = 3;
+    PROPERTY_UINT32 = 4;
+    PROPERTY_INT64 = 5;
+    PROPERTY_UINT64 = 6;
+    PROPERTY_UNKNOWN = 7;
 }
 
 enum ErrorCode {
@@ -933,6 +254,7 @@ enum ErrorCode {
     RAFT_REDIRECT = 6;
     RAFT_NO_LEADER = 7;
     RAFT_LOG_ERROR = 8;
+    UQL_ERRPR = 9;
 }
 
 message Status {
@@ -983,7 +305,34 @@ enum TASK_TYPE {
     TASK_TRIANGLE_COUNTING = 6;
     TASK_BS_FIND_NODES_BY_NEIGHBOR = 7;
     TASK_BS_FIND_PAIR_BY_NEIGHBOR = 8;
-    TASK_GRAPH_EMBEDDING = 9;
+    TASK_NODE2VEC = 9;
+    TASK_LINE = 10;
+    TASK_RANDOMWALK = 11;
+    TASK_NODE2VEC_RANDOMWALK = 12;
+
+    TASK_JACCARD = 13;
+    TASK_COSINE_SIMILARITY = 14;
+    TASK_CLUSTERING_COEFFICIENT = 15;
+    TASK_RANDOM_WALK = 16;
+    TASK_RANDOM_WALK_NODE2VEC = 17;
+    TASK_EMBEDDING = 18;
+
+    TASK_KNN = 19;
+    TASK_K_CORE = 20;
+    TASK_SYBIL_RANK = 21;
+    TASK_CONNECTED_COMPONENT = 22;
+    TASK_MST = 23;
+    TASK_HANP = 24;
+    TASK_K_MEANS = 25;
+    TASK_SYBILRANK = 26;
+
+    TASK_CLOSENESS_CENTRALITY = 27;
+    TASK_IN_CLOSENESS_CENTRALITY = 28;
+    TASK_OUT_CLOSENESS_CENTRALITY = 29;
+    TASK_DEGREE_CENTRALITY = 30;
+    TASK_IN_DEGREE_CENTRALITY = 31;
+    TASK_OUT_DEGREE_CENTRALITY = 32;
+    TASK_GRAPH_CENTRALITY = 33;
 }
 
 enum TASK_STATUS {
@@ -994,4 +343,5 @@ enum TASK_STATUS {
     TASK_FAILED = 4;
     TASK_UNKNOWN = 5;
 }
+
 /*------------------------public message-----------------------*/
