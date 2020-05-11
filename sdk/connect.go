@@ -57,6 +57,12 @@ func (t *Connection) Init(host string, username string, password string, crt str
 	clientInfo := ClientInfo{}
 	clientInfo.init(conn)
 	t.clientInfo = &clientInfo
+
+	// test connection
+	_, err1 := t.TestConnect()
+	if err1 != nil {
+		return err1
+	}
 	return nil
 }
 
@@ -71,7 +77,7 @@ func (t *Connection) chooseClient(timeout time.Duration) (_clientInfo *ClientInf
 	return t.clientInfo, ctx, cancel
 }
 func (t *Connection) TestConnect()  (bool, error) {
-	clientInfo, ctx, cancel := t.chooseClient(time.Second * 3)
+	clientInfo, ctx, cancel := t.chooseClient(time.Second * 10)
 	defer cancel()
 	name := "MyTest"
 	res, err := clientInfo.Client.SayHello(ctx, &ultipa.HelloUltipaRequest{
