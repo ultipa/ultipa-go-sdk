@@ -5,33 +5,33 @@ import (
 )
 
 type ShowPropertyRequest = struct {
-	Dataset DBType;
+	Dataset utils.DBType;
 }
 
-func (t *Connection) ListProperty (request ShowPropertyRequest) *Res{
+func (t *Connection) ListProperty (request ShowPropertyRequest) *utils.Res {
 	uql := utils.UQLMAKER{}
 	dataset := request.Dataset
 	switch dataset {
-	case DBType_DBNODE:
+	case utils.DBType_DBNODE:
 		uql.SetCommand(utils.CommandList_showNodeProperty)
 		break
-	case DBType_DBEDGE:
+	case utils.DBType_DBEDGE:
 		uql.SetCommand(utils.CommandList_showEdgeProperty)
 		break
 	}
 	res := t.UQL(uql.ToString())
-	urlData, ok := res.Data.(UqlReply)
+	urlData, ok := res.Data.(utils.UqlReply)
 
 	if ok {
-		properties := TableToArray(urlData.Tables[0])
+		properties := utils.TableToArray(urlData.Tables[0])
 
 		for i := 0; i < len(*properties); i++ {
 
 		}
-		var ps []*Property
+		var ps []*utils.Property
 		for _, pv := range *properties{
 			pv := *pv
-			p := Property{
+			p := utils.Property{
 				PropertyName: pv["name"],
 				PropertyType: pv["type"],
 				Index: pv["index"] == "true",

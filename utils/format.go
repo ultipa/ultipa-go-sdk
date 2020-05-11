@@ -1,4 +1,4 @@
-package sdk
+package utils
 
 import (
 	ultipa "ultipa-go-sdk/rpc"
@@ -26,13 +26,9 @@ func FormatNodes(nodes []*ultipa.Node) []*Node {
 	return newNodes
 }
 func FormatNode(node *ultipa.Node) *Node {
-	var values map[string]string
-	for _, _v := range node.GetValues() {
-		values[_v.GetKey()] = _v.GetValue()
-	}
 	newNode := Node{}
 	newNode.ID = node.GetId()
-	newNode.Values = values
+	newNode.Values = FormatValues(node.GetValues())
 	return &newNode
 }
 
@@ -43,17 +39,19 @@ func FormatEdges(edges []*ultipa.Edge) []*Edge {
 	}
 	return newEdges
 }
-
-func FormatEdge(edge *ultipa.Edge) *Edge {
-	var values map[string]string
-	for _, ev := range edge.GetValues() {
-		values[ev.GetKey()] = ev.GetValue()
+func FormatValues(values []*ultipa.Value)  *map[string]string{
+	_values := map[string]string{}
+	for _, ev := range values {
+		_values[ev.GetKey()] = ev.GetValue()
 	}
+	return &_values
+}
+func FormatEdge(edge *ultipa.Edge) *Edge {
 	newEdge := Edge{}
 	newEdge.ID = edge.GetId()
 	newEdge.From = edge.GetFromId()
 	newEdge.To = edge.GetToId()
-	newEdge.Values = values
+	newEdge.Values = FormatValues(edge.GetValues())
 	return &newEdge
 }
 
@@ -70,7 +68,7 @@ func FormatStatus(status *ultipa.Status) *Status {
 }
 
 func TableToValues(table *Table) *map[string][]string {
-	var res map[string][]string
+	res := map[string][]string{}
 	for index, key := range table.Headers {
 		res[key] = table.TableRows[index]
 	}

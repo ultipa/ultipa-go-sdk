@@ -1,4 +1,4 @@
-package sdk
+package utils
 
 import ultipa "ultipa-go-sdk/rpc"
 
@@ -39,19 +39,19 @@ const (
 )
 
 type Status = struct {
-	Code ErrorCode
+	Code    ErrorCode
 	Message string
 }
 type Node = struct {
 	ID string
-	Values interface{}
+	Values *map[string]string
 }
 type Nodes = []*Node
 type Edge = struct {
 	ID string
 	From string
 	To string
-	Values interface{}
+	Values *map[string]string
 }
 type Edges = []*Edge
 type Path = struct {
@@ -89,12 +89,12 @@ type EdgeGroup struct {
 }
 
 type UqlReply struct {
-	Paths      Paths
-	Nodes      []*NodeGroup
-	Edges      []*EdgeGroup
-	Attrs      []*AttrGroup
-	Tables     []*Table
-	Values 	   interface{}
+	Paths  Paths
+	Nodes  []*NodeGroup
+	Edges  []*EdgeGroup
+	Attrs  []*AttrGroup
+	Tables []*Table
+	Values *map[string]string
 }
 
 type Property struct {

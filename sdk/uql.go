@@ -4,9 +4,10 @@ import (
 	"io"
 	"log"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/utils"
 )
 
-func (t *Connection) UQL(uql string) Res {
+func (t *Connection) UQL(uql string) utils.Res {
 	clientInfo, ctx, cancel := t.choiseClient(TIMEOUT_DEFAUL)
 	defer cancel()
 	msg, err := clientInfo.Client.Uql(ctx, &ultipa.UqlRequest{
@@ -17,8 +18,8 @@ func (t *Connection) UQL(uql string) Res {
 		log.Printf("uql error %v", err)
 	}
 	// parse paths
-	uqlReply := UqlReply{}
-	res := Res{}
+	uqlReply := utils.UqlReply{}
+	res := utils.Res{}
 	for {
 		c, err := msg.Recv()
 
@@ -31,15 +32,15 @@ func (t *Connection) UQL(uql string) Res {
 			}
 		}
 		// append Paths
-		paths := FormatPaths(c.Paths)
+		paths := utils.FormatPaths(c.Paths)
 		// log.Printf("%#v", paths)
 		for _, path := range paths {
 			uqlReply.Paths = append(uqlReply.Paths, path)
 		}
 		// append Nodes
 		for _, nodes := range c.Nodes {
-			ns := FormatNodes(nodes.Nodes)
-			group := NodeGroup{
+			ns := utils.FormatNodes(nodes.Nodes)
+			group := utils.NodeGroup{
 				Nodes: ns,
 				Alias: nodes.Alias,
 			}
@@ -47,8 +48,8 @@ func (t *Connection) UQL(uql string) Res {
 		}
 		// append Edges
 		for _, edges := range c.Edges {
-			es := FormatEdges(edges.Edges)
-			group := EdgeGroup{
+			es := utils.FormatEdges(edges.Edges)
+			group := utils.EdgeGroup{
 				Edges: es,
 				Alias: edges.Alias,
 			}
@@ -57,7 +58,7 @@ func (t *Connection) UQL(uql string) Res {
 
 		// append Attrs
 		for _, attrs := range c.Attrs {
-			at := AttrGroup{
+			at := utils.AttrGroup{
 				Values: attrs.Values,
 				Alias:  attrs.Alias,
 			}
@@ -65,7 +66,7 @@ func (t *Connection) UQL(uql string) Res {
 		}
 
 		for _, table := range c.Tables {
-			tb := Table{
+			tb := utils.Table{
 				TableName: table.TableName,
 				Headers:   table.Headers,
 			}
@@ -76,6 +77,7 @@ func (t *Connection) UQL(uql string) Res {
 
 			uqlReply.Tables = append(uqlReply.Tables, &tb)
 		}
+		uqlReply.Values = utils.FormatValues(c.Values)
 
 		if res.EngineCost == 0 {
 			res.EngineCost = c.EngineTimeCost
@@ -86,7 +88,7 @@ func (t *Connection) UQL(uql string) Res {
 		}
 
 		if c.Status != nil {
-			res.Status = &Status{
+			res.Status = &utils.Status{
 				Code: 			c.Status.ErrorCode,
 				Message:       	c.Status.Msg,
 			}
