@@ -1,30 +1,19 @@
 package sdk
 
-import (
-	ultipa "ultipa-go-sdk/rpc"
+import ultipa "ultipa-go-sdk/rpc"
 
-	"google.golang.org/grpc"
-)
-
-// Client keep the connection to ultipa db host
-type Client = ultipa.UltipaRpcsClient
-
-// ClientConn is the connection , you can close it
-type ClientConn = grpc.ClientConn
-
-type Property struct {
-	Name string
-	Type PropertyType
-}
 
 type PropertyType = ultipa.UltipaPropertyType
 
 const (
-	PROPERTY_TYPE_INT     PropertyType = ultipa.UltipaPropertyType_PROPERTY_INT
-	PROPERTY_TYPE_STRING  PropertyType = ultipa.UltipaPropertyType_PROPERTY_STRING
-	PROPERTY_TYPE_TEXT    PropertyType = ultipa.UltipaPropertyType_PROPERTY_TEXT
-	PROPERTY_TYPE_BOOLEAN PropertyType = ultipa.UltipaPropertyType_PROPERTY_BOOLEAN
-	PROPERTY_TYPE_UNKNOWN PropertyType = ultipa.UltipaPropertyType_PROPERTY_UNKNOWN
+	PROPERTY_TYPE__INT32   PropertyType = ultipa.UltipaPropertyType_PROPERTY_INT32
+	PROPERTY_TYPE__STRING  PropertyType = ultipa.UltipaPropertyType_PROPERTY_STRING
+	PROPERTY_TYPE__FLOAT   PropertyType = ultipa.UltipaPropertyType_PROPERTY_FLOAT
+	PROPERTY_TYPE__DOUBLE  PropertyType = ultipa.UltipaPropertyType_PROPERTY_DOUBLE
+	PROPERTY_TYPE__UINT32  PropertyType = ultipa.UltipaPropertyType_PROPERTY_UINT32
+	PROPERTY_TYPE__INT64   PropertyType = ultipa.UltipaPropertyType_PROPERTY_INT64
+	PROPERTY_TYPE__UINT64  PropertyType = ultipa.UltipaPropertyType_PROPERTY_UINT64
+	PROPERTY_TYPE__UNKNOWN PropertyType = ultipa.UltipaPropertyType_PROPERTY_UNKNOWN
 )
 
 type DBType = ultipa.DBType
@@ -34,18 +23,84 @@ const (
 	DBType_DBEDGE DBType = ultipa.DBType_DBEDGE
 )
 
-type Status struct {
-	ErrorCode ErrorCode
-	Msg       string
-}
-
 type ErrorCode = ultipa.ErrorCode
 
 const (
-	ErrorCodeSuccess ErrorCode = ultipa.ErrorCode_SUCCESS
-	ErrorCodeFailed  ErrorCode = ultipa.ErrorCode_FAILED
-	ErrorCodeSystem  ErrorCode = ultipa.ErrorCode_SYSTEM_ERROR
-	ErrorCodeParam   ErrorCode = ultipa.ErrorCode_PARAM_ERROR
-	ErrorCodeEngine  ErrorCode = ultipa.ErrorCode_ENGINE_ERROR
-	ErrorCodeBaseDB  ErrorCode = ultipa.ErrorCode_BASE_DB_ERROR
+	ErrorCode_SUCCESS        ErrorCode = ultipa.ErrorCode_SUCCESS
+	ErrorCode_FAILED         ErrorCode = ultipa.ErrorCode_FAILED
+	ErrorCode_PARAM_ERROR    ErrorCode = ultipa.ErrorCode_PARAM_ERROR
+	ErrorCode_BASE_DB_ERROR  ErrorCode = ultipa.ErrorCode_BASE_DB_ERROR
+	ErrorCode_ENGINE_ERROR   ErrorCode = ultipa.ErrorCode_ENGINE_ERROR
+	ErrorCode_SYSTEM_ERROR   ErrorCode = ultipa.ErrorCode_SYSTEM_ERROR
+	ErrorCode_RAFT_REDIRECT  ErrorCode = ultipa.ErrorCode_RAFT_REDIRECT
+	ErrorCode_RAFT_NO_LEADER ErrorCode = ultipa.ErrorCode_RAFT_NO_LEADER
+	ErrorCode_RAFT_LOG_ERROR ErrorCode = ultipa.ErrorCode_RAFT_LOG_ERROR
+	ErrorCode_UQL_ERRPR      ErrorCode = ultipa.ErrorCode_UQL_ERRPR
 )
+
+type Status = struct {
+	Code ErrorCode
+	Message string
+}
+type Node = struct {
+	ID string
+	Values interface{}
+}
+type Nodes = []*Node
+type Edge = struct {
+	ID string
+	From string
+	To string
+	Values interface{}
+}
+type Edges = []*Edge
+type Path = struct {
+	Nodes Nodes;
+	Edges Edges;
+}
+
+type Paths = []*Path
+
+type Res = struct {
+	Status *Status
+	Data interface{}
+	TotalCost int32
+	EngineCost int32
+}
+type Table = struct {
+	TableName string
+	Headers []string
+	TableRows [][]string
+}
+
+type AttrGroup struct {
+	Values []string
+	Alias  string
+}
+
+type NodeGroup struct {
+	Nodes Nodes
+	Alias string
+}
+
+type EdgeGroup struct {
+	Edges Edges
+	Alias string
+}
+
+type UqlReply struct {
+	Paths      Paths
+	Nodes      []*NodeGroup
+	Edges      []*EdgeGroup
+	Attrs      []*AttrGroup
+	Tables     []*Table
+	Values 	   interface{}
+}
+
+type Property struct {
+	PropertyName string
+	PropertyType string
+	Lte bool
+	Index bool
+}
+type A ultipa.UltipaPropertyType

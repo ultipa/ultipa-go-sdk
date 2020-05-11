@@ -1,63 +1,24 @@
 package sdk
 
 import (
-	"context"
 	"io"
-	"ultipa-go-sdk/utils"
-	// "fmt"
 	"log"
-	"time"
 	ultipa "ultipa-go-sdk/rpc"
 )
 
-type AttrGroup struct {
-	Values []string
-	Alias  string
-}
-
-type NodeGroup struct {
-	Nodes []*utils.Node
-	Alias string
-}
-
-type EdgeGroup struct {
-	Edges []*utils.Edge
-	Alias string
-}
-
-type TableGroup struct {
-	TableName string
-	Headers   []string
-	Rows      [][]string
-}
-
-type UQLReply struct {
-	Paths      []*utils.Path
-	Nodes      []*NodeGroup
-	Edges      []*EdgeGroup
-	Attrs      []*AttrGroup
-	Tables     []*TableGroup
-	EngineCost int32
-	TotalCost  int32
-	Status     Status
-}
-
-func UQL(client ultipa.UltipaRpcsClient, uql string) UQLReply {
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+func (t *Connection) UQL(uql string) Res {
+	clientInfo, ctx, cancel := t.choiseClient(TIMEOUT_DEFAUL)
 	defer cancel()
-
-	msg, err := client.Uql(ctx, &ultipa.UqlRequest{
+	msg, err := clientInfo.Client.Uql(ctx, &ultipa.UqlRequest{
 		Uql: uql,
 	})
 
 	if err != nil {
 		log.Printf("uql error %v", err)
 	}
-
 	// parse paths
-	res := UQLReply{}
-
+	uqlReply := UqlReply{}
+	res := Res{}
 	for {
 		c, err := msg.Recv()
 
@@ -69,36 +30,29 @@ func UQL(client ultipa.UltipaRpcsClient, uql string) UQLReply {
 				break
 			}
 		}
-
 		// append Paths
-		paths := utils.FormatPaths(c.Paths)
-
+		paths := FormatPaths(c.Paths)
 		// log.Printf("%#v", paths)
-
 		for _, path := range paths {
-			res.Paths = append(res.Paths, path)
+			uqlReply.Paths = append(uqlReply.Paths, path)
 		}
-
 		// append Nodes
 		for _, nodes := range c.Nodes {
-			ns := utils.FormatNodes(nodes.Nodes)
+			ns := FormatNodes(nodes.Nodes)
 			group := NodeGroup{
 				Nodes: ns,
 				Alias: nodes.Alias,
 			}
-
-			res.Nodes = append(res.Nodes, &group)
+			uqlReply.Nodes = append(uqlReply.Nodes, &group)
 		}
-
 		// append Edges
 		for _, edges := range c.Edges {
-			es := utils.FormatEdges(edges.Edges)
+			es := FormatEdges(edges.Edges)
 			group := EdgeGroup{
 				Edges: es,
 				Alias: edges.Alias,
 			}
-
-			res.Edges = append(res.Edges, &group)
+			uqlReply.Edges = append(uqlReply.Edges, &group)
 		}
 
 		// append Attrs
@@ -107,20 +61,20 @@ func UQL(client ultipa.UltipaRpcsClient, uql string) UQLReply {
 				Values: attrs.Values,
 				Alias:  attrs.Alias,
 			}
-			res.Attrs = append(res.Attrs, &at)
+			uqlReply.Attrs = append(uqlReply.Attrs, &at)
 		}
 
 		for _, table := range c.Tables {
-			tb := TableGroup{
+			tb := Table{
 				TableName: table.TableName,
 				Headers:   table.Headers,
 			}
 
 			for _, row := range table.TableRows {
-				tb.Rows = append(tb.Rows, row.Values)
+				tb.TableRows = append(tb.TableRows, row.Values)
 			}
 
-			res.Tables = append(res.Tables, &tb)
+			uqlReply.Tables = append(uqlReply.Tables, &tb)
 		}
 
 		if res.EngineCost == 0 {
@@ -132,14 +86,15 @@ func UQL(client ultipa.UltipaRpcsClient, uql string) UQLReply {
 		}
 
 		if c.Status != nil {
-			res.Status = Status{
-				ErrorCode: c.Status.ErrorCode,
-				Msg:       c.Status.Msg,
+			res.Status = &Status{
+				Code: 			c.Status.ErrorCode,
+				Message:       	c.Status.Msg,
 			}
 		}
 
 	}
-
+	res.Data = uqlReply
 	return res
+
 
 }
