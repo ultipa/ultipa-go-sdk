@@ -8,7 +8,7 @@ import (
 )
 
 func (t *Connection) UQL(uql string) utils.Res {
-	clientInfo, ctx, cancel := t.choiseClient(TIMEOUT_DEFAUL)
+	clientInfo, ctx, cancel := t.chooseClient(TIMEOUT_DEFAUL)
 	defer cancel()
 	msg, err := clientInfo.Client.Uql(ctx, &ultipa.UqlRequest{
 		Uql: uql,
@@ -31,6 +31,8 @@ func (t *Connection) UQL(uql string) utils.Res {
 				break
 			}
 		}
+		//_json, _ := utils.StructToJSONString(c)
+		//log.Print(_json)
 		// append Paths
 		paths := utils.FormatPaths(c.Paths)
 		// log.Printf("%#v", paths)

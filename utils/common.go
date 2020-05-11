@@ -14,7 +14,7 @@ func StructToJSONBytes(data interface{}) ([]byte, error) {
 	}
 	return b, nil
 }
-func StuctToJSONString(data interface{})  (string, error){
+func StructToJSONString(data interface{})  (string, error){
 	bs, err := StructToJSONBytes(data)
 	if err != nil {
 		return "", err

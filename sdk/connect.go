@@ -64,14 +64,14 @@ const (
 	TIMEOUT_DEFAUL time.Duration = time.Minute
 )
 
-func (t *Connection) choiseClient(timeout time.Duration) (_clientInfo *ClientInfo, _context context.Context, _cancelFunc context.CancelFunc) {
+func (t *Connection) chooseClient(timeout time.Duration) (_clientInfo *ClientInfo, _context context.Context, _cancelFunc context.CancelFunc) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	ctx = metadata.AppendToOutgoingContext(ctx, *t.metadataKV...)
 	//defer cancel()
 	return t.clientInfo, ctx, cancel
 }
 func (t *Connection) TestConnect()  (bool, error) {
-	clientInfo, ctx, cancel := t.choiseClient(time.Second * 3)
+	clientInfo, ctx, cancel := t.chooseClient(time.Second * 3)
 	defer cancel()
 	name := "MyTest"
 	res, err := clientInfo.Client.SayHello(ctx, &ultipa.HelloUltipaRequest{

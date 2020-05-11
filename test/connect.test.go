@@ -10,7 +10,7 @@ import (
 func main() {
 	connet := sdk.Connection{}
 	host := "192.168.3.129:60162"
-	host = "localhost:60061"
+	//host = "localhost:60061"
 	err := connet.Init(host, "root", "root", "./test/ultipa.crt")
 	if err != nil {
 		panic(err)
@@ -38,7 +38,8 @@ func main() {
 		"find().edges({ _from_id : 12}).limit(3).select(*)", // has Edges
 		"ab().src(12).dest(21).depth(5).limit(5).select(name)", // has Paths
 		"t().n(a{age:75}).e().n({age:75}).return(a.name,a.age)", // has Attrs
-		"algo().out_degree({node_id:12})",
+		"algo().out_degree({node_id:12})", // has Values
+		"show().task()", // has Tasks
 	}
 	for _, uql := range uqls{
 		log.Printf(uql)
