@@ -33,15 +33,24 @@ const (
 	ErrorCode_ENGINE_ERROR   ErrorCode = ultipa.ErrorCode_ENGINE_ERROR
 	ErrorCode_SYSTEM_ERROR   ErrorCode = ultipa.ErrorCode_SYSTEM_ERROR
 	ErrorCode_RAFT_REDIRECT  ErrorCode = ultipa.ErrorCode_RAFT_REDIRECT
-	ErrorCode_RAFT_NO_LEADER ErrorCode = ultipa.ErrorCode_RAFT_NO_LEADER
-	ErrorCode_RAFT_LOG_ERROR ErrorCode = ultipa.ErrorCode_RAFT_LOG_ERROR
-	ErrorCode_UQL_ERRPR      ErrorCode = ultipa.ErrorCode_UQL_ERRPR
+	ErrorCode_RAFT_LEADER_NOT_YET_ELECTED 	ErrorCode = ultipa.ErrorCode_RAFT_LEADER_NOT_YET_ELECTED
+	ErrorCode_RAFT_LOG_ERROR 				ErrorCode = ultipa.ErrorCode_RAFT_LOG_ERROR
+	ErrorCode_UQL_ERROR      				ErrorCode = ultipa.ErrorCode_UQL_ERROR
+	ErrorCode_NOT_RAFT_MODE      		ErrorCode = ultipa.ErrorCode_NOT_RAFT_MODE
 )
+
+
+type ClusterInfo struct {
+	Redirect string
+	RaftPeers []string
+}
 
 type Status = struct {
 	Code    ErrorCode
 	Message string
+	ClusterInfo *ClusterInfo
 }
+
 type Node = struct {
 	ID string
 	Values *map[string]string
@@ -103,4 +112,3 @@ type Property struct {
 	Lte bool
 	Index bool
 }
-type A ultipa.UltipaPropertyType

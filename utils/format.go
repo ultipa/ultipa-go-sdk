@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"fmt"
+	"strings"
 	ultipa "ultipa-go-sdk/rpc"
 )
 
@@ -54,15 +56,27 @@ func FormatEdge(edge *ultipa.Edge) *Edge {
 	newEdge.Values = FormatValues(edge.GetValues())
 	return &newEdge
 }
-
-func FormatStatus(status *ultipa.Status) *Status {
+func FormatStatus(status *ultipa.Status, err error) *Status {
+	if err != nil {
+		return &Status{
+			Code: ErrorCode_FAILED,
+			Message: fmt.Sprint(err),
+		}
+	}
+	clusterInfo := ClusterInfo{}
 	newStatus := Status{
 		Code:    ErrorCode_SUCCESS,
 		Message: "",
+		ClusterInfo: &clusterInfo,
 	}
+	newStatus.Code = status.ErrorCode
 	if status.GetErrorCode() != ultipa.ErrorCode_SUCCESS {
-		newStatus.Code = ErrorCode_FAILED
 		newStatus.Message = status.GetMsg()
+	}
+	_clusterInfo := status.ClusterInfo
+	if _clusterInfo != nil {
+		clusterInfo.Redirect = _clusterInfo.Redirect
+		clusterInfo.RaftPeers = strings.Split(_clusterInfo.RaftPeers, ",")
 	}
 	return &newStatus
 }

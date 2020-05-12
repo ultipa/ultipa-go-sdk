@@ -28,6 +28,8 @@ func (t *Connection) UQL(uql string) utils.Res {
 				break
 			} else {
 				log.Printf("Failed %v \n", err)
+				res.Status = utils.FormatStatus(nil, err)
+				return res
 				break
 			}
 		}
@@ -90,10 +92,7 @@ func (t *Connection) UQL(uql string) utils.Res {
 		}
 
 		if c.Status != nil {
-			res.Status = &utils.Status{
-				Code: 			c.Status.ErrorCode,
-				Message:       	c.Status.Msg,
-			}
+			res.Status = utils.FormatStatus(c.Status, nil)
 		}
 
 	}

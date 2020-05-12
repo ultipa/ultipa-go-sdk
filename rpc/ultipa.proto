@@ -34,7 +34,9 @@ service UltipaRpcs {
     //8.导出点,边数据
     rpc Export (ExportRequest) returns (stream ExportReply) {
     }
-
+    //9. 获取raft的leader
+    rpc GetLeader (GetLeaderRequest) returns (GetLeaderReply) {
+    }
 }
 
 /*------------------------1.SayHello------------------------------*/
@@ -231,6 +233,17 @@ message UFEReply {
 }
 /*--------------------------UFE------------------------------*/
 
+/*------------------------11.GetLeader------------------------------*/
+message GetLeaderRequest {
+
+}
+
+message GetLeaderReply {
+    Status status = 1;
+}
+/*--------------------------SayHello----------------------------*/
+
+
 /*------------------------public message-----------------------*/
 
 enum UltipaPropertyType {
@@ -252,9 +265,10 @@ enum ErrorCode {
     ENGINE_ERROR = 4;
     SYSTEM_ERROR = 5;
     RAFT_REDIRECT = 6;
-    RAFT_NO_LEADER = 7;
+    RAFT_LEADER_NOT_YET_ELECTED = 7;
     RAFT_LOG_ERROR = 8;
-    UQL_ERRPR = 9;
+    UQL_ERROR = 9;
+    NOT_RAFT_MODE = 10;
 }
 
 message Status {
