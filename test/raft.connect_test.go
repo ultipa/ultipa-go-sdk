@@ -8,16 +8,24 @@ import (
 )
 
 func TestGetLeader(t *testing.T) {
+
+	TestLogTitle("Get Leader")
 	connet, err := GetTestDefaultConnection(nil)
 	if err != nil {
 		t.Error(err)
 	}
 	res := connet.GetLeaderReuqest()
 	r, _ := utils.StructToJSONString(res)
-	Debug("%v", r)
+	log.Printf("%v", r)
+
+	err = connet.RefreshRaftLeader()
+	if err != nil {
+		t.Error(err)
+	}
 }
 
-func TestAutoRefreshLeader(t *testing.T)  {
+func TestAutoRefreshLeader(t *testing.T) {
+	t.Skip("skip")
 	hosts := []string{
 		"192.168.3.129:60161",
 		"192.168.3.129:60162",

@@ -6,6 +6,7 @@ import (
 )
 
 func TestConnection(t *testing.T) {
+	TestLogTitle("Connect test")
 	connet, err := GetTestDefaultConnection(nil)
 	if err != nil {
 		t.Error(err)
@@ -19,4 +20,3 @@ func TestConnection(t *testing.T) {
 	}
 	fmt.Printf("test connect -> %v\n", result)
 }
-

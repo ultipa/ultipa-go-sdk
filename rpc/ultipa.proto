@@ -12,30 +12,32 @@ service UltipaRpcs {
     rpc Uql (UqlRequest) returns (stream UqlReply) {
     }
 
-    //3.获取点或边的属性
-    rpc GetPropertyInfo (GetPropertyInfoRequest) returns (GetPropertyInfoReply) {
-    }
-
-    //4.数据库信息
-    rpc DbInformation (DbInformationRequest) returns (DbInformationReply) {
-    }
-
-    //5.鲁汶算法(可视化)
+    //3.鲁汶算法(可视化)
     rpc LouvainStream (LouvainStreamRequest) returns (stream LouvainStreamReply) {
     }
 
-    //6.用户设置(用于存储用户配置信息,用户自主控制)
+    //4.用户设置(用于存储用户配置信息,用户自主控制)
     rpc UserSetting (UserSettingRequest) returns (UserSettingReply) {
     }
 
-    //7.下载算法生成文件
+    //5.下载算法生成文件
     rpc DownloadFile (DownloadFileRequest) returns (stream DownloadFileReply) {
     }
-    //8.导出点,边数据
+
+    //6.导出点,边数据
     rpc Export (ExportRequest) returns (stream ExportReply) {
     }
-    //9. 获取raft的leader
+
+    //7. 获取raft的leader
     rpc GetLeader (GetLeaderRequest) returns (GetLeaderReply) {
+    }
+
+    //8.插入点
+    rpc InsertNodes (InsertNodesRequest) returns (InsertNodesReply) {
+    }
+
+    //9.插入边
+    rpc InsertEdges (InsertEdgesRequest) returns (InsertEdgesReply) {
     }
 }
 
@@ -53,80 +55,49 @@ message HelloUltipaReply {
 /*------------------------2.Uql------------------------------*/
 message UqlRequest {
     string uql = 1;
+    string db_name = 2;
 }
 
 message UqlReply {
     Status status = 1;
-    int32 total_time_cost = 2;
-    int32 engine_time_cost = 3;
-    repeated Path paths = 4;
-    repeated NodeAlias nodes = 5;
-    repeated EdgeAlias edges = 6;
-    repeated AttrAlias attrs = 7;
-    repeated Table tables = 8;
-    repeated Value values = 9;
+    repeated UqlReplyData uql_data = 2;
+}
+
+message UqlReplyData {
+    //返回结果序号 分别对应请求的uql顺序号
+    int32 sequence_id = 1;
+
+    Status status = 2;
+    int32 total_time_cost = 3;
+    int32 engine_time_cost = 4;
+
+    repeated Path paths = 5;
+    repeated NodeAlias nodes = 6;
+    repeated EdgeAlias edges = 7;
+    repeated AttrAlias attrs = 8;
+    repeated Table tables = 9;
+    repeated Value key_values = 10;
 }
 
 message EdgeAlias {
-    repeated Edge edges = 1;
+    EdgeTable edge_table = 1;
     string alias = 2;
 }
 
 message NodeAlias {
-    repeated Node nodes = 1;
+    NodeTable node_table = 1;
     string alias = 2;
 }
 //key = alias.name, value = ly
 message AttrAlias {
     string alias = 1;
-    repeated string values = 2;
-}
-
-message Table {
-    string table_name = 1;
-    repeated string headers = 2;
-    repeated TableRow table_rows = 3;
-}
-
-message TableRow {
-    repeated string values = 1;
+    UltipaPropertyType property_type = 2;
+    repeated bytes values = 3;
 }
 /*------------------------2.Uql------------------------------*/
 
-/*------------------------3.GetPropertyInfo---------------------*/
-message GetPropertyInfoRequest {
-    DBType type = 1;
-}
 
-message GetPropertyInfoReply {
-    Status status = 1;
-    repeated GetPropertyInfoValues properties = 2;
-}
-
-message GetPropertyInfoValues {
-
-    string property_name = 1;
-    UltipaPropertyType property_type = 2;
-    bool is_lte = 3;
-    bool is_index = 4;
-}
-/*------------------------GetPropertyInfo----------------------*/
-
-/*------------------------4.DbInfomation------------------------------*/
-message DbInformationRequest {
-}
-
-message DbInformationReply {
-    Status status = 1;
-    int32 total_nodes = 2;
-    int32 total_edges = 3;
-    int32 memory = 4;
-    int32 disk = 5;
-    int32 cpu = 6;
-}
-/*------------------------DbInfomation------------------------------*/
-
-/*------------------------5.UserSetting------------------------------*/
+/*------------------------3.UserSetting------------------------------*/
 message UserSettingRequest {
     enum OPTION {
         OPT_GET = 0;
@@ -134,7 +105,9 @@ message UserSettingRequest {
     }
     string user_name = 1;
     OPTION opt = 2;
+    //key
     string type = 3;
+    //value
     string data = 4;
 }
 
@@ -144,7 +117,7 @@ message UserSettingReply {
 }
 /*--------------------------UserSetting------------------------------*/
 
-/*------------------------6.AnalyticLouvainStream----------------------------*/
+/*------------------------4.AnalyticLouvainStream----------------------------*/
 //鲁汶算法 计算网络层次结构
 message LouvainStreamRequest {
     string edge_property_name = 1;
@@ -171,18 +144,18 @@ message LouvainStreamReply {
     int32 total_community_num = 8;
 }
 message LouvainStreamNode {
-    int32 community_id = 1;
-    int32 node_id = 2;
+    int64 community_id = 1;
+    int64 node_id = 2;
 }
 
 message LouvainStreamEdge {
-    int32 id = 1;
-    int32 from_id = 2;
-    int32 to_id = 3;
+    int64 id = 1;
+    int64 from_id = 2;
+    int64 to_id = 3;
 }
-/*--------------------------AnalyticLouvainStream------------------------------*/
+/*------------ --------------AnalyticLouvainStream------------------------------*/
 
-/*------------------------7.Download------------------------------*/
+/*------------------------5.Download------------------------------*/
 //下载算法生成文件
 message DownloadFileRequest {
     string file_path_name = 1;
@@ -195,7 +168,7 @@ message DownloadFileReply {
 }
 /*------------------------Download------------------------------*/
 
-/*------------------------8.Export------------------------------*/
+/*------------------------6.Export------------------------------*/
 //导出数据
 //limit <= 0 全量导出
 message ExportRequest {
@@ -206,43 +179,48 @@ message ExportRequest {
 
 message ExportReply {
     Status status = 1;
-    repeated Node nodes = 2;
-    repeated Edge edges = 3;
+    NodeTable node_table = 2;
+    EdgeTable edge_table = 3;
 }
 /*------------------------Export------------------------------*/
 
-/*------------------------9.LTE------------------------------*/
-message LTERequest {
-    string property_name = 1;
-    DBType type = 2;
-}
-message LTEReply {
-    Status status = 1;
-    int32 time_cost = 2;
-}
-/*--------------------------LTE------------------------------*/
-
-/*------------------------10.UFE------------------------------*/
-message UFERequest {
-    string property_name = 1;
-    DBType type = 2;
-}
-message UFEReply {
-    Status status = 1;
-    int32 time_cost = 2;
-}
-/*--------------------------UFE------------------------------*/
-
-/*------------------------11.GetLeader------------------------------*/
+/*------------------------7.GetLeader------------------------------*/
 message GetLeaderRequest {
-
 }
 
 message GetLeaderReply {
     Status status = 1;
 }
-/*--------------------------SayHello----------------------------*/
+/*--------------------------GetLeader----------------------------*/
 
+/*------------------------8.InsertNodes------------------------------*/
+message InsertNodesRequest {
+    NodeTable node_table = 1;
+    bool silent = 2;
+    string db_name = 3;
+}
+
+message InsertNodesReply {
+    Status status = 1;
+    int32 time_cost = 2;
+    repeated int64 ids = 3;
+}
+/*------------------------InsertNodes------------------------------*/
+
+/*------------------------9.InsertEdges------------------------------*/
+message InsertEdgesRequest {
+    EdgeTable edge_table = 1;
+    //if true return ids
+    bool silent = 2;
+    string db_name = 3;
+}
+
+message InsertEdgesReply {
+    Status status = 1;
+    int32 time_cost = 2;
+    repeated int64 ids = 3;
+}
+/*------------------------InsertEdges------------------------------*/
 
 /*------------------------public message-----------------------*/
 
@@ -254,7 +232,7 @@ enum UltipaPropertyType {
     PROPERTY_UINT32 = 4;
     PROPERTY_INT64 = 5;
     PROPERTY_UINT64 = 6;
-    PROPERTY_UNKNOWN = 7;
+    PROPERTY_BLOB = 7;
 }
 
 enum ErrorCode {
@@ -269,6 +247,7 @@ enum ErrorCode {
     RAFT_LOG_ERROR = 8;
     UQL_ERROR = 9;
     NOT_RAFT_MODE = 10;
+    RAFT_NO_FOLLOWERS = 11;
 }
 
 message Status {
@@ -288,20 +267,45 @@ enum DBType {
 }
 
 message Path {
-    repeated Node nodes = 1;
-    repeated Edge edges = 2;
+    NodeTable node_table = 1;
+    EdgeTable edge_table = 2;
 }
 
-message Node {
-    string id = 1;
-    repeated Value values = 2;
+message Table {
+    string table_name = 1;
+    repeated string headers = 2;
+    repeated TableRow table_rows = 3;
 }
 
-message Edge {
-    string id = 1;
-    string from_id = 2;
-    string to_id = 3;
-    repeated Value values = 4;
+message TableRow {
+    repeated bytes values = 1;
+}
+
+message NodeTable {
+    repeated Header headers = 2;
+    repeated NodeRow node_rows = 3;
+}
+
+message EdgeTable {
+    repeated Header headers = 2;
+    repeated EdgeRow edge_rows = 3;
+}
+
+message NodeRow {
+    int64 id = 1;
+    repeated bytes values = 2;
+}
+
+message EdgeRow {
+    int64 id = 1;
+    int64 from_id = 2;
+    int64 to_id = 3;
+    repeated bytes values = 4;
+}
+
+message Header {
+    string property_name = 1;
+    UltipaPropertyType property_type = 2;
 }
 
 message Value {
@@ -309,53 +313,14 @@ message Value {
     string value = 2;
 }
 
-enum TASK_TYPE {
-    TASK_TEST = 0;
-    TASK_LOUVAIN = 1;
-    TASK_PAGERANK = 2;
-    TASK_CC = 3;
-    TASK_LPA = 4;
-    TASK_KHOP = 5;
-    TASK_TRIANGLE_COUNTING = 6;
-    TASK_BS_FIND_NODES_BY_NEIGHBOR = 7;
-    TASK_BS_FIND_PAIR_BY_NEIGHBOR = 8;
-    TASK_NODE2VEC = 9;
-    TASK_LINE = 10;
-    TASK_RANDOMWALK = 11;
-    TASK_NODE2VEC_RANDOMWALK = 12;
-
-    TASK_JACCARD = 13;
-    TASK_COSINE_SIMILARITY = 14;
-    TASK_CLUSTERING_COEFFICIENT = 15;
-    TASK_RANDOM_WALK = 16;
-    TASK_RANDOM_WALK_NODE2VEC = 17;
-    TASK_EMBEDDING = 18;
-
-    TASK_KNN = 19;
-    TASK_K_CORE = 20;
-    TASK_SYBIL_RANK = 21;
-    TASK_CONNECTED_COMPONENT = 22;
-    TASK_MST = 23;
-    TASK_HANP = 24;
-    TASK_K_MEANS = 25;
-    TASK_SYBILRANK = 26;
-
-    TASK_CLOSENESS_CENTRALITY = 27;
-    TASK_IN_CLOSENESS_CENTRALITY = 28;
-    TASK_OUT_CLOSENESS_CENTRALITY = 29;
-    TASK_DEGREE_CENTRALITY = 30;
-    TASK_IN_DEGREE_CENTRALITY = 31;
-    TASK_OUT_DEGREE_CENTRALITY = 32;
-    TASK_GRAPH_CENTRALITY = 33;
-}
-
 enum TASK_STATUS {
-    TASK_WAITTING = 0;
+    TASK_WAITING = 0;
     TASK_COMPUTING = 1;
     TASK_WRITEBACKING = 2;
     TASK_DONE = 3;
     TASK_FAILED = 4;
-    TASK_UNKNOWN = 5;
+    TASK_PAUSE = 5;
+    TASK_STOP = 6;
 }
 
 /*------------------------public message-----------------------*/

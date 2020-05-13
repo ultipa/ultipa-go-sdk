@@ -1,11 +1,13 @@
 package test
 
 import (
+	"log"
 	"testing"
 	"ultipa-go-sdk/utils"
 )
 
 func TestUQL(t *testing.T) {
+	TestLogTitle("UQL")
 	connet, err := GetTestDefaultConnection(nil)
 	if err != nil {
 		t.Error(err)
@@ -18,23 +20,27 @@ func TestUQL(t *testing.T) {
 	//resJson, _ = utils.StructToJSONBytes(*res)
 	//fmt.Printf("\nlist property -> %s\n", resJson)
 	uqls := []string{
-		"show().node_property()",
-		"find().edges(12)",
+		"listUser()", // has Tables
+		"getUser().username(root)", // has Values
+		"showIndex()",
+		//"show().node_property()", // 待测，还不支持 05/13
+		//"show().edge_property()", // 待测，还不支持 05/13
 		"find().nodes(1,2,3).select(*)", // has Nodes
-		"find().edges({ _from_id : 12}).limit(3).select(*)", // has Edges
-		"ab().src(12).dest(21).depth(5).limit(5).select(name)", // has Paths
-		"t().n(a{age:75}).e().n({age:75}).return(a.name,a.age)", // has Attrs
-		"algo().out_degree({node_id:12})", // has Values
-		"show().task()", // has Tasks
+		"find().edges(1,2,3).select(*)", // has Edges
+		//"find().nodes(1,2,3).select(*);find().edges(1,2,3).select(*)", // has Nodes amd Edges //还不支持，待测 05/13
+		"ab().src(12).dest(21).depth(5).limit(5).select(*)", // has Paths // 有bug，有些node_table没有header需要 05/13
+		"t().n(a).e().n(2).return(a.name,a.age)", // has Attrs // values 匹配有问题，需要服务端解决
+		"t().n().e().n().select(*)",
+		"show().task()", // has Tasks // 算法还不支持，所以先不测
 	}
-	for _, uql := range uqls{
-		Debug("uql %v", uql)
+	for _, uql := range uqls {
+		TestLogSubtitle("execute UQL " + uql )
 		resUql := connet.UQL(uql)
 		resJson, err := utils.StructToJSONBytes(resUql)
 		if err != nil {
 			t.Error(err, uqls)
 		}
-		Debug("\nuql res ->\n %s\n", resJson)
+		log.Printf("\nuql res ->\n %s\n", resJson)
 		if resUql.Status.Code != utils.ErrorCode_SUCCESS {
 			t.Errorf("%v", resUql.Status.Code.String())
 		}
