@@ -21,6 +21,15 @@ func StructToJSONString(data interface{})  (string, error){
 	}
 	return BytesToString(bs), nil
 }
+func StructToPrettyJSONString(data interface{})  (string, error)  {
+	b, err := json.MarshalIndent(data, "", "  ")
+
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+	return BytesToString(b), nil
+}
 
 func BytesToString(bytes []byte) string {
 	return string(bytes[:])

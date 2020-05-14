@@ -102,6 +102,7 @@ type Tables []*Table
 type NodeAliases []*NodeAlias
 type EdgeAliases  []*EdgeAlias
 type UqlReply struct {
+	Status *Status
 	SequenceId int32
 	TotalCost  int32
 	EngineCost int32

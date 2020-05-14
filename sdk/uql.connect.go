@@ -46,6 +46,7 @@ func (t *Connection) UQL(uql string) utils.Res {
 			newUqlReply.Attrs = utils.FormatAttrs( uqlReply.GetAttrs())
 			newUqlReply.Tables = utils.FormatTables(uqlReply.GetTables())
 			newUqlReply.KeyValues = utils.FormatKeyValues(uqlReply.GetKeyValues())
+			newUqlReply.Status = utils.FormatStatus(uqlReply.Status, nil)
 			uqlReplys = append(uqlReplys, &newUqlReply)
 		}
 		res.Data = uqlReplys
