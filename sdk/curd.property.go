@@ -1,27 +1,28 @@
 package sdk
 
 import (
+	"ultipa-go-sdk/types"
 	"ultipa-go-sdk/utils"
 )
 
 type ShowPropertyRequest = struct {
-	Dataset utils.DBType;
+	Dataset types.DBType;
 }
 
-func (t *Connection) ListProperty (request ShowPropertyRequest) *utils.Res {
+func (t *Connection) ListProperty (request ShowPropertyRequest) *types.ResAny {
 	uql := utils.UQLMAKER{}
 	dataset := request.Dataset
 	switch dataset {
-	case utils.DBType_DBNODE:
+	case types.DBType_DBNODE:
 		uql.SetCommand(utils.CommandList_showNodeProperty)
 		break
-	case utils.DBType_DBEDGE:
+	case types.DBType_DBEDGE:
 		uql.SetCommand(utils.CommandList_showEdgeProperty)
 		break
 	}
 	res := t.UQL(uql.ToString())
 	//urlData, ok := res.Data.(utils.UqlReply)
-	_, ok := res.Data.(utils.UqlReply)
+	_, ok := res.Data.(types.UqlReply)
 
 	if ok {
 		//properties := utils.TableToArray(urlData.Tables[0])

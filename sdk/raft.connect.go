@@ -2,13 +2,14 @@ package sdk
 
 import (
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/types"
 	"ultipa-go-sdk/utils"
 )
 
 type GetLeaderRequest struct {
 }
 type GetLeaderReply struct {
-	Status *utils.Status
+	Status *types.Status
 }
 
 func (t *Connection) GetLeaderReuqest() *GetLeaderReply {

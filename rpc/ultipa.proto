@@ -53,21 +53,18 @@ message HelloUltipaReply {
 /*--------------------------SayHello----------------------------*/
 
 /*------------------------2.Uql------------------------------*/
+/*
+*uql : ab.src(1).dest(2).depth(1).limit(10).select(*)
+*db_name : default
+*timeout  1s 单位:秒
+*/
 message UqlRequest {
     string uql = 1;
-    string db_name = 2;
+    uint32 timeout = 2;
 }
 
 message UqlReply {
     Status status = 1;
-    repeated UqlReplyData uql_data = 2;
-}
-
-message UqlReplyData {
-    //返回结果序号 分别对应请求的uql顺序号
-    int32 sequence_id = 1;
-
-    Status status = 2;
     int32 total_time_cost = 3;
     int32 engine_time_cost = 4;
 
@@ -143,6 +140,7 @@ message LouvainStreamReply {
     int32 total_time_cost = 7;
     int32 total_community_num = 8;
 }
+
 message LouvainStreamNode {
     int64 community_id = 1;
     int64 node_id = 2;
@@ -153,7 +151,7 @@ message LouvainStreamEdge {
     int64 from_id = 2;
     int64 to_id = 3;
 }
-/*------------ --------------AnalyticLouvainStream------------------------------*/
+/*--------------------------AnalyticLouvainStream------------------------------*/
 
 /*------------------------5.Download------------------------------*/
 //下载算法生成文件
@@ -196,14 +194,16 @@ message GetLeaderReply {
 /*------------------------8.InsertNodes------------------------------*/
 message InsertNodesRequest {
     NodeTable node_table = 1;
+    //if true return ids
     bool silent = 2;
-    string db_name = 3;
+    bool no_inner_id = 3;
 }
 
 message InsertNodesReply {
     Status status = 1;
     int32 time_cost = 2;
-    repeated int64 ids = 3;
+    int32 engine_time_cost = 3;
+    repeated int64 ids = 4;
 }
 /*------------------------InsertNodes------------------------------*/
 
@@ -212,13 +212,14 @@ message InsertEdgesRequest {
     EdgeTable edge_table = 1;
     //if true return ids
     bool silent = 2;
-    string db_name = 3;
+    bool no_inner_id = 3;
 }
 
 message InsertEdgesReply {
     Status status = 1;
     int32 time_cost = 2;
-    repeated int64 ids = 3;
+    int32 engine_time_cost = 3;
+    repeated int64 ids = 4;
 }
 /*------------------------InsertEdges------------------------------*/
 
@@ -248,6 +249,8 @@ enum ErrorCode {
     UQL_ERROR = 9;
     NOT_RAFT_MODE = 10;
     RAFT_NO_FOLLOWERS = 11;
+    //鉴权失败
+    PERMISSION_DENIED = 12;
 }
 
 message Status {
@@ -319,8 +322,7 @@ enum TASK_STATUS {
     TASK_WRITEBACKING = 2;
     TASK_DONE = 3;
     TASK_FAILED = 4;
-    TASK_PAUSE = 5;
-    TASK_STOP = 6;
+    TASK_STOP = 5;
 }
 
 /*------------------------public message-----------------------*/

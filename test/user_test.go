@@ -3,6 +3,7 @@ package test
 import (
 	"log"
 	"testing"
+	"ultipa-go-sdk/types"
 	"ultipa-go-sdk/utils"
 )
 
@@ -47,7 +48,7 @@ func TestUser(t *testing.T) {
 			t.Error(err, uqls)
 		}
 		log.Printf("\nuql res ->\n %s\n", resJson)
-		if resUql.Status.Code != utils.ErrorCode_SUCCESS {
+		if resUql.Status.Code != types.ErrorCode_SUCCESS {
 			t.Errorf("%v", resUql.Status.Code.String())
 		}
 

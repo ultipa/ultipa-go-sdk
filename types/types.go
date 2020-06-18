@@ -1,6 +1,8 @@
-package utils
+package types
 
-import ultipa "ultipa-go-sdk/rpc"
+import (
+	ultipa "ultipa-go-sdk/rpc"
+)
 
 type PropertyType = ultipa.UltipaPropertyType
 
@@ -53,12 +55,9 @@ type NodeRow = struct {
 	ID     int64
 	Values *map[string]interface{}
 }
-type NodeTable = struct {
-	Headers  *[]string
-	NodeRows []*NodeRow
-}
+type NodeTable = []*NodeRow
 type NodeAlias = struct {
-	NodeTable *NodeTable
+	Nodes *NodeTable
 	Alias     string
 }
 
@@ -68,12 +67,9 @@ type EdgeRow = struct {
 	To     int64
 	Values *map[string]interface{}
 }
-type EdgeTable = struct {
-	Headers  *[]string
-	EdgeRows []*EdgeRow
-}
+type EdgeTable = []*EdgeRow
 type EdgeAlias = struct {
-	EdgeTable *EdgeTable
+	Edges *EdgeTable
 	Alias     string
 }
 type Path = struct {
@@ -82,10 +78,14 @@ type Path = struct {
 }
 type Paths = []*Path
 
-type Res = struct {
+type ResAny = struct {
 	Status *Status
+	TotalCost  int32
+	EngineCost int32
+	Req interface{}
 	Data   interface{}
 }
+
 type TableRows []*[]interface{}
 type Table = struct {
 	TableName string
@@ -102,16 +102,15 @@ type Tables []*Table
 type NodeAliases []*NodeAlias
 type EdgeAliases  []*EdgeAlias
 type UqlReply struct {
-	Status *Status
-	SequenceId int32
 	TotalCost  int32
 	EngineCost int32
+
 	Paths       *Paths
-	NodeAliases *NodeAliases
-	EdgeAliases *EdgeAliases
+	Nodes *NodeAliases
+	Edges *EdgeAliases
 	Attrs       *Attrs
 	Tables      *Tables
-	KeyValues     *map[string]string
+	Values     *map[string]interface{}
 }
 
 type Property struct {
@@ -120,3 +119,4 @@ type Property struct {
 	Lte          bool
 	Index        bool
 }
+

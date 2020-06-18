@@ -6,8 +6,8 @@ import (
 )
 
 func GetTestDefaultConnection(hostChange *string) (*sdk.Connection, error) {
-	//host := "192.168.3.129:60062"
-	host := "192.168.3.171:60061"
+	host := "192.168.3.129:60062"
+	//host := "192.168.3.171:60061"
 	//host = "192.168.3.185:60061" // listUser has data
 	if hostChange != nil {
 		host = *hostChange
@@ -15,7 +15,11 @@ func GetTestDefaultConnection(hostChange *string) (*sdk.Connection, error) {
 	username := "root"
 	password := "root"
 	crtFile := "./ultipa.crt"
-	connect, err := sdk.GetConnection(host, username, password, crtFile)
+	crtFile = ""
+	config := sdk.DefaultConfig{
+		"default", 15, true,
+	}
+	connect, err := sdk.GetConnection(host, username, password, crtFile, &config)
 	if err != nil {
 		return nil, err
 	}

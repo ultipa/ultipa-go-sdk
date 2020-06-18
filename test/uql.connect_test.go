@@ -3,9 +3,24 @@ package test
 import (
 	"log"
 	"testing"
+	"ultipa-go-sdk/types"
 	"ultipa-go-sdk/utils"
 )
 
+
+func TestUQLSingle(t *testing.T) {
+	connet, _ := GetTestDefaultConnection(nil)
+	uql := "find().nodes().limit(12).select(company)"
+	uql = "find().edges().limit(12).select(mark)"
+	uql = "t().n(a).e().n().limit(12).return(a.name,a.age)"
+	uql = "show().property()"
+	//uql = "getUser().username(root)"
+	//uql = "listGraph()"
+	resUql := connet.UQL(uql)
+	resJson, _ := utils.StructToJSONBytes(resUql)
+
+	log.Printf("\nuql res ->\n %s\n", resJson)
+}
 func TestUQL(t *testing.T) {
 	TestLogTitle("UQL")
 	connet, err := GetTestDefaultConnection(nil)
@@ -20,6 +35,7 @@ func TestUQL(t *testing.T) {
 	//resJson, _ = utils.StructToJSONBytes(*res)
 	//fmt.Printf("\nlist property -> %s\n", resJson)
 	uqls := []string{
+		"listGraph()",
 		"listUser()", // has Tables
 		"getUser().username(root)", // has Values
 		"showIndex()",
@@ -31,7 +47,7 @@ func TestUQL(t *testing.T) {
 		"ab().src(12).dest(21).depth(5).limit(5).select(*)", // has Paths // 有bug，有些node_table没有header需要 05/13
 		"t().n(a).e().n(2).return(a.name,a.age)", // has Attrs // values 匹配有问题，需要服务端解决
 		"t().n().e().n().select(*)",
-		"show().task()", // has Tasks // 算法还不支持，所以先不测
+		"showTask()",
 	}
 	for _, uql := range uqls {
 		TestLogSubtitle("execute UQL " + uql )
@@ -41,7 +57,7 @@ func TestUQL(t *testing.T) {
 			t.Error(err, uqls)
 		}
 		log.Printf("\nuql res ->\n %s\n", resJson)
-		if resUql.Status.Code != utils.ErrorCode_SUCCESS {
+		if resUql.Status.Code != types.ErrorCode_SUCCESS {
 			t.Errorf("%v", resUql.Status.Code.String())
 		}
 

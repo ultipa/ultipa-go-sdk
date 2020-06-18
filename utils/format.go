@@ -6,69 +6,67 @@ import (
 	"fmt"
 	"strings"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/types"
 )
-func FormatNodeAliases(nodes []*ultipa.NodeAlias) *NodeAliases {
-	var arrs NodeAliases
+func FormatNodeAliases(nodes []*ultipa.NodeAlias) *types.NodeAliases {
+	var arrs types.NodeAliases
 	for _, one := range nodes{
 		arrs = append(arrs, FormatNodeAlias(one))
 	}
 	return &arrs
 }
-func FormatEdgeAliases(edges []*ultipa.EdgeAlias) *EdgeAliases {
-	var arrs EdgeAliases
+func FormatEdgeAliases(edges []*ultipa.EdgeAlias) *types.EdgeAliases {
+	var arrs types.EdgeAliases
 	for _, one := range edges{
 		arrs = append(arrs, FormatEdgeAlias(one))
 	}
 	return &arrs
 }
-func FormatNodeAlias(node *ultipa.NodeAlias) *NodeAlias {
-	newNode := NodeAlias{}
+func FormatNodeAlias(node *ultipa.NodeAlias) *types.NodeAlias {
+	newNode := types.NodeAlias{}
 	newNode.Alias = node.Alias
-	newNode.NodeTable = FormatNodeTable(node.GetNodeTable())
+	newNode.Nodes = FormatNodeTable(node.GetNodeTable())
 	return &newNode
 }
-func FormatEdgeAlias(edge *ultipa.EdgeAlias) *EdgeAlias {
-	newEdge := EdgeAlias{}
+func FormatEdgeAlias(edge *ultipa.EdgeAlias) *types.EdgeAlias {
+	newEdge := types.EdgeAlias{}
 	newEdge.Alias = edge.Alias
-	newEdge.EdgeTable = FormatEdgeTable(edge.GetEdgeTable())
+	newEdge.Edges = FormatEdgeTable(edge.GetEdgeTable())
 	return &newEdge
 }
-func FormatNodeTable(nodeTable *ultipa.NodeTable) *NodeTable {
-	newTable := NodeTable{}
+func FormatNodeTable(nodeTable *ultipa.NodeTable) *types.NodeTable {
 	var headers []string
-	var types []PropertyType
+	var types_ []types.PropertyType
 	if nodeTable.Headers != nil {
 		for _, v := range nodeTable.Headers {
 			headers = append(headers, v.GetPropertyName())
-			types = append(types, v.GetPropertyType())
+			types_ = append(types_, v.GetPropertyType())
 		}
 	}
-	newTable.Headers = &headers
-	var rows []*NodeRow
+	var rows []*types.NodeRow
 	if nodeTable.NodeRows != nil {
 		for _, v := range nodeTable.GetNodeRows() {
-			_node := NodeRow{}
+			_node := types.NodeRow{}
 			_node.ID = v.GetId()
-			_vs := _formatValues(v.GetValues(), types, headers)
+			_vs := _formatValues(v.GetValues(), types_, headers)
 			_node.Values = _vs
 			rows = append(rows, &_node)
 		}
 	}
-	newTable.NodeRows = rows
-	return &newTable
+	return &rows
 }
-func _formatValues(values [][]byte, types []PropertyType, headers []string) *map[string]interface{}{
+func _formatValues(values [][]byte, types_ []types.PropertyType, headers []string) *map[string]interface{}{
 	_vs := map[string]interface{}{}
 	_missHeaders := false
-	if len(values) > len(types) || len(values) > len(headers) {
+	if len(values) > len(types_) || len(values) > len(headers) {
 		_missHeaders = true
 		fmt.Println("‼️ BUG 服务器没有返回header")
 	}
 	for _index, vv := range values {
-		vvType := PROPERTY_TYPE_STRING // 服务端有bug，所以，硬修复下 0513
+		vvType := types.PROPERTY_TYPE_STRING // 服务端有bug，所以，硬修复下 0513
 		var key string
 		if _missHeaders == false {
-			vvType = types[_index]
+			vvType = types_[_index]
 			key = headers[_index]
 		} else {
 			key = fmt.Sprintf("Unknown %v", _index)
@@ -78,37 +76,33 @@ func _formatValues(values [][]byte, types []PropertyType, headers []string) *map
 	}
 	return &_vs
 }
-func FormatEdgeTable(edgeTable *ultipa.EdgeTable) *EdgeTable {
-	newTable := EdgeTable{}
+func FormatEdgeTable(edgeTable *ultipa.EdgeTable) *types.EdgeTable {
 	var headers []string
-	var types []PropertyType
+	var types_ []types.PropertyType
 	if edgeTable.Headers != nil {
 		for _, v := range edgeTable.Headers {
 			headers = append(headers, v.GetPropertyName())
-			types = append(types, v.GetPropertyType())
+			types_ = append(types_, v.GetPropertyType())
 		}
 	}
-	newTable.Headers = &headers
-	var rows []*EdgeRow
+	var rows []*types.EdgeRow
 	if edgeTable.EdgeRows != nil {
 		for _, v := range edgeTable.GetEdgeRows() {
-			_edge := EdgeRow{}
+			_edge := types.EdgeRow{}
 			_edge.From = v.GetFromId()
 			_edge.ID = v.GetId()
 			_edge.To = v.GetToId()
-			_vs := _formatValues(v.GetValues(), types, headers)
+			_vs := _formatValues(v.GetValues(), types_, headers)
 			_edge.Values = _vs
 			rows = append(rows, &_edge)
 		}
 	}
-	newTable.EdgeRows = rows
-
-	return &newTable
+	return &rows
 }
-func FormatPaths(paths []*ultipa.Path) *Paths {
-	var ps Paths
+func FormatPaths(paths []*ultipa.Path) *types.Paths {
+	var ps types.Paths
 	for _,path := range paths{
-		newPath := Path{
+		newPath := types.Path{
 			NodeTable: FormatNodeTable(path.NodeTable),
 			EdgeTable: FormatEdgeTable(path.EdgeTable),
 		}
@@ -116,8 +110,8 @@ func FormatPaths(paths []*ultipa.Path) *Paths {
 	}
 	return &ps
 }
-func FormatAttrAlias(attrAlias *ultipa.AttrAlias) *AttrAlias  {
-	newAttrAlias := AttrAlias{}
+func FormatAttrAlias(attrAlias *ultipa.AttrAlias) *types.AttrAlias {
+	newAttrAlias := types.AttrAlias{}
 	newAttrAlias.Alias = attrAlias.GetAlias()
 	if attrAlias.GetValues() != nil {
 		var newValues []interface{}
@@ -129,8 +123,8 @@ func FormatAttrAlias(attrAlias *ultipa.AttrAlias) *AttrAlias  {
 	}
 	return &newAttrAlias
 }
-func FormatAttrs(attrs []*ultipa.AttrAlias) *Attrs  {
-	var newAttrs Attrs
+func FormatAttrs(attrs []*ultipa.AttrAlias) *types.Attrs {
+	var newAttrs types.Attrs
 	if attrs != nil {
 		for _, attr := range attrs {
 			newAttrs = append(newAttrs, FormatAttrAlias(attr) )
@@ -138,23 +132,23 @@ func FormatAttrs(attrs []*ultipa.AttrAlias) *Attrs  {
 	}
 	return &newAttrs
 }
-func FormatTables(tables []*ultipa.Table) *Tables  {
+func FormatTables(tables []*ultipa.Table) *types.Tables {
 	if tables == nil {
 		return nil
 	}
-	var newTables Tables
+	var newTables types.Tables
 	for _, table := range tables {
-		tb := Table{
+		tb := types.Table{
 			TableName: table.TableName,
 			Headers:   table.Headers,
 		}
-		var newRows TableRows
+		var newRows types.TableRows
 		tableRows := table.GetTableRows()
 		if tableRows != nil {
 			for _, row := range tableRows {
 				var _row []interface{}
 				for _, v := range row.GetValues(){
-					_v := deserialize(v, PROPERTY_TYPE_STRING)
+					_v := deserialize(v, types.PROPERTY_TYPE_STRING)
 					_row = append(_row, _v)
 				}
 				newRows = append(newRows, &_row)
@@ -165,11 +159,11 @@ func FormatTables(tables []*ultipa.Table) *Tables  {
 	}
 	return &newTables
 }
-func FormatKeyValues(values []*ultipa.Value)  *map[string]string{
+func FormatKeyValues(values []*ultipa.Value)  *map[string]interface{}{
 	if values == nil {
 		return nil
 	}
-	_values := map[string]string{}
+	_values := map[string]interface{}{}
 	for _, ev := range values {
 		_values[ev.GetKey()] = ev.GetValue()
 	}
@@ -180,31 +174,34 @@ func _bytesToRead(bs []byte, out interface{}) {
 	buff := bytes.NewBuffer(bs)
 	binary.Read(buff, binary.BigEndian, out)
 }
-func deserialize(bytes []byte, propertyType PropertyType) interface{} {
+func deserialize(bytes []byte, propertyType types.PropertyType) interface{} {
+	if (len(bytes) == 0 && propertyType != types.PROPERTY_TYPE_STRING) {
+		return nil
+	}
 	switch propertyType {
-	case PROPERTY_TYPE_STRING:
+	case types.PROPERTY_TYPE_STRING:
 		return string(bytes)
-	case PROPERTY_TYPE_INT32:
+	case types.PROPERTY_TYPE_INT32:
 		var num int32
 		_bytesToRead(bytes, &num)
 		return num
-	case PROPERTY_TYPE_INT64:
+	case types.PROPERTY_TYPE_INT64:
 		var num int64
 		_bytesToRead(bytes, &num)
 		return num
-	case PROPERTY_TYPE_UINT32:
+	case types.PROPERTY_TYPE_UINT32:
 		var num uint32
 		_bytesToRead(bytes, &num)
 		return num
-	case PROPERTY_TYPE_UINT64:
+	case types.PROPERTY_TYPE_UINT64:
 		var num uint64
 		_bytesToRead(bytes, &num)
 		return num
-	case PROPERTY_TYPE_FLOAT:
+	case types.PROPERTY_TYPE_FLOAT:
 		var num float32
 		_bytesToRead(bytes, &num)
 		return num
-	case PROPERTY_TYPE_DOUBLE:
+	case types.PROPERTY_TYPE_DOUBLE:
 		var num float64
 		_bytesToRead(bytes, &num)
 		return num
@@ -229,16 +226,16 @@ func deserialize(bytes []byte, propertyType PropertyType) interface{} {
 //	newEdge.Values = FormatValues(edge.GetValues())
 //	return &newEdge
 //}
-func FormatStatus(status *ultipa.Status, err error) *Status {
+func FormatStatus(status *ultipa.Status, err error) *types.Status {
 	if err != nil {
-		return &Status{
-			Code:    ErrorCode_FAILED,
+		return &types.Status{
+			Code:    types.ErrorCode_FAILED,
 			Message: fmt.Sprint(err),
 		}
 	}
-	clusterInfo := ClusterInfo{}
-	newStatus := Status{
-		Code:        ErrorCode_SUCCESS,
+	clusterInfo := types.ClusterInfo{}
+	newStatus := types.Status{
+		Code:        types.ErrorCode_SUCCESS,
 		Message:     "",
 		ClusterInfo: &clusterInfo,
 	}
@@ -274,3 +271,4 @@ func FormatStatus(status *ultipa.Status, err error) *Status {
 //	}
 //	return &res
 //}
+

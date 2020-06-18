@@ -4,21 +4,23 @@ import (
 	"io"
 	"log"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/types"
 	"ultipa-go-sdk/utils"
 )
 
-func (t *Connection) UQL(uql string) utils.Res {
+func (t *Connection) UQL(uql string) types.ResAny {
 	clientInfo, ctx, cancel := t.chooseClient(TIMEOUT_DEFAUL)
 	defer cancel()
 	msg, err := clientInfo.Client.Uql(ctx, &ultipa.UqlRequest{
 		Uql: uql,
+		Timeout: t.defaultConfig.TimeoutWithSeconds,
 	})
 
 	if err != nil {
 		log.Printf("uql error %v", err)
 	}
 
-	res := utils.Res{}
+	res := types.ResAny{}
 	for {
 		c, err := msg.Recv()
 
@@ -34,27 +36,31 @@ func (t *Connection) UQL(uql string) utils.Res {
 		}
 		//_json, _ := utils.StructToJSONString(c)
 		//log.Printf("--uql原始response--\n %v \n %v \n", c, _json)
-		var uqlReplys []*utils.UqlReply
-		for _, uqlReply := range c.UqlData {
-			newUqlReply := utils.UqlReply{}
-			newUqlReply.SequenceId = uqlReply.GetSequenceId()
-			newUqlReply.EngineCost = uqlReply.GetEngineTimeCost()
-			newUqlReply.TotalCost = uqlReply.GetTotalTimeCost()
-			newUqlReply.Paths = utils.FormatPaths(uqlReply.GetPaths())
-			newUqlReply.NodeAliases = utils.FormatNodeAliases(uqlReply.GetNodes())
-			newUqlReply.EdgeAliases = utils.FormatEdgeAliases(uqlReply.GetEdges())
-			newUqlReply.Attrs = utils.FormatAttrs( uqlReply.GetAttrs())
-			newUqlReply.Tables = utils.FormatTables(uqlReply.GetTables())
-			newUqlReply.KeyValues = utils.FormatKeyValues(uqlReply.GetKeyValues())
-			newUqlReply.Status = utils.FormatStatus(uqlReply.Status, nil)
-			uqlReplys = append(uqlReplys, &newUqlReply)
-		}
-		res.Data = uqlReplys
-		if c.Status != nil {
+		if res.Status != nil {
 			res.Status = utils.FormatStatus(c.Status, nil)
+			res.EngineCost = c.GetEngineTimeCost()
+			res.TotalCost = c.GetTotalTimeCost()
 		}
+		newUqlReply := types.UqlReply{}
+		newUqlReply.EngineCost = c.GetEngineTimeCost()
+		newUqlReply.TotalCost = c.GetTotalTimeCost()
+		newUqlReply.Paths = utils.FormatPaths(c.GetPaths())
+		newUqlReply.Nodes = utils.FormatNodeAliases(c.GetNodes())
+		newUqlReply.Edges = utils.FormatEdgeAliases(c.GetEdges())
+		newUqlReply.Attrs = utils.FormatAttrs( c.GetAttrs())
+		newUqlReply.Tables = utils.FormatTables(c.GetTables())
+		newUqlReply.Values = utils.FormatKeyValues(c.GetKeyValues())
+
+		if res.Data != nil {
+			// append
+			uqlReply := res.Data.(types.UqlReply)
+			utils.UqlResponseAppend(&uqlReply, &newUqlReply)
+			newUqlReply = uqlReply
+		}
+		res.Data = newUqlReply
 
 	}
 	return res
 
 }
+

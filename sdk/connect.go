@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/types"
 	"ultipa-go-sdk/utils"
 )
 type ClientInfo struct {
@@ -45,23 +46,45 @@ func (t *HostManager)GetAllHosts()  *[]string{
 
 }
 
+type DefaultConfig struct {
+	GraphSetName string
+	TimeoutWithSeconds uint32
+	ResponseWithRequestInfo bool
+}
+
 type Connection struct {
 	HostManager *HostManager
 	metadataKV *[]string
 	username string
 	password string
 	crtFile string
+	defaultConfig *DefaultConfig
 }
 
-func GetConnection(host string, username string, password string, crtFile string) (*Connection, error){
+func GetConnection(host string, username string, password string, crtFile string, defaultConfig *DefaultConfig) (*Connection, error){
 	connect := Connection{}
-	err := connect.init(host, username, password, crtFile)
+	err := connect.init(host, username, password, crtFile, defaultConfig)
 	if err != nil {
 		return nil, err
 	}
 	return &connect, nil
 }
-
+func (t *Connection) SetDefaultConfig(defaultConfig *DefaultConfig)  {
+	if t.defaultConfig == nil {
+		t.defaultConfig = &DefaultConfig{ "default", 15, false}
+	}
+	if defaultConfig != nil {
+		if &defaultConfig.GraphSetName != nil {
+			t.defaultConfig.GraphSetName = defaultConfig.GraphSetName
+		}
+		if &defaultConfig.TimeoutWithSeconds != nil {
+			t.defaultConfig.TimeoutWithSeconds = defaultConfig.TimeoutWithSeconds
+		}
+		if &defaultConfig.ResponseWithRequestInfo != nil {
+			t.defaultConfig.ResponseWithRequestInfo = defaultConfig.ResponseWithRequestInfo
+		}
+	}
+}
 func saveClose(clientInfo *ClientInfo)  {
 	if clientInfo != nil {
 		clientInfo.Close()
@@ -97,11 +120,12 @@ func (t *Connection) createClientInfo(host string) (*ClientInfo, error) {
 		return &clientInfo, nil
 	}
 }
-func (t *Connection) init(host string, username string, password string, crt string)  error {
+func (t *Connection) init(host string, username string, password string, crt string, config *DefaultConfig)  error {
 	t.username = username
 	t.password = password
 	t.crtFile = crt
-	kv := []string{"user-metadata", username, "passwd-metadata", password}
+	t.SetDefaultConfig(config)
+	kv := []string{"user", username, "password", password}
 	t.metadataKV = &kv
 	t.HostManager = &HostManager{}
 	clientInfo, err := t.createClientInfo(host)
@@ -124,7 +148,10 @@ const (
 
 func (t *Connection) chooseClient(timeout time.Duration) (_clientInfo *ClientInfo, _context context.Context, _cancelFunc context.CancelFunc) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	ctx = metadata.AppendToOutgoingContext(ctx, *t.metadataKV...)
+	kv := []string{"graph_name", t.defaultConfig.GraphSetName}
+	kv = append(kv, *t.metadataKV...)
+	ctx = metadata.AppendToOutgoingContext(ctx, kv...)
+	//ctx = metadata.AppendToOutgoingContext(ctx, *t.metadataKV...)
 	//defer cancel()
 	clientInfo := t.HostManager.leaderClientInfo
 	if clientInfo == nil {
@@ -155,7 +182,7 @@ type RaftLeaderResSimple struct {
 	FollowersHost []string
 }
 func (t *Connection) autoGetRaftLeader(host string) (*RaftLeaderResSimple,error){
-	conn, err := GetConnection(host, t.username, t.password, t.crtFile)
+	conn, err := GetConnection(host, t.username, t.password, t.crtFile, t.defaultConfig)
 	// 用一次就关掉
 	defer conn.CloseAll()
 	if err != nil {
@@ -164,20 +191,20 @@ func (t *Connection) autoGetRaftLeader(host string) (*RaftLeaderResSimple,error)
 	res := conn.GetLeaderReuqest()
 	errorCode := res.Status.Code
 	switch errorCode {
-	case utils.ErrorCode_SUCCESS:
+	case types.ErrorCode_SUCCESS:
 		followers := res.Status.ClusterInfo.RaftPeers
 		return &RaftLeaderResSimple{
 			Code: errorCode,
 			LeaderHost: host,
 			FollowersHost: utils.Remove(followers, host),
 		}, nil
-	case utils.ErrorCode_NOT_RAFT_MODE:
+	case types.ErrorCode_NOT_RAFT_MODE:
 		return &RaftLeaderResSimple{
-			Code: utils.ErrorCode_SUCCESS,
-			LeaderHost: host,
+			Code:          types.ErrorCode_SUCCESS,
+			LeaderHost:    host,
 			FollowersHost: nil,
 		}, nil
-	case utils.ErrorCode_RAFT_REDIRECT:
+	case types.ErrorCode_RAFT_REDIRECT:
 		return t.autoGetRaftLeader(res.Status.ClusterInfo.Redirect)
 	}
 	return &RaftLeaderResSimple{
@@ -192,7 +219,7 @@ func (t *Connection)  RefreshRaftLeader() error{
 		if err != nil {
 			return err
 		}
-		if res.Code == utils.ErrorCode_SUCCESS {
+		if res.Code == types.ErrorCode_SUCCESS {
 			leaderHost := res.LeaderHost
 			followersHost := res.FollowersHost
 			t.HostManager.LeaderHost = leaderHost
