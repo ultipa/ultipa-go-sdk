@@ -103,8 +103,8 @@ func FormatPaths(paths []*ultipa.Path) *types.Paths {
 	var ps types.Paths
 	for _,path := range paths{
 		newPath := types.Path{
-			NodeTable: FormatNodeTable(path.NodeTable),
-			EdgeTable: FormatEdgeTable(path.EdgeTable),
+			Nodes: FormatNodeTable(path.NodeTable),
+			Edges: FormatEdgeTable(path.EdgeTable),
 		}
 		ps = append(ps, &newPath)
 	}

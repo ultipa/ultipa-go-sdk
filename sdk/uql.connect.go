@@ -13,7 +13,7 @@ func (t *Connection) UQL(uql string) types.ResAny {
 	defer cancel()
 	msg, err := clientInfo.Client.Uql(ctx, &ultipa.UqlRequest{
 		Uql: uql,
-		Timeout: t.defaultConfig.TimeoutWithSeconds,
+		Timeout: t.DefaultConfig.TimeoutWithSeconds,
 	})
 
 	if err != nil {
@@ -36,7 +36,7 @@ func (t *Connection) UQL(uql string) types.ResAny {
 		}
 		//_json, _ := utils.StructToJSONString(c)
 		//log.Printf("--uql原始response--\n %v \n %v \n", c, _json)
-		if res.Status != nil {
+		if res.Status == nil {
 			res.Status = utils.FormatStatus(c.Status, nil)
 			res.EngineCost = c.GetEngineTimeCost()
 			res.TotalCost = c.GetTotalTimeCost()

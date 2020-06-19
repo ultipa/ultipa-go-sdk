@@ -58,7 +58,7 @@ type Connection struct {
 	username string
 	password string
 	crtFile string
-	defaultConfig *DefaultConfig
+	DefaultConfig *DefaultConfig
 }
 
 func GetConnection(host string, username string, password string, crtFile string, defaultConfig *DefaultConfig) (*Connection, error){
@@ -70,18 +70,18 @@ func GetConnection(host string, username string, password string, crtFile string
 	return &connect, nil
 }
 func (t *Connection) SetDefaultConfig(defaultConfig *DefaultConfig)  {
-	if t.defaultConfig == nil {
-		t.defaultConfig = &DefaultConfig{ "default", 15, false}
+	if t.DefaultConfig == nil {
+		t.DefaultConfig = &DefaultConfig{ "default", 15, false}
 	}
 	if defaultConfig != nil {
 		if &defaultConfig.GraphSetName != nil {
-			t.defaultConfig.GraphSetName = defaultConfig.GraphSetName
+			t.DefaultConfig.GraphSetName = defaultConfig.GraphSetName
 		}
 		if &defaultConfig.TimeoutWithSeconds != nil {
-			t.defaultConfig.TimeoutWithSeconds = defaultConfig.TimeoutWithSeconds
+			t.DefaultConfig.TimeoutWithSeconds = defaultConfig.TimeoutWithSeconds
 		}
 		if &defaultConfig.ResponseWithRequestInfo != nil {
-			t.defaultConfig.ResponseWithRequestInfo = defaultConfig.ResponseWithRequestInfo
+			t.DefaultConfig.ResponseWithRequestInfo = defaultConfig.ResponseWithRequestInfo
 		}
 	}
 }
@@ -148,7 +148,7 @@ const (
 
 func (t *Connection) chooseClient(timeout time.Duration) (_clientInfo *ClientInfo, _context context.Context, _cancelFunc context.CancelFunc) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	kv := []string{"graph_name", t.defaultConfig.GraphSetName}
+	kv := []string{"graph_name", t.DefaultConfig.GraphSetName}
 	kv = append(kv, *t.metadataKV...)
 	ctx = metadata.AppendToOutgoingContext(ctx, kv...)
 	//ctx = metadata.AppendToOutgoingContext(ctx, *t.metadataKV...)
@@ -182,7 +182,7 @@ type RaftLeaderResSimple struct {
 	FollowersHost []string
 }
 func (t *Connection) autoGetRaftLeader(host string) (*RaftLeaderResSimple,error){
-	conn, err := GetConnection(host, t.username, t.password, t.crtFile, t.defaultConfig)
+	conn, err := GetConnection(host, t.username, t.password, t.crtFile, t.DefaultConfig)
 	// 用一次就关掉
 	defer conn.CloseAll()
 	if err != nil {

@@ -73,8 +73,8 @@ type EdgeAlias = struct {
 	Alias     string
 }
 type Path = struct {
-	NodeTable *NodeTable
-	EdgeTable *EdgeTable
+	Nodes *NodeTable
+	Edges *EdgeTable
 }
 type Paths = []*Path
 
