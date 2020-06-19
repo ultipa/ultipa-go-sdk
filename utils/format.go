@@ -157,6 +157,9 @@ func FormatTables(tables []*ultipa.Table) *types.Tables {
 	return &newTables
 }
 func FormatKeyValues(values []*ultipa.Value)  *map[string]interface{}{
+	if values == nil {
+		return nil
+	}
 	_values := map[string]interface{}{}
 	for _, ev := range values {
 		_values[ev.GetKey()] = ev.GetValue()
