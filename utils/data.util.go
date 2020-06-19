@@ -68,7 +68,6 @@ func UqlResponseAppend(uqlReply1 *types.UqlReply, uqlReply2 *types.UqlReply)  {
 	}
 	uqlReply1.Attrs = &newAttrs
 
-
 	tables := append(*uqlReply1.Tables, *uqlReply2.Tables...)
 	var newTables types.Tables
 	for _, n := range tables {

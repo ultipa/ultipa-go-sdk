@@ -11,9 +11,9 @@ import (
 func TestUQLSingle(t *testing.T) {
 	connet, _ := GetTestDefaultConnection(nil)
 	uql := "find().nodes().limit(12).select(company)"
-	uql = "find().edges().limit(12).select(mark)"
-	uql = "t().n(a).e().n().limit(12).return(a.name,a.age)"
-	uql = "show().property()"
+	//uql = "find().edges().limit(12).select(mark)"
+	//uql = "t().n(a).e().n().limit(12).return(a.name,a.age)"
+	//uql = "show().property()"
 	//uql = "getUser().username(root)"
 	//uql = "listGraph()"
 	resUql := connet.UQL(uql)

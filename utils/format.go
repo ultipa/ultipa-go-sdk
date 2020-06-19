@@ -133,9 +133,6 @@ func FormatAttrs(attrs []*ultipa.AttrAlias) *types.Attrs {
 	return &newAttrs
 }
 func FormatTables(tables []*ultipa.Table) *types.Tables {
-	if tables == nil {
-		return nil
-	}
 	var newTables types.Tables
 	for _, table := range tables {
 		tb := types.Table{
@@ -160,9 +157,6 @@ func FormatTables(tables []*ultipa.Table) *types.Tables {
 	return &newTables
 }
 func FormatKeyValues(values []*ultipa.Value)  *map[string]interface{}{
-	if values == nil {
-		return nil
-	}
 	_values := map[string]interface{}{}
 	for _, ev := range values {
 		_values[ev.GetKey()] = ev.GetValue()
