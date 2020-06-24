@@ -82,7 +82,7 @@ type ResAny = struct {
 	Status *Status
 	TotalCost  int32
 	EngineCost int32
-	Req interface{}
+	Req *map[string]interface{}
 	Data   interface{}
 }
 

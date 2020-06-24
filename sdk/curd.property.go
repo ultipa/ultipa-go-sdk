@@ -20,7 +20,7 @@ func (t *Connection) ListProperty (request ShowPropertyRequest) *types.ResAny {
 		uql.SetCommand(utils.CommandList_showEdgeProperty)
 		break
 	}
-	res := t.UQL(uql.ToString())
+	res := t.UQL(uql.ToString(), nil)
 	//urlData, ok := res.Data.(utils.UqlReply)
 	_, ok := res.Data.(types.UqlReply)
 

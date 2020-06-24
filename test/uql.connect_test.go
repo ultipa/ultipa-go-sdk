@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"log"
 	"testing"
 	"ultipa-go-sdk/types"
@@ -10,13 +11,15 @@ import (
 
 func TestUQLSingle(t *testing.T) {
 	connet, _ := GetTestDefaultConnection(nil)
-	uql := "find().nodes().limit(12).select(company)"
+	fmt.Println("init host:", connet.HostManagerControl.InitHost)
+	uql := "find().nodes().limit(12).select(*)"
 	//uql = "find().edges().limit(12).select(mark)"
 	//uql = "t().n(a).e().n().limit(12).return(a.name,a.age)"
 	//uql = "show().property()"
-	//uql = "getUser().username(root)"
-	//uql = "listGraph()"
-	resUql := connet.UQL(uql)
+	//uql = "getUscer().username(root)"
+	uql = "listGraph()"
+	uql = "top()"
+	resUql := connet.UQL(uql, nil)
 	resJson, _ := utils.StructToJSONBytes(resUql)
 
 	log.Printf("\nuql res ->\n %s\n", resJson)
@@ -35,6 +38,7 @@ func TestUQL(t *testing.T) {
 	//resJson, _ = utils.StructToJSONBytes(*res)
 	//fmt.Printf("\nlist property -> %s\n", resJson)
 	uqls := []string{
+		"show().property()",
 		"listGraph()",
 		"listUser()", // has Tables
 		"getUser().username(root)", // has Values
@@ -51,7 +55,7 @@ func TestUQL(t *testing.T) {
 	}
 	for _, uql := range uqls {
 		TestLogSubtitle("execute UQL " + uql )
-		resUql := connet.UQL(uql)
+		resUql := connet.UQL(uql, nil)
 		resJson, err := utils.StructToJSONBytes(resUql)
 		if err != nil {
 			t.Error(err, uqls)

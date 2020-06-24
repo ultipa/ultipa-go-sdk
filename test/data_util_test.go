@@ -1,7 +1,9 @@
 package test
 
 import (
+	"fmt"
 	"testing"
+	"ultipa-go-sdk/utils"
 )
 
 func TestMerge(t *testing.T) {
@@ -17,4 +19,10 @@ func TestMerge(t *testing.T) {
 	//nodes1 = append(nodes1, &n1)
 	//nodes2 = append(nodes2, &n2)
 	//dataMerge.Concat(nodes1, nodes2, "alias")
+}
+func TestRegexp(t *testing.T)  {
+	uqlString := `showTask().id( "1").name('abc').status(  'pengding'  ).limit(199 ).filter( {abc: "123", a: {$gt: 123}})`
+	uql := utils.UQL{}
+	uql.Parse(uqlString)
+	fmt.Println(utils.StructToPrettyJSONString(uql))
 }

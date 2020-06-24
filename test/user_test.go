@@ -10,8 +10,7 @@ import (
 func TestUser(t *testing.T) {
 	t.Skip("skip")
 	TestLogTitle("UQL User Policy")
-	host := "192.168.3.185:60061"
-	connet, err := GetTestDefaultConnection(&host)
+	connet, err := GetTestDefaultConnection(nil)
 
 	if err != nil {
 		t.Error(err)
@@ -42,7 +41,7 @@ func TestUser(t *testing.T) {
 	}
 	for _, uql := range uqls {
 		TestLogSubtitle("execute UQL " + uql )
-		resUql := connet.UQL(uql)
+		resUql := connet.UQL(uql, nil)
 		resJson, err := utils.StructToPrettyJSONString(resUql)
 		if err != nil {
 			t.Error(err, uqls)

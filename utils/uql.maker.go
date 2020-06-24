@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -141,3 +142,33 @@ func (t *UQLMAKER) ToString() string {
 
 
 
+type UQL struct {
+	Uql string
+	Command string
+	CommandParam string
+	Params map[string] interface{}
+}
+func (t *UQL) Parse(uqlString string) {
+	r, _ := regexp.Compile("([a-zA-Z]*)\\(([^\\(|^\\)]*)\\)")
+	var findAll = r.FindAllStringSubmatch(uqlString, -1)
+
+	t.Uql = uqlString
+	t.Command = ""
+	t.CommandParam = ""
+	t.Params = map[string] interface{}{}
+
+	for i, find := range findAll {
+		name := find[1]
+		value := ""
+		if (len(find) >= 2) {
+			value = find[2]
+		}
+		value = strings.Trim(value, " '\"")
+		if 0 == i {
+			t.Command = name
+			t.CommandParam = value
+		} else {
+			t.Params[name] = value
+		}
+	}
+}
