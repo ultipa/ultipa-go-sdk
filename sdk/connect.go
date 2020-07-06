@@ -35,6 +35,7 @@ var (
 	ClientType_Default 	ClientType = 0
 	ClientType_Algo 	ClientType = 1
 	ClientType_Update 	ClientType = 2
+	ClientType_Leader 	ClientType = 3
 )
 var (
 	UQL_Command_Global = []string{
@@ -149,7 +150,7 @@ func (t*HostManager) chooseClientInfo(clientType ClientType, uql string, readMod
 		}
 		return t.defaultClientInfo
 	}
-	if clientType == ClientType_Update || readModeNonConsistency == false {
+	if clientType == ClientType_Update || clientType == ClientType_Leader || readModeNonConsistency == false {
 		if t.leaderClientInfo != nil {
 			return t.leaderClientInfo
 		}

@@ -2,6 +2,7 @@ package types
 
 import (
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/types/types_response"
 )
 
 type PropertyType = ultipa.UltipaPropertyType
@@ -78,13 +79,7 @@ type Path = struct {
 }
 type Paths = []*Path
 
-type ResAny = struct {
-	Status *Status
-	TotalCost  int32
-	EngineCost int32
-	Req *map[string]interface{}
-	Data   interface{}
-}
+
 
 type TableRows []*[]interface{}
 type Table = struct {
@@ -113,10 +108,18 @@ type UqlReply struct {
 	Values     *map[string]interface{}
 }
 
-type Property struct {
-	PropertyName string
-	PropertyType string
-	Lte          bool
-	Index        bool
+type ResWithoutData = struct {
+	Status *Status
+	TotalCost  int32
+	EngineCost int32
+	Req *map[string]interface{}
 }
 
+type ResUqlReply = struct {
+	*ResWithoutData
+	Data *UqlReply
+}
+type ResListProperty = struct {
+	*ResWithoutData
+	Data []*types_response.Property
+}

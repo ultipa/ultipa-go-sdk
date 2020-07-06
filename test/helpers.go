@@ -8,12 +8,12 @@ import (
 )
 var hosts = []string{
 	// single raft
-	//"192.168.3.129:60062",
+	//"24.193.211.21:60062",
 
 	// multiple rafts
-	"192.168.3.129:60161",
-	"192.168.3.129:60162",
-	"192.168.3.129:60163",
+	"124.193.211.21:60161",
+	"124.193.211.21:60162",
+	"124.193.211.21:60163",
 }
 
 func GetTestDefaultConnection(hostChange *string) (*sdk.Connection, error) {

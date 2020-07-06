@@ -25,9 +25,9 @@ func TestGetLeader(t *testing.T) {
 
 func TestAutoRefreshLeader(t *testing.T) {
 	hosts := []string{
-		"192.168.3.129:60161",
-		"192.168.3.129:60162",
-		"192.168.3.129:60163",
+		"124.193.211.21:60161",
+		"124.193.211.21:60162",
+		"124.193.211.21:60163",
 	}
 	for _, h := range hosts {
 		conn, err := GetTestDefaultConnection(&h)
@@ -38,5 +38,8 @@ func TestAutoRefreshLeader(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
+		res := conn.GetLeaderReuqest(nil)
+		r, _ := utils.StructToJSONString(res)
+		log.Printf("%v", r)
 	}
 }

@@ -257,15 +257,15 @@ func FormatStatus(status *ultipa.Status, err error) *types.Status {
 //	return &res
 //}
 //
-//func TableToArray(table *Table) *[]*map[string]string {
-//	var res []*map[string]string
-//	for _, rows := range table.TableRows {
-//		item := map[string]string{}
-//		for index, row := range rows {
-//			item[table.Headers[index]] = row
-//		}
-//		res = append(res, &item)
-//	}
-//	return &res
-//}
+func TableToArray(table *types.Table) *[]*map[string]interface{} {
+	var res []*map[string]interface{}
+	for _, rows := range *table.TableRows {
+		item := map[string]interface{}{}
+		for index, row := range *rows {
+			item[table.Headers[index]] = row
+		}
+		res = append(res, &item)
+	}
+	return &res
+}
 

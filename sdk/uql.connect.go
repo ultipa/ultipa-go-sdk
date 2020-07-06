@@ -8,7 +8,7 @@ import (
 	"ultipa-go-sdk/utils"
 )
 
-func (t *Connection) UQL(uql string, req *SdkRequest_Common) types.ResAny {
+func (t *Connection) UQL(uql string, req *SdkRequest_Common) types.ResUqlReply {
 	clientInfo := t.getClientInfo(&GetClientInfoParams{
 		Uql: uql,
 	})
@@ -33,7 +33,9 @@ func (t *Connection) UQL(uql string, req *SdkRequest_Common) types.ResAny {
 		log.Printf("uql error %v", err)
 	}
 
-	res := types.ResAny{}
+	res := types.ResUqlReply{
+		ResWithoutData:&types.ResWithoutData{},
+	}
 	for {
 		c, err := msg.Recv()
 
@@ -62,7 +64,7 @@ func (t *Connection) UQL(uql string, req *SdkRequest_Common) types.ResAny {
 				}
 			}
 		}
-		newUqlReply := types.UqlReply{}
+		newUqlReply := &types.UqlReply{}
 		newUqlReply.EngineCost = c.GetEngineTimeCost()
 		newUqlReply.TotalCost = c.GetTotalTimeCost()
 		newUqlReply.Paths = utils.FormatPaths(c.GetPaths())
@@ -74,8 +76,8 @@ func (t *Connection) UQL(uql string, req *SdkRequest_Common) types.ResAny {
 
 		if res.Data != nil {
 			// append
-			uqlReply := res.Data.(types.UqlReply)
-			utils.UqlResponseAppend(&uqlReply, &newUqlReply)
+			uqlReply := res.Data
+			utils.UqlResponseAppend(uqlReply, newUqlReply)
 			newUqlReply = uqlReply
 		}
 		res.Data = newUqlReply
