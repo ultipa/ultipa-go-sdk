@@ -29,13 +29,27 @@ func (t *Connection) UQL(uql string, req *SdkRequest_Common) types.ResUqlReply {
 	})
 	//log.Printf("❗️ UQL: %s, host: %s, graphSetName: %s", uql, clientInfo.Host, clientInfo.GraphSetName)
 
-	if err != nil {
-		log.Printf("uql error %v", err)
-	}
-
 	res := types.ResUqlReply{
 		ResWithoutData:&types.ResWithoutData{},
 	}
+	if t.DefaultConfig.ResponseWithRequestInfo {
+		res.Req = &map[string]interface{}{
+			"host": clientInfo.Host,
+			"graphSetName": clientInfo.GraphSetName,
+			"retry": retry,
+			"uql": uql,
+		}
+	}
+
+	if err != nil {
+		log.Printf("uql error %v", err)
+		res.Status = &types.Status{
+			Code: types.ErrorCode_UNKNOW,
+			Message: err.Error(),
+		}
+		return res
+	}
+
 	for {
 		c, err := msg.Recv()
 
@@ -55,14 +69,6 @@ func (t *Connection) UQL(uql string, req *SdkRequest_Common) types.ResUqlReply {
 			res.Status = utils.FormatStatus(c.Status, nil)
 			res.EngineCost = c.GetEngineTimeCost()
 			res.TotalCost = c.GetTotalTimeCost()
-			if t.DefaultConfig.ResponseWithRequestInfo {
-				res.Req = &map[string]interface{}{
-					"host": clientInfo.Host,
-					"graphSetName": clientInfo.GraphSetName,
-					"retry": retry,
-					"uql": uql,
-				}
-			}
 		}
 		newUqlReply := &types.UqlReply{}
 		newUqlReply.EngineCost = c.GetEngineTimeCost()

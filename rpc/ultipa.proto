@@ -12,31 +12,27 @@ service UltipaRpcs {
     rpc Uql (UqlRequest) returns (stream UqlReply) {
     }
 
-    //3.鲁汶算法(可视化)
-    rpc LouvainStream (LouvainStreamRequest) returns (stream LouvainStreamReply) {
-    }
-
-    //4.用户设置(用于存储用户配置信息,用户自主控制)
+    //3.用户设置(用于存储用户配置信息,用户自主控制)
     rpc UserSetting (UserSettingRequest) returns (UserSettingReply) {
     }
 
-    //5.下载算法生成文件
+    //4.下载算法生成文件
     rpc DownloadFile (DownloadFileRequest) returns (stream DownloadFileReply) {
     }
 
-    //6.导出点,边数据
+    //5.导出点,边数据
     rpc Export (ExportRequest) returns (stream ExportReply) {
     }
 
-    //7. 获取raft的leader
+    //6. 获取raft的leader
     rpc GetLeader (GetLeaderRequest) returns (GetLeaderReply) {
     }
 
-    //8.插入点
+    //7.插入点
     rpc InsertNodes (InsertNodesRequest) returns (InsertNodesReply) {
     }
 
-    //9.插入边
+    //8.插入边
     rpc InsertEdges (InsertEdgesRequest) returns (InsertEdgesReply) {
     }
 }
@@ -61,6 +57,7 @@ message HelloUltipaReply {
 message UqlRequest {
     string uql = 1;
     uint32 timeout = 2;
+    string graph_name = 3;
 }
 
 message UqlReply {
@@ -114,46 +111,7 @@ message UserSettingReply {
 }
 /*--------------------------UserSetting------------------------------*/
 
-/*------------------------4.AnalyticLouvainStream----------------------------*/
-//鲁汶算法 计算网络层次结构
-message LouvainStreamRequest {
-    string edge_property_name = 1;
-    double min_modularity_increase = 2;
-    int32 phase1_loop = 3;
-    int32 community_num = 4;
-    int32 node_num = 5;
-    int32 edge_num = 6;
-}
-
-message LouvainStreamReply {
-    enum RET_TYPE {
-        NODE = 0;
-        EDGE = 1;
-    }
-
-    Status status = 1;
-    RET_TYPE ret_type = 2;
-    repeated LouvainStreamNode node = 3;
-    repeated LouvainStreamEdge edge = 4;
-    double modularity = 5;
-    int32 engine_time_cost = 6;
-    int32 total_time_cost = 7;
-    int32 total_community_num = 8;
-}
-
-message LouvainStreamNode {
-    int64 community_id = 1;
-    int64 node_id = 2;
-}
-
-message LouvainStreamEdge {
-    int64 id = 1;
-    int64 from_id = 2;
-    int64 to_id = 3;
-}
-/*--------------------------AnalyticLouvainStream------------------------------*/
-
-/*------------------------5.Download------------------------------*/
+/*------------------------4.Download------------------------------*/
 //下载算法生成文件
 message DownloadFileRequest {
     string file_path_name = 1;
@@ -166,7 +124,7 @@ message DownloadFileReply {
 }
 /*------------------------Download------------------------------*/
 
-/*------------------------6.Export------------------------------*/
+/*------------------------5.Export------------------------------*/
 //导出数据
 //limit <= 0 全量导出
 message ExportRequest {
@@ -182,7 +140,7 @@ message ExportReply {
 }
 /*------------------------Export------------------------------*/
 
-/*------------------------7.GetLeader------------------------------*/
+/*------------------------6.GetLeader------------------------------*/
 message GetLeaderRequest {
 }
 
@@ -191,12 +149,13 @@ message GetLeaderReply {
 }
 /*--------------------------GetLeader----------------------------*/
 
-/*------------------------8.InsertNodes------------------------------*/
+/*------------------------7.InsertNodes------------------------------*/
 message InsertNodesRequest {
     NodeTable node_table = 1;
     //if true return ids
     bool silent = 2;
     bool no_inner_id = 3;
+    string graph_name = 4;
 }
 
 message InsertNodesReply {
@@ -207,12 +166,13 @@ message InsertNodesReply {
 }
 /*------------------------InsertNodes------------------------------*/
 
-/*------------------------9.InsertEdges------------------------------*/
+/*------------------------8.InsertEdges------------------------------*/
 message InsertEdgesRequest {
     EdgeTable edge_table = 1;
     //if true return ids
     bool silent = 2;
     bool no_inner_id = 3;
+    string graph_name = 4;
 }
 
 message InsertEdgesReply {
@@ -317,12 +277,12 @@ message Value {
 }
 
 enum TASK_STATUS {
-    TASK_WAITING = 0;
+    TASK_PENDING = 0;
     TASK_COMPUTING = 1;
-    TASK_WRITEBACKING = 2;
+    TASK_WRITING = 2;
     TASK_DONE = 3;
     TASK_FAILED = 4;
-    TASK_STOP = 5;
+    TASK_STOPPED = 5;
 }
 
 /*------------------------public message-----------------------*/

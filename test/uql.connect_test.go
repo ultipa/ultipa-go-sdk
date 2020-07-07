@@ -19,6 +19,7 @@ func TestUQLSingle(t *testing.T) {
 	//uql = "getUscer().username(root)"
 	uql = "listGraph()"
 	uql = "top()"
+	//uql = "find().nodes([11]).select(*)"
 	resUql := connet.UQL(uql, nil)
 	resJson, _ := utils.StructToJSONBytes(resUql)
 
