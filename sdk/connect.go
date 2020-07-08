@@ -396,7 +396,7 @@ type RaftLeaderResSimple struct {
 	LeaderHost string
 	FollowersHost []string
 }
-func (t *Connection) autoGetRaftLeader(host string, req *SdkRequest_Common) (*RaftLeaderResSimple,error){
+func (t *Connection) autoGetRaftLeader(host string, req *SdkRequest_Common, retry int) (*RaftLeaderResSimple,error){
 	conn, err := GetConnection(host, t.username, t.password, t.crtFile, t.DefaultConfig)
 	// 用一次就关掉
 	defer conn.CloseAll()
@@ -420,7 +420,13 @@ func (t *Connection) autoGetRaftLeader(host string, req *SdkRequest_Common) (*Ra
 			FollowersHost: nil,
 		}, nil
 	case types.ErrorCode_RAFT_REDIRECT:
-		return t.autoGetRaftLeader(res.Status.ClusterInfo.Redirect, req)
+		if retry > 1 {
+			return &RaftLeaderResSimple{
+				Code: types.ErrorCode_UNKNOW,
+				Message: "raft redirect too many times",
+			}, nil
+		}
+		return t.autoGetRaftLeader(res.Status.ClusterInfo.Redirect, req, retry+1)
 	}
 	return &RaftLeaderResSimple{
 		Code: errorCode,
@@ -452,7 +458,7 @@ func (t *Connection)  RefreshRaftLeader(redirectHost string, req *SdkRequest_Com
 	}
 	goGraphName := t.getGraphSetName(req.GraphSetName, "", false)
 	for _, host := range hosts{
-		res, err := t.autoGetRaftLeader(host, req)
+		res, err := t.autoGetRaftLeader(host, req, 0)
 		if err != nil {
 			return err
 		}
