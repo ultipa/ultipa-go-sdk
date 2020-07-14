@@ -226,7 +226,7 @@ func deserialize(bytes []byte, propertyType types.PropertyType) interface{} {
 func FormatStatus(status *ultipa.Status, err error) *types.Status {
 	if err != nil {
 		return &types.Status{
-			Code:    types.ErrorCode_FAILED,
+			Code:    types.ErrorCode_UNKNOW,
 			Message: fmt.Sprint(err),
 		}
 	}

@@ -136,7 +136,14 @@ func (t *HostManager)GetAllHosts()  *[]string{
 	return &hosts
 
 }
-func (t*HostManager) chooseClientInfo(clientType ClientType, uql string, readModeNonConsistency bool) *ClientInfo  {
+func (t*HostManager) chooseClientInfo(clientType ClientType, uql string, readModeNonConsistency bool, useHost string) *ClientInfo  {
+	if useHost != "" {
+		for _, clientInfo := range t.getAllClientInfos()  {
+			if clientInfo.Host == useHost {
+				return clientInfo
+			}
+		}
+	}
 	if clientType == ClientType_Default && uql != "" {
 		if (UqlIsAlgo(uql)) {
 			clientType = ClientType_Algo
@@ -218,9 +225,9 @@ func (t *HostManagerControl) Init(initHost string, username string, password str
 	t.AllHostManager = map[string]*HostManager{}
 }
 
-func (t*HostManagerControl) chooseClientInfo(graphSetName string, clientType ClientType, uql string) *ClientInfo {
+func (t*HostManagerControl) chooseClientInfo(graphSetName string, clientType ClientType, uql string, useHost string) *ClientInfo {
 	hostManager := t.getHostManager(graphSetName)
-	return hostManager.chooseClientInfo(clientType, uql, t.ReadModeNonConsistency)
+	return hostManager.chooseClientInfo(clientType, uql, t.ReadModeNonConsistency, useHost)
 }
 func (t*HostManagerControl) getHostManager(graphSetName string) *HostManager {
 	hostManager := t.AllHostManager[graphSetName]
@@ -335,6 +342,7 @@ type GetClientInfoParams struct {
 	Uql string
 	IsGlobal bool
 	IgnoreRaft bool
+	UseHost string
 }
 
 func (t *Connection) getClientInfo(params *GetClientInfoParams) *GetClientInfoResult {
@@ -354,7 +362,7 @@ func (t *Connection) getClientInfo(params *GetClientInfoParams) *GetClientInfoRe
 		t.HostManagerControl.getHostManager(goGraphSetName).RaftReady = true
 	}
 
-	clientInfo := t.HostManagerControl.chooseClientInfo(goGraphSetName, params.ClientType, params.Uql)
+	clientInfo := t.HostManagerControl.chooseClientInfo(goGraphSetName, params.ClientType, params.Uql, params.UseHost)
 	return &GetClientInfoResult{
 		ClientInfo: clientInfo,
 		Context: ctx,
@@ -372,9 +380,13 @@ func (t *Connection) getGraphSetName(currentGraphName string,uql string, isGloba
 	}
 	return t.DefaultConfig.GraphSetName
 }
-func (t *Connection) TestConnect()  (bool, error) {
+func (t *Connection) TestConnect(commonReq *SdkRequest_Common)  (bool, error) {
+	if commonReq == nil {
+		commonReq = &SdkRequest_Common{}
+	}
 	clientInfo := t.getClientInfo(&GetClientInfoParams{
 		IsGlobal: true,
+		UseHost: commonReq.UseHost,
 	})
 	defer clientInfo.CancelFunc()
 	name := "MyTest"
@@ -396,14 +408,14 @@ type RaftLeaderResSimple struct {
 	LeaderHost string
 	FollowersHost []string
 }
-func (t *Connection) autoGetRaftLeader(host string, req *SdkRequest_Common, retry int) (*RaftLeaderResSimple,error){
+func (t *Connection) autoGetRaftLeader(host string, commonReq *SdkRequest_Common, retry int) (*RaftLeaderResSimple,error){
 	conn, err := GetConnection(host, t.username, t.password, t.crtFile, t.DefaultConfig)
 	// 用一次就关掉
 	defer conn.CloseAll()
 	if err != nil {
 		return nil, err
 	}
-	res := conn.GetLeaderReuqest(req)
+	res := conn.GetLeaderReuqest(commonReq)
 	errorCode := res.Status.Code
 	switch errorCode {
 	case types.ErrorCode_SUCCESS:
@@ -426,7 +438,7 @@ func (t *Connection) autoGetRaftLeader(host string, req *SdkRequest_Common, retr
 				Message: "raft redirect too many times",
 			}, nil
 		}
-		return t.autoGetRaftLeader(res.Status.ClusterInfo.Redirect, req, retry+1)
+		return t.autoGetRaftLeader(res.Status.ClusterInfo.Redirect, commonReq, retry+1)
 	}
 	return &RaftLeaderResSimple{
 		Code: errorCode,
@@ -443,12 +455,13 @@ type (
 		GraphSetName string
 		TimeoutSeconds time.Duration
 		Retry *Retry
+		UseHost string
 	}
 )
 
-func (t *Connection)  RefreshRaftLeader(redirectHost string, req *SdkRequest_Common) error{
-	if req == nil {
-		req = &SdkRequest_Common{}
+func (t *Connection)  RefreshRaftLeader(redirectHost string, commonReq *SdkRequest_Common) error{
+	if commonReq == nil {
+		commonReq = &SdkRequest_Common{}
 	}
 	var hosts []string
 	if redirectHost != "" {
@@ -456,9 +469,9 @@ func (t *Connection)  RefreshRaftLeader(redirectHost string, req *SdkRequest_Com
 	} else {
 		hosts = append(hosts, *t.HostManagerControl.GetAllHosts()...)
 	}
-	goGraphName := t.getGraphSetName(req.GraphSetName, "", false)
+	goGraphName := t.getGraphSetName(commonReq.GraphSetName, "", false)
 	for _, host := range hosts{
-		res, err := t.autoGetRaftLeader(host, req, 0)
+		res, err := t.autoGetRaftLeader(host, commonReq, 0)
 		if err != nil {
 			return err
 		}

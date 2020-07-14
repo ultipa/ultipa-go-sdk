@@ -2,21 +2,21 @@ package sdk
 
 import (
 	"io"
-	"log"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/types"
 	"ultipa-go-sdk/utils"
 )
 
-func (t *Connection) UQL(uql string, req *SdkRequest_Common) types.ResUqlReply {
+func (t *Connection) UQL(uql string, commonReq *SdkRequest_Common) *types.ResUqlReply {
+	if commonReq == nil {
+		commonReq = &SdkRequest_Common{}
+	}
 	clientInfo := t.getClientInfo(&GetClientInfoParams{
 		Uql: uql,
+		UseHost: commonReq.UseHost,
 	})
 	defer clientInfo.CancelFunc()
-	if req == nil {
-		req = &SdkRequest_Common{}
-	}
-	retry := req.Retry
+	retry := commonReq.Retry
 	if retry == nil {
 		retry = &Retry{
 			Current: 0,
@@ -29,7 +29,7 @@ func (t *Connection) UQL(uql string, req *SdkRequest_Common) types.ResUqlReply {
 	})
 	//log.Printf("❗️ UQL: %s, host: %s, graphSetName: %s", uql, clientInfo.Host, clientInfo.GraphSetName)
 
-	res := types.ResUqlReply{
+	res := &types.ResUqlReply{
 		ResWithoutData:&types.ResWithoutData{},
 	}
 	if t.DefaultConfig.ResponseWithRequestInfo {
@@ -42,11 +42,8 @@ func (t *Connection) UQL(uql string, req *SdkRequest_Common) types.ResUqlReply {
 	}
 
 	if err != nil {
-		log.Printf("uql error %v", err)
-		res.Status = &types.Status{
-			Code: types.ErrorCode_UNKNOW,
-			Message: err.Error(),
-		}
+		//log.Printf("uql error %v", err)
+		res.Status = utils.FormatStatus(nil, err)
 		return res
 	}
 
@@ -57,7 +54,7 @@ func (t *Connection) UQL(uql string, req *SdkRequest_Common) types.ResUqlReply {
 			if err == io.EOF {
 				break
 			} else {
-				log.Printf("Failed %v \n", err)
+				//log.Printf("Failed %v \n", err)
 				res.Status = utils.FormatStatus(nil, err)
 				return res
 				break

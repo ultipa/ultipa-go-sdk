@@ -12,13 +12,13 @@ type GetLeaderReply struct {
 	Status *types.Status
 }
 
-func (t *Connection) GetLeaderReuqest(req *SdkRequest_Common) *GetLeaderReply {
-	if req == nil {
-		req = &SdkRequest_Common{}
+func (t *Connection) GetLeaderReuqest(commonReq *SdkRequest_Common) *GetLeaderReply {
+	if commonReq == nil {
+		commonReq = &SdkRequest_Common{}
 	}
 	clientInfo := t.getClientInfo(&GetClientInfoParams{
 		ClientType: ClientType_Leader,
-		GraphSetName: req.GraphSetName,
+		GraphSetName: commonReq.GraphSetName,
 		IgnoreRaft: true,
 	})
 	defer clientInfo.CancelFunc()

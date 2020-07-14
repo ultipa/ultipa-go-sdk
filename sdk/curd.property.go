@@ -27,8 +27,7 @@ func (t *Connection) ListProperty (request ShowPropertyRequest) *types.ResListPr
 	var newData []*types_response.Property
 	for _, pty := range *properties{
 		newPty := types_response.Property{
-			Lte: (*pty)["lte"] == "true",
-			Index: (*pty)["index"] == "true",
+			Lte: (*pty)["lte"].(string),
 			PropertyName: (*pty)["name"].(string),
 			PropertyType: (*pty)["type"].(string),
 		}

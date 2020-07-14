@@ -18,6 +18,6 @@ func TestGetProperty(t *testing.T) {
 
 	log.Printf("\nuql res ->\n %s\n", resJson)
 	for _, pty := range res.Data {
-		log.Printf("%s, %s, %v, %v", pty.PropertyType, pty.PropertyName, pty.Lte, pty.Index)
+		log.Printf("%s, %s, %v", pty.PropertyType, pty.PropertyName, pty.Lte)
 	}
 }

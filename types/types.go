@@ -143,3 +143,11 @@ type ResListProperty = struct {
 	*ResWithoutData
 	Data []*types_response.Property
 }
+type ResListClusterInfo = struct {
+	*ResWithoutData
+	Data []*types_response.ClusterInfo
+}
+type ResStat = struct {
+	*ResWithoutData
+	Data *types_response.Stat
+}

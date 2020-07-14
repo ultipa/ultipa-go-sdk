@@ -11,7 +11,7 @@ func TestConnection(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	result, err1 := connet.TestConnect()
+	result, err1 := connet.TestConnect(nil)
 	if err1 != nil {
 		t.Error(err1)
 	}
