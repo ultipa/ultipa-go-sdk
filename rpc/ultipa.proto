@@ -35,6 +35,13 @@ service UltipaRpcs {
     //8.插入边
     rpc InsertEdges (InsertEdgesRequest) returns (InsertEdgesReply) {
     }
+
+    //9.uql扩展，以下命令在此接口执行执行 top, kill showTask, stopTask,clearTask show() stat listGraph
+    // listAlgo getGraph createPolicy, deletePolicy, listPolicy, getPolicy,
+    // grant, revoke, listPrivilege, getUser, getSelfInfo, createUser, updateUser, deleteUser
+    rpc UqlEx (UqlRequest) returns (stream UqlReply) {
+    }
+
 }
 
 /*------------------------1.SayHello------------------------------*/
@@ -163,6 +170,7 @@ message InsertNodesReply {
     int32 time_cost = 2;
     int32 engine_time_cost = 3;
     repeated int64 ids = 4;
+    repeated int32 ignore_indexes = 5;
 }
 /*------------------------InsertNodes------------------------------*/
 
@@ -180,6 +188,7 @@ message InsertEdgesReply {
     int32 time_cost = 2;
     int32 engine_time_cost = 3;
     repeated int64 ids = 4;
+    repeated int32 ignore_indexes = 5;
 }
 /*------------------------InsertEdges------------------------------*/
 

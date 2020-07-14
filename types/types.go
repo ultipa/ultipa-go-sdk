@@ -151,3 +151,7 @@ type ResStat = struct {
 	*ResWithoutData
 	Data *types_response.Stat
 }
+type ResListSample = struct {
+	*ResWithoutData
+	Data *[]*map[string]interface{}
+}

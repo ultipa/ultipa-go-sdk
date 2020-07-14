@@ -9,11 +9,10 @@ func (t *Connection) Stat(commonReq *SdkRequest_Common) *types.ResStat {
 	uql := utils.UQLMAKER{}
 	uql.SetCommand(utils.CommandList_stat)
 
-	res := t.UQL(uql.ToString(),  commonReq)
+	res := t.UQLListSample(uql.ToString(),  commonReq)
 	var newData types_response.Stat
 	if res.Status.Code == types.ErrorCode_SUCCESS  {
-		uqlReply := res.Data
-		datas := utils.TableToArray((*uqlReply.Tables)[0])
+		datas := res.Data
 		for _, data := range *datas{
 			newData = types_response.Stat{
 				MemUsage: (*data)["memUsage"].(string),

@@ -7,6 +7,18 @@ import (
 	"ultipa-go-sdk/utils"
 )
 
+func (t *Connection) UQLListSample(uql string, commonReq *SdkRequest_Common) *types.ResListSample  {
+	res := t.UQL(uql, commonReq)
+	uqlReply := res.Data
+	var data *[]*map[string]interface{}
+	if uqlReply != nil && uqlReply.Tables != nil && len(*uqlReply.Tables) > 0 {
+		data = utils.TableToArray((*uqlReply.Tables)[0])
+	}
+	return &types.ResListSample{
+		res.ResWithoutData,
+		data,
+	}
+}
 func (t *Connection) UQL(uql string, commonReq *SdkRequest_Common) *types.ResUqlReply {
 	if commonReq == nil {
 		commonReq = &SdkRequest_Common{}

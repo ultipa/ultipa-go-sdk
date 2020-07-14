@@ -10,7 +10,7 @@ type ShowPropertyRequest = struct {
 	Dataset types.DBType;
 }
 
-func (t *Connection) ListProperty (request ShowPropertyRequest) *types.ResListProperty {
+func (t *Connection) ListProperty (request *ShowPropertyRequest, commonReq *SdkRequest_Common) *types.ResListProperty {
 	uql := utils.UQLMAKER{}
 	dataset := request.Dataset
 	switch dataset {
@@ -21,9 +21,8 @@ func (t *Connection) ListProperty (request ShowPropertyRequest) *types.ResListPr
 		uql.SetCommand(utils.CommandList_showEdgeProperty)
 		break
 	}
-	res := t.UQL(uql.ToString(), nil)
-	uqlReply := res.Data
-	properties := utils.TableToArray((*uqlReply.Tables)[0])
+	res := t.UQLListSample(uql.ToString(), commonReq)
+	properties := res.Data
 	var newData []*types_response.Property
 	for _, pty := range *properties{
 		newPty := types_response.Property{
@@ -33,8 +32,6 @@ func (t *Connection) ListProperty (request ShowPropertyRequest) *types.ResListPr
 		}
 		newData = append(newData, &newPty)
 	}
-
-
 	return &types.ResListProperty{
 		res.ResWithoutData,
 		newData,

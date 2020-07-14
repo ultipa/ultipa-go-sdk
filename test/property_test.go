@@ -11,9 +11,9 @@ import (
 func TestGetProperty(t *testing.T) {
 	conn, _ := GetTestDefaultConnection(nil)
 
-	res := conn.ListProperty(sdk.ShowPropertyRequest{
+	res := conn.ListProperty(&sdk.ShowPropertyRequest{
 		Dataset: types.DBType_DBNODE,
-	})
+	}, nil)
 	resJson, _ := utils.StructToJSONBytes(res)
 
 	log.Printf("\nuql res ->\n %s\n", resJson)
