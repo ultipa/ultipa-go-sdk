@@ -35,10 +35,24 @@ func (t *Connection) UQL(uql string, commonReq *SdkRequest_Common) *types.ResUql
 			Max: 3,
 		}
 	}
-	msg, err := clientInfo.ClientInfo.Client.Uql(clientInfo.Context, &ultipa.UqlRequest{
-		Uql: uql,
-		Timeout: t.DefaultConfig.TimeoutWithSeconds,
-	})
+	isUseUqlExtra := UqlIsExtra(uql)
+	//msg, err := clientInfo.ClientInfo.Client.Uql(clientInfo.Context, &ultipa.UqlRequest{
+	//	Uql: uql,
+	//	Timeout: t.DefaultConfig.TimeoutWithSeconds,
+	//})
+	var msg ultipa.UltipaRpcs_UqlClient
+	var err error
+	if isUseUqlExtra {
+		msg, err = clientInfo.ClientInfo.Client.UqlEx(clientInfo.Context, &ultipa.UqlRequest{
+			Uql: uql,
+			Timeout: t.DefaultConfig.TimeoutWithSeconds,
+		})
+	} else {
+		msg, err = clientInfo.ClientInfo.Client.Uql(clientInfo.Context, &ultipa.UqlRequest{
+			Uql: uql,
+			Timeout: t.DefaultConfig.TimeoutWithSeconds,
+		})
+	}
 	//log.Printf("❗️ UQL: %s, host: %s, graphSetName: %s", uql, clientInfo.Host, clientInfo.GraphSetName)
 
 	res := &types.ResUqlReply{
@@ -50,6 +64,7 @@ func (t *Connection) UQL(uql string, commonReq *SdkRequest_Common) *types.ResUql
 			"graphSetName": clientInfo.GraphSetName,
 			"retry": retry,
 			"uql": uql,
+			"isUseUqlExtra": isUseUqlExtra,
 		}
 	}
 

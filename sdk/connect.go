@@ -50,12 +50,23 @@ var (
 		"revoke","createPolicy","updatePolicy","deletePolicy","createIndex",
 		"dropIndex","createGraph","dropGraph","stopTask",
 	}
+	UQL_Command_Extra = [] string {
+		"top","kill","showTask","stopTask","clearTask","show","stat","listGraph","listAlgo","getGraph",
+		"createPolicy","deletePolicy","listPolicy","getPolicy","grant","revoke","listPrivilege","getUser",
+		"getSelfInfo","createUser","updateUser","deleteUser",
+	}
 )
 
 func UqlIsGlobal(uqlStr string)  bool {
 	uql := utils.UQL{}
 	uql.Parse(uqlStr)
 	_, f := Find(UQL_Command_Global, uql.Command)
+	return f
+}
+func UqlIsExtra(uqlStr string)  bool{
+	uql := utils.UQL{}
+	uql.Parse(uqlStr)
+	_, f := Find(UQL_Command_Extra, uql.Command)
 	return f
 }
 func UqlIsWrite(uqlStr string) bool {
