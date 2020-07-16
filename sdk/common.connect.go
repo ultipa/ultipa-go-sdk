@@ -35,11 +35,11 @@ func (t *Connection) ClusterInfo(commonReq *SdkRequest_Common) *types_response.R
 	for _, peer := range res.Status.ClusterInfo.RaftPeers{
 		info := &types_response.ClusterInfo{
 			RaftPeerInfo: peer,
-			//Stat: &types_response.Stat{
-			//	MemUsage: "",
-			//	CpuUsage: "",
-			//	ExpiredDate: "",
-			//},
+			Stat: &types_response.Stat{
+				MemUsage: "",
+				CpuUsage: "",
+				ExpiredDate: "",
+			},
 		}
 		//log.Printf("------")
 		if peer.Status {
