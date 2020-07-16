@@ -38,7 +38,7 @@ service UltipaRpcs {
 
     //9.uql扩展，以下命令在此接口执行执行 top, kill showTask, stopTask,clearTask show() stat listGraph
     // listAlgo getGraph createPolicy, deletePolicy, listPolicy, getPolicy,
-    // grant, revoke, listPrivilege, getUser, getSelfInfo, createUser, updateUser, deleteUser
+    // grant, revoke, listPrivilege, getUser, getSelfInfo, createUser, updateUser, deleteUser, showIndex
     rpc UqlEx (UqlRequest) returns (stream UqlReply) {
     }
 
@@ -217,9 +217,10 @@ enum ErrorCode {
     RAFT_LOG_ERROR = 8;
     UQL_ERROR = 9;
     NOT_RAFT_MODE = 10;
-    RAFT_NO_FOLLOWERS = 11;
+    RAFT_NO_AVAILABLE_FOLLOWERS = 11;
+    RAFT_NO_AVAILABLE_ALGO_SERVERS = 12;
     //鉴权失败
-    PERMISSION_DENIED = 12;
+    PERMISSION_DENIED = 13;
 }
 
 message Status {
@@ -228,9 +229,27 @@ message Status {
     ClusterInfo cluster_info = 3;
 }
 
+enum FollowerRole {
+    ROLE_UNSET = 0;
+    ROLE_READABLE = 1;
+    ROLE_ALGO_EXECUTABLE = 2;
+}
+
+message RaftFollower {
+    string address = 1;
+    int32 role = 2;
+    ServerStatus status = 3;
+}
+
+enum ServerStatus {
+    DEAD = 0;
+    ALIVE = 1;
+}
+
 message ClusterInfo {
     string redirect = 1;
-    string raft_peers = 2;
+    string leader_address = 2;
+    repeated RaftFollower followers = 3;
 }
 
 enum DBType {

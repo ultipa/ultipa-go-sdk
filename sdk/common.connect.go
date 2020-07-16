@@ -5,7 +5,7 @@ import (
 	"ultipa-go-sdk/types/types_response"
 	"ultipa-go-sdk/utils"
 )
-func (t *Connection) Stat(commonReq *SdkRequest_Common) *types.ResStat {
+func (t *Connection) Stat(commonReq *SdkRequest_Common) *types_response.ResStat {
 	uql := utils.UQLMAKER{}
 	uql.SetCommand(utils.CommandList_stat)
 
@@ -17,42 +17,44 @@ func (t *Connection) Stat(commonReq *SdkRequest_Common) *types.ResStat {
 			newData = types_response.Stat{
 				MemUsage: (*data)["memUsage"].(string),
 				CpuUsage: (*data)["cpuUsage"].(string),
+				ExpiredDate: (*data)["expiredDate"].(string),
 			}
 			break
 		}
 	}
-	return &types.ResStat{
+	return &types_response.ResStat{
 		res.ResWithoutData,
 		&newData,
 	}
 }
 
-func (t *Connection) ClusterInfo() *types.ResListClusterInfo {
-	t.RefreshRaftLeader("",&SdkRequest_Common{
-		GraphSetName: RAFT_GLOBAL,
-	})
-	hosts := t.HostManagerControl.GetAllHosts()
-	var result []*types_response.ClusterInfo
-	for _, host := range *hosts{
-		host_commom_req := &SdkRequest_Common{
-			UseHost: host,
-		}
-		status, _ := t.TestConnect(host_commom_req)
+func (t *Connection) ClusterInfo(commonReq *SdkRequest_Common) *types_response.ResListClusterInfo {
+	t.RefreshRaftLeader("",commonReq)
+	res := t.GetLeaderReuqest(commonReq)
+	var result = []*types_response.ClusterInfo{}
+	for _, peer := range res.Status.ClusterInfo.RaftPeers{
 		info := &types_response.ClusterInfo{
-			Status: status,
-			Host: host,
-			Stat: &types_response.Stat{
-				MemUsage: "",
-				CpuUsage: "",
-			},
+			RaftPeerInfo: peer,
+			//Stat: &types_response.Stat{
+			//	MemUsage: "",
+			//	CpuUsage: "",
+			//	ExpiredDate: "",
+			//},
 		}
-		res := t.Stat(host_commom_req)
-		if res.Status.Code == types.ErrorCode_SUCCESS {
-			info.Stat = res.Data
+		//log.Printf("------")
+		if peer.Status {
+			res := t.Stat(&SdkRequest_Common{
+				UseHost: peer.Host,
+			})
+			//v, _ := utils.StructToJSONString(res)
+			//log.Printf(v)
+			if res.Status.Code == types.ErrorCode_SUCCESS {
+				info.Stat = res.Data
+			}
 		}
 		result = append(result, info)
 	}
-	return &types.ResListClusterInfo{
+	return &types_response.ResListClusterInfo{
 		&types.ResWithoutData{
 			Status: &types.Status{
 				Code: types.ErrorCode_SUCCESS,

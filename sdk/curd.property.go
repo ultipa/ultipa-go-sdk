@@ -10,7 +10,7 @@ type ShowPropertyRequest = struct {
 	Dataset types.DBType;
 }
 
-func (t *Connection) ListProperty (request *ShowPropertyRequest, commonReq *SdkRequest_Common) *types.ResListProperty {
+func (t *Connection) ListProperty (request *ShowPropertyRequest, commonReq *SdkRequest_Common) *types_response.ResListProperty {
 	uql := utils.UQLMAKER{}
 	dataset := request.Dataset
 	switch dataset {
@@ -32,7 +32,7 @@ func (t *Connection) ListProperty (request *ShowPropertyRequest, commonReq *SdkR
 		}
 		newData = append(newData, &newPty)
 	}
-	return &types.ResListProperty{
+	return &types_response.ResListProperty{
 		res.ResWithoutData,
 		newData,
 	}

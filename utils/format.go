@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"strings"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/types"
 )
@@ -242,8 +241,31 @@ func FormatStatus(status *ultipa.Status, err error) *types.Status {
 	}
 	_clusterInfo := status.GetClusterInfo()
 	if _clusterInfo != nil {
-		clusterInfo.Redirect = _clusterInfo.Redirect
-		clusterInfo.RaftPeers = strings.Split(_clusterInfo.RaftPeers, ",")
+		clusterInfo.Redirect = _clusterInfo.GetRedirect()
+		clusterInfo.RaftPeers = []*types.RaftPeerInfo{}
+		if len(_clusterInfo.GetFollowers())> 0 {
+			clusterInfo.RaftPeers = append(clusterInfo.RaftPeers,
+				&types.RaftPeerInfo{
+					Host: _clusterInfo.GetLeaderAddress(),
+					Status: true,
+					IsLeader: true,
+					IsAlgoExecutable: false,
+					IsFollowerReadable: false,
+					IsUnset: false,
+				})
+		}
+		for _, info := range  _clusterInfo.GetFollowers() {
+			role := info.GetRole()
+			clusterInfo.RaftPeers = append(clusterInfo.RaftPeers, &types.RaftPeerInfo{
+				Host: info.GetAddress(),
+				Status: info.GetStatus() == 1,
+				IsLeader: false,
+				IsAlgoExecutable: role & int32(types.RAFT_FOLLOWER_ROLE_ALGO_EXECUTABLE) > 0,
+				IsFollowerReadable: role & int32(types.RAFT_FOLLOWER_ROLE_READABLE) > 0,
+				IsUnset: role == int32(types.RAFT_FOLLOWER_ROLE_UNSET),
+			})
+		}
+
 	}
 	return &newStatus
 }

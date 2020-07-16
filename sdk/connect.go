@@ -92,7 +92,7 @@ func Find(slice []string, val string) (int, bool) {
 type HostManager struct {
 	GraphSetName string
 	LeaderHost string
-	FollowersHost []string
+	FollowersPeerInfos []*types.RaftPeerInfo
 	RaftReady bool
 
 	username string
@@ -100,9 +100,11 @@ type HostManager struct {
 	crtFile string
 
 	leaderClientInfo *ClientInfo
-	algoClientInfo *ClientInfo
+	algoClientInfos []*ClientInfo
 	defaultClientInfo *ClientInfo
 	otherFollowerClientInfos []*ClientInfo
+	otherUnsetFollowerClientInfos []*ClientInfo
+	nullClientInfo *ClientInfo
 }
 func (t *HostManager) Init(graphSetName string, host string, username string, password string, crtFile string)  {
 	t.GraphSetName = graphSetName
@@ -110,8 +112,8 @@ func (t *HostManager) Init(graphSetName string, host string, username string, pa
 	t.password = password
 	t.crtFile = crtFile
 	t.LeaderHost = host
-	clientInfo, _ := t.createClientInfo(host)
-	t.defaultClientInfo = clientInfo
+	t.nullClientInfo, _ = t.createClientInfo("")
+	t.defaultClientInfo, _ = t.createClientInfo(host)
 }
 func (t *HostManager) createClientInfo(host string) (*ClientInfo, error) {
 	var opts []grpc.DialOption
@@ -141,15 +143,18 @@ func (t *HostManager)GetAllHosts()  *[]string{
 	hosts := []string{
 		t.LeaderHost,
 	}
-	if t.FollowersHost != nil && len(t.FollowersHost) > 0 {
-		hosts = append(hosts, t.FollowersHost...)
+	if t.FollowersPeerInfos != nil && len(t.FollowersPeerInfos) > 0 {
+		for _, info := range t.FollowersPeerInfos {
+			hosts = append(hosts, info.Host)
+		}
+
 	}
 	return &hosts
 
 }
 func (t*HostManager) chooseClientInfo(clientType ClientType, uql string, readModeNonConsistency bool, useHost string) *ClientInfo  {
 	if useHost != "" {
-		for _, clientInfo := range t.getAllClientInfos()  {
+		for _, clientInfo := range t.getAllClientInfos(false, true)  {
 			if clientInfo.Host == useHost {
 				return clientInfo
 			}
@@ -163,10 +168,11 @@ func (t*HostManager) chooseClientInfo(clientType ClientType, uql string, readMod
 		}
 	}
 	if clientType == ClientType_Algo {
-		if t.algoClientInfo != nil {
-			return t.algoClientInfo
+		if t.algoClientInfos != nil && len(t.algoClientInfos)>0 {
+			return t.algoClientInfos[rand.Intn(len(t.algoClientInfos))]
+		} else {
+			return t.nullClientInfo
 		}
-		return t.defaultClientInfo
 	}
 	if clientType == ClientType_Update || clientType == ClientType_Leader || readModeNonConsistency == false {
 		if t.leaderClientInfo != nil {
@@ -176,45 +182,56 @@ func (t*HostManager) chooseClientInfo(clientType ClientType, uql string, readMod
 	}
 
 	// 负载均衡，随机挑一个
-	all := t.getAllClientInfos()
+	all := t.getAllClientInfos(true,false)
 	return all[rand.Intn(len(all))]
 }
-func (t *HostManager) getAllClientInfos() []*ClientInfo  {
+func (t *HostManager) getAllClientInfos(ignoreAlgo bool, needUnset bool) []*ClientInfo  {
 	all := []*ClientInfo{
 		t.defaultClientInfo,
-	}
-	if t.algoClientInfo != nil {
-		all = append(all, t.algoClientInfo)
 	}
 	if t.leaderClientInfo != nil && t.leaderClientInfo.Host != t.defaultClientInfo.Host{
 		all = append(all, t.leaderClientInfo)
 	}
+	if !ignoreAlgo && t.algoClientInfos != nil {
+		all = append(all, t.algoClientInfos...)
+	}
 	if t.otherFollowerClientInfos != nil {
 		all = append(all, t.otherFollowerClientInfos...)
 	}
+	if needUnset && t.otherUnsetFollowerClientInfos != nil {
+		all = append(all, t.otherUnsetFollowerClientInfos...)
+	}
 	return all
 }
-func (t *HostManager) SetClients(leaderHost string, followersHost [] string)  {
+func (t *HostManager) SetClients(leaderHost string, followersPeerInfos []*types.RaftPeerInfo)  {
 	t.LeaderHost = leaderHost
 	if t.defaultClientInfo.Host == leaderHost {
 		t.leaderClientInfo = t.defaultClientInfo
 	} else {
-		clientInfo, _ := t.createClientInfo(leaderHost)
-		t.leaderClientInfo = clientInfo
+		t.leaderClientInfo, _ = t.createClientInfo(leaderHost)
 	}
-	t.FollowersHost = followersHost
-	if t.FollowersHost != nil && len(t.FollowersHost) > 0 {
-		info, _ := t.createClientInfo(followersHost[rand.Intn(len(followersHost))])
-		t.algoClientInfo = info
-		for _, host := range followersHost {
-			if host == info.Host {
-				continue
+	t.FollowersPeerInfos = followersPeerInfos
+	t.otherFollowerClientInfos = []*ClientInfo{}
+	t.otherUnsetFollowerClientInfos = []*ClientInfo{}
+	t.algoClientInfos = []*ClientInfo{}
+
+	if t.FollowersPeerInfos != nil && len(t.FollowersPeerInfos) > 0 {
+		for _, info := range t.FollowersPeerInfos {
+			host := info.Host
+			clientInfo, _ := t.createClientInfo(host)
+			if info.IsAlgoExecutable {
+				t.algoClientInfos = append(t.algoClientInfos, clientInfo)
 			}
-			info, _ := t.createClientInfo(host)
-			t.otherFollowerClientInfos = append(t.otherFollowerClientInfos, info)
+			if info.IsFollowerReadable {
+				t.otherFollowerClientInfos = append(t.otherFollowerClientInfos, clientInfo)
+			}
+			if info.IsUnset {
+				t.otherUnsetFollowerClientInfos = append(t.otherUnsetFollowerClientInfos, clientInfo)
+			}
 		}
+
 	} else {
-		t.algoClientInfo = t.leaderClientInfo
+		t.algoClientInfos = []*ClientInfo{t.leaderClientInfo}
 	}
 
 }
@@ -265,7 +282,6 @@ func (t *HostManagerControl) CloseAll()  {
 		if hostManager != nil {
 			saveClose(hostManager.defaultClientInfo)
 			saveClose(hostManager.leaderClientInfo)
-			saveClose(hostManager.algoClientInfo)
 		}
 	}
 }
@@ -417,7 +433,7 @@ type RaftLeaderResSimple struct {
 	Code ultipa.ErrorCode
 	Message string
 	LeaderHost string
-	FollowersHost []string
+	FollowersPeerInfos []*types.RaftPeerInfo
 }
 func (t *Connection) autoGetRaftLeader(host string, commonReq *SdkRequest_Common, retry int) (*RaftLeaderResSimple,error){
 	conn, err := GetConnection(host, t.username, t.password, t.crtFile, t.DefaultConfig)
@@ -434,18 +450,21 @@ func (t *Connection) autoGetRaftLeader(host string, commonReq *SdkRequest_Common
 		return &RaftLeaderResSimple{
 			Code: errorCode,
 			LeaderHost: host,
-			FollowersHost: utils.Remove(followers, host),
+			FollowersPeerInfos: utils.RemoveRaftInfos(followers, host),
 		}, nil
 	case types.ErrorCode_NOT_RAFT_MODE:
 		return &RaftLeaderResSimple{
 			Code:          types.ErrorCode_SUCCESS,
 			LeaderHost:    host,
-			FollowersHost: nil,
+			FollowersPeerInfos: nil,
 		}, nil
-	case types.ErrorCode_RAFT_REDIRECT, types.ErrorCode_RAFT_LEADER_NOT_YET_ELECTED, types.ErrorCode_RAFT_NO_FOLLOWERS:
+	case 	types.ErrorCode_RAFT_REDIRECT,
+			types.ErrorCode_RAFT_LEADER_NOT_YET_ELECTED,
+			types.ErrorCode_RAFT_NO_AVAILABLE_FOLLOWERS,
+			types.ErrorCode_RAFT_NO_AVAILABLE_ALGO_SERVERS:
 		if retry > 2 {
 			return &RaftLeaderResSimple{
-				Code: types.ErrorCode_UNKNOW,
+				Code: errorCode,
 				Message: "raft retry too many times",
 			}, nil
 		}
@@ -491,9 +510,9 @@ func (t *Connection)  RefreshRaftLeader(redirectHost string, commonReq *SdkReque
 		}
 		if res.Code == types.ErrorCode_SUCCESS {
 			leaderHost := res.LeaderHost
-			followersHost := res.FollowersHost
+			followersPeerInfos := res.FollowersPeerInfos
 			hostManager := t.HostManagerControl.upsetHostManager(goGraphName, leaderHost)
-			hostManager.SetClients(leaderHost, followersHost)
+			hostManager.SetClients(leaderHost, followersPeerInfos)
 			return nil
 		}
 		return fmt.Errorf("%v - %v", res.Code.String(), res.Message)

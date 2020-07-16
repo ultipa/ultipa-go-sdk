@@ -2,7 +2,6 @@ package types
 
 import (
 	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/types/types_response"
 )
 
 type PropertyType = ultipa.UltipaPropertyType
@@ -57,15 +56,32 @@ const (
 	ErrorCode_RAFT_LOG_ERROR              ErrorCode = ultipa.ErrorCode_RAFT_LOG_ERROR
 	ErrorCode_UQL_ERROR                   ErrorCode = ultipa.ErrorCode_UQL_ERROR
 	ErrorCode_NOT_RAFT_MODE               ErrorCode = ultipa.ErrorCode_NOT_RAFT_MODE
-	ErrorCode_RAFT_NO_FOLLOWERS 		  ErrorCode	= ultipa.ErrorCode_RAFT_NO_FOLLOWERS
+	ErrorCode_RAFT_NO_AVAILABLE_FOLLOWERS 		  ErrorCode	= ultipa.ErrorCode_RAFT_NO_AVAILABLE_FOLLOWERS
+	ErrorCode_RAFT_NO_AVAILABLE_ALGO_SERVERS 		  ErrorCode	= ultipa.ErrorCode_RAFT_NO_AVAILABLE_ALGO_SERVERS
 	ErrorCode_PERMISSION_DENIED 		  ErrorCode = ultipa.ErrorCode_PERMISSION_DENIED
 
 	ErrorCode_UNKNOW					  ErrorCode = 1000
 )
 
+type RAFT_FOLLOWER_ROLE = ultipa.FollowerRole
+const (
+	RAFT_FOLLOWER_ROLE_UNSET  RAFT_FOLLOWER_ROLE = ultipa.FollowerRole_ROLE_UNSET
+	RAFT_FOLLOWER_ROLE_READABLE RAFT_FOLLOWER_ROLE = ultipa.FollowerRole_ROLE_READABLE
+	RAFT_FOLLOWER_ROLE_ALGO_EXECUTABLE RAFT_FOLLOWER_ROLE = ultipa.FollowerRole_ROLE_ALGO_EXECUTABLE
+)
+
+type RaftPeerInfo struct {
+	Host string
+	Status bool
+	IsLeader bool
+	IsFollowerReadable bool
+	IsAlgoExecutable bool
+	IsUnset bool
+}
+
 type ClusterInfo struct {
 	Redirect  string
-	RaftPeers []string
+	RaftPeers []*RaftPeerInfo
 }
 
 type Status = struct {
@@ -140,20 +156,4 @@ type ResWithoutData = struct {
 type ResUqlReply = struct {
 	*ResWithoutData
 	Data *UqlReply
-}
-type ResListProperty = struct {
-	*ResWithoutData
-	Data []*types_response.Property
-}
-type ResListClusterInfo = struct {
-	*ResWithoutData
-	Data []*types_response.ClusterInfo
-}
-type ResStat = struct {
-	*ResWithoutData
-	Data *types_response.Stat
-}
-type ResListSample = struct {
-	*ResWithoutData
-	Data *[]*map[string]interface{}
 }

@@ -4,17 +4,18 @@ import (
 	"io"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/types"
+	"ultipa-go-sdk/types/types_response"
 	"ultipa-go-sdk/utils"
 )
 
-func (t *Connection) UQLListSample(uql string, commonReq *SdkRequest_Common) *types.ResListSample  {
+func (t *Connection) UQLListSample(uql string, commonReq *SdkRequest_Common) *types_response.ResListSample  {
 	res := t.UQL(uql, commonReq)
 	uqlReply := res.Data
 	var data *[]*map[string]interface{}
 	if uqlReply != nil && uqlReply.Tables != nil && len(*uqlReply.Tables) > 0 {
 		data = utils.TableToArray((*uqlReply.Tables)[0])
 	}
-	return &types.ResListSample{
+	return &types_response.ResListSample{
 		res.ResWithoutData,
 		data,
 	}
