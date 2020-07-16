@@ -53,7 +53,7 @@ var (
 	UQL_Command_Extra = [] string {
 		"top","kill","showTask","stopTask","clearTask","show","stat","listGraph","listAlgo","getGraph",
 		"createPolicy","deletePolicy","listPolicy","getPolicy","grant","revoke","listPrivilege","getUser",
-		"getSelfInfo","createUser","updateUser","deleteUser",
+		"getSelfInfo","createUser","updateUser","deleteUser", "showIndex",
 	}
 )
 
@@ -442,12 +442,15 @@ func (t *Connection) autoGetRaftLeader(host string, commonReq *SdkRequest_Common
 			LeaderHost:    host,
 			FollowersHost: nil,
 		}, nil
-	case types.ErrorCode_RAFT_REDIRECT:
-		if retry > 1 {
+	case types.ErrorCode_RAFT_REDIRECT, types.ErrorCode_RAFT_LEADER_NOT_YET_ELECTED, types.ErrorCode_RAFT_NO_FOLLOWERS:
+		if retry > 2 {
 			return &RaftLeaderResSimple{
 				Code: types.ErrorCode_UNKNOW,
-				Message: "raft redirect too many times",
+				Message: "raft retry too many times",
 			}, nil
+		}
+		if errorCode != ultipa.ErrorCode_RAFT_REDIRECT {
+			time.Sleep(300 * time.Millisecond)
 		}
 		return t.autoGetRaftLeader(res.Status.ClusterInfo.Redirect, commonReq, retry+1)
 	}

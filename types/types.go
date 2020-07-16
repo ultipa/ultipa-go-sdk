@@ -57,6 +57,8 @@ const (
 	ErrorCode_RAFT_LOG_ERROR              ErrorCode = ultipa.ErrorCode_RAFT_LOG_ERROR
 	ErrorCode_UQL_ERROR                   ErrorCode = ultipa.ErrorCode_UQL_ERROR
 	ErrorCode_NOT_RAFT_MODE               ErrorCode = ultipa.ErrorCode_NOT_RAFT_MODE
+	ErrorCode_RAFT_NO_FOLLOWERS 		  ErrorCode	= ultipa.ErrorCode_RAFT_NO_FOLLOWERS
+	ErrorCode_PERMISSION_DENIED 		  ErrorCode = ultipa.ErrorCode_PERMISSION_DENIED
 
 	ErrorCode_UNKNOW					  ErrorCode = 1000
 )
