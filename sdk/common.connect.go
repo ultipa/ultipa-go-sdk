@@ -32,28 +32,31 @@ func (t *Connection) ClusterInfo(commonReq *SdkRequest_Common) *types_response.R
 	t.RefreshRaftLeader("",commonReq)
 	res := t.GetLeaderReuqest(commonReq)
 	var result = []*types_response.ClusterInfo{}
-	for _, peer := range res.Status.ClusterInfo.RaftPeers{
-		info := &types_response.ClusterInfo{
-			RaftPeerInfo: peer,
-			Stat: &types_response.Stat{
-				MemUsage: "",
-				CpuUsage: "",
-				ExpiredDate: "",
-			},
-		}
-		//log.Printf("------")
-		if peer.Status {
-			res := t.Stat(&SdkRequest_Common{
-				UseHost: peer.Host,
-			})
-			//v, _ := utils.StructToJSONString(res)
-			//log.Printf(v)
-			if res.Status.Code == types.ErrorCode_SUCCESS {
-				info.Stat = res.Data
+	if res.Status.ClusterInfo != nil {
+		for _, peer := range res.Status.ClusterInfo.RaftPeers{
+			info := &types_response.ClusterInfo{
+				RaftPeerInfo: peer,
+				Stat: &types_response.Stat{
+					MemUsage: "",
+					CpuUsage: "",
+					ExpiredDate: "",
+				},
 			}
+			//log.Printf("------")
+			if peer.Status {
+				res := t.Stat(&SdkRequest_Common{
+					UseHost: peer.Host,
+				})
+				//v, _ := utils.StructToJSONString(res)
+				//log.Printf(v)
+				if res.Status.Code == types.ErrorCode_SUCCESS {
+					info.Stat = res.Data
+				}
+			}
+			result = append(result, info)
 		}
-		result = append(result, info)
 	}
+
 	return &types_response.ResListClusterInfo{
 		&types.ResWithoutData{
 			Status: &types.Status{

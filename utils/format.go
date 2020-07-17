@@ -223,6 +223,10 @@ func deserialize(bytes []byte, propertyType types.PropertyType) interface{} {
 //	return &newEdge
 //}
 func FormatStatus(status *ultipa.Status, err error) *types.Status {
+	return FormatStatusWithHost(status, err, "")
+}
+
+func FormatStatusWithHost(status *ultipa.Status, err error, host string) *types.Status {
 	if err != nil {
 		return &types.Status{
 			Code:    types.ErrorCode_UNKNOW,
@@ -240,28 +244,45 @@ func FormatStatus(status *ultipa.Status, err error) *types.Status {
 		newStatus.Message = status.GetMsg()
 	}
 	_clusterInfo := status.GetClusterInfo()
-	if _clusterInfo != nil {
+	isNotRaftMode := newStatus.Code == ultipa.ErrorCode_NOT_RAFT_MODE
+	if _clusterInfo != nil || isNotRaftMode {
+		if _clusterInfo == nil {
+			_clusterInfo = &ultipa.ClusterInfo{
+				Redirect: "",
+				LeaderAddress: host,
+				Followers: []*ultipa.RaftFollower{},
+			}
+		}
 		clusterInfo.Redirect = _clusterInfo.GetRedirect()
 		clusterInfo.RaftPeers = []*types.RaftPeerInfo{}
-		if len(_clusterInfo.GetFollowers())> 0 {
-			clusterInfo.RaftPeers = append(clusterInfo.RaftPeers,
-				&types.RaftPeerInfo{
-					Host: _clusterInfo.GetLeaderAddress(),
-					Status: true,
-					IsLeader: true,
-					IsAlgoExecutable: false,
-					IsFollowerReadable: false,
-					IsUnset: false,
-				})
+		leaderIsAlgoExecutable := false
+		if isNotRaftMode {
+			leaderIsAlgoExecutable = true
 		}
+		clusterInfo.RaftPeers = append(clusterInfo.RaftPeers,
+			&types.RaftPeerInfo{
+				Host: _clusterInfo.GetLeaderAddress(),
+				Status: true,
+				IsLeader: true,
+				IsAlgoExecutable: leaderIsAlgoExecutable,
+				IsFollowerReadable: false,
+				IsUnset: false,
+			})
 		for _, info := range  _clusterInfo.GetFollowers() {
+			IsAlgoExecutable := false
+			IsFollowerReadable := false
+			Status := info.GetStatus() == 1
 			role := info.GetRole()
+			if Status {
+				IsAlgoExecutable = role & int32(types.RAFT_FOLLOWER_ROLE_ALGO_EXECUTABLE) > 0
+				IsFollowerReadable = role & int32(types.RAFT_FOLLOWER_ROLE_READABLE) > 0
+			}
 			clusterInfo.RaftPeers = append(clusterInfo.RaftPeers, &types.RaftPeerInfo{
 				Host: info.GetAddress(),
-				Status: info.GetStatus() == 1,
+				Status: Status,
 				IsLeader: false,
-				IsAlgoExecutable: role & int32(types.RAFT_FOLLOWER_ROLE_ALGO_EXECUTABLE) > 0,
-				IsFollowerReadable: role & int32(types.RAFT_FOLLOWER_ROLE_READABLE) > 0,
+				IsAlgoExecutable: IsAlgoExecutable,
+				IsFollowerReadable: IsFollowerReadable,
 				IsUnset: role == int32(types.RAFT_FOLLOWER_ROLE_UNSET),
 			})
 		}

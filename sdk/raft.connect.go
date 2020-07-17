@@ -27,11 +27,11 @@ func (t *Connection) GetLeaderReuqest(commonReq *SdkRequest_Common) *GetLeaderRe
 	//log.Printf(utils.StructToPrettyJSONString(res))
 	if err != nil {
 		return &GetLeaderReply{
-			Status: utils.FormatStatus(nil, err),
+			Status: utils.FormatStatusWithHost(nil, err, clientInfo.Host),
 		}
 	} else {
 		return &GetLeaderReply{
-			Status: utils.FormatStatus(res.Status, nil),
+			Status: utils.FormatStatusWithHost(res.Status, nil, clientInfo.Host),
 		}
 	}
 }
