@@ -4,25 +4,24 @@ import (
 	"io"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/types"
-	"ultipa-go-sdk/types/types_response"
 	"ultipa-go-sdk/utils"
 )
 
-func (t *Connection) UQLListSample(uql string, commonReq *SdkRequest_Common) *types_response.ResListSample  {
+func (t *Connection) UQLListSample(uql string, commonReq *types.Request_Common) *types.ResListSample {
 	res := t.UQL(uql, commonReq)
 	uqlReply := res.Data
 	var data *[]*map[string]interface{}
 	if uqlReply != nil && uqlReply.Tables != nil && len(*uqlReply.Tables) > 0 {
 		data = utils.TableToArray((*uqlReply.Tables)[0])
 	}
-	return &types_response.ResListSample{
+	return &types.ResListSample{
 		res.ResWithoutData,
 		data,
 	}
 }
-func (t *Connection) UQL(uql string, commonReq *SdkRequest_Common) *types.ResUqlReply {
+func (t *Connection) UQL(uql string, commonReq *types.Request_Common) *types.ResUqlReply {
 	if commonReq == nil {
-		commonReq = &SdkRequest_Common{}
+		commonReq = &types.Request_Common{}
 	}
 	clientInfo := t.getClientInfo(&GetClientInfoParams{
 		Uql: uql,
@@ -31,7 +30,7 @@ func (t *Connection) UQL(uql string, commonReq *SdkRequest_Common) *types.ResUql
 	defer clientInfo.CancelFunc()
 	retry := commonReq.Retry
 	if retry == nil {
-		retry = &Retry{
+		retry = &types.Retry{
 			Current: 0,
 			Max: 3,
 		}

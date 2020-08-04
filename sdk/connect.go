@@ -383,7 +383,7 @@ func (t *Connection) getClientInfo(params *GetClientInfoParams) *GetClientInfoRe
 	//defer cancel()
 
 	if params.IgnoreRaft == false && t.HostManagerControl.getHostManager(goGraphSetName).RaftReady == false {
-		t.RefreshRaftLeader(t.HostManagerControl.InitHost, &SdkRequest_Common{
+		t.RefreshRaftLeader(t.HostManagerControl.InitHost, &types.Request_Common{
 			GraphSetName: goGraphSetName,
 		})
 		t.HostManagerControl.getHostManager(goGraphSetName).RaftReady = true
@@ -407,9 +407,9 @@ func (t *Connection) getGraphSetName(currentGraphName string,uql string, isGloba
 	}
 	return t.DefaultConfig.GraphSetName
 }
-func (t *Connection) TestConnect(commonReq *SdkRequest_Common)  (bool, error) {
+func (t *Connection) TestConnect(commonReq *types.Request_Common)  (bool, error) {
 	if commonReq == nil {
-		commonReq = &SdkRequest_Common{}
+		commonReq = &types.Request_Common{}
 	}
 	clientInfo := t.getClientInfo(&GetClientInfoParams{
 		IsGlobal: true,
@@ -435,7 +435,7 @@ type RaftLeaderResSimple struct {
 	LeaderHost string
 	FollowersPeerInfos []*types.RaftPeerInfo
 }
-func (t *Connection) autoGetRaftLeader(host string, commonReq *SdkRequest_Common, retry int) (*RaftLeaderResSimple,error){
+func (t *Connection) autoGetRaftLeader(host string, commonReq *types.Request_Common, retry int) (*RaftLeaderResSimple,error){
 	conn, err := GetConnection(host, t.username, t.password, t.crtFile, t.DefaultConfig)
 	// 用一次就关掉
 	defer conn.CloseAll()
@@ -454,8 +454,8 @@ func (t *Connection) autoGetRaftLeader(host string, commonReq *SdkRequest_Common
 		}, nil
 	case types.ErrorCode_NOT_RAFT_MODE:
 		return &RaftLeaderResSimple{
-			Code:          types.ErrorCode_SUCCESS,
-			LeaderHost:    host,
+			Code:               types.ErrorCode_SUCCESS,
+			LeaderHost:         host,
 			FollowersPeerInfos: nil,
 		}, nil
 	case 	types.ErrorCode_RAFT_REDIRECT,
@@ -479,22 +479,10 @@ func (t *Connection) autoGetRaftLeader(host string, commonReq *SdkRequest_Common
 	}, nil
 }
 
-type Retry struct {
-	Current uint32
-	Max uint32
-}
-type (
-	SdkRequest_Common struct {
-		GraphSetName string
-		TimeoutSeconds time.Duration
-		Retry *Retry
-		UseHost string
-	}
-)
 
-func (t *Connection)  RefreshRaftLeader(redirectHost string, commonReq *SdkRequest_Common) error{
+func (t *Connection)  RefreshRaftLeader(redirectHost string, commonReq *types.Request_Common) error{
 	if commonReq == nil {
-		commonReq = &SdkRequest_Common{}
+		commonReq = &types.Request_Common{}
 	}
 	var hosts []string
 	if redirectHost != "" {

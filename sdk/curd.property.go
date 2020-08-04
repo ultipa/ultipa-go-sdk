@@ -2,7 +2,6 @@ package sdk
 
 import (
 	"ultipa-go-sdk/types"
-	"ultipa-go-sdk/types/types_response"
 	"ultipa-go-sdk/utils"
 )
 
@@ -10,7 +9,7 @@ type ShowPropertyRequest = struct {
 	Dataset types.DBType;
 }
 
-func (t *Connection) ListProperty (request *ShowPropertyRequest, commonReq *SdkRequest_Common) *types_response.ResListProperty {
+func (t *Connection) ListProperty (request *types.Request_Property, commonReq *types.Request_Common) *types.ResListProperty {
 	uql := utils.UQLMAKER{}
 	dataset := request.Dataset
 	switch dataset {
@@ -23,16 +22,16 @@ func (t *Connection) ListProperty (request *ShowPropertyRequest, commonReq *SdkR
 	}
 	res := t.UQLListSample(uql.ToString(), commonReq)
 	properties := res.Data
-	var newData []*types_response.Property
+	var newData []*types.Response_Property
 	for _, pty := range *properties{
-		newPty := types_response.Property{
+		newPty := types.Response_Property{
 			Lte: (*pty)["lte"].(string),
 			PropertyName: (*pty)["name"].(string),
 			PropertyType: (*pty)["type"].(string),
 		}
 		newData = append(newData, &newPty)
 	}
-	return &types_response.ResListProperty{
+	return &types.ResListProperty{
 		res.ResWithoutData,
 		newData,
 	}

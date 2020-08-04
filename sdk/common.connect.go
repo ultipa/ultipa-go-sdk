@@ -2,19 +2,18 @@ package sdk
 
 import (
 	"ultipa-go-sdk/types"
-	"ultipa-go-sdk/types/types_response"
 	"ultipa-go-sdk/utils"
 )
-func (t *Connection) Stat(commonReq *SdkRequest_Common) *types_response.ResStat {
+func (t *Connection) Stat(commonReq *types.Request_Common) *types.ResStat {
 	uql := utils.UQLMAKER{}
 	uql.SetCommand(utils.CommandList_stat)
 
 	res := t.UQLListSample(uql.ToString(),  commonReq)
-	var newData types_response.Stat
+	var newData types.Response_Stat
 	if res.Status.Code == types.ErrorCode_SUCCESS  {
 		datas := res.Data
 		for _, data := range *datas{
-			newData = types_response.Stat{
+			newData = types.Response_Stat{
 				MemUsage: (*data)["memUsage"].(string),
 				CpuUsage: (*data)["cpuUsage"].(string),
 				ExpiredDate: (*data)["expiredDate"].(string),
@@ -22,21 +21,21 @@ func (t *Connection) Stat(commonReq *SdkRequest_Common) *types_response.ResStat 
 			break
 		}
 	}
-	return &types_response.ResStat{
+	return &types.ResStat{
 		res.ResWithoutData,
 		&newData,
 	}
 }
 
-func (t *Connection) ClusterInfo(commonReq *SdkRequest_Common) *types_response.ResListClusterInfo {
+func (t *Connection) ClusterInfo(commonReq *types.Request_Common) *types.ResListClusterInfo {
 	t.RefreshRaftLeader("",commonReq)
 	res := t.GetLeaderReuqest(commonReq)
-	var result = []*types_response.ClusterInfo{}
+	var result = []*types.Response_ClusterInfo{}
 	if res.Status.ClusterInfo != nil {
 		for _, peer := range res.Status.ClusterInfo.RaftPeers{
-			info := &types_response.ClusterInfo{
+			info := &types.Response_ClusterInfo{
 				RaftPeerInfo: peer,
-				Stat: &types_response.Stat{
+				Response_Stat: &types.Response_Stat{
 					MemUsage: "",
 					CpuUsage: "",
 					ExpiredDate: "",
@@ -44,20 +43,20 @@ func (t *Connection) ClusterInfo(commonReq *SdkRequest_Common) *types_response.R
 			}
 			//log.Printf("------")
 			if peer.Status {
-				res := t.Stat(&SdkRequest_Common{
+				res := t.Stat(&types.Request_Common{
 					UseHost: peer.Host,
 				})
 				//v, _ := utils.StructToJSONString(res)
 				//log.Printf(v)
 				if res.Status.Code == types.ErrorCode_SUCCESS {
-					info.Stat = res.Data
+					info.Response_Stat = res.Data
 				}
 			}
 			result = append(result, info)
 		}
 	}
 
-	return &types_response.ResListClusterInfo{
+	return &types.ResListClusterInfo{
 		&types.ResWithoutData{
 			Status: &types.Status{
 				Code: types.ErrorCode_SUCCESS,

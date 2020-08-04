@@ -12,9 +12,9 @@ type GetLeaderReply struct {
 	Status *types.Status
 }
 
-func (t *Connection) GetLeaderReuqest(commonReq *SdkRequest_Common) *GetLeaderReply {
+func (t *Connection) GetLeaderReuqest(commonReq *types.Request_Common) *GetLeaderReply {
 	if commonReq == nil {
-		commonReq = &SdkRequest_Common{}
+		commonReq = &types.Request_Common{}
 	}
 	clientInfo := t.getClientInfo(&GetClientInfoParams{
 		ClientType: ClientType_Leader,
