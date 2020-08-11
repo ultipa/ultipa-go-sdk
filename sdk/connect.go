@@ -305,6 +305,7 @@ type Connection struct {
 	password string
 	crtFile string
 	DefaultConfig *DefaultConfig
+	mutex sync.Mutex
 }
 
 func GetConnection(host string, username string, password string, crtFile string, defaultConfig *DefaultConfig) (*Connection, error){
@@ -377,6 +378,8 @@ type GetClientInfoParams struct {
 }
 
 func (t *Connection) getClientInfo(params *GetClientInfoParams) *GetClientInfoResult {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
 	goGraphSetName := t.getGraphSetName(params.GraphSetName, params.Uql, params.IsGlobal)
 	timeout := TIMEOUT_DEFAUL
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
