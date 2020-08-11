@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 	"math/rand"
+	"sync"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/types"
@@ -243,6 +244,7 @@ type HostManagerControl struct {
 	crtFile string
 	ReadModeNonConsistency bool
 	AllHostManager map[string]*HostManager
+	mutex sync.Mutex
 }
 
 func (t *HostManagerControl) Init(initHost string, username string, password string, crtFile string, readModeNonConsistency bool)  {
@@ -260,11 +262,13 @@ func (t*HostManagerControl) chooseClientInfo(graphSetName string, clientType Cli
 func (t*HostManagerControl) getHostManager(graphSetName string) *HostManager {
 	hostManager := t.AllHostManager[graphSetName]
 	if hostManager == nil {
-		hostManager = t.upsetHostManager(graphSetName, t.InitHost)
+		hostManager = t.updateHostManager(graphSetName, t.InitHost)
 	}
 	return hostManager
 }
-func (t*HostManagerControl) upsetHostManager(graphSetName string, initHost string) *HostManager{
+func (t*HostManagerControl) updateHostManager(graphSetName string, initHost string) *HostManager{
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
 	hostManager := HostManager{}
 	hostManager.Init(graphSetName, initHost, t.username, t.password, t.crtFile)
 	t.AllHostManager[graphSetName] = &hostManager
@@ -499,7 +503,7 @@ func (t *Connection)  RefreshRaftLeader(redirectHost string, commonReq *types.Re
 		if res.Code == types.ErrorCode_SUCCESS {
 			leaderHost := res.LeaderHost
 			followersPeerInfos := res.FollowersPeerInfos
-			hostManager := t.HostManagerControl.upsetHostManager(goGraphName, leaderHost)
+			hostManager := t.HostManagerControl.updateHostManager(goGraphName, leaderHost)
 			hostManager.SetClients(leaderHost, followersPeerInfos)
 			return nil
 		}
