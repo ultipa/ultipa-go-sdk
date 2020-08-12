@@ -15,6 +15,14 @@ func StructToJSONBytes(data interface{}) ([]byte, error) {
 	}
 	return b, nil
 }
+func JSONString(data interface{}) string {
+	b, err := json.Marshal(data)
+	if err != nil {
+		println(err)
+		return "{}"
+	}
+	return string(b[:])
+}
 func StructToJSONString(data interface{})  (string, error){
 	bs, err := StructToJSONBytes(data)
 	if err != nil {
