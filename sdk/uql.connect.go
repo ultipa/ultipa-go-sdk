@@ -19,6 +19,13 @@ func (t *Connection) UQLListSample(uql string, commonReq *types.Request_Common) 
 		data,
 	}
 }
+func (t*Connection) GetTimeOut(commonReq *types.Request_Common) uint32 {
+	_t := t.DefaultConfig.TimeoutWithSeconds
+	if commonReq.TimeoutSeconds > 0 {
+		_t = commonReq.TimeoutSeconds
+	}
+	return _t
+}
 func (t *Connection) UQL(uql string, commonReq *types.Request_Common) *types.ResUqlReply {
 	if commonReq == nil {
 		commonReq = &types.Request_Common{}
@@ -26,6 +33,7 @@ func (t *Connection) UQL(uql string, commonReq *types.Request_Common) *types.Res
 	clientInfo := t.getClientInfo(&GetClientInfoParams{
 		Uql: uql,
 		UseHost: commonReq.UseHost,
+		TimeoutSeconds: commonReq.TimeoutSeconds,
 	})
 	defer clientInfo.CancelFunc()
 	retry := commonReq.Retry
@@ -45,12 +53,12 @@ func (t *Connection) UQL(uql string, commonReq *types.Request_Common) *types.Res
 	if isUseUqlExtra {
 		msg, err = clientInfo.ClientInfo.Client.UqlEx(clientInfo.Context, &ultipa.UqlRequest{
 			Uql: uql,
-			Timeout: t.DefaultConfig.TimeoutWithSeconds,
+			Timeout: t.GetTimeOut(commonReq),
 		})
 	} else {
 		msg, err = clientInfo.ClientInfo.Client.Uql(clientInfo.Context, &ultipa.UqlRequest{
 			Uql: uql,
-			Timeout: t.DefaultConfig.TimeoutWithSeconds,
+			Timeout: t.GetTimeOut(commonReq),
 		})
 	}
 	//log.Printf("❗️ UQL: %s, host: %s, graphSetName: %s", uql, clientInfo.Host, clientInfo.GraphSetName)

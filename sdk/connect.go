@@ -357,10 +357,6 @@ func (t *Connection) init(host string, username string, password string, crt str
 	return nil
 }
 
-const (
-	TIMEOUT_DEFAUL time.Duration = time.Minute
-)
-
 type GetClientInfoResult struct {
 	ClientInfo *ClientInfo
 	Context context.Context
@@ -375,14 +371,18 @@ type GetClientInfoParams struct {
 	IsGlobal bool
 	IgnoreRaft bool
 	UseHost string
+	TimeoutSeconds uint32
 }
 
 func (t *Connection) getClientInfo(params *GetClientInfoParams) *GetClientInfoResult {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 	goGraphSetName := t.getGraphSetName(params.GraphSetName, params.Uql, params.IsGlobal)
-	timeout := TIMEOUT_DEFAUL
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	timeout := t.DefaultConfig.TimeoutWithSeconds
+	if params.TimeoutSeconds > 0{
+		timeout = params.TimeoutSeconds
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout) * time.Second)
 	kv := []string{"graph_name", goGraphSetName}
 	kv = append(kv, *t.metadataKV...)
 	ctx = metadata.AppendToOutgoingContext(ctx, kv...)
