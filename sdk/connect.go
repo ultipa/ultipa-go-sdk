@@ -382,7 +382,7 @@ func (t *Connection) getClientInfo(params *GetClientInfoParams) *GetClientInfoRe
 	if params.TimeoutSeconds > 0{
 		timeout = params.TimeoutSeconds
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout) * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout + 120) * time.Second)
 	kv := []string{"graph_name", goGraphSetName}
 	kv = append(kv, *t.metadataKV...)
 	ctx = metadata.AppendToOutgoingContext(ctx, kv...)
