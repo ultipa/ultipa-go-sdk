@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"ultipa-go-sdk/types"
@@ -59,4 +61,10 @@ func RemoveRaftInfos(infos []*types.RaftPeerInfo, host string) []*types.RaftPeer
 		}
 	}
 	return infos
+}
+
+func Md5ToString(str string) string  {
+	h := md5.New()
+	h.Write([]byte(str))
+	return hex.EncodeToString(h.Sum(nil))
 }

@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 	"math/rand"
+	"strings"
 	"sync"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
@@ -296,6 +297,7 @@ type DefaultConfig struct {
 	TimeoutWithSeconds uint32
 	ResponseWithRequestInfo bool
 	ReadModeNonConsistency bool
+	IsMd5 bool
 }
 
 type Connection struct {
@@ -310,6 +312,9 @@ type Connection struct {
 
 func GetConnection(host string, username string, password string, crtFile string, defaultConfig *DefaultConfig) (*Connection, error){
 	connect := Connection{}
+	if defaultConfig.IsMd5 {
+		password = strings.ToUpper(utils.Md5ToString(password))
+	}
 	err := connect.init(host, username, password, crtFile, defaultConfig)
 	if err != nil {
 		return nil, err
@@ -318,7 +323,7 @@ func GetConnection(host string, username string, password string, crtFile string
 }
 func (t *Connection) SetDefaultConfig(defaultConfig *DefaultConfig)  {
 	if t.DefaultConfig == nil {
-		t.DefaultConfig = &DefaultConfig{ "default", 15, false, false}
+		t.DefaultConfig = &DefaultConfig{ "default", 15, false, false, false}
 	}
 	if defaultConfig != nil {
 		if &defaultConfig.GraphSetName != nil {
@@ -332,6 +337,9 @@ func (t *Connection) SetDefaultConfig(defaultConfig *DefaultConfig)  {
 		}
 		if &defaultConfig.ReadModeNonConsistency != nil {
 			t.DefaultConfig.ReadModeNonConsistency = defaultConfig.ReadModeNonConsistency
+		}
+		if &defaultConfig.IsMd5 != nil {
+			t.DefaultConfig.IsMd5 = defaultConfig.IsMd5
 		}
 	}
 }
