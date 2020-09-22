@@ -2,6 +2,7 @@ package sdk
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -439,7 +440,7 @@ func (t *Connection) TestConnect(commonReq *types.Request_Common)  (bool, error)
 		return false, err
 	}
 	if res.Message != name + " Welcome To Ultipa!"{
-		return false, err
+		return false, errors.New("test connect failed!")
 	}
 	return true, nil
 }
