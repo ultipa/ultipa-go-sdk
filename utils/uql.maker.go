@@ -37,6 +37,8 @@ const (
 	UQLCommand_showEdgeProperty   UQLCommand = "show().edge_property"
 	UQLCommand_createNodeProperty UQLCommand = "create().node_property"
 	UQLCommand_createEdgeProperty UQLCommand = "create().edge_property"
+	UQLCommand_alterNodeProperty  UQLCommand = "alter().node_property"
+	UQLCommand_alterEdgeProperty  UQLCommand = "alter().edge_property"
 	UQLCommand_dropNodeProperty   UQLCommand = "drop().node_property"
 	UQLCommand_dropEdgeProperty   UQLCommand = "drop().edge_property"
 	UQLCommand_lteNode            UQLCommand = "LTE().node_property"
@@ -64,6 +66,7 @@ const (
 	UQLCommand_showTask           UQLCommand = "show().task"
 	UQLCommand_clearTask          UQLCommand = "clear().task"
 	UQLCommand_createGraph        UQLCommand = "createGraph"
+	UQLCommand_getGraph           UQLCommand = "getGraph"
 	UQLCommand_listGraph          UQLCommand = "listGraph"
 	UQLCommand_dropGraph          UQLCommand = "dropGraph"
 	UQLCommand_updateGraph        UQLCommand = "updateGraph"
@@ -141,7 +144,7 @@ func (t *UQLMAKER) ToString() string {
 		for _, v := range t._params {
 			strs = append(strs, fmt.Sprintf("%s(%s)", v.key, v.value))
 		}
-		uql = uql + strings.Join(strs, ".")
+		uql = uql + "." + strings.Join(strs, ".")
 	}
 	return uql
 }

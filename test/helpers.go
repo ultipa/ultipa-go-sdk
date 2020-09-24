@@ -30,6 +30,7 @@ func GetTestDefaultConnection(hostChange *string) (*sdk.Connection, error) {
 	crtFile := ""
 	config := sdk.DefaultConfig{
 		//"default", 15, true,
+		IsMd5:                   true,
 		GraphSetName:            "default",
 		ResponseWithRequestInfo: true,
 		ReadModeNonConsistency:  true,
