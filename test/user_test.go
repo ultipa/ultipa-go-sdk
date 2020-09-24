@@ -40,7 +40,7 @@ func TestUser(t *testing.T) {
 		`getUser().username("autotest_username")`,
 	}
 	for _, uql := range uqls {
-		TestLogSubtitle("execute UQL " + uql )
+		TestLogSubtitle("execute UQL " + uql)
 		resUql := connet.UQL(uql, nil)
 		resJson, err := utils.StructToPrettyJSONString(resUql)
 		if err != nil {

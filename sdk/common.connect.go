@@ -4,18 +4,19 @@ import (
 	"ultipa-go-sdk/types"
 	"ultipa-go-sdk/utils"
 )
+
 func (t *Connection) Stat(commonReq *types.Request_Common) *types.ResStat {
 	uql := utils.UQLMAKER{}
-	uql.SetCommand(utils.CommandList_stat)
+	uql.SetCommand(utils.UQLCommand_stat)
 
-	res := t.UQLListSample(uql.ToString(),  commonReq)
+	res := t.UQLListSample(uql.ToString(), commonReq)
 	var newData types.Response_Stat
-	if res.Status.Code == types.ErrorCode_SUCCESS  {
+	if res.Status.Code == types.ErrorCode_SUCCESS {
 		datas := res.Data
-		for _, data := range *datas{
+		for _, data := range *datas {
 			newData = types.Response_Stat{
-				MemUsage: (*data)["memUsage"].(string),
-				CpuUsage: (*data)["cpuUsage"].(string),
+				MemUsage:    (*data)["memUsage"].(string),
+				CpuUsage:    (*data)["cpuUsage"].(string),
 				ExpiredDate: (*data)["expiredDate"].(string),
 			}
 			break
@@ -28,16 +29,16 @@ func (t *Connection) Stat(commonReq *types.Request_Common) *types.ResStat {
 }
 
 func (t *Connection) ClusterInfo(commonReq *types.Request_Common) *types.ResListClusterInfo {
-	t.RefreshRaftLeader("",commonReq)
+	t.RefreshRaftLeader("", commonReq)
 	res := t.GetLeaderReuqest(commonReq)
 	var result = []*types.Response_ClusterInfo{}
 	if res.Status.ClusterInfo != nil {
-		for _, peer := range res.Status.ClusterInfo.RaftPeers{
+		for _, peer := range res.Status.ClusterInfo.RaftPeers {
 			info := &types.Response_ClusterInfo{
 				RaftPeerInfo: peer,
 				Response_Stat: &types.Response_Stat{
-					MemUsage: "",
-					CpuUsage: "",
+					MemUsage:    "",
+					CpuUsage:    "",
 					ExpiredDate: "",
 				},
 			}
@@ -65,4 +66,3 @@ func (t *Connection) ClusterInfo(commonReq *types.Request_Common) *types.ResList
 		result,
 	}
 }
-

@@ -4,9 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/metadata"
 	"math/rand"
 	"strings"
 	"sync"
@@ -14,11 +11,16 @@ import (
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/types"
 	"ultipa-go-sdk/utils"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/metadata"
 )
+
 type ClientInfo struct {
-	conn *grpc.ClientConn
+	conn   *grpc.ClientConn
 	Client ultipa.UltipaRpcsClient
-	Host string
+	Host   string
 }
 
 func (t *ClientInfo) init(conn *grpc.ClientConn, host string) {
@@ -27,46 +29,47 @@ func (t *ClientInfo) init(conn *grpc.ClientConn, host string) {
 	t.conn = conn
 	t.Host = host
 }
-func (t *ClientInfo) Close(){
+func (t *ClientInfo) Close() {
 	if t.conn != nil {
 		t.conn.Close()
 	}
 }
 
 type ClientType int32
+
 var (
-	ClientType_Default 	ClientType = 0
-	ClientType_Algo 	ClientType = 1
-	ClientType_Update 	ClientType = 2
-	ClientType_Leader 	ClientType = 3
+	ClientType_Default ClientType = 0
+	ClientType_Algo    ClientType = 1
+	ClientType_Update  ClientType = 2
+	ClientType_Leader  ClientType = 3
 )
 var (
 	UQL_Command_Global = []string{
 		"listUser", "getUser", "createUser", "updateUser",
 		"deleteUser", "grant", "revoke", "listPolicy", "getPolicy",
 		"createPolicy", "updatePolicy", "deletePolicy", "listPrivilege",
-		"stat", "listGraph", "getGraph", "createGraph", "dropGraph", "top","kill",
+		"stat", "listGraph", "getGraph", "createGraph", "dropGraph", "top", "kill",
 	}
-	UQL_Command_Write = [] string {
-		"insert","update","delete","drop","create","LTE","UFE",
-		"clearTask","createUser","updateUser","deleteUser","grant",
-		"revoke","createPolicy","updatePolicy","deletePolicy","createIndex",
-		"dropIndex","createGraph","dropGraph","stopTask",
+	UQL_Command_Write = []string{
+		"insert", "update", "delete", "drop", "create", "LTE", "UFE",
+		"clearTask", "createUser", "updateUser", "deleteUser", "grant",
+		"revoke", "createPolicy", "updatePolicy", "deletePolicy", "createIndex",
+		"dropIndex", "createGraph", "dropGraph", "stopTask",
 	}
-	UQL_Command_Extra = [] string {
-		"top","kill","showTask","stopTask","clearTask","show","stat","listGraph","listAlgo","getGraph",
-		"createPolicy","deletePolicy","listPolicy","getPolicy","grant","revoke","listPrivilege","getUser",
-		"getSelfInfo","createUser","updateUser","deleteUser", "showIndex",
+	UQL_Command_Extra = []string{
+		"top", "kill", "showTask", "stopTask", "clearTask", "show", "stat", "listGraph", "listAlgo", "getGraph",
+		"createPolicy", "deletePolicy", "listPolicy", "getPolicy", "grant", "revoke", "listPrivilege", "getUser",
+		"getSelfInfo", "createUser", "updateUser", "deleteUser", "showIndex",
 	}
 )
 
-func UqlIsGlobal(uqlStr string)  bool {
+func UqlIsGlobal(uqlStr string) bool {
 	uql := utils.UQL{}
 	uql.Parse(uqlStr)
 	_, f := Find(UQL_Command_Global, uql.Command)
 	return f
 }
-func UqlIsExtra(uqlStr string)  bool{
+func UqlIsExtra(uqlStr string) bool {
 	uql := utils.UQL{}
 	uql.Parse(uqlStr)
 	_, f := Find(UQL_Command_Extra, uql.Command)
@@ -93,23 +96,24 @@ func Find(slice []string, val string) (int, bool) {
 }
 
 type HostManager struct {
-	GraphSetName string
-	LeaderHost string
+	GraphSetName       string
+	LeaderHost         string
 	FollowersPeerInfos []*types.RaftPeerInfo
-	RaftReady bool
+	RaftReady          bool
 
 	username string
 	password string
-	crtFile string
+	crtFile  string
 
-	leaderClientInfo *ClientInfo
-	algoClientInfos []*ClientInfo
-	defaultClientInfo *ClientInfo
-	otherFollowerClientInfos []*ClientInfo
+	leaderClientInfo              *ClientInfo
+	algoClientInfos               []*ClientInfo
+	defaultClientInfo             *ClientInfo
+	otherFollowerClientInfos      []*ClientInfo
 	otherUnsetFollowerClientInfos []*ClientInfo
-	nullClientInfo *ClientInfo
+	nullClientInfo                *ClientInfo
 }
-func (t *HostManager) Init(graphSetName string, host string, username string, password string, crtFile string)  {
+
+func (t *HostManager) Init(graphSetName string, host string, username string, password string, crtFile string) {
 	t.GraphSetName = graphSetName
 	t.username = username
 	t.password = password
@@ -142,7 +146,7 @@ func (t *HostManager) createClientInfo(host string) (*ClientInfo, error) {
 	}
 }
 
-func (t *HostManager)GetAllHosts()  *[]string{
+func (t *HostManager) GetAllHosts() *[]string {
 	hosts := []string{
 		t.LeaderHost,
 	}
@@ -155,23 +159,23 @@ func (t *HostManager)GetAllHosts()  *[]string{
 	return &hosts
 
 }
-func (t*HostManager) chooseClientInfo(clientType ClientType, uql string, readModeNonConsistency bool, useHost string) *ClientInfo  {
+func (t *HostManager) chooseClientInfo(clientType ClientType, uql string, readModeNonConsistency bool, useHost string) *ClientInfo {
 	if useHost != "" {
-		for _, clientInfo := range t.getAllClientInfos(false, true)  {
+		for _, clientInfo := range t.getAllClientInfos(false, true) {
 			if clientInfo.Host == useHost {
 				return clientInfo
 			}
 		}
 	}
 	if clientType == ClientType_Default && uql != "" {
-		if (UqlIsAlgo(uql)) {
+		if UqlIsAlgo(uql) {
 			clientType = ClientType_Algo
-		} else if (UqlIsWrite(uql)) {
+		} else if UqlIsWrite(uql) {
 			clientType = ClientType_Update
 		}
 	}
 	if clientType == ClientType_Algo {
-		if t.algoClientInfos != nil && len(t.algoClientInfos)>0 {
+		if t.algoClientInfos != nil && len(t.algoClientInfos) > 0 {
 			return t.algoClientInfos[rand.Intn(len(t.algoClientInfos))]
 		} else {
 			return t.nullClientInfo
@@ -185,14 +189,14 @@ func (t*HostManager) chooseClientInfo(clientType ClientType, uql string, readMod
 	}
 
 	// 负载均衡，随机挑一个
-	all := t.getAllClientInfos(true,false)
+	all := t.getAllClientInfos(true, false)
 	return all[rand.Intn(len(all))]
 }
-func (t *HostManager) getAllClientInfos(ignoreAlgo bool, needUnset bool) []*ClientInfo  {
+func (t *HostManager) getAllClientInfos(ignoreAlgo bool, needUnset bool) []*ClientInfo {
 	all := []*ClientInfo{
 		t.defaultClientInfo,
 	}
-	if t.leaderClientInfo != nil && t.leaderClientInfo.Host != t.defaultClientInfo.Host{
+	if t.leaderClientInfo != nil && t.leaderClientInfo.Host != t.defaultClientInfo.Host {
 		all = append(all, t.leaderClientInfo)
 	}
 	if !ignoreAlgo && t.algoClientInfos != nil {
@@ -206,7 +210,7 @@ func (t *HostManager) getAllClientInfos(ignoreAlgo bool, needUnset bool) []*Clie
 	}
 	return all
 }
-func (t *HostManager) SetClients(leaderHost string, followersPeerInfos []*types.RaftPeerInfo)  {
+func (t *HostManager) SetClients(leaderHost string, followersPeerInfos []*types.RaftPeerInfo) {
 	t.LeaderHost = leaderHost
 	if t.defaultClientInfo.Host == leaderHost {
 		t.leaderClientInfo = t.defaultClientInfo
@@ -240,16 +244,16 @@ func (t *HostManager) SetClients(leaderHost string, followersPeerInfos []*types.
 }
 
 type HostManagerControl struct {
-	InitHost string
-	username string
-	password string
-	crtFile string
+	InitHost               string
+	username               string
+	password               string
+	crtFile                string
 	ReadModeNonConsistency bool
-	AllHostManager map[string]*HostManager
-	mutex sync.Mutex
+	AllHostManager         map[string]*HostManager
+	mutex                  sync.Mutex
 }
 
-func (t *HostManagerControl) Init(initHost string, username string, password string, crtFile string, readModeNonConsistency bool)  {
+func (t *HostManagerControl) Init(initHost string, username string, password string, crtFile string, readModeNonConsistency bool) {
 	t.InitHost = initHost
 	t.username = username
 	t.password = password
@@ -257,18 +261,18 @@ func (t *HostManagerControl) Init(initHost string, username string, password str
 	t.AllHostManager = map[string]*HostManager{}
 }
 
-func (t*HostManagerControl) chooseClientInfo(graphSetName string, clientType ClientType, uql string, useHost string) *ClientInfo {
+func (t *HostManagerControl) chooseClientInfo(graphSetName string, clientType ClientType, uql string, useHost string) *ClientInfo {
 	hostManager := t.getHostManager(graphSetName)
 	return hostManager.chooseClientInfo(clientType, uql, t.ReadModeNonConsistency, useHost)
 }
-func (t*HostManagerControl) getHostManager(graphSetName string) *HostManager {
+func (t *HostManagerControl) getHostManager(graphSetName string) *HostManager {
 	hostManager := t.AllHostManager[graphSetName]
 	if hostManager == nil {
 		hostManager = t.updateHostManager(graphSetName, t.InitHost)
 	}
 	return hostManager
 }
-func (t*HostManagerControl) updateHostManager(graphSetName string, initHost string) *HostManager{
+func (t *HostManagerControl) updateHostManager(graphSetName string, initHost string) *HostManager {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 	hostManager := HostManager{}
@@ -279,12 +283,12 @@ func (t*HostManagerControl) updateHostManager(graphSetName string, initHost stri
 
 const RAFT_GLOBAL = "global"
 
-func (t *HostManagerControl) GetAllHosts() *[]string{
+func (t *HostManagerControl) GetAllHosts() *[]string {
 	hostManager := t.getHostManager(RAFT_GLOBAL)
 	return hostManager.GetAllHosts()
 }
-func (t *HostManagerControl) CloseAll()  {
-	for _, hostManager := range t.AllHostManager{
+func (t *HostManagerControl) CloseAll() {
+	for _, hostManager := range t.AllHostManager {
 		if hostManager != nil {
 			saveClose(hostManager.defaultClientInfo)
 			saveClose(hostManager.leaderClientInfo)
@@ -292,26 +296,25 @@ func (t *HostManagerControl) CloseAll()  {
 	}
 }
 
-
 type DefaultConfig struct {
-	GraphSetName string
-	TimeoutWithSeconds uint32
+	GraphSetName            string
+	TimeoutWithSeconds      uint32
 	ResponseWithRequestInfo bool
-	ReadModeNonConsistency bool
-	IsMd5 bool
+	ReadModeNonConsistency  bool
+	IsMd5                   bool
 }
 
 type Connection struct {
 	HostManagerControl *HostManagerControl
-	metadataKV *[]string
-	username string
-	password string
-	crtFile string
-	DefaultConfig *DefaultConfig
-	mutex sync.Mutex
+	metadataKV         *[]string
+	username           string
+	password           string
+	crtFile            string
+	DefaultConfig      *DefaultConfig
+	mutex              sync.Mutex
 }
 
-func GetConnection(host string, username string, password string, crtFile string, defaultConfig *DefaultConfig) (*Connection, error){
+func GetConnection(host string, username string, password string, crtFile string, defaultConfig *DefaultConfig) (*Connection, error) {
 	connect := Connection{}
 	if defaultConfig.IsMd5 {
 		password = strings.ToUpper(utils.Md5ToString(password))
@@ -322,9 +325,9 @@ func GetConnection(host string, username string, password string, crtFile string
 	}
 	return &connect, nil
 }
-func (t *Connection) SetDefaultConfig(defaultConfig *DefaultConfig)  {
+func (t *Connection) SetDefaultConfig(defaultConfig *DefaultConfig) {
 	if t.DefaultConfig == nil {
-		t.DefaultConfig = &DefaultConfig{ "default", 15, false, false, false}
+		t.DefaultConfig = &DefaultConfig{"default", 15, false, false, false}
 	}
 	if defaultConfig != nil {
 		if &defaultConfig.GraphSetName != nil {
@@ -344,16 +347,16 @@ func (t *Connection) SetDefaultConfig(defaultConfig *DefaultConfig)  {
 		}
 	}
 }
-func saveClose(clientInfo *ClientInfo)  {
+func saveClose(clientInfo *ClientInfo) {
 	if clientInfo != nil {
 		clientInfo.Close()
 	}
 }
-func (t *Connection) CloseAll()  {
+func (t *Connection) CloseAll() {
 	t.HostManagerControl.CloseAll()
 }
 
-func (t *Connection) init(host string, username string, password string, crt string, config *DefaultConfig)  error {
+func (t *Connection) init(host string, username string, password string, crt string, config *DefaultConfig) error {
 	t.username = username
 	t.password = password
 	t.crtFile = crt
@@ -367,19 +370,19 @@ func (t *Connection) init(host string, username string, password string, crt str
 }
 
 type GetClientInfoResult struct {
-	ClientInfo *ClientInfo
-	Context context.Context
-	CancelFunc context.CancelFunc
-	Host string
+	ClientInfo   *ClientInfo
+	Context      context.Context
+	CancelFunc   context.CancelFunc
+	Host         string
 	GraphSetName string
 }
 type GetClientInfoParams struct {
-	GraphSetName string
-	ClientType ClientType
-	Uql string
-	IsGlobal bool
-	IgnoreRaft bool
-	UseHost string
+	GraphSetName   string
+	ClientType     ClientType
+	Uql            string
+	IsGlobal       bool
+	IgnoreRaft     bool
+	UseHost        string
 	TimeoutSeconds uint32
 }
 
@@ -388,10 +391,10 @@ func (t *Connection) getClientInfo(params *GetClientInfoParams) *GetClientInfoRe
 	defer t.mutex.Unlock()
 	goGraphSetName := t.getGraphSetName(params.GraphSetName, params.Uql, params.IsGlobal)
 	timeout := t.DefaultConfig.TimeoutWithSeconds
-	if params.TimeoutSeconds > 0{
+	if params.TimeoutSeconds > 0 {
 		timeout = params.TimeoutSeconds
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout + 120) * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout+120)*time.Second)
 	kv := []string{"graph_name", goGraphSetName}
 	kv = append(kv, *t.metadataKV...)
 	ctx = metadata.AppendToOutgoingContext(ctx, kv...)
@@ -407,14 +410,14 @@ func (t *Connection) getClientInfo(params *GetClientInfoParams) *GetClientInfoRe
 
 	clientInfo := t.HostManagerControl.chooseClientInfo(goGraphSetName, params.ClientType, params.Uql, params.UseHost)
 	return &GetClientInfoResult{
-		ClientInfo: clientInfo,
-		Context: ctx,
-		CancelFunc: cancel,
-		Host: clientInfo.Host,
+		ClientInfo:   clientInfo,
+		Context:      ctx,
+		CancelFunc:   cancel,
+		Host:         clientInfo.Host,
 		GraphSetName: goGraphSetName,
 	}
 }
-func (t *Connection) getGraphSetName(currentGraphName string,uql string, isGlobal bool) string{
+func (t *Connection) getGraphSetName(currentGraphName string, uql string, isGlobal bool) string {
 	if isGlobal || (uql != "" && UqlIsGlobal(uql)) {
 		return RAFT_GLOBAL
 	}
@@ -423,13 +426,13 @@ func (t *Connection) getGraphSetName(currentGraphName string,uql string, isGloba
 	}
 	return t.DefaultConfig.GraphSetName
 }
-func (t *Connection) TestConnect(commonReq *types.Request_Common)  (bool, error) {
+func (t *Connection) TestConnect(commonReq *types.Request_Common) (bool, error) {
 	if commonReq == nil {
 		commonReq = &types.Request_Common{}
 	}
 	clientInfo := t.getClientInfo(&GetClientInfoParams{
 		IsGlobal: true,
-		UseHost: commonReq.UseHost,
+		UseHost:  commonReq.UseHost,
 	})
 	defer clientInfo.CancelFunc()
 	name := "MyTest"
@@ -439,19 +442,20 @@ func (t *Connection) TestConnect(commonReq *types.Request_Common)  (bool, error)
 	if err != nil {
 		return false, err
 	}
-	if res.Message != name + " Welcome To Ultipa!"{
+	if res.Message != name+" Welcome To Ultipa!" {
 		return false, errors.New("test connect failed!")
 	}
 	return true, nil
 }
 
 type RaftLeaderResSimple struct {
-	Code ultipa.ErrorCode
-	Message string
-	LeaderHost string
+	Code               ultipa.ErrorCode
+	Message            string
+	LeaderHost         string
 	FollowersPeerInfos []*types.RaftPeerInfo
 }
-func (t *Connection) autoGetRaftLeader(host string, commonReq *types.Request_Common, retry int) (*RaftLeaderResSimple,error){
+
+func (t *Connection) autoGetRaftLeader(host string, commonReq *types.Request_Common, retry int) (*RaftLeaderResSimple, error) {
 	conn, err := GetConnection(host, t.username, t.password, t.crtFile, t.DefaultConfig)
 	// 用一次就关掉
 	defer conn.CloseAll()
@@ -464,8 +468,8 @@ func (t *Connection) autoGetRaftLeader(host string, commonReq *types.Request_Com
 	case types.ErrorCode_SUCCESS:
 		followers := res.Status.ClusterInfo.RaftPeers
 		return &RaftLeaderResSimple{
-			Code: errorCode,
-			LeaderHost: host,
+			Code:               errorCode,
+			LeaderHost:         host,
 			FollowersPeerInfos: utils.RemoveRaftInfos(followers, host),
 		}, nil
 	case types.ErrorCode_NOT_RAFT_MODE:
@@ -474,13 +478,13 @@ func (t *Connection) autoGetRaftLeader(host string, commonReq *types.Request_Com
 			LeaderHost:         host,
 			FollowersPeerInfos: nil,
 		}, nil
-	case 	types.ErrorCode_RAFT_REDIRECT,
-			types.ErrorCode_RAFT_LEADER_NOT_YET_ELECTED,
-			types.ErrorCode_RAFT_NO_AVAILABLE_FOLLOWERS,
-			types.ErrorCode_RAFT_NO_AVAILABLE_ALGO_SERVERS:
+	case types.ErrorCode_RAFT_REDIRECT,
+		types.ErrorCode_RAFT_LEADER_NOT_YET_ELECTED,
+		types.ErrorCode_RAFT_NO_AVAILABLE_FOLLOWERS,
+		types.ErrorCode_RAFT_NO_AVAILABLE_ALGO_SERVERS:
 		if retry > 2 {
 			return &RaftLeaderResSimple{
-				Code: errorCode,
+				Code:    errorCode,
 				Message: "raft retry too many times",
 			}, nil
 		}
@@ -490,13 +494,12 @@ func (t *Connection) autoGetRaftLeader(host string, commonReq *types.Request_Com
 		return t.autoGetRaftLeader(res.Status.ClusterInfo.Redirect, commonReq, retry+1)
 	}
 	return &RaftLeaderResSimple{
-		Code: errorCode,
+		Code:    errorCode,
 		Message: res.Status.Message,
 	}, nil
 }
 
-
-func (t *Connection)  RefreshRaftLeader(redirectHost string, commonReq *types.Request_Common) error{
+func (t *Connection) RefreshRaftLeader(redirectHost string, commonReq *types.Request_Common) error {
 	if commonReq == nil {
 		commonReq = &types.Request_Common{}
 	}
@@ -507,7 +510,7 @@ func (t *Connection)  RefreshRaftLeader(redirectHost string, commonReq *types.Re
 		hosts = append(hosts, *t.HostManagerControl.GetAllHosts()...)
 	}
 	goGraphName := t.getGraphSetName(commonReq.GraphSetName, "", false)
-	for _, host := range hosts{
+	for _, host := range hosts {
 		res, err := t.autoGetRaftLeader(host, commonReq, 0)
 		if err != nil {
 			return err

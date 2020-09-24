@@ -6,15 +6,16 @@ import (
 	"time"
 	"ultipa-go-sdk/sdk"
 )
+
 var hosts = []string{
 	// single raft
-	//"124.193.211.21:60062",
+	"124.193.211.21:60071",
 
 	// multiple rafts
 	//"124.193.211.21:60164",
-	"124.193.211.21:60161",
-	"124.193.211.21:60162",
-	"124.193.211.21:60163",
+	// "124.193.211.21:60161",
+	// "124.193.211.21:60162",
+	// "124.193.211.21:60163",
 }
 
 func GetTestDefaultConnection(hostChange *string) (*sdk.Connection, error) {
@@ -26,13 +27,12 @@ func GetTestDefaultConnection(hostChange *string) (*sdk.Connection, error) {
 	}
 	username := "root"
 	password := "root"
-	crtFile := "./ultipa.crt"
-	crtFile = ""
+	crtFile := ""
 	config := sdk.DefaultConfig{
 		//"default", 15, true,
-		GraphSetName: "default",
+		GraphSetName:            "default",
 		ResponseWithRequestInfo: true,
-		ReadModeNonConsistency: true,
+		ReadModeNonConsistency:  true,
 	}
 	connect, err := sdk.GetConnection(host, username, password, crtFile, &config)
 	if err != nil {
@@ -43,6 +43,6 @@ func GetTestDefaultConnection(hostChange *string) (*sdk.Connection, error) {
 func TestLogTitle(str string) {
 	log.Println("❗️-------------- TestCase:", str, " --------------")
 }
-func TestLogSubtitle(str string)  {
+func TestLogSubtitle(str string) {
 	log.Println("⚠️ ******* ", str, " *******")
 }

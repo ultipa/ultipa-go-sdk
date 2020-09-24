@@ -19,7 +19,7 @@ func (t *Connection) UQLListSample(uql string, commonReq *types.Request_Common) 
 		data,
 	}
 }
-func (t*Connection) GetTimeOut(commonReq *types.Request_Common) uint32 {
+func (t *Connection) GetTimeOut(commonReq *types.Request_Common) uint32 {
 	_t := t.DefaultConfig.TimeoutWithSeconds
 	if commonReq.TimeoutSeconds > 0 {
 		_t = commonReq.TimeoutSeconds
@@ -31,8 +31,8 @@ func (t *Connection) UQL(uql string, commonReq *types.Request_Common) *types.Res
 		commonReq = &types.Request_Common{}
 	}
 	clientInfo := t.getClientInfo(&GetClientInfoParams{
-		Uql: uql,
-		UseHost: commonReq.UseHost,
+		Uql:            uql,
+		UseHost:        commonReq.UseHost,
 		TimeoutSeconds: commonReq.TimeoutSeconds,
 	})
 	defer clientInfo.CancelFunc()
@@ -40,7 +40,7 @@ func (t *Connection) UQL(uql string, commonReq *types.Request_Common) *types.Res
 	if retry == nil {
 		retry = &types.Retry{
 			Current: 0,
-			Max: 3,
+			Max:     3,
 		}
 	}
 	isUseUqlExtra := UqlIsExtra(uql)
@@ -52,26 +52,26 @@ func (t *Connection) UQL(uql string, commonReq *types.Request_Common) *types.Res
 	var err error
 	if isUseUqlExtra {
 		msg, err = clientInfo.ClientInfo.Client.UqlEx(clientInfo.Context, &ultipa.UqlRequest{
-			Uql: uql,
+			Uql:     uql,
 			Timeout: t.GetTimeOut(commonReq),
 		})
 	} else {
 		msg, err = clientInfo.ClientInfo.Client.Uql(clientInfo.Context, &ultipa.UqlRequest{
-			Uql: uql,
+			Uql:     uql,
 			Timeout: t.GetTimeOut(commonReq),
 		})
 	}
 	//log.Printf("❗️ UQL: %s, host: %s, graphSetName: %s", uql, clientInfo.Host, clientInfo.GraphSetName)
 
 	res := &types.ResUqlReply{
-		ResWithoutData:&types.ResWithoutData{},
+		ResWithoutData: &types.ResWithoutData{},
 	}
 	if t.DefaultConfig.ResponseWithRequestInfo {
 		res.Req = &map[string]interface{}{
-			"host": clientInfo.Host,
-			"graphSetName": clientInfo.GraphSetName,
-			"retry": retry,
-			"uql": uql,
+			"host":          clientInfo.Host,
+			"graphSetName":  clientInfo.GraphSetName,
+			"retry":         retry,
+			"uql":           uql,
 			"isUseUqlExtra": isUseUqlExtra,
 		}
 	}
@@ -108,7 +108,7 @@ func (t *Connection) UQL(uql string, commonReq *types.Request_Common) *types.Res
 		newUqlReply.Paths = utils.FormatPaths(c.GetPaths())
 		newUqlReply.Nodes = utils.FormatNodeAliases(c.GetNodes())
 		newUqlReply.Edges = utils.FormatEdgeAliases(c.GetEdges())
-		newUqlReply.Attrs = utils.FormatAttrs( c.GetAttrs())
+		newUqlReply.Attrs = utils.FormatAttrs(c.GetAttrs())
 		newUqlReply.Tables = utils.FormatTables(c.GetTables())
 		newUqlReply.Values = utils.FormatKeyValues(c.GetKeyValues())
 
@@ -124,4 +124,3 @@ func (t *Connection) UQL(uql string, commonReq *types.Request_Common) *types.Res
 	return res
 
 }
-
