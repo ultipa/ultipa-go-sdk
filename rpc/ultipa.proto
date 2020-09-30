@@ -163,6 +163,7 @@ message InsertNodesRequest {
     bool silent = 2;
     bool no_inner_id = 3;
     string graph_name = 4;
+    bool check_o = 5;
 }
 
 message InsertNodesReply {
@@ -233,6 +234,7 @@ enum FollowerRole {
     ROLE_UNSET = 0;
     ROLE_READABLE = 1;
     ROLE_ALGO_EXECUTABLE = 2;
+    ROLE_LEARNER = 4;
 }
 
 message RaftFollower {

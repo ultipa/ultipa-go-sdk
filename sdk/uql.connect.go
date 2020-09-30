@@ -26,6 +26,7 @@ func (t *Connection) GetTimeOut(commonReq *types.Request_Common) uint32 {
 	}
 	return _t
 }
+
 func (t *Connection) UQL(uql string, commonReq *types.Request_Common) *types.ResUqlReply {
 	if commonReq == nil {
 		commonReq = &types.Request_Common{}
@@ -92,7 +93,6 @@ func (t *Connection) UQL(uql string, commonReq *types.Request_Common) *types.Res
 				//log.Printf("Failed %v \n", err)
 				res.Status = utils.FormatStatus(nil, err)
 				return res
-				break
 			}
 		}
 		//_json, _ := utils.StructToJSONString(c)

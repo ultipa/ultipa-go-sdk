@@ -171,3 +171,19 @@ type ResUqlReply = struct {
 	*ResWithoutData
 	Data *UqlReply
 }
+
+type ResInsertHugeNodesReply = struct {
+	*ResWithoutData
+	Data struct {
+		Ids           []int64
+		IgnoreIndexes []int32
+	}
+}
+
+type ResInsertHugeEdgesReply = struct {
+	*ResWithoutData
+	Data struct {
+		Ids           []int64
+		IgnoreIndexes []int32
+	}
+}

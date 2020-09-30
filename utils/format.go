@@ -7,16 +7,17 @@ import (
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/types"
 )
+
 func FormatNodeAliases(nodes []*ultipa.NodeAlias) *types.NodeAliases {
 	var arrs types.NodeAliases
-	for _, one := range nodes{
+	for _, one := range nodes {
 		arrs = append(arrs, FormatNodeAlias(one))
 	}
 	return &arrs
 }
 func FormatEdgeAliases(edges []*ultipa.EdgeAlias) *types.EdgeAliases {
 	var arrs types.EdgeAliases
-	for _, one := range edges{
+	for _, one := range edges {
 		arrs = append(arrs, FormatEdgeAlias(one))
 	}
 	return &arrs
@@ -54,7 +55,7 @@ func FormatNodeTable(nodeTable *ultipa.NodeTable) *types.NodeTable {
 	}
 	return &rows
 }
-func _formatValues(values [][]byte, types_ []types.PropertyType, headers []string) *map[string]interface{}{
+func _formatValues(values [][]byte, types_ []types.PropertyType, headers []string) *map[string]interface{} {
 	_vs := map[string]interface{}{}
 	_missHeaders := false
 	if len(values) > len(types_) || len(values) > len(headers) {
@@ -100,7 +101,7 @@ func FormatEdgeTable(edgeTable *ultipa.EdgeTable) *types.EdgeTable {
 }
 func FormatPaths(paths []*ultipa.Path) *types.Paths {
 	var ps types.Paths
-	for _,path := range paths{
+	for _, path := range paths {
 		newPath := types.Path{
 			Nodes: FormatNodeTable(path.NodeTable),
 			Edges: FormatEdgeTable(path.EdgeTable),
@@ -114,7 +115,7 @@ func FormatAttrAlias(attrAlias *ultipa.AttrAlias) *types.AttrAlias {
 	newAttrAlias.Alias = attrAlias.GetAlias()
 	if attrAlias.GetValues() != nil {
 		var newValues []interface{}
-		for _, v := range attrAlias.GetValues(){
+		for _, v := range attrAlias.GetValues() {
 			v1 := deserialize(v, attrAlias.GetPropertyType())
 			newValues = append(newValues, v1)
 		}
@@ -126,7 +127,7 @@ func FormatAttrs(attrs []*ultipa.AttrAlias) *types.Attrs {
 	var newAttrs types.Attrs
 	if attrs != nil {
 		for _, attr := range attrs {
-			newAttrs = append(newAttrs, FormatAttrAlias(attr) )
+			newAttrs = append(newAttrs, FormatAttrAlias(attr))
 		}
 	}
 	return &newAttrs
@@ -143,7 +144,7 @@ func FormatTables(tables []*ultipa.Table) *types.Tables {
 		if tableRows != nil {
 			for _, row := range tableRows {
 				var _row []interface{}
-				for _, v := range row.GetValues(){
+				for _, v := range row.GetValues() {
 					_v := deserialize(v, types.PROPERTY_TYPE_STRING)
 					_row = append(_row, _v)
 				}
@@ -155,7 +156,7 @@ func FormatTables(tables []*ultipa.Table) *types.Tables {
 	}
 	return &newTables
 }
-func FormatKeyValues(values []*ultipa.Value)  *map[string]interface{}{
+func FormatKeyValues(values []*ultipa.Value) *map[string]interface{} {
 	if values == nil {
 		return nil
 	}
@@ -171,7 +172,7 @@ func _bytesToRead(bs []byte, out interface{}) {
 	binary.Read(buff, binary.BigEndian, out)
 }
 func deserialize(bytes []byte, propertyType types.PropertyType) interface{} {
-	if (len(bytes) == 0 && propertyType != types.PROPERTY_TYPE_STRING) {
+	if len(bytes) == 0 && propertyType != types.PROPERTY_TYPE_STRING {
 		return nil
 	}
 	switch propertyType {
@@ -248,9 +249,9 @@ func FormatStatusWithHost(status *ultipa.Status, err error, host string) *types.
 	if _clusterInfo != nil || isNotRaftMode {
 		if _clusterInfo == nil {
 			_clusterInfo = &ultipa.ClusterInfo{
-				Redirect: "",
+				Redirect:      "",
 				LeaderAddress: host,
-				Followers: []*ultipa.RaftFollower{},
+				Followers:     []*ultipa.RaftFollower{},
 			}
 		}
 		clusterInfo.Redirect = _clusterInfo.GetRedirect()
@@ -261,29 +262,29 @@ func FormatStatusWithHost(status *ultipa.Status, err error, host string) *types.
 		}
 		clusterInfo.RaftPeers = append(clusterInfo.RaftPeers,
 			&types.RaftPeerInfo{
-				Host: _clusterInfo.GetLeaderAddress(),
-				Status: true,
-				IsLeader: true,
-				IsAlgoExecutable: leaderIsAlgoExecutable,
+				Host:               _clusterInfo.GetLeaderAddress(),
+				Status:             true,
+				IsLeader:           true,
+				IsAlgoExecutable:   leaderIsAlgoExecutable,
 				IsFollowerReadable: false,
-				IsUnset: false,
+				IsUnset:            false,
 			})
-		for _, info := range  _clusterInfo.GetFollowers() {
+		for _, info := range _clusterInfo.GetFollowers() {
 			IsAlgoExecutable := false
 			IsFollowerReadable := false
 			Status := info.GetStatus() == 1
 			role := info.GetRole()
 			if Status {
-				IsAlgoExecutable = role & int32(types.RAFT_FOLLOWER_ROLE_ALGO_EXECUTABLE) > 0
-				IsFollowerReadable = role & int32(types.RAFT_FOLLOWER_ROLE_READABLE) > 0
+				IsAlgoExecutable = role&int32(types.RAFT_FOLLOWER_ROLE_ALGO_EXECUTABLE) > 0
+				IsFollowerReadable = role&int32(types.RAFT_FOLLOWER_ROLE_READABLE) > 0
 			}
 			clusterInfo.RaftPeers = append(clusterInfo.RaftPeers, &types.RaftPeerInfo{
-				Host: info.GetAddress(),
-				Status: Status,
-				IsLeader: false,
-				IsAlgoExecutable: IsAlgoExecutable,
+				Host:               info.GetAddress(),
+				Status:             Status,
+				IsLeader:           false,
+				IsAlgoExecutable:   IsAlgoExecutable,
 				IsFollowerReadable: IsFollowerReadable,
-				IsUnset: role == int32(types.RAFT_FOLLOWER_ROLE_UNSET),
+				IsUnset:            role == int32(types.RAFT_FOLLOWER_ROLE_UNSET),
 			})
 		}
 
@@ -311,4 +312,3 @@ func TableToArray(table *types.Table) *[]*map[string]interface{} {
 	}
 	return &res
 }
-
