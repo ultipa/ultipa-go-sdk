@@ -1,7 +1,9 @@
 package sdk
 
 import (
+	"errors"
 	"log"
+	"strconv"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/types"
 	"ultipa-go-sdk/utils"
@@ -72,42 +74,67 @@ func (t *Connection) DeleteNodes(filter interface{}, commonReq *types.Request_Co
 }
 
 // InsertHugeNodes by one time
-func (t *Connection) InsertHugeNodes(headers []string, rows [][]interface{}, silent bool, checkO bool, commonReq *types.Request_Common) *types.ResInsertHugeNodesReply {
+
+func (t *Connection) InsertHugeNodes(headers []ultipa.Header, rows [][]interface{}, silent bool, checkO bool, commonReq *types.Request_Common) (*types.ResInsertHugeNodesReply, error) {
 	if commonReq == nil {
-		commonReq = &types.Request_Common{}
+		commonReq = &types.Request_Common{
+			GraphSetName: t.DefaultConfig.GraphSetName,
+		}
 	}
 	clientInfo := t.getClientInfo(&GetClientInfoParams{
 		UseHost:        commonReq.UseHost,
-		TimeoutSeconds: commonReq.TimeoutSeconds,
+		TimeoutSeconds: t.GetTimeOut(commonReq),
 	})
 
 	nodeTable := ultipa.NodeTable{}
 	nodeRows := []*ultipa.NodeRow{}
 
-	for _, header := range headers {
-		if header == "_id" {
-			// ignore node
+	for index, _ := range headers {
+		if headers[index].PropertyName == "_id" {
+			// id header not add to header infos
 		} else {
-			nodeTable.Headers = append(nodeTable.Headers, &ultipa.Header{
-				PropertyName: header,
-			})
+			nodeTable.Headers = append(nodeTable.Headers, &headers[index])
 		}
 	}
 
 	for _, row := range rows {
 		nodeRow := ultipa.NodeRow{}
-		for index, header := range headers {
-			if header == "_id" {
-				nodeRow.Id = row[index].(int64)
+		for index := range headers {
+			h := headers[index]
+			if h.PropertyName == "_id" {
+				item := row[index]
+				switch item.(type) {
+				case int64:
+					nodeRow.Id = item.(int64)
+				case string:
+					id, err := strconv.Atoi(item.(string))
+					if err != nil {
+						return nil, err
+					}
+					nodeRow.Id = int64(id)
+				}
+
 			} else {
-				nodeRow.Values = append(nodeRow.Values, row[index].([]byte))
+				v := []byte{}
+				item := row[index]
+				// buff := new(bytes.Buffer)
+				var err error
+				v, err = utils.ConvertToBytes(item, h.PropertyType)
+
+				if err != nil {
+					return nil, err
+				} else {
+					nodeRow.Values = append(nodeRow.Values, v)
+				}
 			}
 		}
-
 		nodeRows = append(nodeRows, &nodeRow)
 	}
 
+	nodeTable.NodeRows = nodeRows
+
 	nodesRequest := ultipa.InsertNodesRequest{
+		GraphName: t.DefaultConfig.GraphSetName,
 		NodeTable: &nodeTable,
 		Silent:    silent,
 		CheckO:    checkO,
@@ -122,17 +149,19 @@ func (t *Connection) InsertHugeNodes(headers []string, rows [][]interface{}, sil
 	if err != nil {
 		//log.Printf("uql error %v", err)
 		res.Status = utils.FormatStatus(nil, err)
-		return res
+		return res, err
 	}
 
-	if res.Status == nil {
+	res.Status = utils.FormatStatus(msg.Status, nil)
+
+	if res.Status.Code != ultipa.ErrorCode_SUCCESS {
 		res.Status = utils.FormatStatus(msg.Status, nil)
-		res.EngineCost = msg.GetEngineTimeCost()
-		res.TotalCost = msg.GetTimeCost()
+		return res, errors.New(res.Status.Message)
 	}
 
+	res.EngineCost = msg.GetEngineTimeCost()
+	res.TotalCost = msg.GetTimeCost()
 	res.Data.Ids = msg.GetIds()
 	res.Data.IgnoreIndexes = msg.GetIgnoreIndexes()
-
-	return res
+	return res, nil
 }

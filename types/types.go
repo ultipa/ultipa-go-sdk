@@ -1,6 +1,8 @@
 package types
 
 import (
+	"log"
+	"strings"
 	ultipa "ultipa-go-sdk/rpc"
 )
 
@@ -29,6 +31,66 @@ const (
 	PROPERTY_TYPE_UINT64_STRING PropertyTypeString = "uint64"
 	PROPERTY_TYPE_BLOB_STRING   PropertyTypeString = "blob"
 )
+
+//GetPropertyTypeStringFromString convert string to property type string, used for create property
+func GetPropertyTypeStringFromString(str string) PropertyTypeString {
+	switch strings.ToLower(str) {
+	case "int":
+		fallthrough
+	case "int32":
+		return PROPERTY_TYPE_INT32_STRING
+	case "uint32":
+		return PROPERTY_TYPE_UINT32_STRING
+	case "int64":
+		return PROPERTY_TYPE_INT64_STRING
+	case "uint64":
+		return PROPERTY_TYPE_UINT64_STRING
+	case "float":
+		fallthrough
+	case "float32":
+		return PROPERTY_TYPE_FLOAT_STRING
+	case "double":
+		fallthrough
+	case "float64":
+		return PROPERTY_TYPE_DOUBLE_STRING
+	case "blob":
+		return PROPERTY_TYPE_BLOB_STRING
+	case "string":
+		return PROPERTY_TYPE_STRING_STRING
+	}
+
+	log.Fatalln("Property type : ", str, " not support, try: [int | int32, uint | uin32, int64, uint64, float | float32, double | float64, string, blob]")
+	return PROPERTY_TYPE_STRING_STRING
+}
+func GetPropertyTypeFromString(str string) ultipa.UltipaPropertyType {
+	switch strings.ToLower(str) {
+	case "int":
+		return ultipa.UltipaPropertyType_PROPERTY_INT32
+	case "int32":
+		return ultipa.UltipaPropertyType_PROPERTY_INT32
+	case "uint32":
+		return ultipa.UltipaPropertyType_PROPERTY_UINT32
+	case "int64":
+		return ultipa.UltipaPropertyType_PROPERTY_INT64
+	case "uint64":
+		return ultipa.UltipaPropertyType_PROPERTY_UINT64
+	case "float":
+		fallthrough
+	case "float32":
+		return ultipa.UltipaPropertyType_PROPERTY_FLOAT
+	case "double":
+		fallthrough
+	case "float64":
+		return ultipa.UltipaPropertyType_PROPERTY_DOUBLE
+	case "blob":
+		return ultipa.UltipaPropertyType_PROPERTY_BLOB
+	case "string":
+		return ultipa.UltipaPropertyType_PROPERTY_STRING
+	}
+
+	log.Fatalln("Property type : ", str, " not support, try: [int | int32, uint | uin32, int64, uint64, float | float32, double | float64, string, blob]")
+	return ultipa.UltipaPropertyType_PROPERTY_STRING
+}
 
 type TASK_STATUS = ultipa.TASK_STATUS
 

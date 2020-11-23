@@ -9,9 +9,9 @@ import (
 
 func TestListGraph(t *testing.T) {
 	conn, _ := GetTestDefaultConnection(nil)
-	graphs := conn.ListGraph(nil)
+	res := conn.ListGraph(nil)
 
-	if len(graphs) < 1 {
+	if len(*res.Graphs) < 1 {
 		log.Fatalln("graph not found")
 	}
 }
@@ -26,9 +26,9 @@ func TestCreateGraph(t *testing.T) {
 	conn, _ := GetTestDefaultConnection(nil)
 	newName := "go_new_graph"
 	conn.CreateGraph(newName, nil)
-	graphs := conn.ListGraph(nil)
+	res := conn.ListGraph(nil)
 	rs := false
-	for _, graph := range graphs {
+	for _, graph := range *res.Graphs {
 		// log.Println(graph.Id, graph.Name, graph.TotalEdges, graph.TotalNodes)
 		if graph.Name == newName {
 			rs = true
@@ -42,9 +42,9 @@ func TestDropGraph(t *testing.T) {
 	conn, _ := GetTestDefaultConnection(nil)
 	newName := "go_new_graph"
 	conn.DropGraph(newName, nil)
-	graphs := conn.ListGraph(nil)
+	res := conn.ListGraph(nil)
 	rs := true
-	for _, graph := range graphs {
+	for _, graph := range *res.Graphs {
 		// log.Println(graph.Id, graph.Name, graph.TotalEdges, graph.TotalNodes)
 		if graph.Name == newName {
 			rs = false

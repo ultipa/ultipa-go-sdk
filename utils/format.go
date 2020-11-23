@@ -3,7 +3,9 @@ package utils
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
+	"strconv"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/types"
 )
@@ -311,4 +313,71 @@ func TableToArray(table *types.Table) *[]*map[string]interface{} {
 		res = append(res, &item)
 	}
 	return &res
+}
+
+// ConvertToBytes data to bytes by Ultipa property type
+func ConvertToBytes(value interface{}, t ultipa.UltipaPropertyType) ([]byte, error) {
+	v := []byte{}
+
+	if value == nil {
+		switch t {
+		case ultipa.UltipaPropertyType_PROPERTY_INT32:
+			value = int32(0)
+		case ultipa.UltipaPropertyType_PROPERTY_STRING:
+			value = ""
+		case ultipa.UltipaPropertyType_PROPERTY_INT64:
+			value = int64(0)
+		case ultipa.UltipaPropertyType_PROPERTY_UINT32:
+			value = uint32(0)
+		case ultipa.UltipaPropertyType_PROPERTY_UINT64:
+			value = uint64(0)
+		case ultipa.UltipaPropertyType_PROPERTY_FLOAT:
+			value = float32(0)
+		case ultipa.UltipaPropertyType_PROPERTY_DOUBLE:
+			value = float64(0)
+		default:
+			return nil, errors.New(fmt.Sprint("not supported ultipa type : ", t))
+		}
+	}
+
+	switch t {
+	case ultipa.UltipaPropertyType_PROPERTY_INT32:
+		v = make([]byte, 4)
+		binary.BigEndian.PutUint32(v, uint32(value.(int32)))
+	case ultipa.UltipaPropertyType_PROPERTY_STRING:
+		v = []byte(value.(string))
+	case ultipa.UltipaPropertyType_PROPERTY_INT64:
+		v = make([]byte, 8)
+		binary.BigEndian.PutUint64(v, uint64(value.(int64)))
+	case ultipa.UltipaPropertyType_PROPERTY_UINT32:
+		v = make([]byte, 4)
+		binary.BigEndian.PutUint32(v, uint32(value.(uint32)))
+	case ultipa.UltipaPropertyType_PROPERTY_UINT64:
+		v = make([]byte, 8)
+		binary.BigEndian.PutUint64(v, uint64(value.(uint64)))
+	case ultipa.UltipaPropertyType_PROPERTY_FLOAT:
+		v = make([]byte, 4)
+		binary.BigEndian.PutUint64(v, uint64(value.(float32)))
+	case ultipa.UltipaPropertyType_PROPERTY_DOUBLE:
+		v = make([]byte, 8)
+		binary.BigEndian.PutUint64(v, uint64(value.(float64)))
+	default:
+		return nil, errors.New(fmt.Sprint("not supported ultipa type : ", t))
+	}
+
+	return v, nil
+}
+
+// ConvertToID data to bytes by Ultipa property type
+func ConvertToID(value interface{}) int64 {
+	id := int64(0)
+	switch value.(type) {
+	case int64:
+		id = value.(int64)
+	case string:
+		v, _ := strconv.Atoi(value.(string))
+		id = int64(v)
+	}
+
+	return id
 }

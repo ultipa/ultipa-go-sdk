@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"errors"
 	"log"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/types"
@@ -72,70 +73,86 @@ func (t *Connection) DeleteEdges(filter interface{}, commonReq *types.Request_Co
 }
 
 // InsertHugeEdges by one time
-func (t *Connection) InsertHugeEdges(headers []string, rows [][]interface{}, silent bool, checkO bool, commonReq *types.Request_Common) *types.ResInsertHugeEdgesReply {
+func (t *Connection) InsertHugeEdges(headers []ultipa.Header, rows [][]interface{}, silent bool, commonReq *types.Request_Common) (*types.ResInsertHugeEdgesReply, error) {
 	if commonReq == nil {
-		commonReq = &types.Request_Common{}
+		commonReq = &types.Request_Common{
+			GraphSetName: t.DefaultConfig.GraphSetName,
+		}
 	}
 	clientInfo := t.getClientInfo(&GetClientInfoParams{
 		UseHost:        commonReq.UseHost,
-		TimeoutSeconds: commonReq.TimeoutSeconds,
+		TimeoutSeconds: t.GetTimeOut(commonReq),
 	})
 
 	edgeTable := ultipa.EdgeTable{}
 	edgeRows := []*ultipa.EdgeRow{}
 
-	for _, header := range headers {
-		if header == "_id" || header == "_from_id" || header == "_to_id" {
+	for index, _ := range headers {
+		header := headers[index]
+		if header.PropertyName == "_id" || header.PropertyName == "_from_id" || header.PropertyName == "_to_id" {
 		} else {
-			edgeTable.Headers = append(edgeTable.Headers, &ultipa.Header{
-				PropertyName: header,
-			})
+			edgeTable.Headers = append(edgeTable.Headers, &header)
 		}
 	}
 
 	for _, row := range rows {
 		edgeRow := ultipa.EdgeRow{}
-		for index, header := range headers {
-			switch header {
+		for index, _ := range headers {
+			header := headers[index]
+			value := row[index]
+
+			switch header.PropertyName {
 			case "_id":
-				edgeRow.Id = row[index].(int64)
+				edgeRow.Id = utils.ConvertToID(value)
 			case "_from_id":
-				edgeRow.FromId = row[index].(int64)
+				edgeRow.FromId = utils.ConvertToID(value)
 			case "_to_id":
-				edgeRow.ToId = row[index].(int64)
+				edgeRow.ToId = utils.ConvertToID(value)
 			default:
-				edgeRow.Values = append(edgeRow.Values, row[index].([]byte))
+				v, err := utils.ConvertToBytes(value, header.PropertyType)
+				if err != nil {
+					return nil, err
+				}
+				edgeRow.Values = append(edgeRow.Values, v)
 			}
 		}
 
 		edgeRows = append(edgeRows, &edgeRow)
 	}
 
-	EdgesRequest := ultipa.InsertEdgesRequest{
+	edgeTable.EdgeRows = edgeRows
+	edgesRequest := ultipa.InsertEdgesRequest{
+		GraphName: commonReq.GraphSetName,
 		EdgeTable: &edgeTable,
 		Silent:    silent,
 	}
 
-	msg, err := clientInfo.ClientInfo.Client.InsertEdges(clientInfo.Context, &EdgesRequest)
+	utils.PrintJSON(edgesRequest)
+
+	msg, err := clientInfo.ClientInfo.Client.InsertEdges(clientInfo.Context, &edgesRequest)
 
 	res := &types.ResInsertHugeEdgesReply{
 		ResWithoutData: &types.ResWithoutData{},
 	}
 
+	utils.PrintJSON(msg)
 	if err != nil {
 		//log.Printf("uql error %v", err)
 		res.Status = utils.FormatStatus(nil, err)
-		return res
+		return res, err
 	}
 
-	if res.Status == nil {
+	res.Status = utils.FormatStatus(msg.Status, nil)
+
+	if res.Status.Code != ultipa.ErrorCode_SUCCESS {
 		res.Status = utils.FormatStatus(msg.Status, nil)
-		res.EngineCost = msg.GetEngineTimeCost()
-		res.TotalCost = msg.GetTimeCost()
+		return res, errors.New(res.Status.Message)
 	}
 
+	res.EngineCost = msg.GetEngineTimeCost()
+	res.TotalCost = msg.GetTimeCost()
 	res.Data.Ids = msg.GetIds()
 	res.Data.IgnoreIndexes = msg.GetIgnoreIndexes()
 
-	return res
+	return res, nil
 }
