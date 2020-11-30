@@ -127,7 +127,7 @@ func (t *Connection) InsertHugeEdges(headers []ultipa.Header, rows [][]interface
 		Silent:    silent,
 	}
 
-	utils.PrintJSON(edgesRequest)
+	// utils.PrintJSON(edgesRequest)
 
 	msg, err := clientInfo.ClientInfo.Client.InsertEdges(clientInfo.Context, &edgesRequest)
 
@@ -135,7 +135,7 @@ func (t *Connection) InsertHugeEdges(headers []ultipa.Header, rows [][]interface
 		ResWithoutData: &types.ResWithoutData{},
 	}
 
-	utils.PrintJSON(msg)
+	// utils.PrintJSON(msg)
 	if err != nil {
 		//log.Printf("uql error %v", err)
 		res.Status = utils.FormatStatus(nil, err)

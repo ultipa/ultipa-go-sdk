@@ -33,7 +33,7 @@ const (
 	GoTag
 )
 
-// Unmarshal deserializes the default string s according to the given kind k.
+// Unmarshal Deserializes the default string s according to the given kind k.
 // When k is an enum, a list of enum value descriptors must be provided.
 func Unmarshal(s string, k pref.Kind, evs pref.EnumValueDescriptors, f Format) (pref.Value, pref.EnumValueDescriptor, error) {
 	switch k {
@@ -171,7 +171,7 @@ func Marshal(v pref.Value, ev pref.EnumValueDescriptor, k pref.Kind, f Format) (
 	return "", errors.New("could not format value for %v: %v", k, v)
 }
 
-// unmarshalBytes deserializes bytes by applying C unescaping.
+// unmarshalBytes Deserializes bytes by applying C unescaping.
 func unmarshalBytes(s string) ([]byte, bool) {
 	// Bytes values use the same escaping as the text format,
 	// however they lack the surrounding double quotes.

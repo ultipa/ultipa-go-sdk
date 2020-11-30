@@ -73,7 +73,7 @@ func _formatValues(values [][]byte, types_ []types.PropertyType, headers []strin
 		} else {
 			key = fmt.Sprintf("Unknown %v", _index)
 		}
-		change := deserialize(vv, vvType)
+		change := Deserialize(vv, vvType)
 		_vs[key] = change
 	}
 	return &_vs
@@ -118,7 +118,7 @@ func FormatAttrAlias(attrAlias *ultipa.AttrAlias) *types.AttrAlias {
 	if attrAlias.GetValues() != nil {
 		var newValues []interface{}
 		for _, v := range attrAlias.GetValues() {
-			v1 := deserialize(v, attrAlias.GetPropertyType())
+			v1 := Deserialize(v, attrAlias.GetPropertyType())
 			newValues = append(newValues, v1)
 		}
 		newAttrAlias.Values = newValues
@@ -147,7 +147,7 @@ func FormatTables(tables []*ultipa.Table) *types.Tables {
 			for _, row := range tableRows {
 				var _row []interface{}
 				for _, v := range row.GetValues() {
-					_v := deserialize(v, types.PROPERTY_TYPE_STRING)
+					_v := Deserialize(v, types.PROPERTY_TYPE_STRING)
 					_row = append(_row, _v)
 				}
 				newRows = append(newRows, &_row)
@@ -173,7 +173,8 @@ func _bytesToRead(bs []byte, out interface{}) {
 	buff := bytes.NewBuffer(bs)
 	binary.Read(buff, binary.BigEndian, out)
 }
-func deserialize(bytes []byte, propertyType types.PropertyType) interface{} {
+
+func Deserialize(bytes []byte, propertyType types.PropertyType) interface{} {
 	if len(bytes) == 0 && propertyType != types.PROPERTY_TYPE_STRING {
 		return nil
 	}

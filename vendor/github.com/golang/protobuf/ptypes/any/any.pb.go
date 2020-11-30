@@ -75,7 +75,7 @@ const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 // JSON
 // ====
 // The JSON representation of an `Any` value uses the regular
-// representation of the deserialized, embedded message, with an
+// representation of the Deserialized, embedded message, with an
 // additional field `@type` which contains the type URL. Example:
 //
 //     package google.profile;
