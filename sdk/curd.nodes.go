@@ -115,17 +115,24 @@ func (t *Connection) InsertHugeNodes(headers []ultipa.Header, rows [][]interface
 				}
 
 			} else {
+
 				v := []byte{}
 				item := row[index]
 				// buff := new(bytes.Buffer)
 				var err error
 				v, err = utils.ConvertToBytes(item, h.PropertyType)
 
+				// fmt.Println(nodeRow.Id, h.PropertyName, v)
+				// if nodeRow.Id <= 0 && h.PropertyName == "_o" {
+				// 	// nodeRow.Id = utils.Hash64(v)
+				// }
+
 				if err != nil {
 					return nil, err
 				} else {
 					nodeRow.Values = append(nodeRow.Values, v)
 				}
+
 			}
 		}
 		nodeRows = append(nodeRows, &nodeRow)

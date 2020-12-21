@@ -110,9 +110,17 @@ func (t *Connection) InsertHugeEdges(headers []ultipa.Header, rows [][]interface
 				edgeRow.ToId = utils.ConvertToID(value)
 			default:
 				v, err := utils.ConvertToBytes(value, header.PropertyType)
+
 				if err != nil {
 					return nil, err
 				}
+
+				// if edgeRow.FromId < 0 && header.PropertyName == "_from_o" {
+				// 	edgeRow.FromId = utils.Hash64(v)
+				// } else if edgeRow.ToId < 0 && header.PropertyName == "_to_o" {
+				// 	edgeRow.ToId = utils.Hash64(v)
+				// } else {
+				// }
 				edgeRow.Values = append(edgeRow.Values, v)
 			}
 		}
