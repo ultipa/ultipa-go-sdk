@@ -117,3 +117,42 @@ func (t *Connection) AlterProperty(dataset ultipa.DBType, propertyName string, m
 		res.ResWithoutData,
 	}
 }
+
+type ResponseLTEProperty struct {
+	*types.ResWithoutData
+}
+
+func (t *Connection) LTE(dataset ultipa.DBType, propertyName string, commonReq *types.Request_Common) *ResponseLTEProperty {
+	uql := utils.UQLMAKER{}
+	switch dataset {
+	case types.DBType_DBNODE:
+		uql.SetCommand(utils.UQLCommand_lteNode)
+		break
+	case types.DBType_DBEDGE:
+		uql.SetCommand(utils.UQLCommand_lteEdge)
+		break
+	}
+	uql.SetCommandParams(propertyName)
+	log.Println(uql.ToString())
+	res := t.UQLListSample(uql.ToString(), commonReq)
+	return &ResponseLTEProperty{
+		res.ResWithoutData,
+	}
+}
+func (t *Connection) UFE(dataset ultipa.DBType, propertyName string, commonReq *types.Request_Common) *ResponseLTEProperty {
+	uql := utils.UQLMAKER{}
+	switch dataset {
+	case types.DBType_DBNODE:
+		uql.SetCommand(utils.UQLCommand_ufeNode)
+		break
+	case types.DBType_DBEDGE:
+		uql.SetCommand(utils.UQLCommand_ufeEdge)
+		break
+	}
+	uql.SetCommandParams(propertyName)
+	log.Println(uql.ToString())
+	res := t.UQLListSample(uql.ToString(), commonReq)
+	return &ResponseLTEProperty{
+		res.ResWithoutData,
+	}
+}

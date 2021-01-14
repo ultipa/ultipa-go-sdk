@@ -162,41 +162,41 @@ type ClusterInfo struct {
 	RaftPeers []*RaftPeerInfo
 }
 
-type Status = struct {
+type Status struct {
 	Code        ErrorCode
 	Message     string
 	ClusterInfo *ClusterInfo
 }
 
-type NodeRow = struct {
+type NodeRow struct {
 	ID     int64
 	Values *map[string]interface{}
 }
 type NodeTable = []*NodeRow
-type NodeAlias = struct {
+type NodeAlias struct {
 	Nodes *NodeTable
 	Alias string
 }
 
-type EdgeRow = struct {
+type EdgeRow struct {
 	ID     int64
 	From   int64
 	To     int64
 	Values *map[string]interface{}
 }
 type EdgeTable = []*EdgeRow
-type EdgeAlias = struct {
+type EdgeAlias struct {
 	Edges *EdgeTable
 	Alias string
 }
-type Path = struct {
+type Path struct {
 	Nodes *NodeTable
 	Edges *EdgeTable
 }
 type Paths = []*Path
 
 type TableRows []*[]interface{}
-type Table = struct {
+type Table struct {
 	TableName string
 	Headers   []string
 	TableRows *TableRows
@@ -222,19 +222,23 @@ type UqlReply struct {
 	Values *map[string]interface{}
 }
 
-type ResWithoutData = struct {
+type ResWithoutData struct {
 	Status     *Status
 	TotalCost  int32
 	EngineCost int32
 	Req        *map[string]interface{}
 }
 
-type ResUqlReply = struct {
+func (t *ResWithoutData) IsSuccess() bool {
+	return t.Status.Code == ErrorCode_SUCCESS
+}
+
+type ResUqlReply struct {
 	*ResWithoutData
 	Data *UqlReply
 }
 
-type ResInsertHugeNodesReply = struct {
+type ResInsertHugeNodesReply struct {
 	*ResWithoutData
 	Data struct {
 		Ids           []int64
@@ -242,7 +246,7 @@ type ResInsertHugeNodesReply = struct {
 	}
 }
 
-type ResInsertHugeEdgesReply = struct {
+type ResInsertHugeEdgesReply struct {
 	*ResWithoutData
 	Data struct {
 		Ids           []int64

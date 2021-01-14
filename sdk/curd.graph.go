@@ -56,9 +56,10 @@ func (t *Connection) CreateGraph(name string, commonReq *types.Request_Common) *
 
 	res := t.UQLListSample(uql.ToString(), commonReq)
 
-	return &ResponseCreateGraph{
+	rs := &ResponseCreateGraph{
 		res.ResWithoutData,
 	}
+	return rs
 }
 
 type ResponseDropGraph struct {
