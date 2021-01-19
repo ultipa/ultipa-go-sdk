@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"math/rand"
 	"strings"
 	"sync"
@@ -124,8 +125,8 @@ func (t *HostManager) Init(graphSetName string, host string, username string, pa
 }
 func (t *HostManager) createClientInfo(host string) (*ClientInfo, error) {
 	var opts []grpc.DialOption
-	//opts = append(opts, grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(-1)))
-	//opts = append(opts, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(-1)))
+	opts = append(opts, grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(math.MaxInt32)))
+	opts = append(opts, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(math.MaxInt32)))
 	if len(t.crtFile) == 0 {
 		// 兼容2.0
 		opts = append(opts, grpc.WithInsecure())
