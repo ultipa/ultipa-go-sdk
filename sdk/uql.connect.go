@@ -35,6 +35,7 @@ func (t *Connection) UQL(uql string, commonReq *types.Request_Common) *types.Res
 		Uql:            uql,
 		UseHost:        commonReq.UseHost,
 		TimeoutSeconds: commonReq.TimeoutSeconds,
+		GraphSetName: commonReq.GraphSetName,
 	})
 	defer clientInfo.CancelFunc()
 	retry := commonReq.Retry

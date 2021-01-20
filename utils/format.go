@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"math"
 	"strconv"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/types"
@@ -358,10 +359,10 @@ func ConvertToBytes(value interface{}, t ultipa.UltipaPropertyType) ([]byte, err
 		binary.BigEndian.PutUint64(v, uint64(value.(uint64)))
 	case ultipa.UltipaPropertyType_PROPERTY_FLOAT:
 		v = make([]byte, 4)
-		binary.BigEndian.PutUint32(v, uint32(value.(float32)))
+		binary.BigEndian.PutUint32(v, math.Float32bits(value.(float32)))
 	case ultipa.UltipaPropertyType_PROPERTY_DOUBLE:
 		v = make([]byte, 8)
-		binary.BigEndian.PutUint64(v, uint64(value.(float64)))
+		binary.BigEndian.PutUint64(v, math.Float64bits(value.(float64)))
 	default:
 		return nil, errors.New(fmt.Sprint("not supported ultipa type : ", t))
 	}
