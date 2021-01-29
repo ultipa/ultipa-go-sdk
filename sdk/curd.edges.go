@@ -80,7 +80,8 @@ func (t *Connection) InsertHugeEdges(headers []ultipa.Header, rows [][]interface
 		}
 	}
 	clientInfo := t.getClientInfo(&GetClientInfoParams{
-		UseHost:        commonReq.UseHost,
+		GraphSetName:   commonReq.GraphSetName,
+		ClientType:     ClientType_Update,
 		TimeoutSeconds: t.GetTimeOut(commonReq),
 	})
 
