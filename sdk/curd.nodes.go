@@ -121,6 +121,7 @@ func (t *Connection) InsertHugeNodes(headers []ultipa.Header, rows [][]interface
 				item := row[index]
 				// buff := new(bytes.Buffer)
 				var err error
+				// log.Println(item, h.PropertyName, h.PropertyType)
 				v, err = utils.ConvertToBytes(item, h.PropertyType)
 
 				// fmt.Println(nodeRow.Id, h.PropertyName, v)

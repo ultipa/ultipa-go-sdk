@@ -321,12 +321,12 @@ func TableToArray(table *types.Table) *[]*map[string]interface{} {
 func ConvertToBytes(value interface{}, t ultipa.UltipaPropertyType) ([]byte, error) {
 	v := []byte{}
 
-	if value == nil {
+	if value == nil || value == "" {
 		switch t {
-		case ultipa.UltipaPropertyType_PROPERTY_INT32:
-			value = int32(0)
 		case ultipa.UltipaPropertyType_PROPERTY_STRING:
 			value = ""
+		case ultipa.UltipaPropertyType_PROPERTY_INT32:
+			value = int32(0)
 		case ultipa.UltipaPropertyType_PROPERTY_INT64:
 			value = int64(0)
 		case ultipa.UltipaPropertyType_PROPERTY_UINT32:
