@@ -72,6 +72,10 @@ const (
 	UQLCommand_updateGraph        UQLCommand = "updateGraph"
 )
 
+func replace_doller(str string) string  {
+	reg := regexp.MustCompile(`"(\$[a-z_A-Z]+)"`)
+	return reg.ReplaceAllString(str, "${1}")
+}
 func (t *UQLMAKER) SetCommand(command UQLCommand) {
 	t._command = command
 }
@@ -88,7 +92,7 @@ func (t *UQLMAKER) SetCommandParams(commandP interface{}) {
 	if nil != err {
 		return
 	}
-	t._commandP = BytesToString(jsonBytes)
+	t._commandP = replace_doller(BytesToString(jsonBytes))
 }
 
 func (t *UQLMAKER) AddParam(key string, value interface{}, required bool) {
@@ -129,7 +133,7 @@ func (t *UQLMAKER) AddParam(key string, value interface{}, required bool) {
 		if nil != err {
 			return
 		}
-		valueString = BytesToString(bytes)
+		valueString = replace_doller(BytesToString(bytes))
 	}
 	t._params = append(t._params, struct {
 		key   string
