@@ -1,7 +1,9 @@
- .DS_Store
- .idea
- .vscode
- .vscode/*
- .idea/*
- coverage
- vendor
+.DS_Store
+.idea
+.idea/*
+.vscode
+.vscode/*
+.idea/*
+coverage
+vendor
+
