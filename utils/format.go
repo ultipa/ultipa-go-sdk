@@ -11,6 +11,8 @@ import (
 	"ultipa-go-sdk/types"
 )
 
+var ultipaTime = UltipaTime{}
+
 func FormatNodeAliases(nodes []*ultipa.NodeAlias) *types.NodeAliases {
 	var arrs types.NodeAliases
 	for _, one := range nodes {
@@ -206,6 +208,10 @@ func Deserialize(bytes []byte, propertyType types.PropertyType) interface{} {
 		var num float64
 		_bytesToRead(bytes, &num)
 		return num
+	case types.PROPERTY_TYPE_DATETIME:
+		var num uint64
+		_bytesToRead(bytes, &num)
+		return ultipaTime.New(num).ToString()
 	}
 	return "Unknown"
 }
@@ -337,6 +343,8 @@ func ConvertToBytes(value interface{}, t ultipa.UltipaPropertyType) ([]byte, err
 			value = float32(0)
 		case ultipa.UltipaPropertyType_PROPERTY_DOUBLE:
 			value = float64(0)
+		case ultipa.UltipaPropertyType_PROPERTY_DATETIME:
+			value = uint64(0)
 		default:
 			return nil, errors.New(fmt.Sprint("not supported ultipa type : ", t))
 		}
@@ -353,16 +361,24 @@ func ConvertToBytes(value interface{}, t ultipa.UltipaPropertyType) ([]byte, err
 		binary.BigEndian.PutUint64(v, uint64(value.(int64)))
 	case ultipa.UltipaPropertyType_PROPERTY_UINT32:
 		v = make([]byte, 4)
-		binary.BigEndian.PutUint32(v, uint32(value.(uint32)))
+		binary.BigEndian.PutUint32(v, value.(uint32))
 	case ultipa.UltipaPropertyType_PROPERTY_UINT64:
 		v = make([]byte, 8)
-		binary.BigEndian.PutUint64(v, uint64(value.(uint64)))
+		binary.BigEndian.PutUint64(v, value.(uint64))
 	case ultipa.UltipaPropertyType_PROPERTY_FLOAT:
 		v = make([]byte, 4)
 		binary.BigEndian.PutUint32(v, math.Float32bits(value.(float32)))
 	case ultipa.UltipaPropertyType_PROPERTY_DOUBLE:
 		v = make([]byte, 8)
 		binary.BigEndian.PutUint64(v, math.Float64bits(value.(float64)))
+	case ultipa.UltipaPropertyType_PROPERTY_DATETIME:
+		v = make([]byte, 8)
+		n, err := ultipaTime.NewFromString(value.(string))
+		if err != nil {
+			return nil, err
+		}
+		binary.BigEndian.PutUint64(v, n.Datetime)
+
 	default:
 		return nil, errors.New(fmt.Sprint("not supported ultipa type : ", t))
 	}

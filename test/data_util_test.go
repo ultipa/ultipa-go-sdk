@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"log"
 	"testing"
 	"ultipa-go-sdk/utils"
 )
@@ -25,4 +26,27 @@ func TestRegexp(t *testing.T)  {
 	uql := utils.UQL{}
 	uql.Parse(uqlString)
 	fmt.Println(utils.StructToPrettyJSONString(uql))
+}
+
+func TestStringToTime(_ *testing.T) {
+	ultipaTime := utils.UltipaTime{}
+
+	d := "2021-03-19 12:04:05.123"
+	t, err := ultipaTime.NewFromString(d)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	utils.PrintJSON(t)
+
+	// set uint64 to time
+	t2 := ultipaTime.New(1849051732466851960)
+	utils.PrintJSON(t2)
+
+}
+
+func CreateUltipaTime(t *testing.T) {
+	//tt := utils.UltipaTime{}
+	//tt.Update()
 }

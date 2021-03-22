@@ -16,7 +16,7 @@ const (
 	PROPERTY_TYPE_UINT32 PropertyType = ultipa.UltipaPropertyType_PROPERTY_UINT32
 	PROPERTY_TYPE_INT64  PropertyType = ultipa.UltipaPropertyType_PROPERTY_INT64
 	PROPERTY_TYPE_UINT64 PropertyType = ultipa.UltipaPropertyType_PROPERTY_UINT64
-	PROPERTY_TYPE_BLOB   PropertyType = ultipa.UltipaPropertyType_PROPERTY_BLOB
+	PROPERTY_TYPE_DATETIME PropertyType = ultipa.UltipaPropertyType_PROPERTY_DATETIME
 )
 
 type PropertyTypeString string
@@ -29,7 +29,8 @@ const (
 	PROPERTY_TYPE_UINT32_STRING PropertyTypeString = "uint32"
 	PROPERTY_TYPE_INT64_STRING  PropertyTypeString = "int64"
 	PROPERTY_TYPE_UINT64_STRING PropertyTypeString = "uint64"
-	PROPERTY_TYPE_BLOB_STRING   PropertyTypeString = "blob"
+	PROPERTY_TYPE_DATETIME_STRING   PropertyTypeString = "datetime"
+
 )
 
 //GetPropertyTypeStringFromString convert string to property type string, used for create property
@@ -53,15 +54,16 @@ func GetPropertyTypeStringFromString(str string) PropertyTypeString {
 		fallthrough
 	case "float64":
 		return PROPERTY_TYPE_DOUBLE_STRING
-	case "blob":
-		return PROPERTY_TYPE_BLOB_STRING
+	case "datetime":
+		return PROPERTY_TYPE_DATETIME_STRING
 	case "string":
 		return PROPERTY_TYPE_STRING_STRING
 	}
 
-	log.Fatalln("Property type : ", str, " not support, try: [int | int32, uint | uin32, int64, uint64, float | float32, double | float64, string, blob]")
+	log.Fatalln("Property type : ", str, " not support, try: [int | int32, uint | uin32, int64, uint64, float | float32, double | float64, string, datetime]")
 	return PROPERTY_TYPE_STRING_STRING
 }
+
 func GetPropertyTypeFromString(str string) ultipa.UltipaPropertyType {
 	switch strings.ToLower(str) {
 	case "int":
@@ -82,8 +84,8 @@ func GetPropertyTypeFromString(str string) ultipa.UltipaPropertyType {
 		fallthrough
 	case "float64":
 		return ultipa.UltipaPropertyType_PROPERTY_DOUBLE
-	case "blob":
-		return ultipa.UltipaPropertyType_PROPERTY_BLOB
+	case "datetime":
+		return ultipa.UltipaPropertyType_PROPERTY_DATETIME
 	case "string":
 		return ultipa.UltipaPropertyType_PROPERTY_STRING
 	}
