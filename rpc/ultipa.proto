@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package ultipa;
 option go_package = ".;ultipa";
-
 // The ultipa service definition.
 service UltipaRpcs {
     // 1.Sends a greeting
@@ -72,17 +71,40 @@ message UqlRequest {
     string graph_name = 3;
 }
 
+enum ResultType {
+    RESULT_TYPE_UNSET = 0;
+    RESULT_TYPE_PATH = 1;
+    RESULT_TYPE_NODE = 2;
+    RESULT_TYPE_EDGE = 3;
+    RESULT_TYPE_ATTR = 4;
+    RESULT_TYPE_ARRAY = 5;
+    RESULT_TYPE_TABLE = 6;
+    RESULT_TYPE_KV = 7;
+}
+
+message ResultAlias {
+    string alias = 1;
+    ResultType result_type = 2;
+}
+
 message UqlReply {
     Status status = 1;
-    int32 total_time_cost = 3;
-    int32 engine_time_cost = 4;
+    int32 total_time_cost = 2;
+    int32 engine_time_cost = 3;
 
-    repeated Path paths = 5;
+    repeated ResultAlias alias = 4;
+    repeated PathAlias paths = 5;
     repeated NodeAlias nodes = 6;
     repeated EdgeAlias edges = 7;
     repeated AttrAlias attrs = 8;
-    repeated Table tables = 9;
-    repeated Value key_values = 10;
+    repeated ArrayAlias arrays = 9;
+    repeated Table tables = 10;
+    repeated Value key_values = 11;
+}
+
+message PathAlias {
+    repeated Path paths = 1;
+    string alias = 2;
 }
 
 message EdgeAlias {
@@ -100,6 +122,17 @@ message AttrAlias {
     UltipaPropertyType property_type = 2;
     repeated bytes values = 3;
 }
+
+message ArrayElement {
+    repeated bytes values = 1;
+}
+
+message ArrayAlias {
+    string alias = 1;
+    UltipaPropertyType property_type = 2;
+    repeated ArrayElement elements = 3;
+}
+
 /*------------------------2.Uql------------------------------*/
 
 
@@ -172,14 +205,17 @@ message InsertNodesRequest {
     bool no_inner_id = 3;
     string graph_name = 4;
     bool check_o = 5;
+    bool overwrite = 6;
+    bool upsert = 7;
 }
 
 message InsertNodesReply {
     Status status = 1;
     int32 time_cost = 2;
     int32 engine_time_cost = 3;
-    repeated int64 ids = 4;
-    repeated int32 ignore_indexes = 5;
+    repeated uint64 uuids = 4;
+    repeated string ids = 5;
+    repeated uint32 ignore_indexes = 6;
 }
 /*------------------------InsertNodes------------------------------*/
 
@@ -191,28 +227,31 @@ message InsertEdgesRequest {
     bool no_inner_id = 3;
     string graph_name = 4;
     bool create_node_if_not_exist = 5;
+    bool overwrite = 6;
+    bool upsert = 7;
 }
 
 message InsertEdgesReply {
     Status status = 1;
     int32 time_cost = 2;
     int32 engine_time_cost = 3;
-    repeated int64 ids = 4;
-    repeated int32 ignore_indexes = 5;
+    repeated uint64 uuids = 4;
+    repeated uint32 ignore_indexes = 5;
 }
 /*------------------------InsertEdges------------------------------*/
 
 /*------------------------public message-----------------------*/
 
 enum UltipaPropertyType {
-    PROPERTY_INT32 = 0;
-    PROPERTY_STRING = 1;
-    PROPERTY_FLOAT = 2;
-    PROPERTY_DOUBLE = 3;
-    PROPERTY_UINT32 = 4;
-    PROPERTY_INT64 = 5;
-    PROPERTY_UINT64 = 6;
-    PROPERTY_DATETIME = 7;
+    UNSET = 0;
+    INT32 = 1;
+    UINT32 = 2;
+    INT64 = 3;
+    UINT64 = 4;
+    FLOAT = 5;
+    DOUBLE = 6;
+    STRING = 7;
+    DATETIME = 8;
 }
 
 enum ErrorCode {
@@ -275,7 +314,7 @@ message Path {
 
 message Table {
     string table_name = 1;
-    repeated string headers = 2;
+    repeated Header headers = 2;
     repeated TableRow table_rows = 3;
 }
 
@@ -284,25 +323,35 @@ message TableRow {
 }
 
 message NodeTable {
-    repeated Header headers = 2;
-    repeated NodeRow node_rows = 3;
+    repeated SchemaHeader headers = 1;
+    repeated NodeRow node_rows = 2;
 }
 
 message EdgeTable {
-    repeated Header headers = 2;
+    repeated SchemaHeader headers = 1;
     repeated EdgeRow edge_rows = 3;
 }
 
 message NodeRow {
-    int64 id = 1;
-    repeated bytes values = 2;
+    uint64 uuid = 1;
+    string id = 2;
+    string schema_name = 3;
+    repeated bytes values = 4;
 }
 
 message EdgeRow {
-    int64 id = 1;
-    int64 from_id = 2;
-    int64 to_id = 3;
-    repeated bytes values = 4;
+    uint64 uuid = 1;
+    string schema_name = 2;
+    uint64 from_uuid = 3;
+    uint64 to_uuid = 4;
+    string from_id = 5;
+    string to_id = 6;
+    repeated bytes values = 7;
+}
+
+message SchemaHeader {
+    string schema_name = 1;
+    repeated Header headers = 2;
 }
 
 message Header {
