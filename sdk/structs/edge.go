@@ -5,26 +5,23 @@ import (
 )
 
 type Edge struct {
-	ID types.ID
+	Name string
 	From types.ID
 	To types.ID
+	FromUUID types.UUID
+	ToUUID types.UUID
 	UUID types.UUID
-	Schema types.Schema
-	Values types.Values
+	Schema string
+	Values *Values
 }
 func NewEdgeFromMetaData(md *MetaData) *Edge {
 	return &Edge{
-		ID: md.ID,
 		From: md.From,
 		To: md.To,
 		UUID: md.UUID,
 		Schema: md.Schema,
 		Values: md.Values,
 	}
-}
-
-func (edge *Edge) GetID() types.ID {
-	return edge.ID
 }
 
 func (edge *Edge) GetUUID() types.UUID {
@@ -39,19 +36,22 @@ func (edge *Edge) GetTo() types.ID {
 	return edge.To
 }
 
-func (edge *Edge) GetSchema() types.Schema {
+func (edge *Edge) GetSchema() string {
 	return edge.Schema
+}
+
+func (edge *Edge) GetValues() *Values {
+	return edge.Values
 }
 
 // get a value by key
 func (edge *Edge) Get(key string) interface{} {
-	return (*edge.Values)[key]
+	return edge.Values.Get(key)
 }
 
 // set a value by key
 func (edge *Edge) Set(key string, value interface{}) error {
 
-	//todo: check value type
-	(*edge.Values)[key] = value
+	edge.Values.Set(key, value)
 	return nil
 }

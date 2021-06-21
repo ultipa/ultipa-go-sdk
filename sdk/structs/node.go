@@ -5,20 +5,13 @@ import (
 )
 
 type Node struct {
+	Name string
 	ID types.ID
 	UUID types.UUID
-	Schema types.Schema
-	Values types.Values
+	Schema string
+	Values *Values
 }
 
-func NewNodeFromMetaData(md *MetaData) *Node {
-	return &Node{
-		ID: md.ID,
-		UUID: md.UUID,
-		Schema: md.Schema,
-		Values: md.Values,
-	}
-}
 
 func (node *Node) GetID() types.ID {
 	return node.ID
@@ -28,19 +21,23 @@ func (node *Node) GetUUID() types.UUID {
 	return node.UUID
 }
 
-func (node *Node) GetSchema() types.Schema {
+func (node *Node) GetSchema() string {
 	return node.Schema
+}
+
+func (node *Node) GetValues() *Values {
+	return node.Values
 }
 
 // get a value by key
 func (node *Node) Get(key string) interface{} {
-	return (*node.Values)[key]
+	return node.Values.Get(key)
 }
 
 // set a value by key
 func (node *Node) Set(key string, value interface{}) error {
 
 	//todo: check value type
-	(*node.Values)[key] = value
+	node.Values.Set(key, value)
 	return nil
 }

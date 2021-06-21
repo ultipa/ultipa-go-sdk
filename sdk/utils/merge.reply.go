@@ -49,7 +49,7 @@ func FindAliasDataInReply(reply *ultipa.UqlReply, alias string) (data interface{
 		}
 	}
 
-	return &data, t
+	return data, t
 
 }
 

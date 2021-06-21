@@ -25,5 +25,5 @@ func TestReflectArray(t *testing.T) {
 		return test1[index] == "b"
 	})
 
-	log.Println(res1)
+	log.Println(res1.(string))
 }

@@ -7,8 +7,8 @@ type MetaData struct {
 	UUID   types.UUID
 	From   types.ID
 	To     types.ID
-	Schema types.Schema
-	Values types.Values
+	Schema string
+	Values *Values
 }
 
 

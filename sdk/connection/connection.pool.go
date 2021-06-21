@@ -3,6 +3,7 @@ package connection
 import (
 	"context"
 	"errors"
+	"google.golang.org/grpc/metadata"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
@@ -74,6 +75,9 @@ func (pool *ConnectionPool) RefreshActives() {
 	pool.Actives = []*Connection{}
 	for _, conn := range pool.Connections {
 		ctx ,_ := context.WithTimeout(context.Background(), time.Duration(pool.Config.Timeout) * time.Second)
+
+		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(pool.Config.ToMetaKV()...))
+
 		resp, err := conn.GetClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
 			Name: "go sdk refresh",
 		})
@@ -82,7 +86,7 @@ func (pool *ConnectionPool) RefreshActives() {
 			continue
 		}
 
-		if resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS {
+		if resp.Status == nil || resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS  {
 			pool.Actives = append(pool.Actives, conn)
 		}
 

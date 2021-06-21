@@ -22,6 +22,7 @@ func NewUQLResponse(resp ultipa.UltipaRpcs_UqlClient) (response *UQLResponse, er
 
 	response = &UQLResponse{
 		Resp: resp,
+		Status: &Status{},
 		DataItemMap : map[string]struct {
 			DataItem *DataItem
 			Index    int
@@ -54,16 +55,11 @@ func NewUQLResponse(resp ultipa.UltipaRpcs_UqlClient) (response *UQLResponse, er
 	return response, nil
 }
 
-
-func (r *UQLResponse) Init() {
-
-}
-
 func (r *UQLResponse) Get(index int) (di *DataItem) {
 	return r.Alias(r.AliasList[index])
 }
 
-func (r *UQLResponse) Alias(alias string) (*DataItem) {
+func (r *UQLResponse) Alias(alias string) *DataItem {
 
 	data, t := utils.FindAliasDataInReply(r.Reply, alias)
 
