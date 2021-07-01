@@ -1,3 +1,7 @@
+/**
+ * Returns UQL Results by one time
+ */
+
 package http
 
 import (
@@ -7,23 +11,23 @@ import (
 )
 
 type UQLResponse struct {
-	DataItemMap map[string]struct{
+	DataItemMap map[string]struct {
 		DataItem *DataItem
-		Index int
+		Index    int
 	}
-	Reply *ultipa.UqlReply
-	Status *Status
+	Reply     *ultipa.UqlReply
+	Status    *Status
 	Statistic *Statistic
 	AliasList []string
-	Resp ultipa.UltipaRpcs_UqlClient
+	Resp      ultipa.UltipaRpcs_UqlClient
 }
 
 func NewUQLResponse(resp ultipa.UltipaRpcs_UqlClient) (response *UQLResponse, err error) {
 
 	response = &UQLResponse{
-		Resp: resp,
+		Resp:   resp,
 		Status: &Status{},
-		DataItemMap : map[string]struct {
+		DataItemMap: map[string]struct {
 			DataItem *DataItem
 			Index    int
 		}{},
@@ -35,7 +39,7 @@ func NewUQLResponse(resp ultipa.UltipaRpcs_UqlClient) (response *UQLResponse, er
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			return nil ,err
+			return nil, err
 		}
 
 		if response.Reply == nil {

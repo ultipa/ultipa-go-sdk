@@ -18,13 +18,13 @@ func TestUQL(t *testing.T) {
 
 		resp, err := client.UQL(c.UQL, nil)
 
+		if err != nil {
+			log.Fatalln(err)
+		}
+
 		if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 			log.Println(resp.Status.Message)
 			continue
-		}
-
-		if err != nil {
-			log.Fatalln("Test UQL Error : ", err)
 		}
 
 		for _, a := range c.Alias {
@@ -75,7 +75,11 @@ func TestUQL(t *testing.T) {
 
 				// handle schema table
 				if c.Type == "schema" {
-					res, _ := dataitem.AsSchemas()
+					res, err := dataitem.AsSchemas()
+
+					if err != nil {
+						log.Fatalln(err)
+					}
 
 					for _, schema := range res {
 						fmt.Println("Schema Name: ", schema.Name, "(", schema.TotalNodes,"|",schema.TotalEdges ,")")
@@ -91,7 +95,13 @@ func TestUQL(t *testing.T) {
 							})
 						}
 
-						table.Println()
+						if len(table.Body.Cells) > 0 {
+							table.Println()
+						} else {
+							fmt.Println("---------------------------------------------")
+						}
+
+
 					}
 
 					continue

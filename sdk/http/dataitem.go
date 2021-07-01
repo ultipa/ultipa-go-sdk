@@ -221,11 +221,11 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
 	}
 
-	if di.Alias != "nodeSchema" && di.Alias != "edgeSchema" {
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != "nodeSchema" && table.TableName != "edgeSchema" {
 		return nil, errors.New("DataItem " + di.Alias + " is not a Schema list")
 	}
-	//
-	table := di.Data.(ultipa.Table)
 
 	for _, row := range table.TableRows {
 		//0:name, 1: description, 2: json(properties),3:totalNodes, 4:totalEdges
