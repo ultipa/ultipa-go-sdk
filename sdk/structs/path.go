@@ -20,6 +20,10 @@ func (p *Path) GetNodes() []*Node {
 	return p.Nodes
 }
 
+func (p *Path) GetLastNode() *Node {
+	return p.Nodes[p.GetLength()]
+}
+
 func (p *Path) GetEdges() []*Edge {
 	return p.Edges
 }

@@ -6,6 +6,7 @@ import (
 	"log"
 	"testing"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/configuration"
 )
 
 func TestUQL(t *testing.T) {
@@ -16,7 +17,8 @@ func TestUQL(t *testing.T) {
 
 		log.Println("Exec : ", c.UQL)
 
-		resp, err := client.UQL(c.UQL, nil)
+		//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+		resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
 
 		if err != nil {
 			log.Fatalln(err)
@@ -82,31 +84,31 @@ func TestUQL(t *testing.T) {
 					}
 
 					for _, schema := range res {
-						fmt.Println("Schema Name: ", schema.Name, "(", schema.TotalNodes,"|",schema.TotalEdges ,")")
+						fmt.Println("Schema Name: ", schema.Name, "(", schema.Total, ")")
 						fmt.Println("Description: ", schema.Desc)
 						table := simpletable.New()
-						table.Header.Cells = append(table.Header.Cells, &simpletable.Cell{Text: "Name"}, &simpletable.Cell{Text: "Description"}, &simpletable.Cell{Text: "Type"}, &simpletable.Cell{Text: "lte"})
+						table.Header.Cells = []*simpletable.Cell{&simpletable.Cell{Text: "Name"}, &simpletable.Cell{Text: "Description"}, &simpletable.Cell{Text: "Type"}, &simpletable.Cell{Text: "LTE"}}
+						//table.Footer.Cells = []*simpletable.Cell{&simpletable.Cell{Span: 4, Text: fmt.Sprint("[", schema.Type, "]Schema : "+schema.Name, "(", schema.Total, ")")}}
 
 						for _, prop := range schema.Properties {
 							table.Body.Cells = append(table.Body.Cells, []*simpletable.Cell{
 								&simpletable.Cell{Text: prop.Name},
 								&simpletable.Cell{Text: prop.Desc},
 								&simpletable.Cell{Text: prop.GetStringType()},
+								&simpletable.Cell{},
 							})
 						}
 
 						if len(table.Body.Cells) > 0 {
 							table.Println()
-						} else {
-							fmt.Println("---------------------------------------------")
 						}
 
+						println("-")
 
 					}
 
 					continue
 				}
-
 
 				//handle other table
 				res, err := dataitem.AsTable()
@@ -127,6 +129,42 @@ func TestUQL(t *testing.T) {
 					}
 
 					table.Body.Cells = append(table.Body.Cells, r)
+				}
+
+				table.Println()
+			case ultipa.ResultType_RESULT_TYPE_PATH:
+				paths, err := dataitem.AsPaths()
+
+				if err != nil {
+					log.Fatalln(err)
+				}
+
+				table := simpletable.New()
+
+				table.Header.Cells = []*simpletable.Cell{
+					{Text: "#"},
+					{Text: "Path"},
+				}
+
+				for num, path := range paths {
+					row := []*simpletable.Cell{{Text: fmt.Sprint(num)}}
+					pathString := ""
+					for index, edge := range path.GetEdges() {
+						node := path.GetNodes()[index]
+						d1 := "-"
+						d2 := "-"
+
+						if edge.GetFrom() == node.GetID() {
+							d2 = "->"
+						} else {
+							d1 = "<-"
+						}
+
+						pathString = fmt.Sprintf("(%v) %v [%v] %v ", node.ID, d1, edge.UUID, d2)
+					}
+					pathString += fmt.Sprintf("(%v)", path.GetLastNode().GetID())
+					row = append(row, &simpletable.Cell{Text: pathString})
+					table.Body.Cells = append(table.Body.Cells, row)
 				}
 
 				table.Println()

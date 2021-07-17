@@ -48,6 +48,10 @@ func  (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) ( *h
 		Uql: uql,
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
 	uqlResp, err := http.NewUQLResponse(resp)
 
 	if err != nil {

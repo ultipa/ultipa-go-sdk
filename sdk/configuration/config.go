@@ -45,15 +45,22 @@ func (config *UltipaConfig) FillDefault() {
 }
 
 func (config *UltipaConfig) MergeRequestConfig(rConfig *RequestConfig) *UltipaConfig{
-	newConfig := UltipaConfig{}
-	err := copier.Copy(newConfig, *config)
-	if err != nil {
-		panic(err)
+
+	newConfig := &UltipaConfig{}
+
+	copier.Copy(newConfig, config)
+
+
+	if rConfig.Timeout > 0 {
+		newConfig.Timeout = rConfig.Timeout
 	}
 
-	newConfig.Timeout = rConfig.Timeout
-	newConfig.CurrentGraph = rConfig.GraphName
-	return &newConfig
+	if rConfig.GraphName != "" {
+		newConfig.CurrentGraph = rConfig.GraphName
+	}
+
+
+	return newConfig
 }
 
 func (config *UltipaConfig) ToMetaKV() []string{

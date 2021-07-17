@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"strconv"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/structs"
 	"ultipa-go-sdk/sdk/utils"
@@ -85,6 +86,8 @@ func EdgeTableToEdges(et *ultipa.EdgeTable, alias string) ([]*structs.Edge, map[
 			prop := schema.Properties[index]
 			edge.Values.Set(prop.Name, utils.ConvertBytesToInterface(v, prop.Type))
 		}
+
+		edges = append(edges, edge)
 
 	}
 	return edges, schemas
@@ -223,8 +226,22 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 
 	table := di.Data.(*ultipa.Table)
 
+
 	if table.TableName != "nodeSchema" && table.TableName != "edgeSchema" {
 		return nil, errors.New("DataItem " + di.Alias + " is not a Schema list")
+	}
+
+	// node | edge
+	Type := ""
+	// store index to get total number
+	TotalIndex := 0
+	switch table.TableName {
+	case "nodeSchema":
+		Type = "node"
+		TotalIndex = 3
+	case "edgeSchema":
+		Type = "edge"
+		TotalIndex = 4
 	}
 
 	for _, row := range table.TableRows {
@@ -232,7 +249,11 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		values := row.GetValues()
 		schema := structs.NewSchema(string(values[0]))
 		schema.Desc = string(values[1])
+		schema.Type = Type
+		schema.Total, _ = strconv.Atoi(utils.AsString(values[TotalIndex]))
 		propertyJson := values[2]
+
+
 		var props []*struct {
 			Name        string
 			Type        string

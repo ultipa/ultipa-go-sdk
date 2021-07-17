@@ -8,8 +8,8 @@ type Schema struct {
 	Name string
 	Properties []*Property
 	Desc string
-	TotalNodes int
-	TotalEdges int
+	Type string // node | edge
+	Total int
 }
 
 func NewSchema(name string) *Schema {
