@@ -25,3 +25,7 @@ type Status struct {
 	Message string
 	Code ultipa.ErrorCode
 }
+
+func (t *Status) IsSuccess() bool {
+	return t.Code == ultipa.ErrorCode_SUCCESS
+}

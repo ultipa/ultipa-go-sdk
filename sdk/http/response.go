@@ -7,6 +7,7 @@ package http
 import (
 	"io"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/structs"
 	"ultipa-go-sdk/sdk/utils"
 )
 
@@ -55,6 +56,11 @@ func NewUQLResponse(resp ultipa.UltipaRpcs_UqlClient) (response *UQLResponse, er
 			return response, nil
 		}
 	}
+	var aliasList []string
+	for _, alias := range response.Reply.Alias {
+		aliasList = append(aliasList, alias.GetAlias())
+	}
+	response.AliasList = aliasList
 
 	return response, nil
 }
@@ -71,4 +77,8 @@ func (r *UQLResponse) Alias(alias string) *DataItem {
 		Data: data,
 		Type: t,
 	}
+}
+func (r *UQLResponse) GetSingleTable() (*structs.Table, error) {
+	t, err := r.Get(0).AsTable()
+	return t, err
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"ultipa-go-sdk/utils"
 )
 
 type UQLMAKER struct {
@@ -18,6 +19,9 @@ type UQLMAKER struct {
 type UQLCommand string
 
 const (
+	UQLCommand_listGraph          UQLCommand = "show().graph"
+
+
 	UQLCommand_ab                 UQLCommand = "ab"
 	UQLCommand_khop               UQLCommand = "khop"
 	UQLCommand_nodes              UQLCommand = "find().nodes"
@@ -67,7 +71,6 @@ const (
 	UQLCommand_clearTask          UQLCommand = "clear().task"
 	UQLCommand_createGraph        UQLCommand = "createGraph"
 	UQLCommand_getGraph           UQLCommand = "getGraph"
-	UQLCommand_listGraph          UQLCommand = "listGraph"
 	UQLCommand_dropGraph          UQLCommand = "dropGraph"
 	UQLCommand_updateGraph        UQLCommand = "updateGraph"
 )
@@ -88,11 +91,11 @@ func (t *UQLMAKER) SetCommandParams(commandP interface{}) {
 		t._commandP = commandPString
 		return
 	}
-	jsonBytes, err := StructToJSONBytes(commandP)
+	jsonBytes, err := utils.StructToJSONBytes(commandP)
 	if nil != err {
 		return
 	}
-	t._commandP = replace_doller(BytesToString(jsonBytes))
+	t._commandP = replace_doller(utils.BytesToString(jsonBytes))
 }
 
 func (t *UQLMAKER) AddParam(key string, value interface{}, required bool) {
@@ -129,11 +132,11 @@ func (t *UQLMAKER) AddParam(key string, value interface{}, required bool) {
 	}
 	valueString, ok := value.(string)
 	if !ok {
-		bytes, err := StructToJSONBytes(value)
+		bytes, err := utils.StructToJSONBytes(value)
 		if nil != err {
 			return
 		}
-		valueString = replace_doller(BytesToString(bytes))
+		valueString = replace_doller(utils.BytesToString(bytes))
 	}
 	t._params = append(t._params, struct {
 		key   string

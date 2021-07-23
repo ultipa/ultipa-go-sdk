@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"ultipa-go-sdk/types"
 )
 
 //StructToJSONBytes 把数据转成json的bytes
@@ -54,14 +53,14 @@ func Remove(s []string, r string) []string {
 	}
 	return s
 }
-func RemoveRaftInfos(infos []*types.RaftPeerInfo, host string) []*types.RaftPeerInfo {
-	for i, v := range infos {
-		if v.Host == host {
-			return append(infos[:i], infos[i+1:]...)
-		}
-	}
-	return infos
-}
+//func RemoveRaftInfos(infos []*types.RaftPeerInfo, host string) []*types.RaftPeerInfo {
+//	for i, v := range infos {
+//		if v.Host == host {
+//			return append(infos[:i], infos[i+1:]...)
+//		}
+//	}
+//	return infos
+//}
 
 func Md5ToString(str string) string  {
 	h := md5.New()
