@@ -17,6 +17,7 @@ type UltipaConfig struct {
 	MaxRecvSize int
 	Consistency bool
 	CurrentGraph string
+	CurrentClusterId string
 	Timeout uint32
 }
 
@@ -58,6 +59,9 @@ func (config *UltipaConfig) MergeRequestConfig(rConfig *RequestConfig) *UltipaCo
 	if rConfig.GraphName != "" {
 		newConfig.CurrentGraph = rConfig.GraphName
 	}
+	if rConfig.ClusterId != "" {
+		newConfig.CurrentClusterId = rConfig.ClusterId
+	}
 
 
 	return newConfig
@@ -71,6 +75,8 @@ func (config *UltipaConfig) ToMetaKV() []string{
 		config.Password,
 		"graph_name",
 		config.CurrentGraph,
+		"cluster_id",
+		config.CurrentClusterId,
 	}
 }
 
