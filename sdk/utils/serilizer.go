@@ -3,6 +3,9 @@ package utils
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
+	"fmt"
+	"math"
 	ultipa "ultipa-go-sdk/rpc"
 )
 
@@ -32,6 +35,60 @@ func ConvertBytesToInterface(bs []byte, t ultipa.UltipaPropertyType) interface{}
 
 	}
 }
+
+func ConvertInterfaceToBytes(value interface{}, t ultipa.UltipaPropertyType) ([]byte, error) {
+	v := []byte{}
+
+	if value == nil || value == "" {
+		switch t {
+		case ultipa.UltipaPropertyType_STRING:
+			value = ""
+		case ultipa.UltipaPropertyType_INT32:
+			value = int32(0)
+		case ultipa.UltipaPropertyType_INT64:
+			value = int64(0)
+		case ultipa.UltipaPropertyType_UINT32:
+			value = uint32(0)
+		case ultipa.UltipaPropertyType_UINT64:
+			value = uint64(0)
+		case ultipa.UltipaPropertyType_FLOAT:
+			value = float32(0)
+		case ultipa.UltipaPropertyType_DOUBLE:
+			value = float64(0)
+		default:
+			return nil, errors.New(fmt.Sprint("not supported ultipa type : ", t))
+		}
+	}
+
+	switch t {
+	case ultipa.UltipaPropertyType_INT32:
+		v = make([]byte, 4)
+		binary.BigEndian.PutUint32(v, uint32(value.(int32)))
+	case ultipa.UltipaPropertyType_STRING:
+		v = []byte(value.(string))
+	case ultipa.UltipaPropertyType_INT64:
+		v = make([]byte, 8)
+		binary.BigEndian.PutUint64(v, uint64(value.(int64)))
+	case ultipa.UltipaPropertyType_UINT32:
+		v = make([]byte, 4)
+		binary.BigEndian.PutUint32(v, uint32(value.(uint32)))
+	case ultipa.UltipaPropertyType_UINT64:
+		v = make([]byte, 8)
+		binary.BigEndian.PutUint64(v, uint64(value.(uint64)))
+	case ultipa.UltipaPropertyType_FLOAT:
+		v = make([]byte, 4)
+		binary.BigEndian.PutUint32(v, math.Float32bits(value.(float32)))
+	case ultipa.UltipaPropertyType_DOUBLE:
+		v = make([]byte, 8)
+		binary.BigEndian.PutUint64(v, math.Float64bits(value.(float64)))
+	default:
+		return nil, errors.New(fmt.Sprint("not supported ultipa type : ", t))
+	}
+
+	return v, nil
+}
+
+
 
 
 
