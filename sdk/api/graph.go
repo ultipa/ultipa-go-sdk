@@ -30,9 +30,13 @@ func  (api *UltipaAPI) ListGraph(config *configuration.RequestConfig) ( *http.Re
 		id, _ := strconv.ParseInt(v.Get("id").(string), 10, 64)
 		totalNodes, _ := strconv.ParseInt(v.Get("totalNodes").(string), 10, 64)
 		totalEdges, _ := strconv.ParseInt(v.Get("totalEdges").(string), 10, 64)
+		clusterId := ""
+		if v := v.Get("clusterId"); v != nil {
+			clusterId = v.(string)
+		}
 		graphs = append(graphs, &http.ResponseGraph{
 			Id:         id,
-			ClusterId:  "",
+			ClusterId:  clusterId,
 			Name:       v.Get("name").(string),
 			TotalNodes: totalNodes,
 			TotalEdges: totalEdges,
