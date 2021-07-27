@@ -31,7 +31,7 @@ func TestEasyUqlParse(t *testing.T) {
 		log.Printf("  HasAlgo: %t", uqlParse.HasAlgo())
 		for _, item := range uqlParse.Commands {
 			log.Printf(" -- %+v", item)
-			log.Printf("    ---%+v", item.GetListParams())
+			log.Printf("    ---%+v【%d】", item.GetListParams(), len(item.GetListParams()))
 		}
 	}
 }

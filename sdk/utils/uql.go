@@ -17,16 +17,20 @@ type UqlItem struct {
 func (t *UqlItem) GetListParams() []string {
 	var ps []string
 	str := strings.TrimSpace(t.Params)
+	if str == "" {
+		return ps
+	}
 	if  !strings.HasPrefix(str,"{") {
 		for _, p := range strings.Split(str, ",") {
 			ps = append(ps, strings.Trim(p, ` '"`))
 		}
 	} else {
-		if str != "" {
-			ps = append(ps, str)
-		}
+		ps = append(ps, str)
 	}
 	return ps
+}
+func (t *UqlItem) IsEmptyParams() bool  {
+	return strings.TrimSpace(t.Params) == ""
 }
 
 var WriteUqlCommandKeys = []string{
