@@ -62,14 +62,14 @@ func (t *EasyUqlParse) GetCommand(index int) *UqlItem {
 	}
 	return nil
 }
-func (t *EasyUqlParse) firstCommandName() string {
+func (t *EasyUqlParse) FirstCommandName() string {
 	item := t.GetCommand(0)
 	if item != nil {
 		return item.Name
 	}
 	return ""
 }
-func (t *EasyUqlParse) secondCommandName() string {
+func (t *EasyUqlParse) SecondCommandName() string {
 	item := t.GetCommand(1)
 	if item != nil {
 		return item.Name
@@ -88,5 +88,5 @@ func (t *EasyUqlParse) HasWrite() bool {
 	return false
 }
 func (t *EasyUqlParse) HasAlgo() bool {
-	return t.firstCommandName() == "algo"
+	return t.FirstCommandName() == "algo"
 }
