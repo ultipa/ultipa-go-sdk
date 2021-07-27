@@ -22,10 +22,13 @@ func (t *UqlItem) GetListParams() []string {
 			ps = append(ps, strings.Trim(p, ` '"`))
 		}
 	} else {
-		ps = append(ps, str)
+		if str != "" {
+			ps = append(ps, str)
+		}
 	}
 	return ps
 }
+
 var WriteUqlCommandKeys = []string{
 	"alert", "create","drop", "grant", "revoke",
 	"LTE","UFE","truncate","compact",
