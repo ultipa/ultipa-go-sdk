@@ -20,6 +20,7 @@ type UQLCommand string
 
 const (
 	UQLCommand_listGraph          UQLCommand = "show().graph"
+	UQLCommand_listNodeSchema          UQLCommand = "show().node_schema"
 
 
 	UQLCommand_ab                 UQLCommand = "ab"
