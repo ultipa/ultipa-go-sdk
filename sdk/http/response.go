@@ -66,7 +66,10 @@ func NewUQLResponse(resp ultipa.UltipaRpcs_UqlClient) (response *UQLResponse, er
 }
 
 func (r *UQLResponse) Get(index int) (di *DataItem) {
-	return r.Alias(r.AliasList[index])
+	if len(r.AliasList) > index {
+		return r.Alias(r.AliasList[index])
+	}
+	return nil
 }
 
 func (r *UQLResponse) Alias(alias string) *DataItem {
@@ -79,6 +82,10 @@ func (r *UQLResponse) Alias(alias string) *DataItem {
 	}
 }
 func (r *UQLResponse) GetSingleTable() (*structs.Table, error) {
-	t, err := r.Get(0).AsTable()
-	return t, err
+	di := r.Get(0)
+	if di != nil {
+		t, err := di.AsTable()
+		return t, err
+	}
+	return nil, nil
 }
