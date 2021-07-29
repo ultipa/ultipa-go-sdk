@@ -28,6 +28,7 @@ func NewConnection(host string, config *configuration.UltipaConfig) (*Connection
 	if config.Crt == nil {
 		connection.Conn, err = grpc.Dial(host, grpc.WithInsecure(), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(config.MaxRecvSize)))
 	} else {
+		//fixme:
 		connection.Conn, err = grpc.Dial(host, grpc.WithInsecure(), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(config.MaxRecvSize)))
 	}
 

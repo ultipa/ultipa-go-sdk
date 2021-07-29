@@ -81,7 +81,6 @@ enum ResultType {
   RESULT_TYPE_ATTR = 4;
   RESULT_TYPE_ARRAY = 5;
   RESULT_TYPE_TABLE = 6;
-  RESULT_TYPE_KV = 7;
 }
 
 message ResultAlias {
@@ -101,7 +100,8 @@ message UqlReply {
   repeated AttrAlias attrs = 8;
   repeated ArrayAlias arrays = 9;
   repeated Table tables = 10;
-  repeated Value key_values = 11;
+
+  Table statistics = 11;
 }
 
 message PathAlias {
@@ -181,6 +181,7 @@ message ExportRequest {
   DBType db_type = 1;
   int32 limit = 2;
   repeated string select_properties = 3;
+  string schema = 4;
 }
 
 message ExportReply {
@@ -254,6 +255,7 @@ enum UltipaPropertyType {
   DOUBLE = 6;
   STRING = 7;
   DATETIME = 8;
+  TIMESTAMP = 9;
 }
 
 enum ErrorCode {
