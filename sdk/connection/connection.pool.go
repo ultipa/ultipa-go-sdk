@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"google.golang.org/grpc/metadata"
+	"log"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
@@ -15,6 +16,7 @@ type ConnectionPool struct {
 	Connections map[string]*Connection // Host : Connection
 	Actives     []*Connection
 	Cluster     *ClusterManager
+	AnalyticsActives []*Connection
 	RandomTick int
 }
 
@@ -70,14 +72,28 @@ func (pool *ConnectionPool) CreateConnections() error {
 	return err
 }
 
+// set context with timeout and auth info
+func (pool *ConnectionPool) NewContext() (context.Context, context.CancelFunc) {
+	ctx ,cancel := context.WithTimeout(context.Background(), time.Duration(pool.Config.Timeout) * time.Second)
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(pool.Config.ToContextKV()...))
+	return ctx, cancel
+}
+
+// sync cluster info from server
+func (pool *ConnectionPool) RefreshClusterInfo() error {
+	conn, err := pool.GetConn()
+	ctx ,_ := pool.NewContext()
+	resp, err := conn.GetClient().GetLeader(ctx, nil)
+
+	log.Println(resp)
+	return err
+}
+
 // 更新查看哪些连接还有效
 func (pool *ConnectionPool) RefreshActives() {
 	pool.Actives = []*Connection{}
 	for _, conn := range pool.Connections {
-		ctx ,_ := context.WithTimeout(context.Background(), time.Duration(pool.Config.Timeout) * time.Second)
-
-		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(pool.Config.ToMetaKV()...))
-
+		ctx ,_ := pool.NewContext()
 		resp, err := conn.GetClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
 			Name: "go sdk refresh",
 		})
@@ -120,6 +136,12 @@ func (pool *ConnectionPool) GetRandomConn() (*Connection, error) {
 	pool.RandomTick++
 
 	return pool.Actives[pool.RandomTick % len(pool.Actives)], nil
+}
+
+// Get Task/Analytics client
+func (pool *ConnectionPool) GetAnalyticsConn() (*Connection, error) {
+
+	return nil, nil
 }
 
 func (pool *ConnectionPool) Close() error {

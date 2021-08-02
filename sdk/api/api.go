@@ -1,10 +1,7 @@
 package api
 
 import (
-	"context"
-	"google.golang.org/grpc/metadata"
 	"log"
-	"time"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/connection"
@@ -38,9 +35,7 @@ func  (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) ( *h
 
 	client := conn.GetClient()
 
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(api.Pool.Config.Timeout) * time.Second)
-
-	ctx = metadata.AppendToOutgoingContext(ctx, conf.ToMetaKV()...)
+	ctx, _ := api.Pool.NewContext()
 
 	resp, err := client.Uql(ctx, &ultipa.UqlRequest{
 		GraphName: conf.CurrentGraph,
@@ -62,6 +57,7 @@ func  (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) ( *h
 }
 
 
+//todo:
 func  (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig) ( *http.UQLResponse,  error) {
 
 	conf := api.Pool.Config
@@ -77,10 +73,9 @@ func  (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig
 
 	client := conn.GetClient()
 
-	ctx, _ := context.WithTimeout(context.Background(), time.Duration(api.Pool.Config.Timeout) * time.Second)
+	ctx, _ := api.Pool.NewContext()
 
-	ctx = metadata.AppendToOutgoingContext(ctx, conf.ToMetaKV()...)
-
+	//todo: UqlStream Function
 	resp, err := client.Uql(ctx, &ultipa.UqlRequest{
 		GraphName: conf.CurrentGraph,
 		Timeout: conf.Timeout,
@@ -94,4 +89,22 @@ func  (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig
 	}
 
 	return uqlResp, nil
+}
+
+// test connections
+func Test(api *UltipaAPI) (ok bool) {
+	conn, _ := api.Pool.GetConn()
+
+	ctx, _ := api.Pool.NewContext()
+	resp, err := conn.Client.SayHello(ctx, &ultipa.HelloUltipaRequest{
+		Name: "Conn Test",
+	})
+
+	if err != nil || resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS  { return false }
+
+	return true
+}
+
+func (api *UltipaAPI) Close() {
+	api.Pool.Close()
 }

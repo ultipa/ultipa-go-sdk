@@ -7,12 +7,12 @@ import (
 )
 
 // New an Ultipa Instance !!!!
-func NewUltipa(config *configuration.UltipaConfig) *api.UltipaAPI{
+func NewUltipa(config *configuration.UltipaConfig) (*api.UltipaAPI, error){
 
 	config.FillDefault()
 
 	// set connection pool
 	pool := connection.NewConnectionPool(config)
 
-	return api.NewUltipaAPI(pool)
+	return api.NewUltipaAPI(pool), nil
 }

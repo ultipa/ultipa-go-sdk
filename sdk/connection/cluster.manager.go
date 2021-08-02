@@ -21,6 +21,8 @@ func NewClusterManager(connP *ConnectionPool) *ClusterManager {
 	}
 }
 
+
+
 func (c *ClusterManager) UltipaRaftInfo() {
 	//todo:
 }

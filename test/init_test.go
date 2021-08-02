@@ -23,6 +23,10 @@ func TestMain(m *testing.M) {
 	})
 
 	client = sdk.NewUltipa(config)
+
 	m.Run()
 }
+
+
+
 

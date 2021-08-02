@@ -67,7 +67,7 @@ func (config *UltipaConfig) MergeRequestConfig(rConfig *RequestConfig) *UltipaCo
 	return newConfig
 }
 
-func (config *UltipaConfig) ToMetaKV() []string{
+func (config *UltipaConfig) ToContextKV() []string{
 	return []string{
 		"user",
 		config.Username,

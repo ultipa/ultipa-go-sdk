@@ -17,7 +17,7 @@ func TestNewConn(t *testing.T) {
 
 
 	//conn, err := grpc.Dial("210.13.32.146:60074", grpc.WithInsecure(), grpc.WithDefaultCallOptions())
-	conn, err := grpc.Dial("192.168.1.86:60061", grpc.WithInsecure(), grpc.WithDefaultCallOptions())
+	conn, err := grpc.Dial("210.13.32.146:60074",grpc.WithInsecure(), grpc.WithDefaultCallOptions())
 
 	if err != nil {
 		log.Fatalln(err)
@@ -45,4 +45,10 @@ func TestNewConn(t *testing.T) {
 
 
 	//defer ultipa.Close()
+}
+
+//todo : wait for htap test
+func TestSyncClusterInfo(t *testing.T) {
+	err := client.Pool.RefreshClusterInfo()
+	log.Println(err)
 }
