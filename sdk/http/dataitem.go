@@ -95,6 +95,10 @@ func EdgeTableToEdges(et *ultipa.EdgeTable, alias string) ([]*structs.Edge, map[
 
 func (di *DataItem) AsNodes() (nodes []*structs.Node, schemas map[string]*structs.Schema, err error) {
 
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nodes, schemas, nil
+	}
+
 	if di.Type != ultipa.ResultType_RESULT_TYPE_NODE {
 		return nil, schemas, errors.New("DataItem " + di.Alias + " is not Type Node")
 	}
@@ -107,6 +111,11 @@ func (di *DataItem) AsNodes() (nodes []*structs.Node, schemas map[string]*struct
 }
 
 func (di *DataItem) AsEdges() (edges []*structs.Edge, schemas map[string]*structs.Schema, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return edges, schemas, nil
+	}
+
 	if di.Type != ultipa.ResultType_RESULT_TYPE_EDGE {
 		return nil, schemas, errors.New("DataItem " + di.Alias + " is not Type Edge")
 	}
@@ -119,6 +128,10 @@ func (di *DataItem) AsEdges() (edges []*structs.Edge, schemas map[string]*struct
 }
 
 func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return paths, nil
+	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_PATH {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Paths")
@@ -141,6 +154,10 @@ func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
 }
 
 func (di *DataItem) AsTable() (table *structs.Table, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return table, nil
+	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Table")
@@ -176,6 +193,11 @@ func (di *DataItem) AsTable() (table *structs.Table, err error) {
 
 //find().nodes() as nodes group by nodes.year as y return y,collect(nodes._id)
 func (di *DataItem) AsArray() (arr *structs.Array, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return arr, nil
+	}
+
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ARRAY {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Array")
 	}
@@ -200,6 +222,11 @@ func (di *DataItem) AsArray() (arr *structs.Array, err error) {
 }
 
 func (di *DataItem) AsAttr() (attr *structs.Attr, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return attr, nil
+	}
+
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Attribute list")
 	}
@@ -219,6 +246,10 @@ func (di *DataItem) AsAttr() (attr *structs.Attr, err error) {
 
 // the types will be tables and alias is nodeSchema and edgeSchema
 func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return schemas, nil
+	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
 		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")

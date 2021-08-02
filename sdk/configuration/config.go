@@ -36,12 +36,16 @@ func (config *UltipaConfig) FillDefault() {
 		config.MaxRecvSize = 1024 * 1024 * 10 // 10MB
 	}
 
+	if config.DefaultGraph != "" {
+		config.CurrentGraph = config.DefaultGraph
+	}
+
 	if config.CurrentGraph == "" {
 		config.CurrentGraph = "default"
 	}
 
 	if config.Timeout == 0 {
-		config.Timeout = 10
+		config.Timeout = 1000
 	}
 }
 
@@ -75,8 +79,8 @@ func (config *UltipaConfig) ToContextKV() []string{
 		config.Password,
 		"graph_name",
 		config.CurrentGraph,
-		"cluster_id",
-		config.CurrentClusterId,
+		//"cluster_id",
+		//config.CurrentClusterId,
 	}
 }
 

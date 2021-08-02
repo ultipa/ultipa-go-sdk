@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"google.golang.org/grpc/metadata"
-	"log"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
@@ -83,9 +82,16 @@ func (pool *ConnectionPool) NewContext() (context.Context, context.CancelFunc) {
 func (pool *ConnectionPool) RefreshClusterInfo() error {
 	conn, err := pool.GetConn()
 	ctx ,_ := pool.NewContext()
+	//todo:
 	resp, err := conn.GetClient().GetLeader(ctx, nil)
 
-	log.Println(resp)
+	//todo: update resp
+	if resp == nil { return nil }
+
+	if   resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return errors.New(resp.Status.Msg)
+	}
+
 	return err
 }
 
@@ -138,9 +144,14 @@ func (pool *ConnectionPool) GetRandomConn() (*Connection, error) {
 	return pool.Actives[pool.RandomTick % len(pool.Actives)], nil
 }
 
+func (pool *ConnectionPool) GetClusterInfo() []*Connection{
+	pool.RefreshClusterInfo()
+	return pool.Actives
+}
+
 // Get Task/Analytics client
 func (pool *ConnectionPool) GetAnalyticsConn() (*Connection, error) {
-
+	//todo
 	return nil, nil
 }
 

@@ -13,8 +13,12 @@ func InitCases() {
 	// init single returns
 	cases = append(cases,
 		//&Case{
-		//	UQL:   "n().e().n(as end) return end{*} limit 10;",
-		//	Alias: []string{"end"},
+		//	UQL:   "n().e().n(as end) return end{*} as end1 limit 10;",
+		//	Alias: []string{"end1"},
+		//},
+		//&Case{
+		//	UQL:   "find().nodes() as nodes return nodes limit 10",
+		//	Alias: []string{"nodes"},
 		//},
 		//&Case{
 		//	UQL:   "show().graph()",
@@ -26,7 +30,8 @@ func InitCases() {
 		//	Type:  "schema",
 		//},
 		&Case{
-				UQL:   "n().e().n(as end) as paths return paths limit 10;",
+			UQL:   "n().e().n() as paths return paths limit 10;",
 			Alias: []string{"paths"},
-		})
+		},
+	)
 }

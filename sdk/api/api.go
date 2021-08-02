@@ -12,17 +12,21 @@ import (
 
 type UltipaAPI struct {
 	Pool *connection.ConnectionPool
+	Config *configuration.UltipaConfig
 }
 
 func NewUltipaAPI(pool *connection.ConnectionPool) *UltipaAPI {
-	return &UltipaAPI{
+	api := &UltipaAPI{
 		Pool: pool,
+		Config: pool.Config,
 	}
+	return api
 }
 
-func  (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) ( *http.UQLResponse,  error) {
+func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
 
 	conf := api.Pool.Config
+
 	if config != nil {
 		conf = api.Pool.Config.MergeRequestConfig(config)
 	}
@@ -39,8 +43,8 @@ func  (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) ( *h
 
 	resp, err := client.Uql(ctx, &ultipa.UqlRequest{
 		GraphName: conf.CurrentGraph,
-		Timeout: conf.Timeout,
-		Uql: uql,
+		Timeout:   conf.Timeout,
+		Uql:       uql,
 	})
 
 	if err != nil {
@@ -56,9 +60,8 @@ func  (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) ( *h
 	return uqlResp, nil
 }
 
-
 //todo:
-func  (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig) ( *http.UQLResponse,  error) {
+func (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
 
 	conf := api.Pool.Config
 	if config != nil {
@@ -78,8 +81,8 @@ func  (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig
 	//todo: UqlStream Function
 	resp, err := client.Uql(ctx, &ultipa.UqlRequest{
 		GraphName: conf.CurrentGraph,
-		Timeout: conf.Timeout,
-		Uql: uql,
+		Timeout:   conf.Timeout,
+		Uql:       uql,
 	})
 
 	uqlResp, err := http.NewUQLResponse(resp)
@@ -92,7 +95,7 @@ func  (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig
 }
 
 // test connections
-func Test(api *UltipaAPI) (ok bool) {
+func (api *UltipaAPI) Test() (bool, error) {
 	conn, _ := api.Pool.GetConn()
 
 	ctx, _ := api.Pool.NewContext()
@@ -100,11 +103,13 @@ func Test(api *UltipaAPI) (ok bool) {
 		Name: "Conn Test",
 	})
 
-	if err != nil || resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS  { return false }
+	if err != nil || resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return false, err
+	}
 
-	return true
+	return true, err
 }
 
-func (api *UltipaAPI) Close() {
-	api.Pool.Close()
+func (api *UltipaAPI) Close() error {
+	return api.Pool.Close()
 }

@@ -1,6 +1,7 @@
 package test
 
 import (
+	"log"
 	"testing"
 	"ultipa-go-sdk/sdk"
 	"ultipa-go-sdk/sdk/api"
@@ -10,7 +11,7 @@ import (
 var client *api.UltipaAPI
 
 func TestMain(m *testing.M) {
-
+	var err error
 
 
 	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
@@ -20,10 +21,14 @@ func TestMain(m *testing.M) {
 		},
 		Username: "root",
 		Password: "root",
+		DefaultGraph: "multi_schema_test",
 	})
 
-	client = sdk.NewUltipa(config)
+	client, err = sdk.NewUltipa(config)
 
+	if err != nil {
+		log.Fatalln(err)
+	}
 	m.Run()
 }
 

@@ -11,6 +11,7 @@ type Connection struct {
 	Conn *grpc.ClientConn
 	Client ultipa.UltipaRpcsClient
 	Config *configuration.UltipaConfig
+	Role string // leader, follower, learner, candidate ...
 	Active bool
 }
 

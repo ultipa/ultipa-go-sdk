@@ -25,13 +25,13 @@ func TestNewConn(t *testing.T) {
 
 	client := ultipa.NewUltipaRpcsClient(conn)
 
-	ctx, _ := context.WithTimeout(context.Background(), time.Second * 3)
+
 
 	h := md5.New()
 	h.Write([]byte("root"))
 	pass := hex.EncodeToString(h.Sum(nil))
-
-	ctx = metadata.AppendToOutgoingContext(ctx, "user", "root", "password", strings.ToUpper(pass), "graph_name", "default")
+	ctx, _ := context.WithTimeout(context.Background(), time.Second * 3)
+	ctx = metadata.AppendToOutgoingContext(ctx, "user", "root", "password", strings.ToUpper(pass), "graph_name", "multi_schema_test")
 
 	resp, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
 		Name: "hello",
@@ -43,6 +43,26 @@ func TestNewConn(t *testing.T) {
 
 	log.Println(resp)
 
+	ctx2, _ := context.WithTimeout(context.Background(), time.Second * 1000)
+	ctx2 = metadata.AppendToOutgoingContext(ctx2, "user", "root", "password", strings.ToUpper(pass), "graph_name", "multi_schema_test")
+	resp2, err := client.Uql(ctx2, &ultipa.UqlRequest{
+		Uql: "n().e().n() as path return path limit 10;",
+	})
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	for {
+		record, err := resp2.Recv()
+		if err != nil {
+			log.Fatalln(err)
+			break
+		}
+		log.Println(record.Alias, record.Paths, err)
+	}
+
+
 
 	//defer ultipa.Close()
 }
@@ -51,4 +71,14 @@ func TestNewConn(t *testing.T) {
 func TestSyncClusterInfo(t *testing.T) {
 	err := client.Pool.RefreshClusterInfo()
 	log.Println(err)
+}
+
+func TestUql(t *testing.T) {
+	//conn, _ := client.Pool.GetMasterConn()
+	//client.Pool.RefreshActives()
+	//ctx, _ := client.Pool.NewContext()
+
+	//res, _ := client.UQL("find().nodes() as nodes return nodes limit 10;", nil)
+	res, _ := client.UQL("n().e().n() as path return path limit 10;", nil)
+	log.Println(res.AliasList, res.Get(0), res.Status.Code, res.Status.Message)
 }
