@@ -18,7 +18,6 @@ func PrintAny(dataitem *http.DataItem) {
 		res, err := dataitem.AsTable()
 
 		// handle schema table
-		//fixme: check schema, proeprty by prefix _
 		if strings.Contains(res.Name, "_nodeSchema") || strings.Contains(res.Name, "_edgeSchema"){
 			schemas, err := dataitem.AsSchemas()
 
