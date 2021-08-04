@@ -12,7 +12,11 @@ func NewUltipa(config *configuration.UltipaConfig) (*api.UltipaAPI, error){
 	config.FillDefault()
 
 	// set connection pool
-	pool := connection.NewConnectionPool(config)
+	pool , err := connection.NewConnectionPool(config)
 
-	return api.NewUltipaAPI(pool), nil
+	if  err != nil {
+		return nil ,err
+	}
+
+	return api.NewUltipaAPI(pool), err
 }

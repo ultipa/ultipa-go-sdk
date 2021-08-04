@@ -19,7 +19,7 @@ func PrintAny(dataitem *http.DataItem) {
 
 		// handle schema table
 		//fixme: check schema, proeprty by prefix _
-		if strings.Contains(res.Name, "nodeSchema") || strings.Contains(res.Name, "edgeSchema"){
+		if strings.Contains(res.Name, "_nodeSchema") || strings.Contains(res.Name, "_edgeSchema"){
 			schemas, err := dataitem.AsSchemas()
 
 			if err != nil {
@@ -44,8 +44,22 @@ func PrintAny(dataitem *http.DataItem) {
 		}
 
 		PrintPaths(paths)
+	case ultipa.ResultType_RESULT_TYPE_ATTR:
+		attr, err := dataitem.AsAttr()
+		if err != nil {
+			log.Fatalln(err)
+		}
 
+		PrintAttr(attr)
+
+	case ultipa.ResultType_RESULT_TYPE_ARRAY:
+		arr, err := dataitem.AsArray()
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		PrintArray(arr)
 	default:
-		log.Printf("Got UnHandled Alias %v Type %v \n", dataitem.Alias, dataitem.Type)
+		log.Printf("Printer Got UnHandled Alias %v Type %v \n", dataitem.Alias, dataitem.Type)
 	}
 }

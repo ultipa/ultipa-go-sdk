@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/configuration"
 )
 
 func TestNewConn(t *testing.T) {
@@ -81,4 +82,16 @@ func TestUql(t *testing.T) {
 	//res, _ := client.UQL("find().nodes() as nodes return nodes limit 10;", nil)
 	res, _ := client.UQL("n().e().n() as path return path limit 10;", nil)
 	log.Println(res.AliasList, res.Get(0), res.Status.Code, res.Status.Message)
+}
+
+func TestUqlWithSpecialHost(t *testing.T) {
+	res, err := client.UQL("show().graph()", &configuration.RequestConfig{
+		Host: "localhost:3000",
+	})
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Println(res)
 }

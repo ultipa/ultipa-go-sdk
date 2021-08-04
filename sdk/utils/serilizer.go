@@ -29,9 +29,9 @@ func ConvertBytesToInterface(bs []byte, t ultipa.UltipaPropertyType) interface{}
 	case ultipa.UltipaPropertyType_DATETIME:
 		return NewTime(AsUint64(bs))
 	case ultipa.UltipaPropertyType_UNSET:
-		panic("Unexpected Ultipa Property Type")
+		return nil
 	default:
-		panic("Unexpected Ultipa Property Type")
+		return nil
 
 	}
 }

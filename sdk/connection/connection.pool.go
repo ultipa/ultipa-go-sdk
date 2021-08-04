@@ -19,7 +19,11 @@ type ConnectionPool struct {
 	RandomTick int
 }
 
-func NewConnectionPool(config *configuration.UltipaConfig) *ConnectionPool {
+func NewConnectionPool(config *configuration.UltipaConfig) (*ConnectionPool, error) {
+
+	if len(config.Hosts) < 1{
+		return nil, errors.New("Error Hosts can not by empty")
+	}
 
 	pool := &ConnectionPool{
 		Config: config,
@@ -38,7 +42,7 @@ func NewConnectionPool(config *configuration.UltipaConfig) *ConnectionPool {
 	// Refresh Actives
 	pool.RefreshActives()
 
-	return pool
+	return pool, nil
 }
 
 
@@ -117,6 +121,7 @@ func (pool *ConnectionPool) RefreshActives() {
 
 // Get client by global config
 func (pool *ConnectionPool) GetConn() (*Connection, error) {
+
 	if pool.Config.Consistency {
 		return pool.GetMasterConn()
 	} else {

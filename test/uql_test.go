@@ -28,7 +28,6 @@ func TestUQL(t *testing.T) {
 		}
 
 		for _, a := range c.Alias {
-
 			dataitem := resp.Alias(a)
 			printers.PrintAny(dataitem)
 

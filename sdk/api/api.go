@@ -16,25 +16,37 @@ type UltipaAPI struct {
 }
 
 func NewUltipaAPI(pool *connection.ConnectionPool) *UltipaAPI {
+
 	api := &UltipaAPI{
 		Pool: pool,
 		Config: pool.Config,
 	}
+
 	return api
 }
 
 func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
 
+	var err error
+	var conn *connection.Connection
+
 	conf := api.Pool.Config
 
 	if config != nil {
 		conf = api.Pool.Config.MergeRequestConfig(config)
+
+		// Check if User set Host Address
+		if config.Host != "" {
+			conn, err = connection.NewConnection(config.Host, api.Config)
+			if err != nil { return nil , err}
+		}
 	}
 
-	conn, err := api.Pool.GetConn()
-
-	if err != nil {
-		return nil, err
+	if conn == nil {
+		conn, err = api.Pool.GetConn()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	client := conn.GetClient()
@@ -62,44 +74,20 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 
 //todo:
 func (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
-
-	conf := api.Pool.Config
-	if config != nil {
-		conf = api.Pool.Config.MergeRequestConfig(config)
-	}
-
-	conn, err := api.Pool.GetConn()
-
-	if err != nil {
-		return nil, err
-	}
-
-	client := conn.GetClient()
-
-	ctx, _ := api.Pool.NewContext()
-
-	//todo: UqlStream Function
-	resp, err := client.Uql(ctx, &ultipa.UqlRequest{
-		GraphName: conf.CurrentGraph,
-		Timeout:   conf.Timeout,
-		Uql:       uql,
-	})
-
-	uqlResp, err := http.NewUQLResponse(resp)
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	return uqlResp, nil
+	panic("not implemented")
+	return nil, nil
 }
 
 // test connections
 func (api *UltipaAPI) Test() (bool, error) {
-	conn, _ := api.Pool.GetConn()
+	conn, err := api.Pool.GetConn()
 
+	if err != nil {
+		return false, err
+	}
+	client := conn.GetClient()
 	ctx, _ := api.Pool.NewContext()
-	resp, err := conn.Client.SayHello(ctx, &ultipa.HelloUltipaRequest{
+	resp, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
 		Name: "Conn Test",
 	})
 
@@ -108,6 +96,11 @@ func (api *UltipaAPI) Test() (bool, error) {
 	}
 
 	return true, err
+}
+
+func (api *UltipaAPI) SetCurrentGraph(graphName string) error {
+	api.Config.CurrentGraph = graphName
+	return nil
 }
 
 func (api *UltipaAPI) Close() error {

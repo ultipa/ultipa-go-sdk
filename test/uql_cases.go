@@ -26,12 +26,33 @@ func InitCases() {
 		//},
 		//&Case{
 		//	UQL:   "show().schema()",
-		//	Alias: []string{"nodeSchema", "edgeSchema"},
+		//	Alias: []string{"_nodeSchema", "_edgeSchema"},
 		//	Type:  "schema",
 		//},
+		//&Case{
+		//	UQL:   "n().e().n() as paths return paths limit 10;",
+		//	Alias: []string{"paths"},
+		//},
+		//&Case{
+		//	UQL:   "show().index()",
+		//	Alias: []string{"nodeIndex","edgeIndex"},
+		//},
+		//&Case{
+		//	UQL:   "show().graph(\"multi_schema_test\")",
+		//	Alias: []string{"_graph"},
+		//},
+		//&Case{
+		//	UQL:   "find().nodes({@amz}) as nodes return nodes.name as name limit 10",
+		//	Alias: []string{"name"},
+		//},
+		//&Case{
+		//	UQL:   "find().nodes({@amz}).limit(10) as nodes return collect(nodes.name) as name ",
+		//	Alias: []string{"name"},
+		//},
 		&Case{
-			UQL:   "n().e().n() as paths return paths limit 10;",
-			Alias: []string{"paths"},
+			UQL:   "find().nodes({@amz}) as nodes return count(nodes) as totalName;",
+			Alias: []string{"totalName"},
 		},
+
 	)
 }

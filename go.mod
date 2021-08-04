@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/alexeyco/simpletable v1.0.0
+	github.com/fatih/color v1.12.0
 	github.com/golang/protobuf v1.4.2
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/jinzhu/copier v0.3.2

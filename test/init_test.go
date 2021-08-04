@@ -33,5 +33,9 @@ func TestMain(m *testing.M) {
 }
 
 
+func TestPing(t *testing.T) {
+	client.Test()
+}
+
 
 

@@ -204,7 +204,7 @@ func (di *DataItem) AsArray() (arr *structs.Array, err error) {
 
 	arr = structs.NewArray()
 
-	oArray := di.Data.(ultipa.ArrayAlias)
+	oArray := di.Data.(*ultipa.ArrayAlias)
 
 	arr.Name = oArray.Alias
 
@@ -233,7 +233,7 @@ func (di *DataItem) AsAttr() (attr *structs.Attr, err error) {
 
 	attr = structs.NewAttr()
 
-	oAttr := di.Data.(ultipa.AttrAlias)
+	oAttr := di.Data.(*ultipa.AttrAlias)
 
 	attr.Name = oAttr.Alias
 
@@ -243,6 +243,41 @@ func (di *DataItem) AsAttr() (attr *structs.Attr, err error) {
 
 	return attr, err
 }
+
+// the types will be tables and alias is nodeSchema and edgeSchema
+func (di *DataItem) AsGraphs() (graphs []*structs.Graph, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return graphs, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+
+	if table.TableName != "_graph" {
+		return nil, errors.New("DataItem " + di.Alias + " is not a Graph list")
+	}
+
+	for _, row := range table.TableRows {
+		//0:id, 1: name, 2: totalNodes ,3:totalEdges
+		values := row.GetValues()
+		graph := structs.Graph{}
+		graph.ID = string(values[0])
+		graph.Name = string(values[1])
+		graph.TotalNodes, _ = utils.Str2Uint64(utils.AsString(values[2]))
+		graph.TotalEdges, _ = utils.Str2Uint64(utils.AsString(values[3]))
+
+
+		graphs = append(graphs, &graph)
+	}
+
+	return graphs, err
+}
+
 
 // the types will be tables and alias is nodeSchema and edgeSchema
 func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
@@ -258,7 +293,7 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 	table := di.Data.(*ultipa.Table)
 
 
-	if table.TableName != "nodeSchema" && table.TableName != "edgeSchema" {
+	if table.TableName != "_nodeSchema" && table.TableName != "_edgeSchema" {
 		return nil, errors.New("DataItem " + di.Alias + " is not a Schema list")
 	}
 
@@ -267,10 +302,10 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 	// store index to get total number
 	TotalIndex := 0
 	switch table.TableName {
-	case "nodeSchema":
+	case "_nodeSchema":
 		Type = "node"
 		TotalIndex = 3
-	case "edgeSchema":
+	case "_edgeSchema":
 		Type = "edge"
 		TotalIndex = 4
 	}
@@ -312,3 +347,6 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 
 	return schemas, err
 }
+
+
+
