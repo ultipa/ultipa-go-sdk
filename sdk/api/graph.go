@@ -1,13 +1,15 @@
 package api
 
 import (
+	"fmt"
 	"strconv"
 	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/http"
+	"ultipa-go-sdk/sdk/structs"
 	"ultipa-go-sdk/sdk/utils"
 )
 
-func  (api *UltipaAPI) ListGraph(config *configuration.RequestConfig) ( *http.ResponseGraphs,  error) {
+func (api *UltipaAPI) ListGraph(config *configuration.RequestConfig) (*http.ResponseGraphs, error) {
 	uql := utils.UQLMAKER{}
 	uql.SetCommand(utils.UQLCommand_listGraph)
 	res, err := api.UQL(uql.ToString(), config)
@@ -47,3 +49,26 @@ func  (api *UltipaAPI) ListGraph(config *configuration.RequestConfig) ( *http.Re
 		Graphs: graphs,
 	}, nil
 }
+
+func (api *UltipaAPI) CreateGraph(graph *structs.Graph, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+
+	resp, err := api.UQL(fmt.Sprintf(`create().graph("%v", "%v")`, graph.Name, graph.Description), config)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, err
+}
+
+func (api *UltipaAPI) DropGraph(graphName string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+
+	resp, err := api.UQL(fmt.Sprintf(`drop().graph("%v")`, graphName), config)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, err
+}
+

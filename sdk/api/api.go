@@ -11,22 +11,21 @@ import (
 // UQL, Insert, Export, Download ... API methods
 
 type UltipaAPI struct {
-	Pool *connection.ConnectionPool
+	Pool   *connection.ConnectionPool
 	Config *configuration.UltipaConfig
 }
 
 func NewUltipaAPI(pool *connection.ConnectionPool) *UltipaAPI {
 
 	api := &UltipaAPI{
-		Pool: pool,
+		Pool:   pool,
 		Config: pool.Config,
 	}
 
 	return api
 }
 
-func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
-
+func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.UltipaRpcsClient, *configuration.UltipaConfig, error) {
 	var err error
 	var conn *connection.Connection
 
@@ -38,18 +37,33 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 		// Check if User set Host Address
 		if config.Host != "" {
 			conn, err = connection.NewConnection(config.Host, api.Config)
-			if err != nil { return nil , err}
+			if err != nil {
+				return nil, nil, err
+			}
 		}
 	}
 
 	if conn == nil {
 		conn, err = api.Pool.GetConn()
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
 	client := conn.GetClient()
+
+	return client, conf, nil
+}
+
+func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+
+	var err error
+
+	client, conf, err := api.GetClient(config)
+
+	if err != nil {
+		return nil, err
+	}
 
 	ctx, _ := api.Pool.NewContext()
 

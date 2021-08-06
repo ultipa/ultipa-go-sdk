@@ -30,10 +30,18 @@ var PropertyReverseMap = map[ultipa.UltipaPropertyType]string{
 	ultipa.UltipaPropertyType_DATETIME: "datetime",
 }
 
-func (p *Property) SetTypeByString(str string) {
-	p.Type = PropertyMap[str]
+func (p *Property) SetTypeByString(s string) {
+	p.Type = GetPropertyTypeByString(s)
 }
 
 func (p *Property) GetStringType() string {
-	return PropertyReverseMap[p.Type]
+	return GetStringByPropertyType(p.Type)
+}
+
+func GetPropertyTypeByString(s string) ultipa.UltipaPropertyType {
+	return PropertyMap[s]
+}
+
+func GetStringByPropertyType(t ultipa.UltipaPropertyType) string {
+	return PropertyReverseMap[t]
 }

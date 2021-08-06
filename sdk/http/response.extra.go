@@ -4,6 +4,17 @@ type ResponseGraphs struct {
 	Status *Status
 	Graphs []*ResponseGraph
 }
+
+func (graphs *ResponseGraphs) Find(name string) *ResponseGraph {
+	for _, g := range graphs.Graphs {
+		if name == g.Name {
+			return g
+		}
+	}
+
+	return nil
+}
+
 type ResponseGraph struct {
 	Id         int64
 	ClusterId  string
@@ -12,17 +23,15 @@ type ResponseGraph struct {
 	TotalEdges int64
 }
 type ResponseProperty struct {
-
-
 }
 type ResponseSchema struct {
-	Name string
+	Name        string
 	Description string
-	Properties []*ResponseProperty
-	TotalNodes int64
-	TotalEdges int64
+	Properties  []*ResponseProperty
+	TotalNodes  int64
+	TotalEdges  int64
 }
 type ResponseNodeSchemas struct {
-	Status *Status
+	Status  *Status
 	Schemas []*ResponseSchema
 }

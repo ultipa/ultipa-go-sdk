@@ -1,6 +1,7 @@
 package structs
 
 import (
+	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/utils"
 )
 
@@ -9,6 +10,7 @@ type Schema struct {
 	Properties []*Property
 	Desc string
 	Type string // node | edge
+	DBType ultipa.DBType
 	Total int
 }
 
@@ -27,3 +29,9 @@ func (s *Schema) GetProperty(name string)  *Property {
 }
 
 
+// todo:
+// compare 2 schema is same, or is able to fit a to b
+func CompareSchemas(schema1 *Schema, schema2 *Schema, fit bool) bool {
+
+	return true
+}
