@@ -9,16 +9,16 @@ import (
 
 //
 type UltipaConfig struct {
-	Hosts []string
-	Username string
-	Password string
-	DefaultGraph string
-	Crt []byte
-	MaxRecvSize int
-	Consistency bool
-	CurrentGraph string
+	Hosts            []string
+	Username         string
+	Password         string
+	DefaultGraph     string
+	Crt              []byte
+	MaxRecvSize      int
+	Consistency      bool
+	CurrentGraph     string
 	CurrentClusterId string
-	Timeout uint32
+	Timeout          uint32
 }
 
 func NewUltipaConfig(config *UltipaConfig) *UltipaConfig {
@@ -49,12 +49,11 @@ func (config *UltipaConfig) FillDefault() {
 	}
 }
 
-func (config *UltipaConfig) MergeRequestConfig(rConfig *RequestConfig) *UltipaConfig{
+func (config *UltipaConfig) MergeRequestConfig(rConfig *RequestConfig) *UltipaConfig {
 
 	newConfig := &UltipaConfig{}
 
 	copier.Copy(newConfig, config)
-
 
 	if rConfig.Timeout > 0 {
 		newConfig.Timeout = rConfig.Timeout
@@ -67,21 +66,25 @@ func (config *UltipaConfig) MergeRequestConfig(rConfig *RequestConfig) *UltipaCo
 		newConfig.CurrentClusterId = rConfig.ClusterId
 	}
 
-
 	return newConfig
 }
 
-func (config *UltipaConfig) ToContextKV() []string{
+func (config *UltipaConfig) ToContextKV(rConfig *RequestConfig) []string {
+
+	graphName := config.CurrentGraph
+
+	if rConfig != nil && rConfig.GraphName != "" {
+		graphName = rConfig.GraphName
+	}
+
 	return []string{
 		"user",
 		config.Username,
 		"password",
 		config.Password,
 		"graph_name",
-		config.CurrentGraph,
+		graphName,
 		//"cluster_id",
 		//config.CurrentClusterId,
 	}
 }
-
-

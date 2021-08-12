@@ -65,7 +65,7 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 		return nil, err
 	}
 
-	ctx, _ := api.Pool.NewContext()
+	ctx, _ := api.Pool.NewContext(config)
 
 	resp, err := client.Uql(ctx, &ultipa.UqlRequest{
 		GraphName: conf.CurrentGraph,
@@ -100,7 +100,7 @@ func (api *UltipaAPI) Test() (bool, error) {
 		return false, err
 	}
 	client := conn.GetClient()
-	ctx, _ := api.Pool.NewContext()
+	ctx, _ := api.Pool.NewContext(nil)
 	resp, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
 		Name: "Conn Test",
 	})
