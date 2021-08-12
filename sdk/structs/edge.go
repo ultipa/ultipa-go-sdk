@@ -2,6 +2,7 @@ package structs
 
 import (
 "ultipa-go-sdk/sdk/types"
+	"ultipa-go-sdk/sdk/utils"
 )
 
 type Edge struct {
@@ -48,6 +49,13 @@ func (edge *Edge) GetValues() *Values {
 func (edge *Edge) Get(key string) interface{} {
 	return edge.Values.Get(key)
 }
+
+// get a value by key
+func (edge *Edge) GetBytes(key string) ([]byte, error) {
+	v := edge.Values.Get(key)
+	return utils.ConvertInterfaceToBytes(v)
+}
+
 
 // set a value by key
 func (edge *Edge) Set(key string, value interface{}) error {

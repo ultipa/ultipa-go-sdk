@@ -200,16 +200,18 @@ message GetLeaderReply {
 }
 /*--------------------------GetLeader----------------------------*/
 
+enum InsertType {
+  NORMAL = 0;
+  OVERWRITE = 1;
+  UPSERT = 2;
+}
 /*------------------------7.InsertNodes------------------------------*/
 message InsertNodesRequest {
   NodeTable node_table = 1;
   //if true return ids
   bool silent = 2;
-  bool no_inner_id = 3;
-  string graph_name = 4;
-  bool check_o = 5;
-  bool overwrite = 6;
-  bool upsert = 7;
+  string graph_name = 3;
+  InsertType insert_type = 4;
 }
 
 message InsertNodesReply {
@@ -227,11 +229,9 @@ message InsertEdgesRequest {
   EdgeTable edge_table = 1;
   //if true return ids
   bool silent = 2;
-  bool no_inner_id = 3;
-  string graph_name = 4;
-  bool create_node_if_not_exist = 5;
-  bool overwrite = 6;
-  bool upsert = 7;
+  string graph_name = 3;
+  bool create_node_if_not_exist = 4;
+  InsertType insert_type = 5;
 }
 
 message InsertEdgesReply {

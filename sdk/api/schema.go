@@ -48,33 +48,31 @@ func (api *UltipaAPI) ListNodeSchema(config *configuration.RequestConfig) (*http
 	}, nil
 }
 
-func (api *UltipaAPI) GetSchema(schemaName string, DBType ultipa.DBType) (*structs.Schema, error) {
-
-	var resp *http.UQLResponse
-	var err error
-	var schemas []*structs.Schema
+func (api *UltipaAPI) GetSchema(schemaName string, DBType ultipa.DBType, config *configuration.RequestConfig) (*structs.Schema, error) {
 
 	if DBType == ultipa.DBType_DBNODE {
-
-		resp, err = api.UQL(fmt.Sprintf(`show().node_schema("%v")`, schemaName), nil)
-		if err != nil {
-			return nil, err
-		}
-
+		return api.GetNodeSchema(schemaName, config)
 	} else if DBType == ultipa.DBType_DBEDGE {
-		resp, err = api.UQL(fmt.Sprintf(`show().edge_schema(%v)`, schemaName), nil)
-		if err != nil {
-			return nil, err
-		}
+		return api.GetEdgeSchema(schemaName, config)
 	} else {
 		return nil, errors.New("GetSchema() error db_type")
 	}
 
-	schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
+	return nil, nil
 
+}
+
+func (api *UltipaAPI) GetNodeSchema(schemaName string, config *configuration.RequestConfig) (*structs.Schema, error) {
+	var resp *http.UQLResponse
+	var err error
+	var schemas []*structs.Schema
+
+	resp, err = api.UQL(fmt.Sprintf(`show().node_schema("%v")`, schemaName), config)
 	if err != nil {
 		return nil, err
 	}
+
+	schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 
 	if len(schemas) == 0 {
 		return nil, err
@@ -83,28 +81,65 @@ func (api *UltipaAPI) GetSchema(schemaName string, DBType ultipa.DBType) (*struc
 	return schemas[0], err
 }
 
-func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bool) (*http.UQLResponse, error) {
+func (api *UltipaAPI) GetEdgeSchema(schemaName string, config *configuration.RequestConfig) (*structs.Schema, error) {
+	var resp *http.UQLResponse
+	var err error
+	var schemas []*structs.Schema
+
+	resp, err = api.UQL(fmt.Sprintf(`show().edge_schema("%v")`, schemaName), config)
+	if err != nil {
+		return nil, err
+	}
+
+	schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
+
+	if len(schemas) == 0 {
+		return nil, err
+	}
+
+	return schemas[0], err
+}
+
+func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bool, conf *configuration.RequestConfig) (*http.UQLResponse, error) {
 
 	var resp *http.UQLResponse
 	var err error
 
 	if schema.DBType == ultipa.DBType_DBNODE {
-		resp, err = api.UQL(fmt.Sprintf(`create().node_schema("%v","%v")`, schema.Name, schema.Desc), nil)
+
+		resp, err = api.UQL(fmt.Sprintf(`create().node_schema("%v","%v")`, schema.Name, schema.Desc), conf)
 		if err != nil {
 			return nil, err
 		}
 
 	} else if schema.DBType == ultipa.DBType_DBEDGE {
-		resp, err = api.UQL(fmt.Sprintf(`create().edge_schema("%v","%v")`, schema.Name, schema.Desc), nil)
+
+		resp, err = api.UQL(fmt.Sprintf(`create().edge_schema("%v","%v")`, schema.Name, schema.Desc), conf)
 		if err != nil {
 			return nil, err
 		}
+
 	} else {
+
 		return nil, errors.New("GetSchema() error db_type")
+
 	}
 
-	// todo create property here!
+	// create property of schemas
 	if isCreateProperties {
+
+		for _, prop := range schema.Properties {
+
+			resp, err := api.CreateProperty(schema.Name, schema.DBType, prop, conf)
+
+			if err != nil {
+				return nil, err
+			}
+
+			if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+				return resp, nil
+			}
+		}
 
 	}
 
