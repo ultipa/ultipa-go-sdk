@@ -36,7 +36,7 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 
 		// Check if User set Host Address
 		if config.Host != "" {
-			conn, err = connection.NewConnection(config.Host, api.Config)
+			conn, err = connection.NewConnection(config.Host, conf)
 			if err != nil {
 				return nil, nil, err
 			}

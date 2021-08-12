@@ -130,6 +130,10 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 
 		for _, prop := range schema.Properties {
 
+			if prop.IsIDType(){
+				continue
+			}
+
 			resp, err := api.CreateProperty(schema.Name, schema.DBType, prop, conf)
 
 			if err != nil {
