@@ -25,10 +25,10 @@ func NodeTableToNodes(nt *ultipa.NodeTable, alias string) ([]*structs.Node, map[
 	schemas := map[string]*structs.Schema{}
 	nodes := []*structs.Node{}
 
-	for _, oSchema := range nt.Headers {
+	for _, oSchema := range nt.Schemas {
 		schema := structs.NewSchema(oSchema.SchemaName)
 		schemas[schema.Name] = schema
-		for _, header := range oSchema.Headers {
+		for _, header := range oSchema.Properties {
 			schema.Properties = append(schema.Properties, &structs.Property{Name: header.PropertyName, Type: header.PropertyType})
 		}
 	}
@@ -60,10 +60,10 @@ func EdgeTableToEdges(et *ultipa.EdgeTable, alias string) ([]*structs.Edge, map[
 	schemas := map[string]*structs.Schema{}
 	edges := []*structs.Edge{}
 
-	for _, oSchema := range et.Headers {
+	for _, oSchema := range et.Schemas {
 		schema := structs.NewSchema(oSchema.SchemaName)
 		schemas[schema.Name] = schema
-		for _, header := range oSchema.Headers {
+		for _, header := range oSchema.Properties {
 			schema.Properties = append(schema.Properties, &structs.Property{Name: header.PropertyName, Type: header.PropertyType})
 		}
 	}
@@ -257,7 +257,6 @@ func (di *DataItem) AsGraphs() (graphs []*structs.Graph, err error) {
 
 	table := di.Data.(*ultipa.Table)
 
-
 	if table.TableName != "_graph" {
 		return nil, errors.New("DataItem " + di.Alias + " is not a Graph list")
 	}
@@ -271,13 +270,11 @@ func (di *DataItem) AsGraphs() (graphs []*structs.Graph, err error) {
 		graph.TotalNodes, _ = utils.Str2Uint64(utils.AsString(values[2]))
 		graph.TotalEdges, _ = utils.Str2Uint64(utils.AsString(values[3]))
 
-
 		graphs = append(graphs, &graph)
 	}
 
 	return graphs, err
 }
-
 
 // the types will be tables and alias is nodeSchema and edgeSchema
 func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
@@ -291,7 +288,6 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 	}
 
 	table := di.Data.(*ultipa.Table)
-
 
 	if table.TableName != "_nodeSchema" && table.TableName != "_edgeSchema" {
 		return nil, errors.New("DataItem " + di.Alias + " is not a Schema list")
@@ -319,6 +315,11 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		schema.Total, _ = strconv.Atoi(utils.AsString(values[TotalIndex]))
 		propertyJson := values[2]
 
+		schema.DBType, err = structs.GetDBTypeByString(schema.Type)
+
+		if err != nil {
+			return nil, err
+		}
 
 		var props []*struct {
 			Name        string
@@ -347,6 +348,3 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 
 	return schemas, err
 }
-
-
-

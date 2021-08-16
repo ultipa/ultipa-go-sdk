@@ -11,25 +11,25 @@ import (
 )
 
 // Convert Bytes to GoLang Type and return to an interface
-func ConvertBytesToInterface(bs []byte, t ultipa.UltipaPropertyType) interface{} {
+func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType) interface{} {
 	switch t {
-	case ultipa.UltipaPropertyType_STRING:
+	case ultipa.PropertyType_STRING:
 		return AsString(bs)
-	case ultipa.UltipaPropertyType_INT32:
+	case ultipa.PropertyType_INT32:
 		return AsInt32(bs)
-	case ultipa.UltipaPropertyType_INT64:
+	case ultipa.PropertyType_INT64:
 		return AsInt64(bs)
-	case ultipa.UltipaPropertyType_UINT32:
+	case ultipa.PropertyType_UINT32:
 		return AsUint32(bs)
-	case ultipa.UltipaPropertyType_UINT64:
+	case ultipa.PropertyType_UINT64:
 		return AsUint64(bs)
-	case ultipa.UltipaPropertyType_FLOAT:
+	case ultipa.PropertyType_FLOAT:
 		return AsFloat32(bs)
-	case ultipa.UltipaPropertyType_DOUBLE:
+	case ultipa.PropertyType_DOUBLE:
 		return AsFloat64(bs)
-	case ultipa.UltipaPropertyType_DATETIME:
+	case ultipa.PropertyType_DATETIME:
 		return NewTime(AsUint64(bs))
-	case ultipa.UltipaPropertyType_UNSET:
+	case ultipa.PropertyType_UNSET:
 		return nil
 	default:
 		return nil
@@ -128,16 +128,16 @@ func AsBool(value []byte) bool {
 	}
 }
 
-func StringAsInterface(str string, t ultipa.UltipaPropertyType) (interface{}, error) {
+func StringAsInterface(str string, t ultipa.PropertyType) (interface{}, error) {
 
 	switch t {
-	case ultipa.UltipaPropertyType_INT32:
+	case ultipa.PropertyType_INT32:
 		v, err := strconv.ParseInt(str, 10, 32)
 		if err != nil {
 			return nil, err
 		}
 		return int32(v), err
-	case ultipa.UltipaPropertyType_INT64:
+	case ultipa.PropertyType_INT64:
 		return strconv.ParseInt(str, 10, 32)
 	default:
 		return str, nil

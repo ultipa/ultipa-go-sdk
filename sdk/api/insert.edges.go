@@ -36,10 +36,10 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 
 	table := &ultipa.EdgeTable{}
 
-	table.Headers = []*ultipa.SchemaHeader{
+	table.Schemas = []*ultipa.Schema{
 		{
 			SchemaName: schema.Name,
-			Headers:    []*ultipa.Header{},
+			Properties: []*ultipa.Property{},
 		},
 	}
 
@@ -49,7 +49,7 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 			continue
 		}
 
-		table.Headers[0].Headers = append(table.Headers[0].Headers, &ultipa.Header{
+		table.Schemas[0].Properties = append(table.Schemas[0].Properties, &ultipa.Property{
 			PropertyName: prop.Name,
 			PropertyType: prop.Type,
 		})
@@ -58,8 +58,8 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 	for _, row := range rows {
 
 		newnode := &ultipa.EdgeRow{
-			FromId: row.From,
-			ToId: row.To,
+			FromId:     row.From,
+			ToId:       row.To,
 			SchemaName: schema.Name,
 		}
 
@@ -82,10 +82,10 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 	}
 
 	resp, err := client.InsertEdges(ctx, &ultipa.InsertEdgesRequest{
-		GraphName: conf.CurrentGraph,
-		EdgeTable: table,
+		GraphName:  conf.CurrentGraph,
+		EdgeTable:  table,
 		InsertType: ultipa.InsertType_OVERWRITE,
-		Silent:    true,
+		Silent:     true,
 	})
 
 	return resp, err

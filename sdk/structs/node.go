@@ -5,6 +5,7 @@ import (
 	"ultipa-go-sdk/sdk/utils"
 )
 
+
 type Node struct {
 	Name   string
 	ID     types.ID

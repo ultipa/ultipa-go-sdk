@@ -3,7 +3,6 @@ syntax = "proto3";
 package ultipa;
 
 option go_package = ".;ultipa";
-
 // The ultipa service definition.
 service UltipaRpcs {
   // 1.Sends a greeting
@@ -121,7 +120,7 @@ message NodeAlias {
 //key = alias.name, value = ly
 message AttrAlias {
   string alias = 1;
-  UltipaPropertyType property_type = 2;
+  PropertyType property_type = 2;
   repeated bytes values = 3;
 }
 
@@ -131,7 +130,7 @@ message ArrayElement {
 
 message ArrayAlias {
   string alias = 1;
-  UltipaPropertyType property_type = 2;
+  PropertyType property_type = 2;
   repeated ArrayElement elements = 3;
 }
 
@@ -245,7 +244,7 @@ message InsertEdgesReply {
 
 /*------------------------public message-----------------------*/
 
-enum UltipaPropertyType {
+enum PropertyType {
   UNSET = 0;
   INT32 = 1;
   UINT32 = 2;
@@ -256,6 +255,13 @@ enum UltipaPropertyType {
   STRING = 7;
   DATETIME = 8;
   TIMESTAMP = 9;
+  UUID = 10;
+  ID = 11;
+  FROM = 12;
+  FROM_UUID = 13;
+  TO = 14;
+  TO_UUID = 15;
+  IGNORE = 16;
 }
 
 enum ErrorCode {
@@ -327,12 +333,12 @@ message TableRow {
 }
 
 message NodeTable {
-  repeated SchemaHeader headers = 1;
+  repeated Schema schemas = 1;
   repeated NodeRow node_rows = 2;
 }
 
 message EdgeTable {
-  repeated SchemaHeader headers = 1;
+  repeated Schema schemas = 1;
   repeated EdgeRow edge_rows = 3;
 }
 
@@ -353,14 +359,19 @@ message EdgeRow {
   repeated bytes values = 7;
 }
 
-message SchemaHeader {
+message Schema {
   string schema_name = 1;
-  repeated Header headers = 2;
+  repeated Property properties = 2;
+}
+
+message Property {
+  string property_name = 1;
+  PropertyType property_type = 2;
 }
 
 message Header {
   string property_name = 1;
-  UltipaPropertyType property_type = 2;
+  PropertyType property_type = 2;
 }
 
 message Value {

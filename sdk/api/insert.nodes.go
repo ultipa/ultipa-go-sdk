@@ -37,10 +37,10 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 
 	table := &ultipa.NodeTable{}
 
-	table.Headers = []*ultipa.SchemaHeader{
+	table.Schemas = []*ultipa.Schema{
 		{
 			SchemaName: schema.Name,
-			Headers:    []*ultipa.Header{},
+			Properties: []*ultipa.Property{},
 		},
 	}
 
@@ -50,7 +50,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 			continue
 		}
 
-		table.Headers[0].Headers = append(table.Headers[0].Headers, &ultipa.Header{
+		table.Schemas[0].Properties = append(table.Schemas[0].Properties, &ultipa.Property{
 			PropertyName: prop.Name,
 			PropertyType: prop.Type,
 		})
@@ -82,10 +82,10 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 	}
 
 	resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
-		GraphName: conf.CurrentGraph,
-		NodeTable: table,
+		GraphName:  conf.CurrentGraph,
+		NodeTable:  table,
 		InsertType: ultipa.InsertType_OVERWRITE,
-		Silent:    true,
+		Silent:     true,
 	})
 
 	return resp, err

@@ -67,7 +67,7 @@ func (api *UltipaAPI) GetNodeSchema(schemaName string, config *configuration.Req
 	var err error
 	var schemas []*structs.Schema
 
-	resp, err = api.UQL(fmt.Sprintf(`show().node_schema("%v")`, schemaName), config)
+	resp, err = api.UQL(fmt.Sprintf(`show().node_schema(@%v)`, schemaName), config)
 	if err != nil {
 		return nil, err
 	}
@@ -86,12 +86,12 @@ func (api *UltipaAPI) GetEdgeSchema(schemaName string, config *configuration.Req
 	var err error
 	var schemas []*structs.Schema
 
-	resp, err = api.UQL(fmt.Sprintf(`show().edge_schema("%v")`, schemaName), config)
+	resp, err = api.UQL(fmt.Sprintf(`show().edge_schema(@%v)`, schemaName), config)
 	if err != nil {
 		return nil, err
 	}
 
-	schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
+	schemas, err = resp.Alias(http.RESP_EDGE_SCHEMA_KEY).AsSchemas()
 
 	if len(schemas) == 0 {
 		return nil, err
@@ -130,7 +130,7 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 
 		for _, prop := range schema.Properties {
 
-			if prop.IsIDType(){
+			if prop.IsIDType() || prop.Type == ultipa.PropertyType_IGNORE{
 				continue
 			}
 

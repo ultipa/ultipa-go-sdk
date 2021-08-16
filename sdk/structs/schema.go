@@ -9,7 +9,7 @@ type Schema struct {
 	Name       string
 	Properties []*Property
 	Desc       string
-	Type       string // node | edge
+	Type       string
 	DBType     ultipa.DBType
 	Total      int
 }
@@ -29,14 +29,18 @@ func (s *Schema) GetProperty(name string) *Property {
 }
 
 // compare 2 schema is same, or is able to fit schema1 to schema2
-func CompareSchemas(schema1 *Schema, schema2 *Schema, fit bool) bool {
+// schema1 is new schema
+// schema2 is server side schema
+func CompareSchemas(schema1 *Schema, schema2 *Schema, fit bool) (bool, []*Property) {
+
+	var NotExistProperties []*Property
 
 	if schema1 == nil {
-		return false
+		return false, nil
 	}
 
 	if schema2 == nil {
-		return fit
+		return fit, nil
 	}
 
 	schema1PropMap := map[string]*Property{}
@@ -56,13 +60,18 @@ func CompareSchemas(schema1 *Schema, schema2 *Schema, fit bool) bool {
 		prop2 := schema2PropMap[name]
 
 		if fit == true && (prop2 != nil && prop2.Type != prop1.Type) {
-			return false
+			return false, nil
 		}
 
 		if fit == false && (prop2 == nil || prop2.Type != prop1.Type) {
-			return false
+			return false, nil
+		}
+
+		// not exist properties
+		if fit == true && prop2 == nil && prop1.IsIDType() == false{
+			NotExistProperties = append(NotExistProperties, prop1)
 		}
 	}
 
-	return true
+	return true, NotExistProperties
 }

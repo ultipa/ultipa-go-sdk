@@ -5,61 +5,56 @@ import ultipa "ultipa-go-sdk/rpc"
 type Property struct {
 	Name string
 	Desc string
-	Type ultipa.UltipaPropertyType
+	Type ultipa.PropertyType
 }
 
-const (
-	UltipaPropertyType_ID       ultipa.UltipaPropertyType = 20
-	UltipaPropertyType_UUID     ultipa.UltipaPropertyType = 21
-	UltipaPropertyType_FROM     ultipa.UltipaPropertyType = 22
-	UltipaPropertyType_FROMUUID ultipa.UltipaPropertyType = 23
-	UltipaPropertyType_TO       ultipa.UltipaPropertyType = 24
-	UltipaPropertyType_TOUUID   ultipa.UltipaPropertyType = 25
-)
-
-var PropertyMap = map[string]ultipa.UltipaPropertyType{
-	"string":     ultipa.UltipaPropertyType_STRING,
-	"int32":      ultipa.UltipaPropertyType_INT32,
-	"int64":      ultipa.UltipaPropertyType_INT64,
-	"uint32":     ultipa.UltipaPropertyType_UINT32,
-	"uint64":     ultipa.UltipaPropertyType_UINT64,
-	"float":      ultipa.UltipaPropertyType_FLOAT,
-	"double":     ultipa.UltipaPropertyType_DOUBLE,
-	"datetime":   ultipa.UltipaPropertyType_DATETIME,
-	"_id":        UltipaPropertyType_ID,
-	"_uuid":      UltipaPropertyType_UUID,
-	"_from":      UltipaPropertyType_FROM,
-	"_to":        UltipaPropertyType_TO,
-	"_from_uuid": UltipaPropertyType_FROMUUID,
-	"_to_uuid":   UltipaPropertyType_TOUUID,
+var PropertyMap = map[string]ultipa.PropertyType{
+	"string":     ultipa.PropertyType_STRING,
+	"int32":      ultipa.PropertyType_INT32,
+	"int64":      ultipa.PropertyType_INT64,
+	"uint32":     ultipa.PropertyType_UINT32,
+	"uint64":     ultipa.PropertyType_UINT64,
+	"float":      ultipa.PropertyType_FLOAT,
+	"double":     ultipa.PropertyType_DOUBLE,
+	"datetime":   ultipa.PropertyType_DATETIME,
+	"timestamp":  ultipa.PropertyType_TIMESTAMP,
+	"_id":        ultipa.PropertyType_ID,
+	"_uuid":      ultipa.PropertyType_UUID,
+	"_from":      ultipa.PropertyType_FROM,
+	"_to":        ultipa.PropertyType_TO,
+	"_from_uuid": ultipa.PropertyType_FROM_UUID,
+	"_to_uuid":   ultipa.PropertyType_TO_UUID,
+	"_ignore":    ultipa.PropertyType_IGNORE,
 }
 
-var PropertyReverseMap = map[ultipa.UltipaPropertyType]string{
-	ultipa.UltipaPropertyType_STRING:   "string",
-	ultipa.UltipaPropertyType_INT32:    "int32",
-	ultipa.UltipaPropertyType_INT64:    "int64",
-	ultipa.UltipaPropertyType_UINT32:   "uint32",
-	ultipa.UltipaPropertyType_UINT64:   "uint64",
-	ultipa.UltipaPropertyType_FLOAT:    "float",
-	ultipa.UltipaPropertyType_DOUBLE:   "double",
-	ultipa.UltipaPropertyType_DATETIME: "datetime",
-	UltipaPropertyType_ID:              "_id",
-	UltipaPropertyType_UUID:            "_uuid",
-	UltipaPropertyType_FROM:            "_from",
-	UltipaPropertyType_TO:              "_to",
-	UltipaPropertyType_FROMUUID:        "_from_uuid",
-	UltipaPropertyType_TOUUID:          "_to_uuid",
+var PropertyReverseMap = map[ultipa.PropertyType]string{
+	ultipa.PropertyType_STRING:    "string",
+	ultipa.PropertyType_INT32:     "int32",
+	ultipa.PropertyType_INT64:     "int64",
+	ultipa.PropertyType_UINT32:    "uint32",
+	ultipa.PropertyType_UINT64:    "uint64",
+	ultipa.PropertyType_FLOAT:     "float",
+	ultipa.PropertyType_DOUBLE:    "double",
+	ultipa.PropertyType_DATETIME:  "datetime",
+	ultipa.PropertyType_TIMESTAMP: "timestamp",
+	ultipa.PropertyType_ID:        "_id",
+	ultipa.PropertyType_UUID:      "_uuid",
+	ultipa.PropertyType_FROM:      "_from",
+	ultipa.PropertyType_TO:        "_to",
+	ultipa.PropertyType_FROM_UUID: "_from_uuid",
+	ultipa.PropertyType_TO_UUID:   "_to_uuid",
+	ultipa.PropertyType_IGNORE:    "_ignore",
 }
 
 func (p *Property) IsIDType() bool {
 
-	idTyps := []ultipa.UltipaPropertyType{
-		UltipaPropertyType_ID,
-		UltipaPropertyType_UUID,
-		UltipaPropertyType_FROM,
-		UltipaPropertyType_TO,
-		UltipaPropertyType_FROMUUID,
-		UltipaPropertyType_TOUUID,
+	idTyps := []ultipa.PropertyType{
+		ultipa.PropertyType_ID,
+		ultipa.PropertyType_UUID,
+		ultipa.PropertyType_FROM,
+		ultipa.PropertyType_TO,
+		ultipa.PropertyType_FROM_UUID,
+		ultipa.PropertyType_TO_UUID,
 	}
 
 	for _, t := range idTyps {
@@ -79,10 +74,10 @@ func (p *Property) GetStringType() string {
 	return GetStringByPropertyType(p.Type)
 }
 
-func GetPropertyTypeByString(s string) ultipa.UltipaPropertyType {
+func GetPropertyTypeByString(s string) ultipa.PropertyType {
 	return PropertyMap[s]
 }
 
-func GetStringByPropertyType(t ultipa.UltipaPropertyType) string {
+func GetStringByPropertyType(t ultipa.PropertyType) string {
 	return PropertyReverseMap[t]
 }
