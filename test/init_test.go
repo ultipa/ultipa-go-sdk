@@ -11,24 +11,18 @@ import (
 var client *api.UltipaAPI
 
 func TestMain(m *testing.M) {
-	var err error
+	//var err error
 
 
-	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
-		Hosts: []string {
-			"210.13.32.146:60075",
-			//"localhost:8088",
-		},
-		Username: "root",
-		Password: "root",
-		DefaultGraph: "multi_schema_test",
-	})
+	//client, err = GetClient([]string {
+	//	"210.13.32.146:60074",
+	//	//"localhost:8088",
+	//},"default")
+	//
+	//if err != nil {
+	//	log.Fatalln(err)
+	//}
 
-	client, err = sdk.NewUltipa(config)
-
-	if err != nil {
-		log.Fatalln(err)
-	}
 	m.Run()
 }
 
@@ -37,5 +31,25 @@ func TestPing(t *testing.T) {
 	client.Test()
 }
 
+
+func GetClient(hosts []string, graphName string) (*api.UltipaAPI, error){
+	var err error
+
+
+	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
+		Hosts: hosts,
+		Username: "root",
+		Password: "root",
+		DefaultGraph: graphName,
+	})
+
+	client, err = sdk.NewUltipa(config)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return client, err
+}
 
 

@@ -68,11 +68,6 @@ func TestNewConn(t *testing.T) {
 	//defer ultipa.Close()
 }
 
-//todo : wait for htap test
-func TestSyncClusterInfo(t *testing.T) {
-	err := client.Pool.RefreshClusterInfo()
-	log.Println(err)
-}
 
 func TestUql(t *testing.T) {
 	//conn, _ := client.Pool.GetMasterConn()

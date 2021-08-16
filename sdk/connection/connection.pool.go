@@ -4,96 +4,64 @@ import (
 	"context"
 	"errors"
 	"google.golang.org/grpc/metadata"
+	"log"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
 )
 
+type GraphClusterInfo struct {
+	Graph     string
+	Leader    *Connection
+	Followers []*Connection
+}
+
 // handle all connections
 type ConnectionPool struct {
-	Config      *configuration.UltipaConfig
-	Connections map[string]*Connection // Host : Connection
-	Actives     []*Connection
-	Cluster     *ClusterManager
+	GraphInfos       map[string]*GraphClusterInfo // graph name : clusterinfo
+	Config           *configuration.UltipaConfig
+	Connections      map[string]*Connection // Host : Connection
 	AnalyticsActives []*Connection
-	RandomTick int
+	RandomTick       int
+	Actives          []*Connection
 }
 
 func NewConnectionPool(config *configuration.UltipaConfig) (*ConnectionPool, error) {
 
-	if len(config.Hosts) < 1{
+	if len(config.Hosts) < 1 {
 		return nil, errors.New("Error Hosts can not by empty")
 	}
 
 	pool := &ConnectionPool{
-		Config: config,
+		Config:      config,
 		Connections: map[string]*Connection{},
+		GraphInfos: map[string]*GraphClusterInfo{},
 	}
 
 	// Init Cluster Manager
-	pool.Cluster = NewClusterManager(pool)
 
 	// Get Connections
-	pool.CreateConnections()
+	err := pool.CreateConnections()
 
-	// Update Raft Infos
-	pool.Cluster.UltipaRaftInfo()
+	if err != nil {
+		log.Println(err)
+	}
 
 	// Refresh Actives
 	pool.RefreshActives()
 
+	// Refresh global Cluster info
+	pool.RefreshClusterInfo("global")
+
 	return pool, nil
 }
 
-
 func (pool *ConnectionPool) CreateConnections() error {
 	var err error
+
 	for _, host := range pool.Config.Hosts {
 		conn, _ := NewConnection(host, pool.Config)
-		client := conn.GetClient()
-		ctx ,_ := context.WithTimeout(context.Background(), time.Duration(pool.Config.Timeout) * time.Second)
-		resp, e := client.GetLeader(ctx, &ultipa.GetLeaderRequest{})
-
-		if e != nil {
-			err = e
-			continue
-		}
-
-		// Not Raft Mode
-		if resp.Status.ErrorCode == ultipa.ErrorCode_NOT_RAFT_MODE {
-			pool.Connections[host] = conn
-			pool.Cluster.Leader = conn
-			return nil
-		}
-
-		//todo: raft mode
-		if resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS {
-			panic("Not Implement, Raft Mode Connections")
-		}
-	}
-
-	return err
-}
-
-// set context with timeout and auth info
-func (pool *ConnectionPool) NewContext(config *configuration.RequestConfig) (context.Context, context.CancelFunc) {
-	ctx ,cancel := context.WithTimeout(context.Background(), time.Duration(pool.Config.Timeout) * time.Second)
-	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(pool.Config.ToContextKV(config)...))
-	return ctx, cancel
-}
-
-// sync cluster info from server
-func (pool *ConnectionPool) RefreshClusterInfo() error {
-	conn, err := pool.GetConn()
-	ctx ,_ := pool.NewContext(nil)
-	//todo:
-	resp, err := conn.GetClient().GetLeader(ctx, nil)
-
-	//todo: update resp
-	if resp == nil { return nil }
-
-	if   resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		return errors.New(resp.Status.Msg)
+		pool.Connections[host] = conn
 	}
 
 	return err
@@ -103,7 +71,9 @@ func (pool *ConnectionPool) RefreshClusterInfo() error {
 func (pool *ConnectionPool) RefreshActives() {
 	pool.Actives = []*Connection{}
 	for _, conn := range pool.Connections {
-		ctx ,_ := pool.NewContext(nil)
+
+		ctx, _ := pool.NewContext(nil)
+
 		resp, err := conn.GetClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
 			Name: "go sdk refresh",
 		})
@@ -112,12 +82,79 @@ func (pool *ConnectionPool) RefreshActives() {
 			continue
 		}
 
-		if resp.Status == nil || resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS  {
+		if resp.Status == nil || resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS {
 			pool.Actives = append(pool.Actives, conn)
 		}
 
 	}
 }
+
+
+// sync cluster info from server
+func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
+
+	var conn *Connection
+	var err error
+	if pool.GraphInfos[graphName] == nil || pool.GraphInfos[graphName].Leader == nil {
+		conn, err = pool.GetConn()
+	} else {
+		conn = pool.GraphInfos[graphName].Leader
+	}
+
+
+	if err != nil {
+		return err
+	}
+
+	ctx, _ := pool.NewContext(&configuration.RequestConfig{GraphName: graphName})
+	client := conn.GetClient()
+	resp, err := client.GetLeader(ctx, &ultipa.GetLeaderRequest{})
+
+
+
+	//todo: update resp
+	if resp == nil || err != nil {
+		return err
+	}
+
+	if resp.Status.ErrorCode == ultipa.ErrorCode_RAFT_REDIRECT {
+		pool.GraphInfos[graphName] = &GraphClusterInfo{
+			Graph: graphName,
+			Leader: pool.Connections[resp.Status.ClusterInfo.Redirect],
+		}
+
+		return pool.RefreshClusterInfo(graphName)
+	}
+
+	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		log.Println(resp.Status.Msg)
+
+	} else {
+
+		if pool.GraphInfos[graphName] == nil {
+			pool.GraphInfos[graphName] = &GraphClusterInfo{
+				Graph: graphName,
+				Leader: pool.Connections[resp.Status.ClusterInfo.Redirect],
+			}
+		}
+
+		for _, follower := range resp.Status.ClusterInfo.Followers {
+			fconn := pool.Connections[follower.Address]
+			fconn.Host = follower.Address
+			fconn.Active = follower.Status
+			fconn.Role = follower.Role
+			pool.GraphInfos[graphName].Followers = append(pool.GraphInfos[graphName].Followers, fconn)
+		}
+	}
+
+
+
+
+
+	return err
+}
+
+
 
 // Get client by global config
 func (pool *ConnectionPool) GetConn() (*Connection, error) {
@@ -131,11 +168,8 @@ func (pool *ConnectionPool) GetConn() (*Connection, error) {
 
 // Get master client
 func (pool *ConnectionPool) GetMasterConn() (*Connection, error) {
-	if pool.Cluster.Leader == nil {
-		return nil, errors.New("Leader Connection is not found!")
-	}
-
-	return pool.Cluster.Leader, nil
+	//todo get target graph master
+	return nil, nil
 }
 
 // Get random client
@@ -147,11 +181,6 @@ func (pool *ConnectionPool) GetRandomConn() (*Connection, error) {
 	pool.RandomTick++
 
 	return pool.Actives[pool.RandomTick % len(pool.Actives)], nil
-}
-
-func (pool *ConnectionPool) GetClusterInfo() []*Connection{
-	pool.RefreshClusterInfo()
-	return pool.Actives
 }
 
 // Get Task/Analytics client
@@ -168,4 +197,11 @@ func (pool *ConnectionPool) Close() error {
 		}
 	}
 	return nil
+}
+
+// set context with timeout and auth info
+func (pool *ConnectionPool) NewContext(config *configuration.RequestConfig) (context.Context, context.CancelFunc) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(pool.Config.Timeout)*time.Second)
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(pool.Config.ToContextKV(config)...))
+	return ctx, cancel
 }

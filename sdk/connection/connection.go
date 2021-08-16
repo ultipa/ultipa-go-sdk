@@ -11,8 +11,8 @@ type Connection struct {
 	Conn *grpc.ClientConn
 	Client ultipa.UltipaRpcsClient
 	Config *configuration.UltipaConfig
-	Role string // leader, follower, learner, candidate ...
-	Active bool
+	Role int32 // leader, follower, learner, candidate ...
+	Active ultipa.ServerStatus
 }
 
 func NewConnection(host string, config *configuration.UltipaConfig) (*Connection, error) {
@@ -21,6 +21,7 @@ func NewConnection(host string, config *configuration.UltipaConfig) (*Connection
 
 	connection :=  &Connection{
 		Config: config,
+		Host: host,
 	}
 
 	// add default mac receive size
