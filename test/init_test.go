@@ -10,12 +10,17 @@ import (
 
 var client *api.UltipaAPI
 
+var hosts []string
+
 func TestMain(m *testing.M) {
 	//var err error
 
 
+	hosts = []string{
+		"210.13.32.146:60075",
+	}
 	//client, err = GetClient([]string {
-	//	"210.13.32.146:60074",
+	//
 	//	//"localhost:8088",
 	//},"default")
 	//

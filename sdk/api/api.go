@@ -59,6 +59,8 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 
 	var err error
 
+	if config == nil { config = &configuration.RequestConfig{}}
+
 	config.Uql = uql
 	client, conf, err := api.GetClient(config)
 

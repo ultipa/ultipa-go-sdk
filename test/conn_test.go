@@ -16,9 +16,8 @@ import (
 
 func TestNewConn(t *testing.T) {
 
-
 	//conn, err := grpc.Dial("210.13.32.146:60074", grpc.WithInsecure(), grpc.WithDefaultCallOptions())
-	conn, err := grpc.Dial("210.13.32.146:60074",grpc.WithInsecure(), grpc.WithDefaultCallOptions())
+	conn, err := grpc.Dial("210.13.32.146:60075", grpc.WithInsecure(), grpc.WithDefaultCallOptions())
 
 	if err != nil {
 		log.Fatalln(err)
@@ -26,12 +25,10 @@ func TestNewConn(t *testing.T) {
 
 	client := ultipa.NewUltipaRpcsClient(conn)
 
-
-
 	h := md5.New()
 	h.Write([]byte("root"))
 	pass := hex.EncodeToString(h.Sum(nil))
-	ctx, _ := context.WithTimeout(context.Background(), time.Second * 3)
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*3)
 	ctx = metadata.AppendToOutgoingContext(ctx, "user", "root", "password", strings.ToUpper(pass), "graph_name", "multi_schema_test")
 
 	resp, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
@@ -44,7 +41,7 @@ func TestNewConn(t *testing.T) {
 
 	log.Println(resp)
 
-	ctx2, _ := context.WithTimeout(context.Background(), time.Second * 1000)
+	ctx2, _ := context.WithTimeout(context.Background(), time.Second*1000)
 	ctx2 = metadata.AppendToOutgoingContext(ctx2, "user", "root", "password", strings.ToUpper(pass), "graph_name", "multi_schema_test")
 	resp2, err := client.Uql(ctx2, &ultipa.UqlRequest{
 		Uql: "n().e().n() as path return path limit 10;",
@@ -63,18 +60,11 @@ func TestNewConn(t *testing.T) {
 		log.Println(record.Alias, record.Paths, err)
 	}
 
-
-
 	//defer ultipa.Close()
 }
 
-
 func TestUql(t *testing.T) {
-	//conn, _ := client.Pool.GetMasterConn()
-	//client.Pool.RefreshActives()
-	//ctx, _ := client.Pool.NewContext()
-
-	//res, _ := client.UQL("find().nodes() as nodes return nodes limit 10;", nil)
+	client, _ := GetClient([]string{"210.13.32.146:60075"}, "default")
 	res, _ := client.UQL("n().e().n() as path return path limit 10;", nil)
 	log.Println(res.AliasList, res.Get(0), res.Status.Code, res.Status.Message)
 }
