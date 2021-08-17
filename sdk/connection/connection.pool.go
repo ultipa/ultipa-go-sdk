@@ -72,6 +72,7 @@ type ConnectionPool struct {
 	Connections map[string]*Connection // Host : Connection
 	RandomTick  int
 	Actives     []*Connection
+	IsRaft      bool
 }
 
 func NewConnectionPool(config *configuration.UltipaConfig) (*ConnectionPool, error) {
@@ -164,8 +165,12 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 		return err
 	}
 
-	if resp.Status.ErrorCode == ultipa.ErrorCode_RAFT_REDIRECT {
+	if resp.Status.ErrorCode == ultipa.ErrorCode_NOT_RAFT_MODE {
+		pool.IsRaft = false
+	}
 
+	if resp.Status.ErrorCode == ultipa.ErrorCode_RAFT_REDIRECT {
+		pool.IsRaft = true
 		if pool.Connections[resp.Status.ClusterInfo.Redirect] == nil {
 			pool.Connections[resp.Status.ClusterInfo.Redirect], err = NewConnection(resp.Status.ClusterInfo.Redirect, pool.Config)
 		}
@@ -181,7 +186,7 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
 		log.Println(resp.Status.Msg)
 	} else {
-
+		pool.IsRaft = true
 		if pool.GraphInfos[graphName] == nil {
 			pool.GraphInfos[graphName] = &GraphClusterInfo{
 				Graph:  graphName,

@@ -41,10 +41,14 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 			if err != nil {
 				return nil, nil, err
 			}
-		} else if UqlItem.HasWrite() {
-			conn, err = api.Pool.GetMasterConn(conf)
-		} else if UqlItem.HasExecTask() {
-			conn, err = api.Pool.GetAnalyticsConn(conf)
+		} else {
+			if api.Pool.IsRaft {
+				if UqlItem.HasWrite() {
+					conn, err = api.Pool.GetMasterConn(conf)
+				} else if UqlItem.HasExecTask() {
+					conn, err = api.Pool.GetAnalyticsConn(conf)
+				}
+			}
 		}
 
 		// Check if Write
