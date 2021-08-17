@@ -66,6 +66,10 @@ func (p *Property) IsIDType() bool {
 	return false
 }
 
+func (p *Property) IsIgnore() bool {
+	return p.Type == ultipa.PropertyType_IGNORE
+}
+
 func (p *Property) SetTypeByString(s string) {
 	p.Type = GetPropertyTypeByString(s)
 }

@@ -46,7 +46,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 
 	for _, prop := range schema.Properties {
 
-		if prop.IsIDType() {
+		if prop.IsIDType() || prop.IsIgnore() {
 			continue
 		}
 
@@ -65,14 +65,14 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 
 		for _, prop := range schema.Properties {
 
-			if prop.IsIDType() {
+			if prop.IsIDType() || prop.IsIgnore() {
 				continue
 			}
 
 			bs, err := row.GetBytes(prop.Name)
 
 			if err != nil {
-				log.Fatal("Get row bytes value failed", prop.Name)
+				log.Fatal("Get row bytes value failed ", prop.Name, err)
 			}
 
 			newnode.Values = append(newnode.Values, bs)

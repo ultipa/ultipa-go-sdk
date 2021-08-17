@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"strings"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/types"
 )
 
 // Convert Bytes to GoLang Type and return to an interface
@@ -130,6 +132,8 @@ func AsBool(value []byte) bool {
 
 func StringAsInterface(str string, t ultipa.PropertyType) (interface{}, error) {
 
+	str = strings.Trim(str, " ")
+
 	switch t {
 	case ultipa.PropertyType_INT32:
 		v, err := strconv.ParseInt(str, 10, 32)
@@ -139,9 +143,47 @@ func StringAsInterface(str string, t ultipa.PropertyType) (interface{}, error) {
 		return int32(v), err
 	case ultipa.PropertyType_INT64:
 		return strconv.ParseInt(str, 10, 32)
+	case ultipa.PropertyType_UINT32:
+		v, err := strconv.ParseUint(str, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		return uint32(v), err
+	case ultipa.PropertyType_UINT64:
+		return strconv.ParseUint(str, 10, 64)
+	case ultipa.PropertyType_FLOAT:
+		v, err := strconv.ParseFloat(str, 32)
+		if err != nil {
+			return nil, err
+		}
+		return float32(v), err
+	case ultipa.PropertyType_DOUBLE:
+		v, err := strconv.ParseFloat(str, 64)
+		if err != nil {
+			return nil, err
+		}
+		return float64(v), err
+	case ultipa.PropertyType_DATETIME:
+		v, err := NewTimeFromString(str)
+		if err != nil {
+			return nil, err
+		}
+		return v.Datetime, err
+	case ultipa.PropertyType_TIMESTAMP:
+		v, err := NewTimeFromString(str)
+		if err != nil {
+			return nil, err
+		}
+		return v.GetTimeStamp(), err
 	default:
 		return str, nil
 	}
 
 	return nil, nil
+}
+
+func StringAsUUID(str string) (types.UUID, error) {
+	str = strings.Trim(str, " ")
+	v, err := strconv.ParseUint(str, 10, 64)
+	return v, err
 }

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"time"
+	"errors"
 )
 
 type UltipaTime struct {
@@ -27,25 +28,30 @@ func NewTime(datetime uint64) *UltipaTime {
 // StringToTime , layoutISO := "2006-01-02 15:04:05.000"
 // StringToTime , layoutISO := "2006-01-02 15:04:05"
 // StringToTime , layoutISO := "2006-01-02"
-func (u *UltipaTime) NewFromString(dateString string) (*UltipaTime, error) {
-	var err error
+func NewTimeFromString(dateString string) (*UltipaTime, error) {
 	n := UltipaTime{}
 	layouts := []string{
 		"2006-01-02 15:04:05.000",
 		"2006-01-02 15:04:05",
+		"2006-01-02 15:04",
+		"2006-01-02 15",
 		"2006-01-02",
 	}
 
 	for _, l := range layouts {
 		t, err := time.Parse(l, dateString)
 		n.Time = &t
-		n.TimeToUint64(&t)
+		v := n.TimeToUint64(&t)
+
 		if err == nil {
+			n.Datetime = v
 			return &n, err
 		}
 	}
 
-	return nil, err
+
+
+	return nil, errors.New("parse datetime string failed : " + dateString)
 }
 
 // parse Bytes to year, month....
@@ -132,4 +138,9 @@ func (u *UltipaTime) TimeToUint64(time *time.Time) uint64 {
 
 func (u *UltipaTime) String() string {
 	return u.Time.Format("2006-01-02 15:04:05.000Z")
+}
+
+// Get Timestamp , Second
+func (u *UltipaTime) GetTimeStamp() uint32 {
+	return uint32(u.Time.Unix())
 }

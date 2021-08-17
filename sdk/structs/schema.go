@@ -1,6 +1,7 @@
 package structs
 
 import (
+	"errors"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/utils"
 )
@@ -31,16 +32,21 @@ func (s *Schema) GetProperty(name string) *Property {
 // compare 2 schema is same, or is able to fit schema1 to schema2
 // schema1 is new schema
 // schema2 is server side schema
-func CompareSchemas(schema1 *Schema, schema2 *Schema, fit bool) (bool, []*Property) {
+func CompareSchemas(schema1 *Schema, schema2 *Schema, fit bool) (error, []*Property) {
 
 	var NotExistProperties []*Property
 
 	if schema1 == nil {
-		return false, nil
+		return errors.New("schema compare failed, schema1 is required"), nil
 	}
 
 	if schema2 == nil {
-		return fit, nil
+		if fit {
+			return nil, nil
+		} else {
+			return errors.New("schema compare failed, schema2 is required or set fit to true"), nil
+		}
+
 	}
 
 	schema1PropMap := map[string]*Property{}
@@ -57,21 +63,25 @@ func CompareSchemas(schema1 *Schema, schema2 *Schema, fit bool) (bool, []*Proper
 	// check one by one
 	for name, prop1 := range schema1PropMap {
 
+		if prop1.IsIDType() || prop1.IsIgnore() {
+			continue
+		}
+
 		prop2 := schema2PropMap[name]
 
 		if fit == true && (prop2 != nil && prop2.Type != prop1.Type) {
-			return false, nil
+			return errors.New("schema compare failed, property : @" + schema1.Name + "." + prop1.Name + " mismatch"), nil
 		}
 
 		if fit == false && (prop2 == nil || prop2.Type != prop1.Type) {
-			return false, nil
+			return errors.New("schema compare failed, property : @" + schema1.Name + "." + prop1.Name + " not exist"), nil
 		}
 
 		// not exist properties
-		if fit == true && prop2 == nil && prop1.IsIDType() == false{
+		if fit == true && prop2 == nil && prop1.IsIDType() == false {
 			NotExistProperties = append(NotExistProperties, prop1)
 		}
 	}
 
-	return true, NotExistProperties
+	return nil, NotExistProperties
 }

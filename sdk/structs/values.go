@@ -3,21 +3,21 @@ package structs
 import "errors"
 
 type Values struct {
-	data map[string]interface{}
+	Data map[string]interface{}
 }
 
 func NewValues() *Values {
 	return &Values{
-		data: map[string]interface{}{},
+		Data: map[string]interface{}{},
 	}
 }
 
 func (v *Values) Set(key string, value interface{}) {
-	v.data[key] = value
+	v.Data[key] = value
 }
 
 func (v *Values) Get(key string) interface{} {
-	return v.data[key]
+	return v.Data[key]
 }
 
 func (v *Values) Has(key string) bool {
@@ -28,8 +28,8 @@ func (v *Values) ForEach(cb func(v interface{}, key string) error, order []strin
 
 	if order == nil {
 
-		for key, v := range v.data {
-			err := cb(v,key)
+		for key, v := range v.Data {
+			err := cb(v, key)
 			if err != nil {
 				return err
 			}
@@ -37,7 +37,6 @@ func (v *Values) ForEach(cb func(v interface{}, key string) error, order []strin
 
 		return nil
 	}
-
 
 	for _, key := range order {
 

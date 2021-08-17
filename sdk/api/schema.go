@@ -130,7 +130,7 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 
 		for _, prop := range schema.Properties {
 
-			if prop.IsIDType() || prop.Type == ultipa.PropertyType_IGNORE{
+			if prop.IsIDType() || prop.IsIgnore() {
 				continue
 			}
 
