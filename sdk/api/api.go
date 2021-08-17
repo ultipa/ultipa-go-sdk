@@ -44,7 +44,7 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 	}
 
 	if conn == nil {
-		conn, err = api.Pool.GetConn()
+		conn, err = api.Pool.GetConn(conf)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -59,6 +59,7 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 
 	var err error
 
+	config.Uql = uql
 	client, conf, err := api.GetClient(config)
 
 	if err != nil {
@@ -94,7 +95,7 @@ func (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig)
 
 // test connections
 func (api *UltipaAPI) Test() (bool, error) {
-	conn, err := api.Pool.GetConn()
+	conn, err := api.Pool.GetConn(nil)
 
 	if err != nil {
 		return false, err

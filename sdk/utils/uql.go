@@ -34,9 +34,9 @@ func (t *UqlItem) IsEmptyParams() bool  {
 }
 
 var WriteUqlCommandKeys = []string{
-	"alert", "create","drop", "grant", "revoke",
+	"create", "alter","drop", "grant", "revoke",
 	"LTE","UFE","truncate","compact",
-	"insert", "update", "delete",
+	"insert", "update", "delete","upsert",
 	"clear","stop", "pause", "resume",
 	"top", "kill",
 }
