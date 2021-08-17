@@ -57,7 +57,7 @@ func NewConnectionPool(config *configuration.UltipaConfig) (*ConnectionPool, err
 		log.Println(err)
 	}
 
-	return pool, nil
+	return pool, err
 }
 
 func (pool *ConnectionPool) CreateConnections() error {
@@ -112,12 +112,16 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 	client := conn.GetClient()
 	resp, err := client.GetLeader(ctx, &ultipa.GetLeaderRequest{})
 
-	//todo: update resp
 	if resp == nil || err != nil {
 		return err
 	}
 
 	if resp.Status.ErrorCode == ultipa.ErrorCode_RAFT_REDIRECT {
+
+		if pool.Connections[resp.Status.ClusterInfo.Redirect] == nil {
+			pool.Connections[resp.Status.ClusterInfo.Redirect], err = NewConnection(resp.Status.ClusterInfo.Redirect, pool.Config)
+		}
+
 		pool.GraphInfos[graphName] = &GraphClusterInfo{
 			Graph:  graphName,
 			Leader: pool.Connections[resp.Status.ClusterInfo.Redirect],
@@ -140,6 +144,12 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 
 		for _, follower := range resp.Status.ClusterInfo.Followers {
 			fconn := pool.Connections[follower.Address]
+
+			if fconn == nil {
+				fconn, err = NewConnection(follower.Address, pool.Config)
+				pool.Connections[follower.Address] = fconn
+			}
+
 			fconn.Host = follower.Address
 			fconn.Active = follower.Status
 			fconn.SetRoleFromInt32(follower.Role)

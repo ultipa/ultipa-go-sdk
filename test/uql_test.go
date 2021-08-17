@@ -9,7 +9,8 @@ import (
 
 func TestUQL(t *testing.T) {
 
-	client, _ := GetClient(hosts, "default")
+	client, _ := GetClient([]string{"210.13.32.146:40101"}, "default")
+
 	InitCases()
 
 	for _, c := range cases {
