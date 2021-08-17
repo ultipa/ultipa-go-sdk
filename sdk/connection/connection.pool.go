@@ -11,19 +11,67 @@ import (
 )
 
 type GraphClusterInfo struct {
-	Graph     string
-	Leader    *Connection
-	Followers []*Connection
+	Graph         string
+	Leader        *Connection
+	Followers     []*Connection
+	Algos         []*Connection
+	LastAlgoIndex int //记录上次使用的 Task 节点索引
+}
+
+func (gci *GraphClusterInfo) AddFollower(conn *Connection) {
+
+	gci.Graph = conn.Host
+
+	if gci.HasConn(conn) == true {
+		return
+	}
+
+	gci.Followers = append(gci.Followers, conn)
+
+	if conn.HasRole(ultipa.FollowerRole_ROLE_ALGO_EXECUTABLE) {
+		gci.Algos = append(gci.Algos, conn)
+	}
+
+}
+
+func (gci *GraphClusterInfo) ClearFollower() {
+	gci.Followers = []*Connection{}
+	gci.Algos = []*Connection{}
+}
+
+func (gci *GraphClusterInfo) GetAnalyticConn() (*Connection, error) {
+
+	if len(gci.Algos) == 0 {
+		return nil, errors.New("no Algo/Task Instance Found")
+	}
+
+	gci.LastAlgoIndex++
+
+	return gci.Algos[gci.LastAlgoIndex%len(gci.Algos)], nil
+}
+
+func (gci *GraphClusterInfo) HasConn(_conn *Connection) bool {
+
+	if gci.Leader == _conn {
+		return true
+	}
+
+	for _, conn := range gci.Followers {
+		if conn == _conn {
+			return true
+		}
+	}
+
+	return false
 }
 
 // handle all connections
 type ConnectionPool struct {
-	GraphInfos       map[string]*GraphClusterInfo // graph name : clusterinfo
-	Config           *configuration.UltipaConfig
-	Connections      map[string]*Connection // Host : Connection
-	AnalyticsActives []*Connection
-	RandomTick       int
-	Actives          []*Connection
+	GraphInfos  map[string]*GraphClusterInfo // graph name : ClusterInfo
+	Config      *configuration.UltipaConfig
+	Connections map[string]*Connection // Host : Connection
+	RandomTick  int
+	Actives     []*Connection
 }
 
 func NewConnectionPool(config *configuration.UltipaConfig) (*ConnectionPool, error) {
@@ -132,7 +180,6 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 
 	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
 		log.Println(resp.Status.Msg)
-
 	} else {
 
 		if pool.GraphInfos[graphName] == nil {
@@ -142,18 +189,25 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 			}
 		}
 
+		pool.GraphInfos[graphName].ClearFollower()
+
 		for _, follower := range resp.Status.ClusterInfo.Followers {
 			fconn := pool.Connections[follower.Address]
 
 			if fconn == nil {
 				fconn, err = NewConnection(follower.Address, pool.Config)
+
+				if err != nil {
+					return err
+				}
+
 				pool.Connections[follower.Address] = fconn
 			}
 
 			fconn.Host = follower.Address
 			fconn.Active = follower.Status
 			fconn.SetRoleFromInt32(follower.Role)
-			pool.GraphInfos[graphName].Followers = append(pool.GraphInfos[graphName].Followers, fconn)
+			pool.GraphInfos[graphName].AddFollower(fconn)
 		}
 	}
 
@@ -197,9 +251,20 @@ func (pool *ConnectionPool) GetRandomConn(config *configuration.UltipaConfig) (*
 }
 
 // Get Task/Analytics client
-func (pool *ConnectionPool) GetAnalyticsConn() (*Connection, error) {
-	//todo
-	return nil, nil
+func (pool *ConnectionPool) GetAnalyticsConn(config *configuration.UltipaConfig) (*Connection, error) {
+
+	gci := pool.GraphInfos[config.CurrentGraph]
+
+	if gci == nil {
+		err := pool.RefreshClusterInfo(config.CurrentGraph)
+		if err != nil {
+			return nil, err
+		}
+		gci = pool.GraphInfos[config.CurrentGraph]
+	}
+
+	return gci.GetAnalyticConn()
+
 }
 
 func (pool *ConnectionPool) Close() error {

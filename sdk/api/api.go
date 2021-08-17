@@ -1,11 +1,11 @@
 package api
 
 import (
-	"log"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/connection"
 	"ultipa-go-sdk/sdk/http"
+	"ultipa-go-sdk/sdk/utils"
 )
 
 // UQL, Insert, Export, Download ... API methods
@@ -33,6 +33,7 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 
 	if config != nil {
 		conf = api.Pool.Config.MergeRequestConfig(config)
+		UqlItem := utils.NewUql(config.Uql)
 
 		// Check if User set Host Address
 		if config.Host != "" {
@@ -40,7 +41,13 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 			if err != nil {
 				return nil, nil, err
 			}
+		} else if UqlItem.HasWrite() {
+			conn, err = api.Pool.GetMasterConn(conf)
+		} else if UqlItem.HasExecTask() {
+			conn, err = api.Pool.GetAnalyticsConn(conf)
 		}
+
+		// Check if Write
 	}
 
 	if conn == nil {
@@ -48,6 +55,10 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 		if err != nil {
 			return nil, nil, err
 		}
+	}
+
+	if err != nil {
+		return nil, conf, err
 	}
 
 	client := conn.GetClient()
@@ -59,7 +70,9 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 
 	var err error
 
-	if config == nil { config = &configuration.RequestConfig{}}
+	if config == nil {
+		config = &configuration.RequestConfig{}
+	}
 
 	config.Uql = uql
 	client, conf, err := api.GetClient(config)
@@ -83,13 +96,20 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 	uqlResp, err := http.NewUQLResponse(resp)
 
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
+	}
+
+	if uqlResp.NeedRedirect() {
+		err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
+		if err != nil {
+			return nil, err
+		}
+		return api.UQL(uql, config)
 	}
 
 	return uqlResp, nil
 }
 
-//todo:
 func (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
 	panic("not implemented")
 	return nil, nil

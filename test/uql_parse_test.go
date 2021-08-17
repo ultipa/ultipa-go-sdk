@@ -13,8 +13,8 @@ func TestEasyUqlParse(t *testing.T) {
 		`show().graph("name")`,
 		`show().graph(name)`,
 		`create().graph("<name>", "<desc?>")`,
-		`algo(degree).params({})`,
-		`alert().node_property()`,
+		`exec task algo(degree).params({})`,
+		`alter().node_property()`,
 		`n({_id == "C001"}).e().n({@card} as neighbors)
     find().nodes({_id == "C002"}) as C002
     with neighbors, C002
@@ -23,15 +23,13 @@ func TestEasyUqlParse(t *testing.T) {
 
 
 	for _, uql := range uqls {
-		uqlParse := utils.EasyUqlParse{}
-		uqlParse.Parse(uql)
-		log.Printf("🧪 uql: %s", uqlParse.Uql)
-		log.Printf("  HasWith: %t", uqlParse.HasWith())
-		log.Printf("  HasWrite: %t", uqlParse.HasWrite())
-		log.Printf("  HasAlgo: %t", uqlParse.HasAlgo())
-		for _, item := range uqlParse.Commands {
-			log.Printf(" -- %+v", item)
-			log.Printf("    ---%+v【%d】", item.GetListParams(), len(item.GetListParams()))
-		}
+		Uql := utils.NewUql(uql)
+		log.Printf("🧪 uql: %s", Uql.Uql)
+		log.Printf("  HasWith: %t", Uql.HasWith())
+		log.Printf("  HasWrite: %t", Uql.HasWrite())
+		log.Printf("  HasTask: %t", Uql.HasExecTask())
 	}
 }
+
+
+

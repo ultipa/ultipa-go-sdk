@@ -65,6 +65,10 @@ func NewUQLResponse(resp ultipa.UltipaRpcs_UqlClient) (response *UQLResponse, er
 	return response, nil
 }
 
+func (r *UQLResponse) NeedRedirect() bool {
+	return r.Status.Code == ultipa.ErrorCode_RAFT_REDIRECT
+}
+
 func (r *UQLResponse) Get(index int) (di *DataItem) {
 	if len(r.AliasList) > index {
 		return r.Alias(r.AliasList[index])

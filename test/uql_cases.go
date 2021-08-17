@@ -21,7 +21,7 @@ func InitCases() {
 		//	Alias: []string{"nodes"},
 		//},
 		&Case{
-			UQL:   "show().graph()",
+			UQL:   "exec task show().graph()",
 			Alias: []string{"_graph"},
 		},
 		//&Case{
