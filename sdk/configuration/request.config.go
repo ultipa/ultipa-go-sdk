@@ -1,5 +1,7 @@
 package configuration
 
+import ultipa "ultipa-go-sdk/rpc"
+
 type RequestType = int32
 
 const (
@@ -14,6 +16,7 @@ type RequestConfig struct {
 	ClusterId string
 	Host      string // set for force host test
 	RequestType RequestType
+	InsertType ultipa.InsertType
 	Uql string
 }
 

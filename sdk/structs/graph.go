@@ -38,3 +38,8 @@ func DBTypeToString(dbType ultipa.DBType) string {
 
 	return ""
 }
+
+//
+//func (db ultipa.DBType) ToString(){
+//
+//}

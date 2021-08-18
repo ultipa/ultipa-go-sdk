@@ -2,6 +2,7 @@ package api
 
 import (
 	"log"
+	"sync"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/structs"
@@ -56,30 +57,46 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		})
 	}
 
+	wg := sync.WaitGroup{}
+	mtx := sync.Mutex{}
+
 	for _, row := range rows {
 
-		newnode := &ultipa.NodeRow{
-			Id:         row.ID,
-			SchemaName: schema.Name,
+		if row == nil {
+			continue
 		}
 
-		for _, prop := range schema.Properties {
-
-			if prop.IsIDType() || prop.IsIgnore() {
-				continue
+		wg.Add(1)
+		go func(row *structs.Node) {
+			defer wg.Done()
+			newnode := &ultipa.NodeRow{
+				Id:         row.ID,
+				SchemaName: schema.Name,
 			}
 
-			bs, err := row.GetBytes(prop.Name)
+			for _, prop := range schema.Properties {
 
-			if err != nil {
-				log.Fatal("Get row bytes value failed ", prop.Name, err)
+				if prop.IsIDType() || prop.IsIgnore() {
+					continue
+				}
+
+				bs, err := row.GetBytes(prop.Name)
+
+				if err != nil {
+					log.Fatal("Get row bytes value failed  ", prop.Name, " ", err)
+				}
+
+				newnode.Values = append(newnode.Values, bs)
 			}
 
-			newnode.Values = append(newnode.Values, bs)
-		}
+			mtx.Lock()
+			table.NodeRows = append(table.NodeRows, newnode)
+			mtx.Unlock()
+		}(row)
 
-		table.NodeRows = append(table.NodeRows, newnode)
 	}
+
+	wg.Wait()
 
 	resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
 		GraphName:  conf.CurrentGraph,

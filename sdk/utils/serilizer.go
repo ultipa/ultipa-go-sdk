@@ -130,9 +130,39 @@ func AsBool(value []byte) bool {
 	}
 }
 
+func GetDefaultNilString(t ultipa.PropertyType) string {
+
+	switch t {
+	case ultipa.PropertyType_INT32:
+		fallthrough
+	case ultipa.PropertyType_INT64:
+		fallthrough
+	case ultipa.PropertyType_UINT32:
+		fallthrough
+	case ultipa.PropertyType_UINT64:
+		fallthrough
+
+	case ultipa.PropertyType_FLOAT:
+		fallthrough
+	case ultipa.PropertyType_DOUBLE:
+		return "0"
+	case ultipa.PropertyType_DATETIME:
+		return "1970-01-01"
+	case ultipa.PropertyType_TIMESTAMP:
+		return "1970-01-01"
+	default:
+		return ""
+	}
+
+}
+
 func StringAsInterface(str string, t ultipa.PropertyType) (interface{}, error) {
 
 	str = strings.Trim(str, " ")
+
+	if str == "" {
+		str = GetDefaultNilString(t)
+	}
 
 	switch t {
 	case ultipa.PropertyType_INT32:
@@ -142,9 +172,9 @@ func StringAsInterface(str string, t ultipa.PropertyType) (interface{}, error) {
 		}
 		return int32(v), err
 	case ultipa.PropertyType_INT64:
-		return strconv.ParseInt(str, 10, 32)
+		return strconv.ParseInt(str, 10, 64)
 	case ultipa.PropertyType_UINT32:
-		v, err := strconv.ParseUint(str, 10, 64)
+		v, err := strconv.ParseUint(str, 10, 32)
 		if err != nil {
 			return nil, err
 		}

@@ -33,7 +33,7 @@ func NewConnection(host string, config *configuration.UltipaConfig) (*Connection
 	}
 
 	if config.Crt == nil {
-		connection.Conn, err = grpc.Dial(host, grpc.WithInsecure(), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(config.MaxRecvSize)))
+		connection.Conn, err = grpc.Dial(host, grpc.WithInsecure(), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(config.MaxRecvSize), grpc.MaxCallSendMsgSize(config.MaxRecvSize)))
 	} else {
 		certPool := x509.NewCertPool()
 		certPool.AppendCertsFromPEM(config.Crt)
