@@ -28,6 +28,11 @@ func (api *UltipaAPI) InsertNodesBatch(table *ultipa.NodeTable, config *configur
 }
 
 func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*structs.Node, config *configuration.RequestConfig) (*ultipa.InsertNodesReply, error) {
+
+	if config == nil {
+		config = &configuration.RequestConfig{}
+	}
+
 	client, conf, err := api.GetClient(config)
 
 	if err != nil {
@@ -101,7 +106,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 	resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
 		GraphName:  conf.CurrentGraph,
 		NodeTable:  table,
-		InsertType: ultipa.InsertType_OVERWRITE,
+		InsertType: config.InsertType,
 		Silent:     true,
 	})
 

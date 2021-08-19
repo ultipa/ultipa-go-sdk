@@ -27,6 +27,11 @@ func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EdgeTable, config *configur
 }
 
 func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*structs.Edge, config *configuration.RequestConfig) (*ultipa.InsertEdgesReply, error) {
+
+	if config == nil {
+		config = &configuration.RequestConfig{}
+	}
+
 	client, conf, err := api.GetClient(config)
 
 	if err != nil {
@@ -81,7 +86,7 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 				bs, err := row.GetBytes(prop.Name)
 
 				if err != nil {
-					log.Fatal("Get row bytes value failed ", prop.Name, " ",err)
+					log.Fatal("Get row bytes value failed ", prop.Name, " ", err)
 				}
 
 				newnode.Values = append(newnode.Values, bs)
@@ -96,10 +101,11 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 	wg.Wait()
 
 	resp, err := client.InsertEdges(ctx, &ultipa.InsertEdgesRequest{
-		GraphName:  conf.CurrentGraph,
-		EdgeTable:  table,
-		InsertType: ultipa.InsertType_OVERWRITE,
-		Silent:     true,
+		GraphName:            conf.CurrentGraph,
+		EdgeTable:            table,
+		InsertType:           config.InsertType,
+		CreateNodeIfNotExist: config.CreateNodeIfNotExist,
+		Silent:               true,
 	})
 
 	return resp, err

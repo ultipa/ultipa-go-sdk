@@ -17,6 +17,8 @@ func ParseStatistic(table *ultipa.Table) (*Statistic, error) {
 
 	stat := Statistic{}
 
+	if table == nil { return &stat , nil }
+
 	kv := map[string]string{}
 
 	for index, header := range table.Headers {

@@ -17,6 +17,7 @@ type RequestConfig struct {
 	Host      string // set for force host test
 	RequestType RequestType
 	InsertType ultipa.InsertType
+	CreateNodeIfNotExist bool
 	Uql string
 }
 
