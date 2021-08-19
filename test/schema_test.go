@@ -88,10 +88,10 @@ func TestCompareSchema(t *testing.T) {
 		{nil, s1, true, false},
 	}
 	for index, pair := range schemaParis {
-		ok,  _ := structs.CompareSchemas(pair.First, pair.Second, false)
+		err, _ := structs.CompareSchemas(pair.First, pair.Second, false)
 
-		if ok != pair.Expect {
-			log.Fatalln("Test Compare schema failed ：", index)
+		if err != nil {
+			log.Fatalln("Test Compare schema failed ：", index, err)
 		}
 	}
 

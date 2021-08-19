@@ -10,7 +10,7 @@ import (
 func TestUQL(t *testing.T) {
 
 	//client, _ := GetClient([]string{"210.13.32.146:40101"}, "default")
-	client, _ := GetClient([]string{"210.13.32.146:60075"}, "default")
+	client, _ := GetClient([]string{"210.13.32.146:60075"}, "multi_schema_test")
 
 	InitCases()
 
@@ -33,6 +33,7 @@ func TestUQL(t *testing.T) {
 		for _, a := range c.Alias {
 			dataitem := resp.Alias(a)
 			printers.PrintAny(dataitem)
+			log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
 
 		}
 	}

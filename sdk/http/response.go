@@ -28,19 +28,27 @@ func NewUQLResponse(resp ultipa.UltipaRpcs_UqlClient) (response *UQLResponse, er
 	response = &UQLResponse{
 		Resp:   resp,
 		Status: &Status{},
+		//Reply:  &ultipa.UqlReply{},
 		DataItemMap: map[string]struct {
 			DataItem *DataItem
 			Index    int
 		}{},
 	}
-
 	for {
+
 		record, err := resp.Recv()
 
 		if err == io.EOF {
 			break
 		} else if err != nil {
 			return nil, err
+		}
+
+		if response.Statistic == nil {
+			response.Statistic, err = ParseStatistic(record.Statistics)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		if response.Reply == nil {
@@ -56,10 +64,13 @@ func NewUQLResponse(resp ultipa.UltipaRpcs_UqlClient) (response *UQLResponse, er
 			return response, nil
 		}
 	}
+
 	var aliasList []string
+
 	for _, alias := range response.Reply.Alias {
 		aliasList = append(aliasList, alias.GetAlias())
 	}
+
 	response.AliasList = aliasList
 
 	return response, nil

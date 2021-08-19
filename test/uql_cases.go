@@ -20,10 +20,10 @@ func InitCases() {
 		//	UQL:   "find().nodes() as nodes return nodes limit 10",
 		//	Alias: []string{"nodes"},
 		//},
-		&Case{
-			UQL:   "exec task show().graph()",
-			Alias: []string{"_graph"},
-		},
+		//&Case{
+		//	UQL:   "exec task show().graph()",
+		//	Alias: []string{"_graph"},
+		//},
 		//&Case{
 		//	UQL:   "show().schema()",
 		//	Alias: []string{"_nodeSchema", "_edgeSchema"},
@@ -53,10 +53,10 @@ func InitCases() {
 		//	UQL:   "find().nodes({@amz}) as nodes return count(nodes) as totalName;",
 		//	Alias: []string{"totalName"},
 		//
-		//&Case{
-		//	UQL:   "find().nodes({@amz}) as nodes return count(nodes) as totalName;",
-		//	Alias: []string{"totalName"},
-		//},
+		&Case{
+			UQL:   "find().nodes() as nodes return count(distinct(nodes.name)) as totalName;",
+			Alias: []string{"totalName"},
+		},
 
 
 	)
