@@ -8,16 +8,19 @@ import (
 
 // 存储返回的统计信息
 type Statistic struct {
-	RowAffected int `key:"rows_affected" type:"int"`
-	TotalCost   int `key:"total_time_cost" type:"int"`
-	EngineCost  int `key:"engine_time_cost" type:"int"`
+	NodeAffected int `key:"node_affected" type:"int"`
+	EdgeAffected int `key:"edge_affected" type:"int"`
+	TotalCost    int `key:"total_time_cost" type:"int"`
+	EngineCost   int `key:"engine_time_cost" type:"int"`
 }
 
 func ParseStatistic(table *ultipa.Table) (*Statistic, error) {
 
 	stat := Statistic{}
 
-	if table == nil { return &stat , nil }
+	if table == nil {
+		return &stat, nil
+	}
 
 	kv := map[string]string{}
 
