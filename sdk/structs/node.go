@@ -1,10 +1,10 @@
 package structs
 
 import (
+	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/types"
 	"ultipa-go-sdk/sdk/utils"
 )
-
 
 type Node struct {
 	Name   string
@@ -47,4 +47,23 @@ func (node *Node) Set(key string, value interface{}) error {
 	//todo: check value type
 	node.Values.Set(key, value)
 	return nil
+}
+
+func NewNode() *Node {
+	return &Node{Values: NewValues()}
+}
+
+func NewNodeFromNodeRow(schema *Schema, nodeRow *ultipa.NodeRow) *Node {
+	newNode := NewNode()
+
+	newNode.ID = nodeRow.Id
+	newNode.UUID = nodeRow.Uuid
+	newNode.Name = nodeRow.SchemaName
+
+	for index, v := range nodeRow.GetValues() {
+		prop := schema.Properties[index]
+		newNode.Values.Set(prop.Name, utils.ConvertBytesToInterface(v, prop.Type))
+	}
+
+	return newNode
 }

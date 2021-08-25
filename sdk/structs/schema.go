@@ -29,6 +29,31 @@ func (s *Schema) GetProperty(name string) *Property {
 	return nil
 }
 
+func NewSchemaMapFromProtoSchema(schemas []*ultipa.Schema, DBType ultipa.DBType) map[string]*Schema {
+	m := map[string]*Schema{}
+
+	for _, s := range schemas {
+		schema := ConvertProtoSchemaToSdkSchema(s, DBType)
+		m[s.SchemaName] = schema
+	}
+
+	return m
+}
+
+func ConvertProtoSchemaToSdkSchema(pSchema *ultipa.Schema, DBType ultipa.DBType) *Schema {
+	s := NewSchema(pSchema.SchemaName)
+
+	s.DBType = DBType
+	for _, prop := range pSchema.Properties {
+		s.Properties = append(s.Properties, &Property{
+			Name: prop.PropertyName,
+			Type: prop.PropertyType,
+		})
+	}
+
+	return s
+}
+
 // compare 2 schema is same, or is able to fit schema1 to schema2
 // schema1 is new schema
 // schema2 is server side schema
