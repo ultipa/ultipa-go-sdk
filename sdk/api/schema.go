@@ -48,6 +48,30 @@ func (api *UltipaAPI) ListNodeSchema(config *configuration.RequestConfig) (*http
 	}, nil
 }
 
+func (api *UltipaAPI) ListSchema(DBType ultipa.DBType, config *configuration.RequestConfig) ([]*structs.Schema, error) {
+	var resp *http.UQLResponse
+	var err error
+	var schemas []*structs.Schema
+
+	if DBType == ultipa.DBType_DBNODE {
+		resp, err = api.UQL(fmt.Sprintf(`show().node_schema()`), config)
+	} else if DBType == ultipa.DBType_DBEDGE {
+		resp, err = api.UQL(fmt.Sprintf(`show().edge_schema()`), config)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
+
+	if len(schemas) == 0 {
+		return nil, err
+	}
+
+	return schemas, err
+}
+
 func (api *UltipaAPI) GetSchema(schemaName string, DBType ultipa.DBType, config *configuration.RequestConfig) (*structs.Schema, error) {
 
 	if DBType == ultipa.DBType_DBNODE {
