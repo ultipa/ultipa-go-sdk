@@ -55,15 +55,19 @@ func (api *UltipaAPI) ListSchema(DBType ultipa.DBType, config *configuration.Req
 
 	if DBType == ultipa.DBType_DBNODE {
 		resp, err = api.UQL(fmt.Sprintf(`show().node_schema()`), config)
+		if err != nil {
+			return nil, err
+		}
+
+		schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 	} else if DBType == ultipa.DBType_DBEDGE {
 		resp, err = api.UQL(fmt.Sprintf(`show().edge_schema()`), config)
-	}
+		if err != nil {
+			return nil, err
+		}
 
-	if err != nil {
-		return nil, err
+		schemas, err = resp.Alias(http.RESP_EDGE_SCHEMA_KEY).AsSchemas()
 	}
-
-	schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 
 	if len(schemas) == 0 {
 		return nil, err
