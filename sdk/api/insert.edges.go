@@ -73,7 +73,9 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 
 			newnode := &ultipa.EdgeRow{
 				FromId:     row.From,
+				FromUuid: row.FromUUID,
 				ToId:       row.To,
+				ToUuid: row.ToUUID,
 				SchemaName: schema.Name,
 			}
 

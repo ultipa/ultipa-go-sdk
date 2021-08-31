@@ -76,6 +76,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 			defer wg.Done()
 			newnode := &ultipa.NodeRow{
 				Id:         row.ID,
+				Uuid:       row.UUID,
 				SchemaName: schema.Name,
 			}
 
