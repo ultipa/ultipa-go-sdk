@@ -103,6 +103,11 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 		return nil, err
 	}
 
+
+	if config.Host != "" {
+		return uqlResp, err
+	}
+
 	if uqlResp.NeedRedirect() {
 		err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
 		if err != nil {
