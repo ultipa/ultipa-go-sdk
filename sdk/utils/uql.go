@@ -22,12 +22,12 @@ var WriteUqlCommandKeys = []string{
 }
 
 func GetUqlRegExpMatcher(fnNames []string) *regexp.Regexp {
-	return regexp.MustCompile(`(\s*|^)` + `(` + strings.Join(fnNames, "|") + `)\s*`)
+	return regexp.MustCompile(`(?i)(\s*|^|\n)(` + strings.Join(fnNames, "|")  + `)\(`)
 }
 
 func NewUql(uql string) *UqlItem {
 	return &UqlItem{
-		Uql: []byte(strings.ToLower(uql)),
+		Uql: []byte(uql),
 	}
 }
 
@@ -35,6 +35,7 @@ func (t *UqlItem) HasWith() bool {
 	matcher := GetUqlRegExpMatcher([]string{"with"})
 	return matcher.Match(t.Uql)
 }
+
 func (t *UqlItem) HasWrite() bool {
 	matcher := GetUqlRegExpMatcher(WriteUqlCommandKeys)
 	return matcher.Match(t.Uql)

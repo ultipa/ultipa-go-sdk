@@ -10,7 +10,7 @@ import (
 func TestUQL(t *testing.T) {
 
 	//client, _ := GetClient([]string{"210.13.32.146:40101"}, "default")
-	client, _ := GetClient([]string{"210.13.32.146:60075"}, "multi_schema_test")
+	client, _ := GetClient([]string{"192.168.1.86:40109"}, "GO_SDK_TEST")
 
 	InitCases()
 

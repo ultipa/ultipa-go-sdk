@@ -41,17 +41,16 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 			if err != nil {
 				return nil, nil, err
 			}
-		} else {
-			if api.Pool.IsRaft {
-				if UqlItem.HasWrite() {
-					conn, err = api.Pool.GetMasterConn(conf)
-				} else if UqlItem.HasExecTask() {
-					conn, err = api.Pool.GetAnalyticsConn(conf)
-				}
+
+		// if is raft mode, check if contains CUD ops or exec task
+		} else if api.Pool.IsRaft {
+			if UqlItem.HasWrite() {
+				conn, err = api.Pool.GetMasterConn(conf)
+			} else if UqlItem.HasExecTask() {
+				conn, err = api.Pool.GetAnalyticsConn(conf)
 			}
 		}
 
-		// Check if Write
 	}
 
 	if conn == nil {
@@ -102,7 +101,6 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 	if err != nil {
 		return nil, err
 	}
-
 
 	if config.Host != "" {
 		return uqlResp, err
