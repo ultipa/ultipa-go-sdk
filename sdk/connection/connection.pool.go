@@ -18,6 +18,10 @@ type GraphClusterInfo struct {
 	LastAlgoIndex int //记录上次使用的 Task 节点索引
 }
 
+//func (gci *GraphClusterInfo) HasLeader() bool {
+//
+//}
+
 func (gci *GraphClusterInfo) AddFollower(conn *Connection) {
 
 	gci.Graph = conn.Host
@@ -175,10 +179,15 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 			pool.Connections[resp.Status.ClusterInfo.Redirect], err = NewConnection(resp.Status.ClusterInfo.Redirect, pool.Config)
 		}
 
-		pool.GraphInfos[graphName] = &GraphClusterInfo{
-			Graph:  graphName,
-			Leader: pool.Connections[resp.Status.ClusterInfo.Redirect],
+		if pool.GraphInfos[graphName] == nil {
+			pool.GraphInfos[graphName] = &GraphClusterInfo{
+				Graph:  graphName,
+				Leader: pool.Connections[resp.Status.ClusterInfo.Redirect],
+			}
+		} else {
+			pool.GraphInfos[graphName].Leader = pool.Connections[resp.Status.ClusterInfo.Redirect]
 		}
+
 
 		return pool.RefreshClusterInfo(graphName)
 	}
