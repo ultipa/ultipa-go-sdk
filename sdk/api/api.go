@@ -44,7 +44,7 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 
 		// if is raft mode, check if contains CUD ops or exec task
 		} else if api.Pool.IsRaft {
-			if UqlItem.HasWrite() {
+			if UqlItem.HasWrite() || config.UseMaster {
 				conn, err = api.Pool.GetMasterConn(conf)
 			} else if UqlItem.HasExecTask() {
 				conn, err = api.Pool.GetAnalyticsConn(conf)

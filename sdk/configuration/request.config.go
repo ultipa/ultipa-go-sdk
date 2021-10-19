@@ -15,6 +15,7 @@ type RequestConfig struct {
 	Timeout   uint32
 	ClusterId string
 	Host      string // set for force host test
+	UseMaster bool
 	RequestType RequestType
 	InsertType ultipa.InsertType
 	CreateNodeIfNotExist bool

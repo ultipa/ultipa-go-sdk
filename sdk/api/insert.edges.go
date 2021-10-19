@@ -9,6 +9,8 @@ import (
 )
 
 func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EdgeTable, config *configuration.RequestConfig) (*ultipa.InsertEdgesReply, error) {
+
+	config.UseMaster = true
 	client, conf, err := api.GetClient(config)
 
 	if err != nil {

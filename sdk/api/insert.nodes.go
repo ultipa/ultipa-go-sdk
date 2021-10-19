@@ -10,6 +10,7 @@ import (
 
 func (api *UltipaAPI) InsertNodesBatch(table *ultipa.NodeTable, config *configuration.RequestConfig) (*ultipa.InsertNodesReply, error) {
 
+	config.UseMaster = true
 	client, conf, err := api.GetClient(config)
 
 	if err != nil {
