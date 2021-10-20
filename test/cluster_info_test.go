@@ -23,7 +23,7 @@ func TestRefreshClusterInfo(t *testing.T) {
 
 	for i := 0; i < 10;  i++ {
 		client.Pool.RefreshClusterInfo("global")
-		utils.PrintJSON(client.Pool.GraphInfos)
+		utils.PrintJSON(client.Pool.GraphMgr)
 	}
 
 }

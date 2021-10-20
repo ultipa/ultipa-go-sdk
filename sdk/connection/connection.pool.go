@@ -18,60 +18,9 @@ type GraphClusterInfo struct {
 	LastAlgoIndex int //记录上次使用的 Task 节点索引
 }
 
-//func (gci *GraphClusterInfo) HasLeader() bool {
-//
-//}
-
-func (gci *GraphClusterInfo) AddFollower(conn *Connection) {
-
-	gci.Graph = conn.Host
-
-	if gci.HasConn(conn) == true {
-		return
-	}
-
-	gci.Followers = append(gci.Followers, conn)
-
-	if conn.HasRole(ultipa.FollowerRole_ROLE_ALGO_EXECUTABLE) {
-		gci.Algos = append(gci.Algos, conn)
-	}
-
-}
-
-func (gci *GraphClusterInfo) ClearFollower() {
-	gci.Followers = []*Connection{}
-	gci.Algos = []*Connection{}
-}
-
-func (gci *GraphClusterInfo) GetAnalyticConn() (*Connection, error) {
-
-	if len(gci.Algos) == 0 {
-		return nil, errors.New("no Algo/Task Instance Found")
-	}
-
-	gci.LastAlgoIndex++
-
-	return gci.Algos[gci.LastAlgoIndex%len(gci.Algos)], nil
-}
-
-func (gci *GraphClusterInfo) HasConn(_conn *Connection) bool {
-
-	if gci.Leader == _conn {
-		return true
-	}
-
-	for _, conn := range gci.Followers {
-		if conn == _conn {
-			return true
-		}
-	}
-
-	return false
-}
-
 // handle all connections
 type ConnectionPool struct {
-	GraphInfos  map[string]*GraphClusterInfo // graph name : ClusterInfo
+	GraphMgr    *GraphManager // graph name : ClusterInfo
 	Config      *configuration.UltipaConfig
 	Connections map[string]*Connection // Host : Connection
 	RandomTick  int
@@ -88,7 +37,7 @@ func NewConnectionPool(config *configuration.UltipaConfig) (*ConnectionPool, err
 	pool := &ConnectionPool{
 		Config:      config,
 		Connections: map[string]*Connection{},
-		GraphInfos:  map[string]*GraphClusterInfo{},
+		GraphMgr:    NewGraphManager(),
 	}
 
 	// Init Cluster Manager
@@ -151,10 +100,10 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 
 	var conn *Connection
 	var err error
-	if pool.GraphInfos[graphName] == nil || pool.GraphInfos[graphName].Leader == nil {
+	if pool.GraphMgr.GetLeader(graphName) == nil {
 		conn, err = pool.GetConn(nil)
 	} else {
-		conn = pool.GraphInfos[graphName].Leader
+		conn = pool.GraphMgr.GetLeader(graphName)
 	}
 
 	if err != nil {
@@ -179,31 +128,19 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 			pool.Connections[resp.Status.ClusterInfo.Redirect], err = NewConnection(resp.Status.ClusterInfo.Redirect, pool.Config)
 		}
 
-		if pool.GraphInfos[graphName] == nil {
-			pool.GraphInfos[graphName] = &GraphClusterInfo{
-				Graph:  graphName,
-				Leader: pool.Connections[resp.Status.ClusterInfo.Redirect],
-			}
-		} else {
-			pool.GraphInfos[graphName].Leader = pool.Connections[resp.Status.ClusterInfo.Redirect]
-		}
-
+		pool.SetMasterConn(graphName, pool.Connections[resp.Status.ClusterInfo.Redirect])
 
 		return pool.RefreshClusterInfo(graphName)
 	}
 
 	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		// not raft mode
 		log.Println(resp.Status.Msg)
 	} else {
 		pool.IsRaft = true
-		if pool.GraphInfos[graphName] == nil {
-			pool.GraphInfos[graphName] = &GraphClusterInfo{
-				Graph:  graphName,
-				Leader: pool.Connections[resp.Status.ClusterInfo.Redirect],
-			}
-		}
-
-		pool.GraphInfos[graphName].ClearFollower()
+		c := pool.Connections[resp.Status.ClusterInfo.LeaderAddress]
+		pool.GraphMgr.SetLeader(graphName, c)
+		pool.GraphMgr.ClearFollower(graphName)
 
 		for _, follower := range resp.Status.ClusterInfo.Followers {
 			fconn := pool.Connections[follower.Address]
@@ -221,7 +158,7 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 			fconn.Host = follower.Address
 			fconn.Active = follower.Status
 			fconn.SetRoleFromInt32(follower.Role)
-			pool.GraphInfos[graphName].AddFollower(fconn)
+			pool.GraphMgr.AddFollower(graphName, fconn)
 		}
 	}
 
@@ -241,7 +178,7 @@ func (pool *ConnectionPool) GetConn(config *configuration.UltipaConfig) (*Connec
 // Get master client
 func (pool *ConnectionPool) GetMasterConn(config *configuration.UltipaConfig) (*Connection, error) {
 
-	if pool.GraphInfos[config.CurrentGraph] == nil || pool.GraphInfos[config.CurrentGraph].Leader == nil {
+	if pool.GraphMgr.GetLeader(config.CurrentGraph) == nil {
 		err := pool.RefreshClusterInfo(config.CurrentGraph)
 
 		if err != nil {
@@ -249,8 +186,13 @@ func (pool *ConnectionPool) GetMasterConn(config *configuration.UltipaConfig) (*
 		}
 	}
 
-	return pool.GraphInfos[config.CurrentGraph].Leader, nil
+	return pool.GraphMgr.GetLeader(config.CurrentGraph), nil
 
+}
+
+//SetMasterConn (graphName , *conn) Set master client
+func (pool *ConnectionPool) SetMasterConn(graphName string, conn *Connection) {
+	pool.GraphMgr.SetLeader(graphName, conn)
 }
 
 // Get random client
@@ -267,14 +209,14 @@ func (pool *ConnectionPool) GetRandomConn(config *configuration.UltipaConfig) (*
 // Get Task/Analytics client
 func (pool *ConnectionPool) GetAnalyticsConn(config *configuration.UltipaConfig) (*Connection, error) {
 
-	gci := pool.GraphInfos[config.CurrentGraph]
+	gci := pool.GraphMgr.GetGraph(config.CurrentGraph)
 
 	if gci == nil {
 		err := pool.RefreshClusterInfo(config.CurrentGraph)
 		if err != nil {
 			return nil, err
 		}
-		gci = pool.GraphInfos[config.CurrentGraph]
+		gci = pool.GraphMgr.GetGraph(config.CurrentGraph)
 	}
 
 	return gci.GetAnalyticConn()
