@@ -17,7 +17,7 @@ func TestMain(m *testing.M) {
 
 
 	hosts = []string{
-		"210.13.32.146:60075",
+		"210.13.32.146:60074",
 	}
 	//client, err = GetClient([]string {
 	//
@@ -33,6 +33,7 @@ func TestMain(m *testing.M) {
 
 
 func TestPing(t *testing.T) {
+	client, _ = GetClient(hosts, "default")
 	client.Test()
 }
 
