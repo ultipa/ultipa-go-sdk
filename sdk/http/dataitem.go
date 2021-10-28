@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"strconv"
 	ultipa "ultipa-go-sdk/rpc"
@@ -257,7 +258,7 @@ func (di *DataItem) AsGraphs() (graphs []*structs.Graph, err error) {
 
 	table := di.Data.(*ultipa.Table)
 
-	if table.TableName != "_graph" {
+	if table.TableName != RESP_GRAPH_KEY {
 		return nil, errors.New("DataItem " + di.Alias + " is not a Graph list")
 	}
 
@@ -289,7 +290,7 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 
 	table := di.Data.(*ultipa.Table)
 
-	if table.TableName != "_nodeSchema" && table.TableName != "_edgeSchema" {
+	if table.TableName != RESP_NODE_SCHEMA_KEY && table.TableName != RESP_EDGE_SCHEMA_KEY {
 		return nil, errors.New("DataItem " + di.Alias + " is not a Schema list")
 	}
 
@@ -298,10 +299,10 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 	// store index to get total number
 	TotalIndex := 0
 	switch table.TableName {
-	case "_nodeSchema":
+	case RESP_NODE_SCHEMA_KEY:
 		Type = "node"
 		TotalIndex = 3
-	case "_edgeSchema":
+	case RESP_EDGE_SCHEMA_KEY:
 		Type = "edge"
 		TotalIndex = 4
 	}
@@ -347,4 +348,34 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 	}
 
 	return schemas, err
+}
+
+func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table(algo) as pre-condition")
+	}
+
+	table, err := di.AsTable()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var algos []*structs.Algo
+
+	algoDatas := table.ToKV()
+
+	for _, algoData := range algoDatas {
+
+		algo, err := structs.NewAlgo(algoData.Data["name"].(string), algoData.Data["param"].(string))
+
+		if err != nil {
+			return nil, errors.New(fmt.Sprint(err.Error(), algoData))
+		}
+
+		algos = append(algos, algo)
+	}
+
+	return algos, nil
 }

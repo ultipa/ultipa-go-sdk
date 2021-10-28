@@ -5,6 +5,7 @@ import (
 	"strings"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/http"
+	//"ultipa-go-sdk/sdk/http"
 )
 
 func PrintAny(dataitem *http.DataItem) {
@@ -18,7 +19,7 @@ func PrintAny(dataitem *http.DataItem) {
 		res, err := dataitem.AsTable()
 
 		// handle schema table
-		if strings.Contains(res.Name, "_nodeSchema") || strings.Contains(res.Name, "_edgeSchema"){
+		if strings.Contains(res.Name, http.RESP_NODE_SCHEMA_KEY) || strings.Contains(res.Name, http.RESP_EDGE_SCHEMA_KEY) {
 			schemas, err := dataitem.AsSchemas()
 
 			if err != nil {
@@ -29,6 +30,18 @@ func PrintAny(dataitem *http.DataItem) {
 			return
 		}
 
+		// handle algo table
+		if strings.Contains(res.Name, http.RESP_ALGOS_KEY) {
+			algos, err := dataitem.AsAlgos()
+
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+			PrintAlgoList(algos)
+			return
+
+		}
 
 		if err != nil {
 			log.Fatalln(err)
