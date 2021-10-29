@@ -7,6 +7,7 @@ import (
 
 type AlgoJsonStruct struct {
 	Name string
+	Version string
 	Description string
 	Parameters map[string]string
 }
@@ -19,6 +20,7 @@ type AlgoParam struct {
 type Algo struct {
 	Name   string
 	Desc string
+	Version string
 	Params map[string]*AlgoParam
 }
 
@@ -46,6 +48,7 @@ func NewAlgo(name string, paramString string) (*Algo, error) {
 	}
 
 	algo.Desc = algoJsonStruct.Description
+	algo.Version = algoJsonStruct.Version
 
 	return algo, nil
 }

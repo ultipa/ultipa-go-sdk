@@ -370,6 +370,7 @@ func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {
 
 		algo, err := structs.NewAlgo(algoData.Data["name"].(string), algoData.Data["param"].(string))
 
+
 		if err != nil {
 			return nil, errors.New(fmt.Sprint(err.Error(), algoData))
 		}

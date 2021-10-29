@@ -13,6 +13,9 @@ func PrintAlgoList(algos []*structs.Algo) {
 			Text: "Algo Name",
 		},
 		{
+			Text: "Version",
+		},
+		{
 			Text: "Description",
 		},
 		{
@@ -28,6 +31,9 @@ func PrintAlgoList(algos []*structs.Algo) {
 			},
 			{
 				Text: algo.Desc,
+			},
+			{
+				Text: algo.Version,
 			},
 			{
 				Text: algo.ParamsToString(),
