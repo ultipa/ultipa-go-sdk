@@ -111,7 +111,7 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 	}
 
 	ctx, _ := pool.NewContext(&configuration.RequestConfig{GraphName: graphName})
-	client := conn.GetClient()
+	client := conn.GetControlClient()
 	resp, err := client.GetLeader(ctx, &ultipa.GetLeaderRequest{})
 
 	if resp == nil || err != nil {

@@ -54,6 +54,10 @@ func (conn *Connection) GetClient() ultipa.UltipaRpcsClient {
 	return ultipa.NewUltipaRpcsClient(conn.Conn)
 }
 
+func (conn *Connection) GetControlClient() ultipa.UltipaControlsClient {
+	return ultipa.NewUltipaControlsClient(conn.Conn)
+}
+
 func (conn *Connection) SetRole(role ultipa.FollowerRole) {
 	conn.Role = role
 }

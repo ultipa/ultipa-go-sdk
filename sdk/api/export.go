@@ -11,7 +11,7 @@ import (
 func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, config *configuration.RequestConfig, cb func(nodes []*structs.Node, edges []*structs.Edge) error) error {
 	var err error
 
-	client, _, err := api.GetClient(config)
+	client, _, err := api.GetControlClient(config)
 
 	if err != nil {
 		return err

@@ -15,6 +15,14 @@ type UltipaAPI struct {
 	Config *configuration.UltipaConfig
 }
 
+type ClientType int
+
+const (
+	ClientTypeGeneral ClientType = 1
+	ClientTypeControl ClientType = 2
+)
+
+
 func NewUltipaAPI(pool *connection.ConnectionPool) *UltipaAPI {
 
 	api := &UltipaAPI{
@@ -25,7 +33,7 @@ func NewUltipaAPI(pool *connection.ConnectionPool) *UltipaAPI {
 	return api
 }
 
-func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.UltipaRpcsClient, *configuration.UltipaConfig, error) {
+func (api *UltipaAPI) GetConn(config *configuration.RequestConfig) (*connection.Connection, *configuration.UltipaConfig, error) {
 	var err error
 	var conn *connection.Connection
 
@@ -39,10 +47,10 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 		if config.Host != "" {
 			conn, err = connection.NewConnection(config.Host, conf)
 			if err != nil {
-				return nil, nil, err
+				return  nil, nil, err
 			}
 
-		// if is raft mode, check if contains CUD ops or exec task
+			// if is raft mode, check if contains CUD ops or exec task
 		} else if api.Pool.IsRaft {
 			if UqlItem.HasWrite() || config.UseMaster {
 				conn, err = api.Pool.GetMasterConn(conf)
@@ -56,7 +64,7 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 	if conn == nil {
 		conn, err = api.Pool.GetConn(conf)
 		if err != nil {
-			return nil, nil, err
+			return nil,nil, err
 		}
 	}
 
@@ -64,7 +72,29 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 		return nil, conf, err
 	}
 
+	return conn, conf, nil
+}
+
+func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.UltipaRpcsClient, *configuration.UltipaConfig, error) {
+
+	conn, conf, err := api.GetConn(config)
+
+	if err != nil {
+		return nil, conf, err
+	}
 	client := conn.GetClient()
+
+	return client, conf, nil
+}
+
+func (api *UltipaAPI) GetControlClient(config *configuration.RequestConfig) (ultipa.UltipaControlsClient, *configuration.UltipaConfig, error) {
+
+	conn, conf, err := api.GetConn(config)
+
+	if err != nil {
+		return nil, conf, err
+	}
+	client := conn.GetControlClient()
 
 	return client, conf, nil
 }

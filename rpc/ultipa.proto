@@ -6,48 +6,50 @@ option go_package = ".;ultipa";
 
 // The ultipa service definition.
 service UltipaRpcs {
-  // 1.Sends a greeting
+  //1.Sends a greeting
   rpc SayHello (HelloUltipaRequest) returns (HelloUltipaReply) {
   }
-
   //2.uql
   rpc Uql (UqlRequest) returns (stream UqlReply) {
   }
 
-  //3.用户设置(用于存储用户配置信息,用户自主控制)
-  rpc UserSetting (UserSettingRequest) returns (UserSettingReply) {
-  }
-
-  //4.下载算法生成文件
-  rpc DownloadFile (DownloadFileRequest) returns (stream DownloadFileReply) {
-  }
-
-  //5.导出点,边数据
-  rpc Export (ExportRequest) returns (stream ExportReply) {
-  }
-
-  //6. 获取raft的leader
-  rpc GetLeader (GetLeaderRequest) returns (GetLeaderReply) {
-  }
-
-  //7.插入点
+  //3.插入点
   rpc InsertNodes (InsertNodesRequest) returns (InsertNodesReply) {
   }
 
-  //8.插入边
+  //4.插入边
   rpc InsertEdges (InsertEdgesRequest) returns (InsertEdgesReply) {
   }
+}
 
-  //9.uql扩展，以下命令在此接口执行执行 top, kill showTask, stopTask,clearTask show() stat listGraph
-  // listAlgo getGraph createPolicy, deletePolicy, listPolicy, getPolicy,
-  // grant, revoke, listPrivilege, getUser, getSelfInfo, createUser, updateUser, deleteUser, showIndex
+// 不被阻塞/无锁
+service UltipaControls{
+  //1.Sends a greeting
+  rpc SayHello (HelloUltipaRequest) returns (HelloUltipaReply) {
+  }
+  //2.用户设置(用于存储用户配置信息,用户自主控制)
+  rpc UserSetting (UserSettingRequest) returns (UserSettingReply) {
+  }
+  //3. 获取raft的leader
+  rpc GetLeader (GetLeaderRequest) returns (GetLeaderReply) {
+  }
+  //4.uql扩展，以下命令在此接口执行执行 top, kill show().*
   rpc UqlEx (UqlRequest) returns (stream UqlReply) {
   }
-
-  //10.下载算法生成文件 v2 下载文件请求改为 算法名 + 任务号
+  //5.导出点,边数据
+  rpc Export (ExportRequest) returns (stream ExportReply) {
+  }
+  //6.下载算法生成文件
+  //下载算法生成文件 v2 下载文件请求改为 算法名 + 任务号
   rpc DownloadFileV2 (DownloadFileRequestV2) returns (stream DownloadFileReply) {
   }
 
+  //7.算法安装
+  rpc InstallAlgo (stream InstallAlgoRequest) returns (InstallAlgoReply){
+  }
+  //8.算法卸载
+  rpc UninstallAlgo (UninstallAlgoRequest) returns (UninstallAlgoReply){
+  }
 }
 
 /*------------------------1.SayHello------------------------------*/
@@ -160,12 +162,9 @@ message UserSettingReply {
 
 /*------------------------4.Download------------------------------*/
 //下载算法生成文件
-message DownloadFileRequest {
-  string file_path_name = 1;
-}
 message DownloadFileRequestV2 {
   string algo_name = 1;
-  uint64 task_id = 2;
+  uint64 task_id = 2 [jstype = JS_STRING];
 }
 message DownloadFileReply {
   Status status = 1;
@@ -176,7 +175,8 @@ message DownloadFileReply {
 
 /*------------------------5.Export------------------------------*/
 //导出数据
-//limit <= 0 全量导出
+// limit < 0 全量导出
+// limit >= 0 导出limit条
 message ExportRequest {
   DBType db_type = 1;
   int32 limit = 2;
@@ -218,7 +218,7 @@ message InsertNodesReply {
   Status status = 1;
   int32 time_cost = 2;
   int32 engine_time_cost = 3;
-  repeated uint64 uuids = 4;
+  repeated uint64 uuids = 4 [jstype = JS_STRING];
   repeated string ids = 5;
   repeated uint32 ignore_indexes = 6;
 }
@@ -238,10 +238,32 @@ message InsertEdgesReply {
   Status status = 1;
   int32 time_cost = 2;
   int32 engine_time_cost = 3;
-  repeated uint64 uuids = 4;
+  repeated uint64 uuids = 4 [jstype = JS_STRING];
   repeated uint32 ignore_indexes = 5;
 }
 /*------------------------InsertEdges------------------------------*/
+
+/*------------------------10.InstallAlgo------------------------------*/
+message InstallAlgoRequest {
+  string file_name = 1;
+  string md5 = 2;
+  bytes chunk = 3;
+}
+
+message InstallAlgoReply {
+  Status status = 1;
+}
+/*------------------------InstallAlgo------------------------------*/
+
+/*------------------------11.UninstallAlgo------------------------------*/
+message UninstallAlgoRequest {
+  string algo_name = 1;
+}
+
+message UninstallAlgoReply {
+  Status status = 1;
+}
+/*------------------------UninstallAlgo------------------------------*/
 
 /*------------------------public message-----------------------*/
 
@@ -344,17 +366,17 @@ message EdgeTable {
 }
 
 message NodeRow {
-  uint64 uuid = 1;
+  uint64 uuid = 1 [jstype = JS_STRING];
   string id = 2;
   string schema_name = 3;
   repeated bytes values = 4;
 }
 
 message EdgeRow {
-  uint64 uuid = 1;
+  uint64 uuid = 1 [jstype = JS_STRING];
   string schema_name = 2;
-  uint64 from_uuid = 3;
-  uint64 to_uuid = 4;
+  uint64 from_uuid = 3 [jstype = JS_STRING];
+  uint64 to_uuid = 4 [jstype = JS_STRING];
   string from_id = 5;
   string to_id = 6;
   repeated bytes values = 7;
