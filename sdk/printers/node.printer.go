@@ -31,6 +31,13 @@ func PrintNodes(nodes []*structs.Node, schemas map[string]*structs.Schema) {
 		}
 
 		node.Values.ForEach(func(v interface{}, key string) error {
+			//vv, err := strconv.Unquote(`"` + fmt.Sprint(v) + `"`)
+
+			//if err != nil {
+			//	PrintError("[ERROR] Node Printer: " + err.Error())
+			//}
+
+			//r = append(r, &simpletable.Cell{Align: simpletable.AlignCenter, Text: vv})
 			r = append(r, &simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(v)})
 			return nil
 		}, nil)

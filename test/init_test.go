@@ -17,7 +17,7 @@ func TestMain(m *testing.M) {
 
 
 	hosts = []string{
-		"210.13.32.146:60074",
+		"210.13.32.147:60095",
 	}
 	//client, err = GetClient([]string {
 	//

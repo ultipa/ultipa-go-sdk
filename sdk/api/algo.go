@@ -11,7 +11,7 @@ import (
 	"ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) ListAlgo(req *configuration.RequestConfig) ([]*structs.Algo, error) {
+func (api *UltipaAPI) ShowAlgo(req *configuration.RequestConfig) ([]*structs.Algo, error) {
 
 	resp, err := api.UQL("show().algo()", req)
 
