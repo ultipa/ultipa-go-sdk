@@ -41,7 +41,7 @@ func PrintUqlErr(errmsg string) {
 	endIndex--
 	end := int(endIndex)
 
-	log.Println(uql, startIndex, endIndex)
+	//log.Println(uql, startIndex, endIndex)
 
 	color.NoColor = false
 	style := color.New(color.FgHiRed).Add(color.Underline).Add(color.Bold).SprintFunc()
