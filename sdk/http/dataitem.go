@@ -380,3 +380,24 @@ func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {
 
 	return algos, nil
 }
+
+func (di *DataItem) AsAny() (interface{}, error) {
+
+	switch di.Type {
+	case ultipa.ResultType_RESULT_TYPE_ATTR:
+		return di.AsAttr()
+	case ultipa.ResultType_RESULT_TYPE_ARRAY:
+		return di.AsArray()
+	case ultipa.ResultType_RESULT_TYPE_EDGE:
+		edges, _, err := di.AsEdges()
+		return edges, err
+	case ultipa.ResultType_RESULT_TYPE_NODE:
+		nodes, _, err := di.AsNodes()
+		return nodes, err
+	case ultipa.ResultType_RESULT_TYPE_TABLE:
+		return di.AsTable()
+	default:
+		return di.Data, nil
+	}
+
+}
