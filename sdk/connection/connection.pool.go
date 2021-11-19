@@ -85,11 +85,15 @@ func (pool *ConnectionPool) RefreshActives() {
 		})
 
 		if err != nil {
+			conn.Active = ultipa.ServerStatus_DEAD
 			continue
 		}
 
 		if resp.Status == nil || resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS {
+			conn.Active = ultipa.ServerStatus_ALIVE
 			pool.Actives = append(pool.Actives, conn)
+		} else {
+			conn.Active = ultipa.ServerStatus_DEAD
 		}
 
 	}
