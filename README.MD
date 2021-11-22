@@ -1,4 +1,4 @@
-# Ultipa GO SDK(Driver)
+# Ultipa GO SDK(Driver 4.0)
 
 ---
 
