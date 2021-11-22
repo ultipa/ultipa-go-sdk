@@ -192,7 +192,7 @@ func (di *DataItem) AsTable() (table *structs.Table, err error) {
 	return table, err
 }
 
-//find().nodes() as nodes group by nodes.year as y return y,collect(nodes._id)
+//AsArray find().nodes() as nodes group by nodes.year as y return y,collect(nodes._id)
 func (di *DataItem) AsArray() (arr *structs.Array, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
@@ -245,7 +245,7 @@ func (di *DataItem) AsAttr() (attr *structs.Attr, err error) {
 	return attr, err
 }
 
-// the types will be tables and alias is nodeSchema and edgeSchema
+//AsGraphs the types will be tables and alias is nodeSchema and edgeSchema
 func (di *DataItem) AsGraphs() (graphs []*structs.Graph, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
@@ -277,7 +277,7 @@ func (di *DataItem) AsGraphs() (graphs []*structs.Graph, err error) {
 	return graphs, err
 }
 
-// the types will be tables and alias is nodeSchema and edgeSchema
+//AsSchemas the types will be tables and alias is nodeSchema and edgeSchema
 func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {

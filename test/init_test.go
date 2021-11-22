@@ -40,8 +40,6 @@ func TestPing(t *testing.T) {
 
 func GetClient(hosts []string, graphName string) (*api.UltipaAPI, error){
 	var err error
-
-
 	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
 		Hosts: hosts,
 		Username: "root",
