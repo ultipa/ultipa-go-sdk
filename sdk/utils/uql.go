@@ -21,6 +21,28 @@ var WriteUqlCommandKeys = []string{
 	"top", "kill",
 }
 
+var GlobalUqlCommandKeys = []string{
+	`show\(\).user`,
+	`get\(\).user`,
+	`create\(\).user`,
+	`delete\(\).user`,
+	`grant\(\).user`,
+	`revoke\(\).user`,
+	`show\(\).policy`,
+	`get\(\).policy`,
+	`create\(\).policy`,
+	`delete\(\).policy`,
+	`show\(\).privilege`,
+	`stats\(\)`,
+	`show\(\).graph`,
+	`get\(\).graph`,
+	`create\(\).graph`,
+	`alter\(\).graph`,
+	`drop\(\).graph`,
+	`kill\(\).graph`,
+	`top\(\).graph`,
+}
+
 func GetUqlRegExpMatcher(fnNames []string) *regexp.Regexp {
 	return regexp.MustCompile(`(?i)(\s*|^|\n)(` + strings.Join(fnNames, "|")  + `)\(`)
 }
@@ -43,5 +65,11 @@ func (t *UqlItem) HasWrite() bool {
 
 func (t *UqlItem) HasExecTask() bool {
 	matcher := GetUqlRegExpMatcher([]string{`exec task`})
+	return matcher.Match(t.Uql)
+}
+
+//IsGlobal check the uql needs global graphset
+func (t *UqlItem) IsGlobal() bool {
+	matcher := GetUqlRegExpMatcher(GlobalUqlCommandKeys)
 	return matcher.Match(t.Uql)
 }

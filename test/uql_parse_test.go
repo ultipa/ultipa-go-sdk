@@ -28,6 +28,7 @@ func TestEasyUqlParse(t *testing.T) {
 		log.Printf("  HasWith: %t", Uql.HasWith())
 		log.Printf("  HasWrite: %t", Uql.HasWrite())
 		log.Printf("  HasTask: %t", Uql.HasExecTask())
+		log.Printf("  IsGlobal: %t", Uql.IsGlobal())
 	}
 }
 

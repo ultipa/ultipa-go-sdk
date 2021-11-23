@@ -179,6 +179,20 @@ func (pool *ConnectionPool) GetConn(config *configuration.UltipaConfig) (*Connec
 	}
 }
 
+// Get Master of Global Graph
+func (pool *ConnectionPool) GetGlobalMasterConn(config *configuration.UltipaConfig) (*Connection, error) {
+	globalGraph := "global"
+	if pool.GraphMgr.GetLeader(globalGraph) == nil {
+		err := pool.RefreshClusterInfo(globalGraph)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return pool.GraphMgr.GetLeader(globalGraph), nil
+}
+
 // Get master client
 func (pool *ConnectionPool) GetMasterConn(config *configuration.UltipaConfig) (*Connection, error) {
 
