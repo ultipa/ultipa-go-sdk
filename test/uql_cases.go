@@ -57,12 +57,16 @@ func InitCases() {
 		//	UQL:   "find().nodes() as nodes return count(distinct(nodes.name)) as totalName;",
 		//	Alias: []string{"totalName"},
 		//},
+		//&Case{
+		//	UQL:   "UFE().node_property(@User.name)",
+		//	Alias: []string{},
+		//},
+		//&Case{
+		//	UQL:   "LTE().node_property(@User.name)",
+		//	Alias: []string{},
+		//},
 		&Case{
-			UQL:   "UFE().node_property(@User.name)",
-			Alias: []string{},
-		},
-		&Case{
-			UQL:   "LTE().node_property(@User.name)",
+			UQL:   "show().schema()",
 			Alias: []string{},
 		},
 

@@ -304,7 +304,7 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		TotalIndex = 3
 	case RESP_EDGE_SCHEMA_KEY:
 		Type = "edge"
-		TotalIndex = 4
+		TotalIndex = 3
 	}
 
 	for _, row := range table.TableRows {
@@ -313,8 +313,8 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		schema := structs.NewSchema(string(values[0]))
 		schema.Desc = string(values[1])
 		schema.Type = Type
-		schema.Total, _ = strconv.Atoi(utils.AsString(values[TotalIndex]))
 		propertyJson := values[2]
+		schema.Total, _ = strconv.Atoi(utils.AsString(values[TotalIndex]))
 
 		schema.DBType, err = structs.GetDBTypeByString(schema.Type)
 
