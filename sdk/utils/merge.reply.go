@@ -71,14 +71,14 @@ func MergeUQLReply(reply1 *ultipa.UqlReply, reply2 *ultipa.UqlReply) *ultipa.Uql
 				data1.EdgeTable.EdgeRows = append(data1.EdgeTable.EdgeRows, data2.EdgeTable.EdgeRows...)
 			}
 		case ultipa.ResultType_RESULT_TYPE_TABLE:
-			data1 := Find(reply1.Edges, func(index int) bool { return reply1.Edges[index].Alias == Alias.Alias }).(*ultipa.Table)
-			data2 := Find(reply2.Edges, func(index int) bool { return reply2.Edges[index].Alias == Alias.Alias }).(*ultipa.Table)
+			data1 := Find(reply1.Tables, func(index int) bool { return reply1.Tables[index].TableName == Alias.Alias }).(*ultipa.Table)
+			data2 := Find(reply2.Tables, func(index int) bool { return reply2.Tables[index].TableName == Alias.Alias }).(*ultipa.Table)
 			if data2 != nil {
 				data1.TableRows = append(data1.TableRows, data2.TableRows...)
 			}
 		case ultipa.ResultType_RESULT_TYPE_PATH:
-			data1 := Find(reply1.Edges, func(index int) bool { return reply1.Edges[index].Alias == Alias.Alias }).(*ultipa.PathAlias)
-			data2 := Find(reply2.Edges, func(index int) bool { return reply2.Edges[index].Alias == Alias.Alias }).(*ultipa.PathAlias)
+			data1 := Find(reply1.Paths, func(index int) bool { return reply1.Paths[index].Alias == Alias.Alias }).(*ultipa.PathAlias)
+			data2 := Find(reply2.Paths, func(index int) bool { return reply2.Paths[index].Alias == Alias.Alias }).(*ultipa.PathAlias)
 			if data2 != nil {
 				data1.Paths = append(data1.Paths, data2.Paths...)
 			}
