@@ -10,7 +10,8 @@ import (
 func TestUQL(t *testing.T) {
 
 	//client, _ := GetClient([]string{"210.13.32.146:40101"}, "default")
-	client, _ := GetClient([]string{"192.168.1.94:60061"}, "default")
+	//client, _ := GetClient([]string{"192.168.1.94:60061"}, "default")
+	client, _ := GetClient([]string{"192.168.1.87:61061"}, "default")
 
 	InitCases()
 

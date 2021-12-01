@@ -103,10 +103,13 @@ func (pool *ConnectionPool) RefreshActives() {
 func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 
 	var conn *Connection
+
 	var err error
+	// 如果该图集暂无初始化时
 	if pool.GraphMgr.GetLeader(graphName) == nil {
 		conn, err = pool.GetConn(nil)
 	} else {
+		// 已经初始化后
 		conn = pool.GraphMgr.GetLeader(graphName)
 	}
 
@@ -124,6 +127,7 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 
 	if resp.Status.ErrorCode == ultipa.ErrorCode_NOT_RAFT_MODE {
 		pool.IsRaft = false
+		pool.GraphMgr.SetLeader(graphName, conn)
 	}
 
 	if resp.Status.ErrorCode == ultipa.ErrorCode_RAFT_REDIRECT {
@@ -132,8 +136,8 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 			pool.Connections[resp.Status.ClusterInfo.Redirect], err = NewConnection(resp.Status.ClusterInfo.Redirect, pool.Config)
 		}
 
-		pool.SetMasterConn(graphName, pool.Connections[resp.Status.ClusterInfo.Redirect])
-
+		pool.GraphMgr.SetLeader(graphName, pool.Connections[resp.Status.ClusterInfo.Redirect])
+		pool.RefreshActives()
 		return pool.RefreshClusterInfo(graphName)
 	}
 
@@ -163,8 +167,10 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 			fconn.Active = follower.Status
 			fconn.SetRoleFromInt32(follower.Role)
 			pool.GraphMgr.AddFollower(graphName, fconn)
+			pool.RefreshActives()
 		}
 	}
+
 
 	return err
 }

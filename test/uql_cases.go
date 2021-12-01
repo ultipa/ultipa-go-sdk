@@ -65,8 +65,24 @@ func InitCases() {
 		//	UQL:   "LTE().node_property(@User.name)",
 		//	Alias: []string{},
 		//},
+		//&Case{
+		//	UQL:   "show().schema()",
+		//	Alias: []string{},
+		//},
 		&Case{
-			UQL:   "show().schema()",
+			UQL:   "find().nodes() return nodes limit 1",
+			Alias: []string{},
+		},
+		&Case{
+			UQL:   "find().nodes() return nodes limit 1",
+			Alias: []string{},
+		},
+		&Case{
+			UQL:   "find().nodes() return nodes limit 1",
+			Alias: []string{},
+		},
+		&Case{
+			UQL:   "find().nodes() return nodes limit 1",
 			Alias: []string{},
 		},
 

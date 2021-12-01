@@ -84,6 +84,7 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 	if err != nil {
 		return nil, conf, err
 	}
+
 	client := conn.GetClient()
 
 	return client, conf, nil
