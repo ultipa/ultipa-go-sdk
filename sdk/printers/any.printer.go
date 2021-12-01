@@ -14,6 +14,9 @@ func PrintAny(dataitem *http.DataItem) {
 	case ultipa.ResultType_RESULT_TYPE_NODE:
 		nodes, schemas, _ := dataitem.AsNodes()
 		PrintNodes(nodes, schemas)
+	case ultipa.ResultType_RESULT_TYPE_EDGE:
+		edges, schemas, _ := dataitem.AsEdges()
+		PrintEdges(edges, schemas)
 	case ultipa.ResultType_RESULT_TYPE_TABLE:
 		//handle other table
 		res, err := dataitem.AsTable()

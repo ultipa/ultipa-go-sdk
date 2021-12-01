@@ -16,6 +16,7 @@ func PrintNodes(nodes []*structs.Node, schemas map[string]*structs.Schema) {
 			if table != nil {
 				fmt.Println(table.String())
 			}
+
 			table = simpletable.New()
 			lastSchema = node.Schema
 			table.Header.Cells = append(table.Header.Cells, &simpletable.Cell{Align: simpletable.AlignCenter, Text: "ID"}, &simpletable.Cell{Align: simpletable.AlignCenter, Text: "UUID"}, &simpletable.Cell{Align: simpletable.AlignCenter, Text: "Schema"})
@@ -30,17 +31,12 @@ func PrintNodes(nodes []*structs.Node, schemas map[string]*structs.Schema) {
 			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(node.GetSchema())},
 		}
 
-		node.Values.ForEach(func(v interface{}, key string) error {
-			//vv, err := strconv.Unquote(`"` + fmt.Sprint(v) + `"`)
+		for i := 3; i < len(table.Header.Cells); i++ {
 
-			//if err != nil {
-			//	PrintError("[ERROR] Node Printer: " + err.Error())
-			//}
-
-			//r = append(r, &simpletable.Cell{Align: simpletable.AlignCenter, Text: vv})
-			r = append(r, &simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(v)})
-			return nil
-		}, nil)
+			headerKey := table.Header.Cells[i].Text
+			vv := node.Values.Get(headerKey)
+			r = append(r, &simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(vv)})
+		}
 
 		table.Body.Cells = append(table.Body.Cells, r)
 	}
