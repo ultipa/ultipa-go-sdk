@@ -78,13 +78,16 @@ func (pool *ConnectionPool) RefreshActives() {
 	pool.Actives = []*Connection{}
 	for _, conn := range pool.Connections {
 
-		ctx, _ := pool.NewContext(nil)
+		ctx, _ := pool.NewContext(&configuration.RequestConfig{
+			Timeout: 3,
+		})
 
 		resp, err := conn.GetClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
 			Name: "go sdk refresh",
 		})
 
 		if err != nil {
+			log.Printf(conn.Host)
 			conn.Active = ultipa.ServerStatus_DEAD
 			continue
 		}
@@ -259,7 +262,7 @@ func (pool *ConnectionPool) Close() error {
 
 // set context with timeout and auth info
 func (pool *ConnectionPool) NewContext(config *configuration.RequestConfig) (context.Context, context.CancelFunc) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(pool.Config.Timeout)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.Timeout)*time.Second)
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(pool.Config.ToContextKV(config)...))
 	return ctx, cancel
 }
