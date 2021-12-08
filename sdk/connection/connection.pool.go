@@ -144,10 +144,7 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 		return pool.RefreshClusterInfo(graphName)
 	}
 
-	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		// not raft mode
-		log.Println(resp.Status.Msg)
-	} else {
+	if resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS {
 		pool.IsRaft = true
 		c := pool.Connections[resp.Status.ClusterInfo.LeaderAddress]
 		pool.GraphMgr.SetLeader(graphName, c)
