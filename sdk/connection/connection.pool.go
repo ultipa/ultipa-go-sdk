@@ -41,7 +41,6 @@ func NewConnectionPool(config *configuration.UltipaConfig) (*ConnectionPool, err
 	}
 
 	// Init Cluster Manager
-
 	// Get Connections
 	err := pool.CreateConnections()
 
