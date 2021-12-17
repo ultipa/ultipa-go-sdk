@@ -17,7 +17,7 @@ const (
 	UQLType_Global = 3
 )
 
-func  (api *UltipaAPI) GetHostsByUQL(uql string, graphName string) (uqlType UQLType, leader *connection.Connection, followers []*connection.Connection, global *connection.Connection, err error) {
+func  (api *UltipaAPI) GetConnByUQL(uql string, graphName string) (uqlType UQLType, leader *connection.Connection, followers []*connection.Connection, global *connection.Connection, err error) {
 
 	leader = api.Pool.GraphMgr.GetLeader(graphName)
 	followers = api.Pool.GraphMgr.GetGraph(graphName).Followers
