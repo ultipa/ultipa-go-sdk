@@ -78,10 +78,10 @@ func (pool *ConnectionPool) RefreshActives() {
 	for _, conn := range pool.Connections {
 
 		ctx, _ := pool.NewContext(&configuration.RequestConfig{
-			Timeout: 3,
+			Timeout: 6,
 		})
 
-		resp, err := conn.GetClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
+		resp, err := conn.GetControlClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
 			Name: "go sdk refresh",
 		})
 
