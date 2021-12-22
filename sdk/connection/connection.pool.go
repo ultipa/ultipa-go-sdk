@@ -258,6 +258,12 @@ func (pool *ConnectionPool) Close() error {
 
 // set context with timeout and auth info
 func (pool *ConnectionPool) NewContext(config *configuration.RequestConfig) (context.Context, context.CancelFunc) {
+
+
+	if config == nil {
+		config = &configuration.RequestConfig{}
+	}
+
 	timeout := config.Timeout
 
 	if timeout == 0 {
