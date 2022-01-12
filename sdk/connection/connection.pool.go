@@ -170,7 +170,6 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 		}
 	}
 
-
 	return err
 }
 
@@ -259,7 +258,6 @@ func (pool *ConnectionPool) Close() error {
 // set context with timeout and auth info
 func (pool *ConnectionPool) NewContext(config *configuration.RequestConfig) (context.Context, context.CancelFunc) {
 
-
 	if config == nil {
 		config = &configuration.RequestConfig{}
 	}
@@ -273,4 +271,33 @@ func (pool *ConnectionPool) NewContext(config *configuration.RequestConfig) (con
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(pool.Config.ToContextKV(config)...))
 	return ctx, cancel
+}
+
+// RunHeartBeat used for special network policy for long connection(such like : force disconnection idle socket)
+func (pool *ConnectionPool) RunHeartBeat() {
+
+	if pool.Config.HeartBeat > 0 {
+		go func() {
+			for {
+				//log.Println("Heart Beat Start... ")
+				for _, conn := range pool.Connections {
+
+					ctx, _ := pool.NewContext(&configuration.RequestConfig{
+						Timeout: 6,
+					})
+					//log.Println("Heart Beat Item", conn.Host)
+					resp, err := conn.GetControlClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
+						Name: "go sdk refresh",
+					})
+
+					if err != nil || (resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS) {
+						log.Printf("heart beat failed : ", conn.Host)
+						continue
+					}
+				}
+				//log.Println("Heart Beat End... ")
+				time.Sleep(time.Duration(pool.Config.HeartBeat) * time.Second)
+			}
+		}()
+	}
 }
