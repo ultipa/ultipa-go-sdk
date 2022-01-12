@@ -19,6 +19,15 @@ const (
 
 func  (api *UltipaAPI) GetConnByUQL(uql string, graphName string) (uqlType UQLType, leader *connection.Connection, followers []*connection.Connection, global *connection.Connection, err error) {
 
+	graph := api.Pool.GraphMgr.GetGraph(graphName)
+
+	if graph == nil {
+		err = api.Pool.RefreshClusterInfo(graphName)
+		if err != nil {
+			return 0, nil, nil, nil, err
+		}
+	}
+
 	leader = api.Pool.GraphMgr.GetLeader(graphName)
 	followers = api.Pool.GraphMgr.GetGraph(graphName).Followers
 	global, err = api.Pool.GetGlobalMasterConn(nil)
