@@ -19,7 +19,7 @@ type UltipaConfig struct {
 	CurrentGraph     string
 	CurrentClusterId string
 	Timeout          uint32
-	HeartBeat        int // frequency:second,  if 0 means no heart beat， > 9
+	HeartBeat        int // frequency:second,  if 0 means no heart beat
 }
 
 func NewUltipaConfig(config *UltipaConfig) *UltipaConfig {
