@@ -1,8 +1,11 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
+	"time"
+	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/http"
 	"ultipa-go-sdk/sdk/structs"
@@ -58,6 +61,39 @@ func (api *UltipaAPI) CreateGraph(graph *structs.Graph, config *configuration.Re
 		return nil, err
 	}
 
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		api.Logger.Log("create graph failed : "+ graph.Name + " " + resp.Status.Message )
+		return resp, errors.New(resp.Status.Message)
+	}
+
+
+	api.Logger.Log("Creating Graph Request OK! - " + graph.Name)
+
+	// Try to detect the graph is created, default times is 600
+	times := 600
+	for {
+		if times < 0 {
+			break
+		}
+
+		api.Logger.Log("Detecting New Graph - " + graph.Name + " Leader")
+		err := api.Pool.RefreshClusterInfo(graph.Name)
+
+		if err != nil {
+			return nil, err
+		}
+		
+		conn := api.Pool.GraphMgr.GetLeader(graph.Name)
+
+		if conn != nil {
+			api.Logger.Log("Detected New Graph - " + graph.Name + " Leader - OK")
+			break
+		}
+
+		time.Sleep(time.Second)
+		times--
+	}
+
 	return resp, err
 }
 
@@ -71,4 +107,3 @@ func (api *UltipaAPI) DropGraph(graphName string, config *configuration.RequestC
 
 	return resp, err
 }
-

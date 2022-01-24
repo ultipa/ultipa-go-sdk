@@ -6,6 +6,7 @@ import (
 	"ultipa-go-sdk/sdk/connection"
 	"ultipa-go-sdk/sdk/http"
 	"ultipa-go-sdk/sdk/utils"
+	"ultipa-go-sdk/sdk/utils/logger"
 )
 
 // UQL, Insert, Export, Download ... API methods
@@ -13,6 +14,7 @@ import (
 type UltipaAPI struct {
 	Pool   *connection.ConnectionPool
 	Config *configuration.UltipaConfig
+	Logger *logger.Logger
 }
 
 type ClientType int
@@ -22,12 +24,12 @@ const (
 	ClientTypeControl ClientType = 2
 )
 
-
 func NewUltipaAPI(pool *connection.ConnectionPool) *UltipaAPI {
 
 	api := &UltipaAPI{
 		Pool:   pool,
 		Config: pool.Config,
+		Logger: logger.NewLogger(pool.Config.Debug),
 	}
 
 	return api
@@ -47,7 +49,7 @@ func (api *UltipaAPI) GetConn(config *configuration.RequestConfig) (*connection.
 		if config.Host != "" {
 			conn, err = connection.NewConnection(config.Host, conf)
 			if err != nil {
-				return  nil, nil, err
+				return nil, nil, err
 			}
 
 			// if is raft mode, check if contains CUD ops or exec task
@@ -66,7 +68,7 @@ func (api *UltipaAPI) GetConn(config *configuration.RequestConfig) (*connection.
 	if conn == nil {
 		conn, err = api.Pool.GetConn(conf)
 		if err != nil {
-			return nil,nil, err
+			return nil, nil, err
 		}
 	}
 

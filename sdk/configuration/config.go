@@ -19,6 +19,7 @@ type UltipaConfig struct {
 	CurrentGraph     string
 	CurrentClusterId string
 	Timeout          uint32
+	Debug            bool
 	HeartBeat        int // frequency:second,  if 0 means no heart beat
 }
 

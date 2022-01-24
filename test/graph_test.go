@@ -1,10 +1,10 @@
 package test
 
 import (
-	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/printers"
 	"ultipa-go-sdk/sdk/structs"
 	"ultipa-go-sdk/utils"
 )
@@ -20,15 +20,36 @@ func TestListGraph(t *testing.T) {
 
 func TestCreateGraph(t *testing.T){
 
-	client.DropGraph("zjs_amz", nil)
 
-	resp, err := client.CreateGraph(&structs.Graph{
-		Name: "zjs_amz",
-		Description: "a graph",
+	graphName := "test_creation"
+	hosts := []string{
+		"192.168.1.87:60201",
+	}
+	client, err := GetClient(hosts, "default")
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	client.DropGraph(graphName, nil)
+
+	client.CreateGraph(&structs.Graph{
+		Name: graphName,
 	}, nil)
 
-	assert.Equal(t, nil, err, "create graph request")
-	assert.Equal(t, resp.Status.Code, ultipa.ErrorCode_SUCCESS, "create graph status")
+	client.SetCurrentGraph(graphName)
+
+	resp, err := client.UQL("insert().nodes({}).into(@default)", nil)
+
+	if err != nil {
+		printers.PrintError(err.Error())
+	}
+
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		printers.PrintError(resp.Status.Message)
+	}
+
 }
 
 
