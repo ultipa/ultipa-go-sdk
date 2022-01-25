@@ -62,10 +62,9 @@ func (api *UltipaAPI) CreateGraph(graph *structs.Graph, config *configuration.Re
 	}
 
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		api.Logger.Log("create graph failed : "+ graph.Name + " " + resp.Status.Message )
+		api.Logger.Log("create graph failed : " + graph.Name + " " + resp.Status.Message)
 		return resp, errors.New(resp.Status.Message)
 	}
-
 
 	api.Logger.Log("Creating Graph Request OK! - " + graph.Name)
 
@@ -82,7 +81,7 @@ func (api *UltipaAPI) CreateGraph(graph *structs.Graph, config *configuration.Re
 		if err != nil {
 			return nil, err
 		}
-		
+
 		conn := api.Pool.GraphMgr.GetLeader(graph.Name)
 
 		if conn != nil {
@@ -106,4 +105,25 @@ func (api *UltipaAPI) DropGraph(graphName string, config *configuration.RequestC
 	}
 
 	return resp, err
+}
+
+func (api *UltipaAPI) HasGraph(graphName string, config *configuration.RequestConfig) (bool, error) {
+	resp, err := api.ListGraph(config)
+
+	if err != nil {
+		return false, err
+	}
+
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return false, errors.New(resp.Status.Message)
+	}
+
+	for _, graph := range resp.Graphs {
+
+		if graph.Name == graphName {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }

@@ -3,25 +3,24 @@ package models
 import "ultipa-go-sdk/sdk/structs"
 
 type GraphModel struct {
-	GraphName string
+	Graph *structs.Graph
 	Schemas   []*structs.Schema
 }
 
-//TODO: finish Graph model
-func NewGraphModel(graphName string) *GraphModel {
+func NewGraphModel(graph *structs.Graph) *GraphModel {
 
 	gm := &GraphModel{
-		GraphName: graphName,
+		Graph: graph,
 	}
 
 	return gm
 }
 
-func (gm *GraphModel) AddSchema(schema *structs.Schema) error {
+func (gm *GraphModel) AddSchema(schema *structs.Schema) {
 	gm.Schemas = append(gm.Schemas, schema)
-	return nil
 }
 
-func (gm *GraphModel) DeleteSchema() error {
-	return nil
+//TODO:
+
+func (gm *GraphModel) NewGraphModelFromYAML(path string) {
 }

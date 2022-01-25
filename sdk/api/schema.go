@@ -133,6 +133,8 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 	var resp *http.UQLResponse
 	var err error
 
+	api.Logger.Log("Creating Schema : @" + schema.Name)
+
 	if schema.DBType == ultipa.DBType_DBNODE {
 
 		resp, err = api.UQL(fmt.Sprintf(`create().node_schema("%v","%v")`, schema.Name, schema.Desc), conf)
@@ -153,6 +155,8 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 
 	}
 
+
+	api.Logger.Log("Created Schema : @" + schema.Name)
 	// create property of schemas
 	if isCreateProperties {
 
@@ -176,4 +180,18 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 	}
 
 	return resp, err
+}
+
+func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, config *configuration.RequestConfig) (exist bool, err error) {
+
+	exist = true
+	s, _ := api.GetSchema(schema.Name, schema.DBType, config)
+
+	if s == nil {
+		_, err = api.CreateSchema(schema, true, config)
+		exist = false
+	}
+
+	return exist, err
+
 }
