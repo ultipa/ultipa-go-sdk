@@ -74,7 +74,7 @@ func EdgeTableToEdges(et *ultipa.EdgeTable, alias string) ([]*structs.Edge, map[
 			Name:     alias,
 			UUID:     oEdge.Uuid,
 			From:     oEdge.FromId,
-			FromUUID: oEdge.Uuid,
+			FromUUID: oEdge.FromUuid,
 			To:       oEdge.ToId,
 			ToUUID:   oEdge.ToUuid,
 			Schema:   oEdge.SchemaName,
@@ -369,7 +369,6 @@ func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {
 	for _, algoData := range algoDatas {
 
 		algo, err := structs.NewAlgo(algoData.Data["name"].(string), algoData.Data["param"].(string))
-
 
 		if err != nil {
 			return nil, errors.New(fmt.Sprint(err.Error(), algoData))
