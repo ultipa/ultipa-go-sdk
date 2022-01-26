@@ -4,6 +4,8 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"github.com/jinzhu/copier"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"strings"
 )
 
@@ -12,15 +14,15 @@ type UltipaConfig struct {
 	Hosts            []string
 	Username         string
 	Password         string
-	DefaultGraph     string
+	DefaultGraph     string `yaml:"DefaultGraph"`
 	Crt              []byte
-	MaxRecvSize      int
+	MaxRecvSize      int `yaml:"max_recv_size"`
 	Consistency      bool
-	CurrentGraph     string
-	CurrentClusterId string
+	CurrentGraph     string `yaml:"current_graph"`
+	CurrentClusterId string `yaml:"current_cluster_id"`
 	Timeout          uint32
 	Debug            bool
-	HeartBeat        int // frequency:second,  if 0 means no heart beat
+	HeartBeat        int `yaml:"heart_beat"` // frequency:second,  if 0 means no heart beat
 }
 
 func NewUltipaConfig(config *UltipaConfig) *UltipaConfig {
@@ -89,4 +91,22 @@ func (config *UltipaConfig) ToContextKV(rConfig *RequestConfig) []string {
 		//"cluster_id",
 		//config.CurrentClusterId,
 	}
+}
+
+func LoadConfigFromYAML(file string) (*UltipaConfig, error) {
+	content, err := ioutil.ReadFile(file)
+
+	if err != nil {
+		return nil, err
+	}
+
+	config := NewUltipaConfig(&UltipaConfig{})
+
+	err = yaml.Unmarshal(content, config)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return config, nil
 }

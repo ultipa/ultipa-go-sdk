@@ -5,3 +5,4 @@
 - Add Model Manager
   - manage model(graph)
     - manage schemas for a model
+- Add load db config from yaml
