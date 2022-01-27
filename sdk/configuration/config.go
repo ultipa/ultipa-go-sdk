@@ -14,7 +14,7 @@ type UltipaConfig struct {
 	Hosts            []string
 	Username         string
 	Password         string
-	DefaultGraph     string `yaml:"DefaultGraph"`
+	DefaultGraph     string `yaml:"default_graph"`
 	Crt              []byte
 	MaxRecvSize      int `yaml:"max_recv_size"`
 	Consistency      bool
@@ -99,14 +99,15 @@ func LoadConfigFromYAML(file string) (*UltipaConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	config := NewUltipaConfig(&UltipaConfig{})
+	config := &UltipaConfig{}
 
 	err = yaml.Unmarshal(content, config)
 
 	if err != nil {
 		return nil, err
 	}
+
+	config = NewUltipaConfig(config)
 
 	return config, nil
 }

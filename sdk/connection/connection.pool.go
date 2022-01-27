@@ -8,6 +8,7 @@ import (
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
+	"ultipa-go-sdk/sdk/printers"
 )
 
 type GraphClusterInfo struct {
@@ -86,7 +87,7 @@ func (pool *ConnectionPool) RefreshActives() {
 		})
 
 		if err != nil {
-			log.Printf(conn.Host)
+			printers.PrintWarn(conn.Host + "failed - " + err.Error())
 			conn.Active = ultipa.ServerStatus_DEAD
 			continue
 		}
@@ -95,6 +96,7 @@ func (pool *ConnectionPool) RefreshActives() {
 			conn.Active = ultipa.ServerStatus_ALIVE
 			pool.Actives = append(pool.Actives, conn)
 		} else {
+			printers.PrintWarn(conn.Host + "failed - " + resp.Status.Msg)
 			conn.Active = ultipa.ServerStatus_DEAD
 		}
 
