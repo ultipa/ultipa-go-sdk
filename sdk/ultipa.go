@@ -1,3 +1,4 @@
+//Package sdk provide Ultipa functions to drive ultipa servers
 package sdk
 
 import (
