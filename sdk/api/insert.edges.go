@@ -17,7 +17,9 @@ func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EdgeTable, config *configur
 		return nil, err
 	}
 
-	ctx, _ := api.Pool.NewContext(config)
+	ctx, cancel := api.Pool.NewContext(config)
+
+	defer cancel()
 
 	resp, err := client.InsertEdges(ctx, &ultipa.InsertEdgesRequest{
 		GraphName: conf.CurrentGraph,
@@ -41,7 +43,9 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 		return nil, err
 	}
 
-	ctx, _ := api.Pool.NewContext(config)
+	ctx, cancel := api.Pool.NewContext(config)
+
+	defer cancel()
 
 	table := &ultipa.EdgeTable{}
 

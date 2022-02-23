@@ -17,7 +17,8 @@ func (api *UltipaAPI) InsertNodesBatch(table *ultipa.NodeTable, config *configur
 		return nil, err
 	}
 
-	ctx, _ := api.Pool.NewContext(config)
+	ctx, cancel := api.Pool.NewContext(config)
+	defer cancel()
 
 	resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
 		GraphName: conf.CurrentGraph,
@@ -41,7 +42,8 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		return nil, err
 	}
 
-	ctx, _ := api.Pool.NewContext(config)
+	ctx, cancel := api.Pool.NewContext(config)
+	defer cancel()
 
 	table := &ultipa.NodeTable{}
 

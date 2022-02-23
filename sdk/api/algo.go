@@ -60,7 +60,9 @@ func (api *UltipaAPI) InstallAlgo(algoFilePath string, algoInfoFilePath string, 
 		return nil, err
 	}
 
-	ctx, _ := api.Pool.NewContext(req)
+	ctx, cancel := api.Pool.NewContext(req)
+	defer cancel()
+
 	streamClient, err := client.InstallAlgo(ctx)
 
 	if err != nil {
@@ -136,7 +138,9 @@ func (api *UltipaAPI) UninstallAlgo(algoName string, req *configuration.RequestC
 		return nil, err
 	}
 
-	ctx, _ := api.Pool.NewContext(req)
+	ctx, cancel := api.Pool.NewContext(req)
+
+	defer cancel()
 
 	reply, err := client.UninstallAlgo(ctx, &ultipa.UninstallAlgoRequest{
 		AlgoName: algoName,

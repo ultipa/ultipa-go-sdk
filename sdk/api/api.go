@@ -119,7 +119,8 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 		return nil, err
 	}
 
-	ctx, _ := api.Pool.NewContext(config)
+	ctx, cancel := api.Pool.NewContext(config)
+	defer cancel()
 
 	resp, err := client.Uql(ctx, &ultipa.UqlRequest{
 		GraphName: conf.CurrentGraph,

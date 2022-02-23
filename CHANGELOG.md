@@ -7,3 +7,5 @@
     - manage schemas for a model
 - Add load db config from yaml
 - Add asFirstNode、asFirstEdge Methods for DataItem
+- Bug Fix
+  - Fix Context Memory leak
