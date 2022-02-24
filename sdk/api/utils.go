@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"ultipa-go-sdk/sdk/connection"
 	"ultipa-go-sdk/sdk/utils"
 )
@@ -17,6 +18,10 @@ const (
 	UQLType_Global = 3
 )
 
+func (api *UltipaAPI) RefreshClusterInfo(graphName string) error {
+	return api.Pool.RefreshClusterInfo(graphName)
+}
+
 func  (api *UltipaAPI) GetConnByUQL(uql string, graphName string) (uqlType UQLType, leader *connection.Connection, followers []*connection.Connection, global *connection.Connection, err error) {
 
 	graph := api.Pool.GraphMgr.GetGraph(graphName)
@@ -26,6 +31,12 @@ func  (api *UltipaAPI) GetConnByUQL(uql string, graphName string) (uqlType UQLTy
 		if err != nil {
 			return 0, nil, nil, nil, err
 		}
+
+	}
+
+	// refresh , but not get graph info
+	if graph == nil {
+		return 0, nil, nil, nil, errors.New("unavailable to get graph cluster infos : " + graphName)
 	}
 
 	leader = api.Pool.GraphMgr.GetLeader(graphName)
