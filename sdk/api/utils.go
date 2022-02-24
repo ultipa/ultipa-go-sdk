@@ -22,7 +22,7 @@ func (api *UltipaAPI) RefreshClusterInfo(graphName string) error {
 	return api.Pool.RefreshClusterInfo(graphName)
 }
 
-func  (api *UltipaAPI) GetConnByUQL(uql string, graphName string) (uqlType UQLType, leader *connection.Connection, followers []*connection.Connection, global *connection.Connection, err error) {
+func (api *UltipaAPI) GetConnByUQL(uql string, graphName string) (uqlType UQLType, leader *connection.Connection, followers []*connection.Connection, global *connection.Connection, err error) {
 
 	graph := api.Pool.GraphMgr.GetGraph(graphName)
 
@@ -31,7 +31,7 @@ func  (api *UltipaAPI) GetConnByUQL(uql string, graphName string) (uqlType UQLTy
 		if err != nil {
 			return 0, nil, nil, nil, err
 		}
-
+		graph = api.Pool.GraphMgr.GetGraph(graphName)
 	}
 
 	// refresh , but not get graph info
