@@ -88,3 +88,27 @@ func (edge *Edge) Set(key string, value interface{}) error {
 	edge.Values.Set(key, value)
 	return nil
 }
+
+func ConvertStringEdges(schema *Schema, edges []*Edge) {
+
+	// For by Schema, not nodes value
+	for _, edge := range edges {
+		for _, prop := range schema.Properties {
+			stri := edge.Values.Get(prop.Name)
+
+			str := ""
+			if stri == nil {
+				str = utils.GetDefaultNilString(prop.Type)
+			} else {
+				str = stri.(string)
+			}
+
+			v, err := utils.StringAsInterface(str, prop.Type)
+
+			if err != nil {
+				continue
+			}
+			edge.Values.Set(prop.Name, v)
+		}
+	}
+}

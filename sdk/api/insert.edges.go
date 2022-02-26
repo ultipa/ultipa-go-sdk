@@ -1,11 +1,12 @@
 package api
 
 import (
-	"log"
 	"sync"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
+	"ultipa-go-sdk/sdk/printers"
 	"ultipa-go-sdk/sdk/structs"
+	"ultipa-go-sdk/sdk/utils"
 )
 
 func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EdgeTable, config *configuration.RequestConfig) (*ultipa.InsertEdgesReply, error) {
@@ -95,7 +96,7 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 				bs, err := row.GetBytes(prop.Name)
 
 				if err != nil {
-					log.Fatal("Get row bytes value failed ", prop.Name, " ", err)
+					printers.PrintError("Get row bytes value failed " + prop.Name + " " + err.Error())
 				}
 
 				newnode.Values = append(newnode.Values, bs)
@@ -119,3 +120,57 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 
 	return resp, err
 }
+
+
+//InsertNodesBatchAuto Nodes interface values should be string
+func(api *UltipaAPI)  InsertEdgesBatchAuto(edges []*structs.Edge, config *configuration.RequestConfig) error {
+
+	// collect schema and nodes
+
+	schemas, err := api.ListSchema(ultipa.DBType_DBEDGE,config)
+
+	if err != nil {
+		return err
+	}
+
+	batches := map[string]*Batch{}
+
+	for _, edge := range edges {
+
+		// init schema
+		if batches[edge.Schema] == nil {
+
+			batches[edge.Schema] = &Batch{}
+
+			s := utils.Find(schemas, func(i int) bool {
+				return schemas[i].Name == edge.Schema
+			})
+
+			if schema, ok := s.(*structs.Schema); ok {
+				batches[edge.Schema].Schema = schema
+			} else {
+				continue
+			}
+		}
+
+		batch := batches[edge.Schema]
+		// add edges
+		batch.Edges = append(batch.Edges, edge)
+	}
+
+	for _, batch := range batches {
+
+		structs.ConvertStringEdges(batch.Schema, batch.Edges)
+
+		_ , err := api.InsertEdgesBatchBySchema(batch.Schema, batch.Edges, config)
+
+		if err != nil {
+			continue
+		}
+	}
+
+	return nil
+}
+
+
+

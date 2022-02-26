@@ -56,7 +56,7 @@ func (api *UltipaAPI) GetConn(config *configuration.RequestConfig) (*connection.
 		} else if api.Pool.IsRaft {
 			if UqlItem.IsGlobal() {
 				conn, err = api.Pool.GetGlobalMasterConn(conf)
-			} else if UqlItem.HasWrite() || config.UseMaster {
+			} else if UqlItem.HasWrite() || config.UseMaster || conf.Consistency  {
 				conn, err = api.Pool.GetMasterConn(conf)
 			} else if UqlItem.HasExecTask() {
 				conn, err = api.Pool.GetAnalyticsConn(conf)

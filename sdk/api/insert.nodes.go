@@ -1,11 +1,12 @@
 package api
 
 import (
-	"log"
 	"sync"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
+	"ultipa-go-sdk/sdk/printers"
 	"ultipa-go-sdk/sdk/structs"
+	"ultipa-go-sdk/sdk/utils"
 )
 
 func (api *UltipaAPI) InsertNodesBatch(table *ultipa.NodeTable, config *configuration.RequestConfig) (*ultipa.InsertNodesReply, error) {
@@ -93,7 +94,8 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 				bs, err := row.GetBytes(prop.Name)
 
 				if err != nil {
-					log.Fatal("Get row bytes value failed  ", prop.Name, " ", err)
+					 printers.PrintError("Get row bytes value failed  " + prop.Name + " " + err.Error())
+					 return
 				}
 
 				newnode.Values = append(newnode.Values, bs)
@@ -102,6 +104,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 			mtx.Lock()
 			table.NodeRows = append(table.NodeRows, newnode)
 			mtx.Unlock()
+
 		}(row)
 
 	}
@@ -117,3 +120,62 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 
 	return resp, err
 }
+
+type Batch struct {
+	Nodes []*structs.Node
+	Edges []*structs.Edge
+	Schema *structs.Schema
+}
+
+
+//InsertNodesBatchAuto Nodes interface values should be string
+func(api *UltipaAPI)  InsertNodesBatchAuto(nodes []*structs.Node, config *configuration.RequestConfig) error {
+
+	// collect schema and nodes
+
+	schemas, err := api.ListSchema(ultipa.DBType_DBNODE,config)
+
+	if err != nil {
+		return err
+	}
+
+	batches := map[string]*Batch{}
+
+	for _, node := range nodes {
+
+		// init schema
+		if batches[node.Schema] == nil {
+
+			batches[node.Schema] = &Batch{}
+
+			s := utils.Find(schemas, func(i int) bool {
+				return schemas[i].Name == node.Schema
+			})
+
+			if schema, ok := s.(*structs.Schema); ok {
+				batches[node.Schema].Schema = schema
+			} else {
+				continue
+			}
+		}
+
+		batch := batches[node.Schema]
+		// add nodes
+		batch.Nodes = append(batch.Nodes, node)
+	}
+
+	for _, batch := range batches {
+
+		structs.ConvertStringNodes(batch.Schema, batch.Nodes)
+
+		_ , err := api.InsertNodesBatchBySchema(batch.Schema, batch.Nodes, config)
+
+		if err != nil {
+			continue
+		}
+	}
+
+	return nil
+}
+
+

@@ -67,3 +67,29 @@ func NewNodeFromNodeRow(schema *Schema, nodeRow *ultipa.NodeRow) *Node {
 
 	return newNode
 }
+
+func ConvertStringNodes(schema *Schema, nodes []*Node) {
+
+	// For by Schema, not nodes value
+	for _, node := range nodes {
+		for _, prop := range schema.Properties {
+			stri := node.Values.Get(prop.Name)
+
+			str := ""
+			if stri == nil {
+				str = utils.GetDefaultNilString(prop.Type)
+			} else {
+				str = stri.(string)
+			}
+
+			v, err := utils.StringAsInterface(str, prop.Type)
+
+			if err != nil {
+				continue
+			}
+			node.Values.Set(prop.Name, v)
+		}
+	}
+}
+
+

@@ -111,7 +111,7 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 	var err error
 	// 如果该图集暂无初始化时
 	if pool.GraphMgr.GetLeader(graphName) == nil {
-		conn, err = pool.GetConn(nil)
+		conn, err = pool.GetConn(&configuration.UltipaConfig{CurrentGraph: graphName})
 	} else {
 		// 已经初始化后
 		conn = pool.GraphMgr.GetLeader(graphName)
@@ -178,11 +178,11 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 // Get client by global config
 func (pool *ConnectionPool) GetConn(config *configuration.UltipaConfig) (*Connection, error) {
 
-	if pool.Config.Consistency {
-		return pool.GetMasterConn(config)
-	} else {
+	//if pool.Config.Consistency {
+	//	return pool.GetMasterConn(config)
+	//} else {
 		return pool.GetRandomConn(config)
-	}
+	//}
 }
 
 // Get Master of Global Graph
