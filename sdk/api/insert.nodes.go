@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"sync"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
@@ -26,6 +27,10 @@ func (api *UltipaAPI) InsertNodesBatch(table *ultipa.NodeTable, config *configur
 		NodeTable: table,
 		Silent:    true,
 	})
+
+	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Msg)
+	}
 
 	return resp, err
 }
@@ -118,6 +123,10 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		Silent:     true,
 	})
 
+	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Msg)
+	}
+
 	return resp, err
 }
 
@@ -171,7 +180,7 @@ func(api *UltipaAPI)  InsertNodesBatchAuto(nodes []*structs.Node, config *config
 		_ , err := api.InsertNodesBatchBySchema(batch.Schema, batch.Nodes, config)
 
 		if err != nil {
-			continue
+			return err
 		}
 	}
 

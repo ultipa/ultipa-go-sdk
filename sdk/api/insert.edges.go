@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"sync"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
@@ -27,6 +28,10 @@ func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EdgeTable, config *configur
 		EdgeTable: table,
 		Silent:    true,
 	})
+
+	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Msg)
+	}
 
 	return resp, err
 }
@@ -114,9 +119,13 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 		GraphName:            conf.CurrentGraph,
 		EdgeTable:            table,
 		InsertType:           config.InsertType,
-		CreateNodeIfNotExist: config.CreateNodeIfNotExist,
+		//CreateNodeIfNotExist: config.CreateNodeIfNotExist,
 		Silent:               true,
 	})
+
+	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Msg)
+	}
 
 	return resp, err
 }
@@ -165,7 +174,7 @@ func(api *UltipaAPI)  InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 		_ , err := api.InsertEdgesBatchBySchema(batch.Schema, batch.Edges, config)
 
 		if err != nil {
-			continue
+			return err
 		}
 	}
 

@@ -21,6 +21,5 @@ func (gm *GraphModel) AddSchema(schema *structs.Schema) {
 }
 
 //TODO:
-
 func (gm *GraphModel) NewGraphModelFromYAML(path string) {
 }
