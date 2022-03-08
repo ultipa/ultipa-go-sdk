@@ -28,6 +28,10 @@ func (api *UltipaAPI) InsertNodesBatch(table *ultipa.NodeTable, config *configur
 		Silent:    true,
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
 	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
 		return nil, errors.New(resp.Status.Msg)
 	}
@@ -122,6 +126,10 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		InsertType: config.InsertType,
 		Silent:     true,
 	})
+
+	if err != nil {
+		return nil, err
+	}
 
 	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
 		return nil, errors.New(resp.Status.Msg)

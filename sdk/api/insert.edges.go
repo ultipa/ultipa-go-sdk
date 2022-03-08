@@ -29,6 +29,10 @@ func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EdgeTable, config *configur
 		Silent:    true,
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
 	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
 		return nil, errors.New(resp.Status.Msg)
 	}
@@ -122,6 +126,10 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 		//CreateNodeIfNotExist: config.CreateNodeIfNotExist,
 		Silent:               true,
 	})
+
+	if err != nil {
+		return nil, err
+	}
 
 	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
 		return nil, errors.New(resp.Status.Msg)
