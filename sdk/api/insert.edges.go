@@ -123,7 +123,7 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 		GraphName:            conf.CurrentGraph,
 		EdgeTable:            table,
 		InsertType:           config.InsertType,
-		//CreateNodeIfNotExist: config.CreateNodeIfNotExist,
+		CreateNodeIfNotExist: config.CreateNodeIfNotExist,
 		Silent:               true,
 	})
 
