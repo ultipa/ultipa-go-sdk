@@ -94,6 +94,7 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 				ToId:       row.To,
 				ToUuid: row.ToUUID,
 				SchemaName: schema.Name,
+				Uuid: row.UUID,
 			}
 
 			for _, prop := range schema.Properties {
