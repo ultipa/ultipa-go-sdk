@@ -79,21 +79,21 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 	}
 
 	wg := sync.WaitGroup{}
-	mtx := sync.Mutex{}
-
-	for _, row := range rows {
+	edgeRows := make([]*ultipa.EdgeRow, len(rows))
+	for index, row := range rows {
 
 		wg.Add(1)
 
-		go func(row *structs.Edge) {
+		go func(index int, row *structs.Edge) {
 			defer wg.Done()
 
 			newnode := &ultipa.EdgeRow{
 				FromId:     row.From,
-				FromUuid: row.FromUUID,
+				FromUuid:   row.FromUUID,
 				ToId:       row.To,
-				ToUuid: row.ToUUID,
+				ToUuid:     row.ToUUID,
 				SchemaName: schema.Name,
+				Uuid:       row.UUID,
 			}
 
 			for _, prop := range schema.Properties {
@@ -110,20 +110,17 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 
 				newnode.Values = append(newnode.Values, bs)
 			}
-
-			mtx.Lock()
-			table.EdgeRows = append(table.EdgeRows, newnode)
-			mtx.Unlock()
-		}(row)
+			edgeRows[index] = newnode
+		}(index, row)
 	}
-
 	wg.Wait()
+	table.EdgeRows =edgeRows
 
 	resp, err := client.InsertEdges(ctx, &ultipa.InsertEdgesRequest{
 		GraphName:            conf.CurrentGraph,
 		EdgeTable:            table,
 		InsertType:           config.InsertType,
-		//CreateNodeIfNotExist: config.CreateNodeIfNotExist,
+		CreateNodeIfNotExist: config.CreateNodeIfNotExist,
 		Silent:               true,
 	})
 
@@ -138,13 +135,12 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 	return resp, err
 }
 
-
 //InsertNodesBatchAuto Nodes interface values should be string
-func(api *UltipaAPI)  InsertEdgesBatchAuto(edges []*structs.Edge, config *configuration.RequestConfig) error {
+func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *configuration.RequestConfig) error {
 
 	// collect schema and nodes
 
-	schemas, err := api.ListSchema(ultipa.DBType_DBEDGE,config)
+	schemas, err := api.ListSchema(ultipa.DBType_DBEDGE, config)
 
 	if err != nil {
 		return err
@@ -179,7 +175,7 @@ func(api *UltipaAPI)  InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 
 		structs.ConvertStringEdges(batch.Schema, batch.Edges)
 
-		_ , err := api.InsertEdgesBatchBySchema(batch.Schema, batch.Edges, config)
+		_, err := api.InsertEdgesBatchBySchema(batch.Schema, batch.Edges, config)
 
 		if err != nil {
 			return err
@@ -188,6 +184,3 @@ func(api *UltipaAPI)  InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 
 	return nil
 }
-
-
-
