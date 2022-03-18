@@ -78,15 +78,15 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 
 	wg := sync.WaitGroup{}
 	mtx := sync.Mutex{}
-
-	for _, row := range rows {
+	nodeRows := make([]*ultipa.NodeRow, len(rows))
+	for index, row := range rows {
 
 		if row == nil {
 			continue
 		}
 
 		wg.Add(1)
-		go func(row *structs.Node) {
+		go func(index int, row *structs.Node) {
 			defer wg.Done()
 			newnode := &ultipa.NodeRow{
 				Id:         row.ID,
@@ -109,17 +109,12 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 
 				newnode.Values = append(newnode.Values, bs)
 			}
-
-			mtx.Lock()
-			table.NodeRows = append(table.NodeRows, newnode)
-			mtx.Unlock()
-
-		}(row)
-
+			nodeRows[index] = newnode
+		}(index,row)
 	}
 
 	wg.Wait()
-
+	table.NodeRows =nodeRows
 	resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
 		GraphName:  conf.CurrentGraph,
 		NodeTable:  table,
