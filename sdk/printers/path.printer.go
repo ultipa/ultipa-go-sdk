@@ -7,6 +7,7 @@ import (
 )
 
 func PrintPaths(paths []*structs.Path) {
+
 	table := simpletable.New()
 
 	table.Header.Cells = []*simpletable.Cell{
@@ -15,6 +16,8 @@ func PrintPaths(paths []*structs.Path) {
 	}
 
 	for num, path := range paths {
+
+		//log.Println(path.Nodes)
 		row := []*simpletable.Cell{{Text: fmt.Sprint(num)}}
 		pathString := ""
 		for index, edge := range path.GetEdges() {
@@ -28,7 +31,7 @@ func PrintPaths(paths []*structs.Path) {
 				d1 = "<-"
 			}
 
-			pathString = fmt.Sprintf("(%v) %v [%v] %v ", node.ID, d1, edge.UUID, d2)
+			pathString += fmt.Sprintf("(%v) %v [%v] %v ", node.ID, d1, edge.UUID, d2)
 		}
 		pathString += fmt.Sprintf("(%v)", path.GetLastNode().GetID())
 		row = append(row, &simpletable.Cell{Text: pathString})
