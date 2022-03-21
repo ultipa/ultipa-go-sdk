@@ -77,7 +77,6 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 	}
 
 	wg := sync.WaitGroup{}
-	mtx := sync.Mutex{}
 	nodeRows := make([]*ultipa.NodeRow, len(rows))
 	for index, row := range rows {
 
