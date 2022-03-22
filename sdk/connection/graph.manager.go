@@ -2,8 +2,9 @@ package connection
 
 import (
 	"errors"
-	"github.com/lrita/cmap"
 	ultipa "ultipa-go-sdk/rpc"
+
+	"github.com/lrita/cmap"
 )
 
 type GraphManager struct {
@@ -15,10 +16,12 @@ func NewGraphManager() *GraphManager {
 		graphs: &cmap.Cmap{},
 	}
 }
-
+func (gm *GraphManager) DeleteGraph(graphName string) {
+	gm.graphs.Delete(graphName)
+}
 func (gm *GraphManager) AddGraph(graphName string) {
 
-	 gm.graphs.LoadOrStore(graphName, &GraphClusterInfo{
+	gm.graphs.LoadOrStore(graphName, &GraphClusterInfo{
 		Graph: graphName,
 	})
 

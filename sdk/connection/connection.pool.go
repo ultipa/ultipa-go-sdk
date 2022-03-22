@@ -102,6 +102,10 @@ func (pool *ConnectionPool) RefreshActives() {
 
 	}
 }
+func (pool *ConnectionPool) ForceRefreshClusterInfo(graphName string) error {
+	pool.GraphMgr.DeleteGraph(graphName)
+	return pool.RefreshClusterInfo(graphName)
+}
 
 // sync cluster info from server
 func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
@@ -181,7 +185,7 @@ func (pool *ConnectionPool) GetConn(config *configuration.UltipaConfig) (*Connec
 	//if pool.Config.Consistency {
 	//	return pool.GetMasterConn(config)
 	//} else {
-		return pool.GetRandomConn(config)
+	return pool.GetRandomConn(config)
 	//}
 }
 
