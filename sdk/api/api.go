@@ -94,6 +94,13 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 
 func (api *UltipaAPI) GetControlClient(config *configuration.RequestConfig) (ultipa.UltipaControlsClient, *configuration.UltipaConfig, error) {
 
+	if config == nil {
+		config = &configuration.RequestConfig{}
+	}
+
+	config.UseMaster = true
+	config.GraphName = "global"
+
 	conn, conf, err := api.GetConn(config)
 
 	if err != nil {
@@ -104,6 +111,9 @@ func (api *UltipaAPI) GetControlClient(config *configuration.RequestConfig) (ult
 	return client, conf, nil
 }
 
+// UQL send a uql string to ultipa graph, and return a http UQL Response
+// get Alias from UQL Response and convert to any type you need by asNodes, asEdges, asPaths, asTable, as asArray...
+// Check DataItem to learn more about UQL Response
 func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
 
 	var err error

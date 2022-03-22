@@ -31,8 +31,8 @@ nodes := resp.alias("nodes").asNodes()
 
 ## UQLResponse Interface
 
-- Alias(alias string) : DataItem
-- Alias(index int) : DataItem
+- Alias(alias string) : *DataItem
+- Alias(index int) : *DataItem
 
 
 ## DataItem Interface
