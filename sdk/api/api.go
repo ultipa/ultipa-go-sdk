@@ -54,7 +54,7 @@ func (api *UltipaAPI) GetConn(config *configuration.RequestConfig) (*connection.
 
 			// if is raft mode, check if contains CUD ops or exec task
 		} else if api.Pool.IsRaft {
-			if UqlItem.IsGlobal() {
+			if UqlItem.IsGlobal() || config.UseControl {
 				conn, err = api.Pool.GetGlobalMasterConn(conf)
 			} else if UqlItem.HasWrite() || config.UseMaster || conf.Consistency  {
 				conn, err = api.Pool.GetMasterConn(conf)
@@ -92,23 +92,22 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 	return client, conf, nil
 }
 
-func (api *UltipaAPI) GetControlClient(config *configuration.RequestConfig) (ultipa.UltipaControlsClient, *configuration.UltipaConfig, error) {
+func (api *UltipaAPI) GetControlClient(config *configuration.RequestConfig) (ultipa.UltipaControlsClient,  error) {
 
 	if config == nil {
 		config = &configuration.RequestConfig{}
 	}
 
-	config.UseMaster = true
-	config.GraphName = "global"
+	config.UseControl = true
 
-	conn, conf, err := api.GetConn(config)
+	conn, _, err := api.GetConn(config)
 
 	if err != nil {
-		return nil, conf, err
+		return nil, err
 	}
 	client := conn.GetControlClient()
 
-	return client, conf, nil
+	return client, nil
 }
 
 // UQL send a uql string to ultipa graph, and return a http UQL Response

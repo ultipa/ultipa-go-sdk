@@ -54,7 +54,7 @@ func (api *UltipaAPI) InstallAlgo(algoFilePath string, algoInfoFilePath string, 
 
 	algoInfoFileMD5, _ := checksum.MD5sum(algoInfoFilePath)
 
-	client, _, err := api.GetControlClient(req)
+	client, err := api.GetControlClient(req)
 
 	if err != nil {
 		return nil, err
@@ -132,7 +132,7 @@ func (api *UltipaAPI) InstallAlgo(algoFilePath string, algoInfoFilePath string, 
 
 func (api *UltipaAPI) UninstallAlgo(algoName string, req *configuration.RequestConfig) (*ultipa.UninstallAlgoReply, error) {
 
-	client, _, err := api.GetControlClient(req)
+	client, err := api.GetControlClient(req)
 
 	if err != nil {
 		return nil, err

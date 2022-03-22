@@ -2,10 +2,14 @@ package api_test
 
 import (
 	"log"
+	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk"
 	"ultipa-go-sdk/sdk/api"
 	"ultipa-go-sdk/sdk/configuration"
+	"ultipa-go-sdk/sdk/structs"
 )
+
+var client *api.UltipaAPI
 
 func ExampleNewUltipaAPI() {
 
@@ -46,4 +50,33 @@ func ExampleUltipaAPI_UQL_Nodes_Edges() {
 	edges, edgeSchemas, err := respEdges.Alias("edges").AsEdges()
 
 	log.Println(edges, edgeSchemas, err)
+}
+
+
+func ExampleUltipaAPI_CreateGraph() {
+
+	graph := &structs.Graph{
+		Name: "new_graph",
+		Description: "my new graph",
+	}
+	resp, err := client.CreateGraph(graph, nil)
+
+	log.Println(resp.Status.Code, err)
+}
+
+func ExampleUltipaAPI_DropGraph() {
+
+	resp, err := client.DropGraph("old_graph", nil)
+	log.Println(resp.Status.Code, err)
+}
+
+func ExampleUltipaAPI_HasGraph() {
+
+	exist, err := client.HasGraph("exist_graph", nil)
+	log.Println(exist, err)
+}
+
+func ExampleUltipaAPI_ListSchema() {
+	schemas, _ := client.ListSchema(ultipa.DBType_DBNODE, nil)
+	log.Println(schemas)
 }
