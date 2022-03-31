@@ -79,6 +79,10 @@ func (gm *GraphManager) AddFollower(graphName string, conn *Connection) {
 
 	gci := gm.GetGraph(graphName)
 
+	if gci == nil {
+		return
+	}
+
 	gci.Graph = conn.Host
 
 	if gci.HasConn(conn) == true {
