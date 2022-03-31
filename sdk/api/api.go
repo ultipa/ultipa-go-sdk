@@ -140,11 +140,20 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 	if err != nil {
 		// if get error, ex: unavailable
 		err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
+
+		if err != nil {
+			return nil, err
+		}
+
 		resp, err = client.Uql(ctx, &ultipa.UqlRequest{
 			GraphName: conf.CurrentGraph,
 			Timeout:   conf.Timeout,
 			Uql:       uql,
 		})
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	uqlResp, err := http.NewUQLResponse(resp)
