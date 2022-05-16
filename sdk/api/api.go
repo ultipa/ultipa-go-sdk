@@ -201,6 +201,24 @@ func (api *UltipaAPI) Test() (bool, error) {
 
 	return true, err
 }
+func (api *UltipaAPI) GetActiveClientTest() (bool, *connection.Connection, error) {
+	conn, err := api.Pool.GetConn(nil)
+
+	if err != nil {
+		return false, nil, err
+	}
+	client := conn.GetClient()
+	ctx, _ := api.Pool.NewContext(nil)
+	resp, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
+		Name: "Conn Test",
+	})
+
+	if err != nil || resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return false, nil, err
+	}
+
+	return true, conn, err
+}
 
 func (api *UltipaAPI) SetCurrentGraph(graphName string) error {
 	api.Config.CurrentGraph = graphName
