@@ -5,6 +5,7 @@ import (
 	"errors"
 	"google.golang.org/grpc/metadata"
 	"log"
+	"sync"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
@@ -78,31 +79,35 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds uint32) {
 	if seconds <= 0 {
 		seconds = 3
 	}
+	var wg sync.WaitGroup
 	for _, conn := range pool.Connections {
+		wg.Add(1)
+		go func(conn *Connection) {
+			defer wg.Done()
+			ctx, _ := pool.NewContext(&configuration.RequestConfig{
+				Timeout: seconds,
+			})
 
-		ctx, _ := pool.NewContext(&configuration.RequestConfig{
-			Timeout: seconds,
-		})
+			resp, err := conn.GetControlClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
+				Name: "go sdk refresh",
+			})
 
-		resp, err := conn.GetControlClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
-			Name: "go sdk refresh",
-		})
+			if err != nil {
+				printers.PrintWarn(conn.Host + "failed - " + err.Error())
+				conn.Active = ultipa.ServerStatus_DEAD
+				return
+			}
 
-		if err != nil {
-			printers.PrintWarn(conn.Host + "failed - " + err.Error())
-			conn.Active = ultipa.ServerStatus_DEAD
-			continue
-		}
-
-		if resp.Status == nil || resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS {
-			conn.Active = ultipa.ServerStatus_ALIVE
-			pool.Actives = append(pool.Actives, conn)
-		} else {
-			printers.PrintWarn(conn.Host + "failed - " + resp.Status.Msg)
-			conn.Active = ultipa.ServerStatus_DEAD
-		}
-
+			if resp.Status == nil || resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS {
+				conn.Active = ultipa.ServerStatus_ALIVE
+				pool.Actives = append(pool.Actives, conn)
+			} else {
+				printers.PrintWarn(conn.Host + "failed - " + resp.Status.Msg)
+				conn.Active = ultipa.ServerStatus_DEAD
+			}
+		}(conn)
 	}
+	wg.Wait()
 }
 // 更新查看哪些连接还有效
 func (pool *ConnectionPool) RefreshActives() {
