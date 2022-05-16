@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"time"
 	"errors"
+	"time"
 )
 
 type UltipaTime struct {
@@ -31,6 +31,7 @@ func NewTime(datetime uint64) *UltipaTime {
 func NewTimeFromString(dateString string) (*UltipaTime, error) {
 	n := UltipaTime{}
 	layouts := []string{
+		"2006-01-02T15:04:05Z",
 		"2006-01-02 15:04:05.000",
 		"2006-01-02 15:04:05",
 		"2006-01-02 15:04",
@@ -48,8 +49,6 @@ func NewTimeFromString(dateString string) (*UltipaTime, error) {
 			return &n, err
 		}
 	}
-
-
 
 	return nil, errors.New("parse datetime string failed : " + dateString)
 }
