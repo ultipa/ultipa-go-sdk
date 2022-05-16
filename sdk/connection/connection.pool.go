@@ -73,13 +73,15 @@ func (pool *ConnectionPool) CreateConnections() error {
 	return err
 }
 
-// 更新查看哪些连接还有效
-func (pool *ConnectionPool) RefreshActives() {
+func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds uint32) {
 	pool.Actives = []*Connection{}
+	if seconds <= 0 {
+		seconds = 3
+	}
 	for _, conn := range pool.Connections {
 
 		ctx, _ := pool.NewContext(&configuration.RequestConfig{
-			Timeout: 6,
+			Timeout: seconds,
 		})
 
 		resp, err := conn.GetControlClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
@@ -101,6 +103,10 @@ func (pool *ConnectionPool) RefreshActives() {
 		}
 
 	}
+}
+// 更新查看哪些连接还有效
+func (pool *ConnectionPool) RefreshActives() {
+	pool.RefreshActivesWithSeconds(6)
 }
 func (pool *ConnectionPool) ForceRefreshClusterInfo(graphName string) error {
 	pool.GraphMgr.DeleteGraph(graphName)
