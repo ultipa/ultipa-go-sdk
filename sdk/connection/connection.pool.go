@@ -28,6 +28,7 @@ type ConnectionPool struct {
 	RandomTick  int
 	Actives     []*Connection
 	IsRaft      bool
+	muActiveSafely sync.Mutex
 }
 
 func NewConnectionPool(config *configuration.UltipaConfig) (*ConnectionPool, error) {
@@ -75,6 +76,8 @@ func (pool *ConnectionPool) CreateConnections() error {
 }
 
 func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds uint32) {
+	pool.muActiveSafely.Lock()
+	defer pool.muActiveSafely.Unlock()
 	pool.Actives = []*Connection{}
 	if seconds <= 0 {
 		seconds = 3
@@ -165,7 +168,6 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 		c := pool.Connections[resp.Status.ClusterInfo.LeaderAddress]
 		pool.GraphMgr.SetLeader(graphName, c)
 		pool.GraphMgr.ClearFollower(graphName)
-
 		for _, follower := range resp.Status.ClusterInfo.Followers {
 			fconn := pool.Connections[follower.Address]
 
@@ -236,6 +238,8 @@ func (pool *ConnectionPool) SetMasterConn(graphName string, conn *Connection) {
 
 // Get random client
 func (pool *ConnectionPool) GetRandomConn(config *configuration.UltipaConfig) (*Connection, error) {
+	pool.muActiveSafely.Lock()
+	defer pool.muActiveSafely.Unlock()
 	if len(pool.Actives) < 1 {
 		return nil, errors.New("No Actived Connection is found")
 	}
