@@ -40,7 +40,7 @@ func NewTimeFromString(dateString string) (*UltipaTime, error) {
 	}
 
 	for _, l := range layouts {
-		t, err := time.Parse(l, dateString)
+		t, err := time.ParseInLocation(l, dateString, time.Local)
 		n.Time = &t
 		v := n.TimeToUint64(&t)
 
