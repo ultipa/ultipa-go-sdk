@@ -155,7 +155,11 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 	if resp.Status.ErrorCode == ultipa.ErrorCode_RAFT_REDIRECT {
 		pool.IsRaft = true
 		if pool.Connections[resp.Status.ClusterInfo.Redirect] == nil {
-			pool.Connections[resp.Status.ClusterInfo.Redirect], err = NewConnection(resp.Status.ClusterInfo.Redirect, pool.Config)
+			c, err := NewConnection(resp.Status.ClusterInfo.Redirect, pool.Config)
+			if err != nil {
+				return err
+			}
+			pool.Connections[resp.Status.ClusterInfo.Redirect] = c
 		}
 
 		pool.GraphMgr.SetLeader(graphName, pool.Connections[resp.Status.ClusterInfo.Redirect])
@@ -245,8 +249,11 @@ func (pool *ConnectionPool) GetRandomConn(config *configuration.UltipaConfig) (*
 	}
 
 	pool.RandomTick++
-
-	return pool.Actives[pool.RandomTick%len(pool.Actives)], nil
+	conn := pool.Actives[pool.RandomTick%len(pool.Actives)]
+	if conn == nil {
+		return nil, errors.New("Random Actived Connection is nil")
+	}
+	return conn, nil
 }
 
 // Get Task/Analytics client
