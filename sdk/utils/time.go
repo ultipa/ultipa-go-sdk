@@ -31,7 +31,7 @@ func NewTime(datetime uint64) *UltipaTime {
 func NewTimeFromString(dateString string) (*UltipaTime, error) {
 	n := UltipaTime{}
 	layouts := []string{
-		"2006-01-02T15:04:05Z",
+		"2006-01-02T15:04:05Z07:00",
 		"2006-01-02 15:04:05.000",
 		"2006-01-02 15:04:05",
 		"2006-01-02 15:04",
