@@ -27,6 +27,7 @@ type ConnectionPool struct {
 	Connections map[string]*Connection // Host : Connection
 	RandomTick  int
 	Actives     []*Connection
+	LastActivesTime time.Time
 	IsRaft      bool
 	muActiveSafely sync.Mutex
 }
@@ -78,6 +79,13 @@ func (pool *ConnectionPool) CreateConnections() error {
 func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds uint32) {
 	pool.muActiveSafely.Lock()
 	defer pool.muActiveSafely.Unlock()
+	if time.Now().Sub(pool.LastActivesTime) <= 5 * time.Second {
+		// 避免频繁刷新
+		return
+	}
+	defer func() {
+		pool.LastActivesTime = time.Now()
+	}()
 	pool.Actives = []*Connection{}
 	if seconds <= 0 {
 		seconds = 3
@@ -87,9 +95,10 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds uint32) {
 		wg.Add(1)
 		go func(conn *Connection) {
 			defer wg.Done()
-			ctx, _ := pool.NewContext(&configuration.RequestConfig{
+			ctx, cancel := pool.NewContext(&configuration.RequestConfig{
 				Timeout: seconds,
 			})
+			defer cancel()
 
 			resp, err := conn.GetControlClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
 				Name: "go sdk refresh",
@@ -139,7 +148,8 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 		return err
 	}
 
-	ctx, _ := pool.NewContext(&configuration.RequestConfig{GraphName: graphName})
+	ctx, cancel := pool.NewContext(&configuration.RequestConfig{GraphName: graphName})
+	defer cancel()
 	client := conn.GetControlClient()
 	resp, err := client.GetLeader(ctx, &ultipa.GetLeaderRequest{})
 
@@ -310,9 +320,10 @@ func (pool *ConnectionPool) RunHeartBeat() {
 				//log.Println("Heart Beat Start... ")
 				for _, conn := range pool.Connections {
 
-					ctx, _ := pool.NewContext(&configuration.RequestConfig{
+					ctx, cancel := pool.NewContext(&configuration.RequestConfig{
 						Timeout: 6,
 					})
+					defer cancel()
 					//log.Println("Heart Beat Item", conn.Host)
 					resp, err := conn.GetControlClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
 						Name: "go sdk refresh",

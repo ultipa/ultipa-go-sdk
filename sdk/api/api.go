@@ -190,7 +190,8 @@ func (api *UltipaAPI) Test() (bool, error) {
 		return false, err
 	}
 	client := conn.GetClient()
-	ctx, _ := api.Pool.NewContext(nil)
+	ctx, cancel := api.Pool.NewContext(nil)
+	defer cancel()
 	resp, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
 		Name: "Conn Test",
 	})
@@ -208,7 +209,8 @@ func (api *UltipaAPI) GetActiveClientTest() (bool, *connection.Connection, error
 		return false, nil, err
 	}
 	client := conn.GetClient()
-	ctx, _ := api.Pool.NewContext(nil)
+	ctx, cancel := api.Pool.NewContext(nil)
+	defer cancel()
 	resp, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
 		Name: "Conn Test",
 	})
