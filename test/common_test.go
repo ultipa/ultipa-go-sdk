@@ -3,6 +3,7 @@ package test
 import (
 	"log"
 	"testing"
+	"time"
 )
 
 func TestSlice(t *testing.T) {
@@ -26,5 +27,24 @@ func TestBitIsInclude(t *testing.T) {
 
 	AB := A | B
 
-	log.Println(AB & A, AB & B, AB & C, AB & D)
+	log.Println(AB&A, AB&B, AB&C, AB&D)
+}
+
+func TestTimeZoneTimestamp(t *testing.T) {
+	t1 := "2022-05-19T12:00:00Z"
+	t2 := "2022-05-19T12:00:00Z"
+
+	tt1, err := time.Parse(time.RFC3339, t1)
+
+	if err != nil {
+		log.Fatalln("E1",err)
+	}
+
+	tt2, err := time.Parse("2006-01-02T15:04:05Z07:00", t2)
+
+	if err != nil {
+		log.Fatalln("E2", err)
+	}
+
+	log.Println(tt1.UTC(), tt2.UTC())
 }
