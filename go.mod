@@ -9,6 +9,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/jinzhu/copier v0.3.2
 	github.com/lrita/cmap v0.0.0-20200818170753-e987cd3dfa73
+	github.com/pieterclaerhout/go-waitgroup v1.0.7
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	golang.org/x/sys v0.0.0-20211019181941-9d821ace8654 // indirect
 	golang.org/x/text v0.3.7 // indirect
