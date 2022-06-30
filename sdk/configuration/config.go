@@ -11,18 +11,18 @@ import (
 
 //
 type UltipaConfig struct {
-	Hosts            []string
-	Username         string
-	Password         string
-	DefaultGraph     string `yaml:"default_graph"`
-	Crt              []byte
-	MaxRecvSize      int `yaml:"max_recv_size"`
-	Consistency      bool
-	CurrentGraph     string `yaml:"current_graph"`
-	CurrentClusterId string `yaml:"current_cluster_id"`
-	Timeout          uint32
-	Debug            bool
-	HeartBeat        int `yaml:"heart_beat"` // frequency:second,  if 0 means no heart beat
+	Hosts            []string  // hosts with ports
+	Username         string // ultipa graph username
+	Password         string // ultipa graph password
+	DefaultGraph     string `yaml:"default_graph"` // default graph when connection established
+	Crt              []byte // certification file for encrypt messages
+	MaxRecvSize      int `yaml:"max_recv_size"` // grpc max receive size
+	Consistency      bool // if consistency, reading query will send to master
+	CurrentGraph     string `yaml:"current_graph"` // the current graph, used when user what get the connection's current graph name
+	CurrentClusterId string `yaml:"current_cluster_id"` // used for name server only
+	Timeout          uint32 // timeout - seconds
+	Debug            bool // debug, print more logs
+	HeartBeat        int `yaml:"heart_beat"` // frequency:second,  if 0 means no heart beat, to make sure the connection is alive
 }
 
 func NewUltipaConfig(config *UltipaConfig) *UltipaConfig {

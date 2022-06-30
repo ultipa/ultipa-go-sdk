@@ -237,6 +237,7 @@ func (di *DataItem) AsAttr() (attr *structs.Attr, err error) {
 	oAttr := di.Data.(*ultipa.AttrAlias)
 
 	attr.Name = oAttr.Alias
+	attr.PropertyType = oAttr.PropertyType
 
 	for _, v := range oAttr.Values {
 		attr.Rows = append(attr.Rows, utils.ConvertBytesToInterface(v, oAttr.PropertyType))

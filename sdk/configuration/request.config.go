@@ -11,16 +11,16 @@ const (
 )
 
 type RequestConfig struct {
-	GraphName string
-	Timeout   uint32
-	ClusterId string
+	GraphName string // Graphset Name
+	Timeout   uint32 // timeout (Seconds)
+	ClusterId string // Name Server Only
 	Host      string // set for force host test
-	UseMaster bool
-	UseControl bool
-	RequestType RequestType
-	InsertType ultipa.InsertType
-	CreateNodeIfNotExist bool
-	Uql string
+	UseMaster bool // Use Master( graphSet master )
+	UseControl bool // Use Control Node( global master )
+	RequestType RequestType // choose connection by request type, write => master, task > algo, normal => random
+	InsertType ultipa.InsertType // used for insertBulkNodes/Edges
+	CreateNodeIfNotExist bool // used for insertBulkEdges
+	Uql string // for Go Only, used for inner program
 }
 
 func (rc * RequestConfig) SetRequestTypeByUql(uql string) {
