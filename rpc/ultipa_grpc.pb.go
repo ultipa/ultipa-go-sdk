@@ -254,7 +254,7 @@ type UltipaControlsClient interface {
 	UserSetting(ctx context.Context, in *UserSettingRequest, opts ...grpc.CallOption) (*UserSettingReply, error)
 	//3. 获取raft的leader
 	GetLeader(ctx context.Context, in *GetLeaderRequest, opts ...grpc.CallOption) (*GetLeaderReply, error)
-	//4.uql扩展，以下命令在此接口执行执行 top, kill show().*
+	//4.uql扩展，以下命令在此接口执行执行 top, kill show().* stats
 	UqlEx(ctx context.Context, in *UqlRequest, opts ...grpc.CallOption) (UltipaControls_UqlExClient, error)
 	//5.导出点,边数据
 	Export(ctx context.Context, in *ExportRequest, opts ...grpc.CallOption) (UltipaControls_ExportClient, error)
@@ -451,7 +451,7 @@ type UltipaControlsServer interface {
 	UserSetting(context.Context, *UserSettingRequest) (*UserSettingReply, error)
 	//3. 获取raft的leader
 	GetLeader(context.Context, *GetLeaderRequest) (*GetLeaderReply, error)
-	//4.uql扩展，以下命令在此接口执行执行 top, kill show().*
+	//4.uql扩展，以下命令在此接口执行执行 top, kill show().* stats
 	UqlEx(*UqlRequest, UltipaControls_UqlExServer) error
 	//5.导出点,边数据
 	Export(*ExportRequest, UltipaControls_ExportServer) error

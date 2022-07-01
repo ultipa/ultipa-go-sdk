@@ -4,6 +4,7 @@ package ultipa;
 
 option go_package = ".;ultipa";
 
+
 // The ultipa service definition.
 service UltipaRpcs {
   //1.Sends a greeting
@@ -22,7 +23,6 @@ service UltipaRpcs {
   }
 }
 
-// 不被阻塞/无锁
 service UltipaControls{
   //1.Sends a greeting
   rpc SayHello (HelloUltipaRequest) returns (HelloUltipaReply) {
@@ -33,7 +33,7 @@ service UltipaControls{
   //3. 获取raft的leader
   rpc GetLeader (GetLeaderRequest) returns (GetLeaderReply) {
   }
-  //4.uql扩展，以下命令在此接口执行执行 top, kill show().*
+  //4.uql扩展，以下命令在此接口执行执行 top, kill show().* stats
   rpc UqlEx (UqlRequest) returns (stream UqlReply) {
   }
   //5.导出点,边数据
@@ -73,6 +73,7 @@ message UqlRequest {
   string uql = 1;
   uint32 timeout = 2;
   string graph_name = 3;
+  string user_name = 4;
 }
 
 enum ResultType {
@@ -163,7 +164,7 @@ message UserSettingReply {
 /*------------------------4.Download------------------------------*/
 //下载算法生成文件
 message DownloadFileRequestV2 {
-  string algo_name = 1;
+  string file_name = 1;
   uint64 task_id = 2 [jstype = JS_STRING];
 }
 message DownloadFileReply {
@@ -221,6 +222,7 @@ message InsertNodesReply {
   repeated uint64 uuids = 4 [jstype = JS_STRING];
   repeated string ids = 5;
   repeated uint32 ignore_indexes = 6;
+  repeated uint32 ignore_error_code = 7;
 }
 /*------------------------InsertNodes------------------------------*/
 
@@ -240,6 +242,7 @@ message InsertEdgesReply {
   int32 engine_time_cost = 3;
   repeated uint64 uuids = 4 [jstype = JS_STRING];
   repeated uint32 ignore_indexes = 5;
+  repeated uint32 ignore_error_code = 7;
 }
 /*------------------------InsertEdges------------------------------*/
 

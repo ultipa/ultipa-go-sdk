@@ -1,5 +1,10 @@
 # CHANGE LOGS
 
+## Version 4.0.10
+
+- add insertRequestConfig
+- add insertResponse
+- update insertBatch* Methods
 
 ## Version 4.0.5
 

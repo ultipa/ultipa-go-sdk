@@ -1,6 +1,7 @@
 package structs
 
 import (
+	"fmt"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/types"
 	"ultipa-go-sdk/sdk/utils"
@@ -13,6 +14,11 @@ type Node struct {
 	Schema string
 	Values *Values
 }
+
+func NewNode() *Node {
+	return &Node{Values: NewValues()}
+}
+
 
 func (node *Node) GetID() types.ID {
 	return node.ID
@@ -49,9 +55,15 @@ func (node *Node) Set(key string, value interface{}) error {
 	return nil
 }
 
-func NewNode() *Node {
-	return &Node{Values: NewValues()}
+
+func (node *Node) UpdateByValueID(){
+	id := node.Get("_id")
+	//uuid := node.Get("_uuid")
+	if id != nil {
+		node.ID = id.(string)
+	}
 }
+
 
 func NewNodeFromNodeRow(schema *Schema, nodeRow *ultipa.NodeRow) *Node {
 	newNode := NewNode()
@@ -68,6 +80,7 @@ func NewNodeFromNodeRow(schema *Schema, nodeRow *ultipa.NodeRow) *Node {
 	return newNode
 }
 
+
 func ConvertStringNodes(schema *Schema, nodes []*Node) {
 
 	// For by Schema, not nodes value
@@ -79,7 +92,11 @@ func ConvertStringNodes(schema *Schema, nodes []*Node) {
 			if stri == nil {
 				str = utils.GetDefaultNilString(prop.Type)
 			} else {
-				str = stri.(string)
+				if strtmp, ok := stri.(string); ok {
+					str = strtmp
+				} else {
+					str = fmt.Sprint(str)
+				}
 			}
 
 			v, err := utils.StringAsInterface(str, prop.Type)

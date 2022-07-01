@@ -5,28 +5,31 @@ import (
 	"sync"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
+	"ultipa-go-sdk/sdk/http"
 	"ultipa-go-sdk/sdk/printers"
 	"ultipa-go-sdk/sdk/structs"
 	"ultipa-go-sdk/sdk/utils"
 )
 
-func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EdgeTable, config *configuration.RequestConfig) (*ultipa.InsertEdgesReply, error) {
+func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EdgeTable, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
 
 	config.UseMaster = true
-	client, conf, err := api.GetClient(config)
+	client, conf, err := api.GetClient(config.RequestConfig)
 
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel := api.Pool.NewContext(config)
+	ctx, cancel := api.Pool.NewContext(config.RequestConfig)
 
 	defer cancel()
 
 	resp, err := client.InsertEdges(ctx, &ultipa.InsertEdgesRequest{
 		GraphName: conf.CurrentGraph,
 		EdgeTable: table,
-		Silent:    true,
+		CreateNodeIfNotExist: config.CreateNodeIfNotExist,
+		InsertType: config.InsertType,
+		Silent:    config.Silent,
 	})
 
 	if err != nil {
@@ -37,23 +40,23 @@ func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EdgeTable, config *configur
 		return nil, errors.New(resp.Status.Msg)
 	}
 
-	return resp, err
+	return http.NewEdgesInsertResponse(resp)
 }
 
-func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*structs.Edge, config *configuration.RequestConfig) (*ultipa.InsertEdgesReply, error) {
+func (api *UltipaAPI) 	InsertEdgesBatchBySchema(schema *structs.Schema, rows []*structs.Edge, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
 
 	if config == nil {
-		config = &configuration.RequestConfig{}
+		config = &configuration.InsertRequestConfig{}
 	}
 
 	config.UseMaster = true
-	client, conf, err := api.GetClient(config)
+	client, conf, err := api.GetClient(config.RequestConfig)
 
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel := api.Pool.NewContext(config)
+	ctx, cancel := api.Pool.NewContext(config.RequestConfig)
 
 	defer cancel()
 
@@ -121,7 +124,7 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 		EdgeTable:            table,
 		InsertType:           config.InsertType,
 		CreateNodeIfNotExist: config.CreateNodeIfNotExist,
-		Silent:               true,
+		Silent:               config.Silent,
 	})
 
 	if err != nil {
@@ -132,18 +135,18 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 		return nil, errors.New(resp.Status.Msg)
 	}
 
-	return resp, err
+	return http.NewEdgesInsertResponse(resp)
 }
 
-//InsertNodesBatchAuto Nodes interface values should be string
-func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *configuration.RequestConfig) error {
+//InsertEdgesBatchAuto Nodes interface values should be string
+func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *configuration.InsertRequestConfig) (resps []*http.InsertResponse, err error) {
 
 	// collect schema and nodes
 
-	schemas, err := api.ListSchema(ultipa.DBType_DBEDGE, config)
+	schemas, err := api.ListSchema(ultipa.DBType_DBEDGE, config.RequestConfig)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	batches := map[string]*Batch{}
@@ -162,7 +165,8 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 			if schema, ok := s.(*structs.Schema); ok {
 				batches[edge.Schema].Schema = schema
 			} else {
-				continue
+				// schema not exit
+				return nil, errors.New("Edge Schema not found : " + edge.Schema)
 			}
 		}
 
@@ -175,12 +179,15 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 
 		structs.ConvertStringEdges(batch.Schema, batch.Edges)
 
-		_, err := api.InsertEdgesBatchBySchema(batch.Schema, batch.Edges, config)
+		resp, err := api.InsertEdgesBatchBySchema(batch.Schema, batch.Edges, config)
 
 		if err != nil {
-			return err
+			return nil,err
 		}
+
+		resps = append(resps, resp)
+
 	}
 
-	return nil
+	return resps,nil
 }

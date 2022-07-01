@@ -22,8 +22,10 @@ type ResponseGraph struct {
 	TotalNodes int64
 	TotalEdges int64
 }
+
 type ResponseProperty struct {
 }
+
 type ResponseSchema struct {
 	Name        string
 	Description string
@@ -31,6 +33,7 @@ type ResponseSchema struct {
 	TotalNodes  int64
 	TotalEdges  int64
 }
+
 type ResponseNodeSchemas struct {
 	Status  *Status
 	Schemas []*ResponseSchema

@@ -18,9 +18,15 @@ type RequestConfig struct {
 	UseMaster bool // Use Master( graphSet master )
 	UseControl bool // Use Control Node( global master )
 	RequestType RequestType // choose connection by request type, write => master, task > algo, normal => random
+	Uql string // for Go Only, used for inner program
+}
+
+
+type InsertRequestConfig struct {
+	*RequestConfig
 	InsertType ultipa.InsertType // used for insertBulkNodes/Edges
 	CreateNodeIfNotExist bool // used for insertBulkEdges
-	Uql string // for Go Only, used for inner program
+	Silent bool // if returns new ids
 }
 
 func (rc * RequestConfig) SetRequestTypeByUql(uql string) {
