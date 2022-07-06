@@ -265,6 +265,8 @@ type UltipaControlsClient interface {
 	InstallAlgo(ctx context.Context, opts ...grpc.CallOption) (UltipaControls_InstallAlgoClient, error)
 	//8.算法卸载
 	UninstallAlgo(ctx context.Context, in *UninstallAlgoRequest, opts ...grpc.CallOption) (*UninstallAlgoReply, error)
+	//9.remote graph loader
+	Uploader(ctx context.Context, opts ...grpc.CallOption) (UltipaControls_UploaderClient, error)
 }
 
 type ultipaControlsClient struct {
@@ -441,6 +443,40 @@ func (c *ultipaControlsClient) UninstallAlgo(ctx context.Context, in *UninstallA
 	return out, nil
 }
 
+func (c *ultipaControlsClient) Uploader(ctx context.Context, opts ...grpc.CallOption) (UltipaControls_UploaderClient, error) {
+	stream, err := c.cc.NewStream(ctx, &UltipaControls_ServiceDesc.Streams[4], "/ultipa.UltipaControls/Uploader", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &ultipaControlsUploaderClient{stream}
+	return x, nil
+}
+
+type UltipaControls_UploaderClient interface {
+	Send(*UploaderRequest) error
+	CloseAndRecv() (*UploaderReply, error)
+	grpc.ClientStream
+}
+
+type ultipaControlsUploaderClient struct {
+	grpc.ClientStream
+}
+
+func (x *ultipaControlsUploaderClient) Send(m *UploaderRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *ultipaControlsUploaderClient) CloseAndRecv() (*UploaderReply, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(UploaderReply)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // UltipaControlsServer is the server API for UltipaControls service.
 // All implementations must embed UnimplementedUltipaControlsServer
 // for forward compatibility
@@ -462,6 +498,8 @@ type UltipaControlsServer interface {
 	InstallAlgo(UltipaControls_InstallAlgoServer) error
 	//8.算法卸载
 	UninstallAlgo(context.Context, *UninstallAlgoRequest) (*UninstallAlgoReply, error)
+	//9.remote graph loader
+	Uploader(UltipaControls_UploaderServer) error
 	mustEmbedUnimplementedUltipaControlsServer()
 }
 
@@ -492,6 +530,9 @@ func (UnimplementedUltipaControlsServer) InstallAlgo(UltipaControls_InstallAlgoS
 }
 func (UnimplementedUltipaControlsServer) UninstallAlgo(context.Context, *UninstallAlgoRequest) (*UninstallAlgoReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UninstallAlgo not implemented")
+}
+func (UnimplementedUltipaControlsServer) Uploader(UltipaControls_UploaderServer) error {
+	return status.Errorf(codes.Unimplemented, "method Uploader not implemented")
 }
 func (UnimplementedUltipaControlsServer) mustEmbedUnimplementedUltipaControlsServer() {}
 
@@ -667,6 +708,32 @@ func _UltipaControls_UninstallAlgo_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UltipaControls_Uploader_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(UltipaControlsServer).Uploader(&ultipaControlsUploaderServer{stream})
+}
+
+type UltipaControls_UploaderServer interface {
+	SendAndClose(*UploaderReply) error
+	Recv() (*UploaderRequest, error)
+	grpc.ServerStream
+}
+
+type ultipaControlsUploaderServer struct {
+	grpc.ServerStream
+}
+
+func (x *ultipaControlsUploaderServer) SendAndClose(m *UploaderReply) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *ultipaControlsUploaderServer) Recv() (*UploaderRequest, error) {
+	m := new(UploaderRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // UltipaControls_ServiceDesc is the grpc.ServiceDesc for UltipaControls service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -710,6 +777,11 @@ var UltipaControls_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "InstallAlgo",
 			Handler:       _UltipaControls_InstallAlgo_Handler,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "Uploader",
+			Handler:       _UltipaControls_Uploader_Handler,
 			ClientStreams: true,
 		},
 	},

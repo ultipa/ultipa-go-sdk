@@ -12,6 +12,7 @@ type Statistic struct {
 	EdgeAffected int `key:"edge_affected" type:"int"`
 	TotalCost    int `key:"total_time_cost" type:"int"`
 	EngineCost   int `key:"engine_time_cost" type:"int"`
+
 }
 
 func ParseStatistic(table *ultipa.Table) (*Statistic, error) {

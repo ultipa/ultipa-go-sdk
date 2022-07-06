@@ -57,7 +57,7 @@ func TestBatchInsertNodes(t *testing.T) {
 					Type: ultipa.PropertyType_INT32,
 				})
 
-				_, err := client.InsertNodesBatchBySchema(schema, nodes, &configuration.RequestConfig{
+				_, err := client.InsertNodesBatchBySchema(schema, nodes, &configuration.InsertRequestConfig{
 					InsertType: ultipa.InsertType_OVERWRITE,
 				})
 
@@ -138,7 +138,7 @@ func TestBatchInsertEdges(t *testing.T) {
 				defer wg.Done()
 
 
-				_, err := client.InsertEdgesBatchBySchema(schema, edges, &configuration.RequestConfig{
+				_, err := client.InsertEdgesBatchBySchema(schema, edges, &configuration.InsertRequestConfig{
 					InsertType: ultipa.InsertType_OVERWRITE,
 				})
 
