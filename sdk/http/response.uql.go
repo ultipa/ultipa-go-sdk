@@ -16,11 +16,12 @@ type UQLResponse struct {
 		DataItem *DataItem
 		Index    int
 	}
-	Reply     *ultipa.UqlReply
-	Status    *Status
-	Statistic *Statistic
-	AliasList []string
-	Resp      ultipa.UltipaRpcs_UqlClient
+	Reply       *ultipa.UqlReply
+	Status      *Status
+	Statistic   *Statistic
+	ExplainPlan *ExplainPlan
+	AliasList   []string
+	Resp        ultipa.UltipaRpcs_UqlClient
 }
 
 func NewUQLResponse(resp ultipa.UltipaRpcs_UqlClient) (response *UQLResponse, err error) {
@@ -46,6 +47,13 @@ func NewUQLResponse(resp ultipa.UltipaRpcs_UqlClient) (response *UQLResponse, er
 
 		if response.Statistic == nil {
 			response.Statistic, err = ParseStatistic(record.Statistics)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		if response.ExplainPlan == nil {
+			response.ExplainPlan, err = ParseExplainPlan(record.ExplainPlan)
 			if err != nil {
 				return nil, err
 			}

@@ -16,7 +16,7 @@ var client *api.UltipaAPI
 func ExampleNewUltipaAPI() {
 
 	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
-		Hosts: []string{"10.0.0.1:60061","10.0.0.2:60061","10.0.0.3:60061"},
+		Hosts:    []string{"10.0.0.1:60061", "10.0.0.2:60061", "10.0.0.3:60061"},
 		Username: "root",
 		Password: "root",
 	})
@@ -34,7 +34,6 @@ func ExampleNewUltipaAPI() {
 
 func ExampleUltipaAPI_UQL_Nodes_Edges() {
 
-
 	rConfig := &configuration.RequestConfig{
 		Timeout: 20,
 	}
@@ -44,8 +43,6 @@ func ExampleUltipaAPI_UQL_Nodes_Edges() {
 
 	log.Println(nodes, schemas, err)
 
-
-
 	respEdges, err := client.UQL("find().edges() return edges limit 1", nil)
 
 	edges, edgeSchemas, err := respEdges.Alias("edges").AsEdges()
@@ -53,11 +50,10 @@ func ExampleUltipaAPI_UQL_Nodes_Edges() {
 	log.Println(edges, edgeSchemas, err)
 }
 
-
 func ExampleUltipaAPI_CreateGraph() {
 
 	graph := &structs.Graph{
-		Name: "new_graph",
+		Name:        "new_graph",
 		Description: "my new graph",
 	}
 	resp, err := client.CreateGraph(graph, nil)
@@ -87,11 +83,11 @@ func ExampleUltipaAPI_ListSchema() {
 
 func ExampleUltipaAPI_GetSchema() {
 	//get node schema
-	nodeSchema, _ := client.GetSchema("my_node_schema",ultipa.DBType_DBNODE, nil)
+	nodeSchema, _ := client.GetSchema("my_node_schema", ultipa.DBType_DBNODE, nil)
 	log.Println(nodeSchema)
 
 	//get edge schema
-	edgeSchema, _ := client.GetSchema("my_edge_schema",ultipa.DBType_DBEDGE, nil)
+	edgeSchema, _ := client.GetSchema("my_edge_schema", ultipa.DBType_DBEDGE, nil)
 	log.Println(edgeSchema)
 }
 
@@ -99,7 +95,7 @@ func ExampleUltipaAPI_CreateSchema() {
 
 	// create an empty schema
 	newSchema := &structs.Schema{
-		Name: "new_node_schema",
+		Name:   "new_node_schema",
 		DBType: ultipa.DBType_DBNODE,
 	}
 	resp, _ := client.CreateSchema(newSchema, false, nil)
@@ -144,7 +140,7 @@ func ExampleUltipaAPI_CreateNodeProperty() {
 		Type: ultipa.PropertyType_STRING,
 	}
 
-	resp ,_ := client.CreateProperty("target_schema", ultipa.DBType_DBNODE, newProp, nil)
+	resp, _ := client.CreateProperty("target_schema", ultipa.DBType_DBNODE, newProp, nil)
 	log.Println(resp.Status.Code)
 
 	// Create Edge Property
@@ -153,10 +149,10 @@ func ExampleUltipaAPI_CreateNodeProperty() {
 		Type: ultipa.PropertyType_STRING,
 	}
 
-	resp2 ,_ := client.CreateProperty("target_schema", ultipa.DBType_DBEDGE, newEdgeProp, nil)
+	resp2, _ := client.CreateProperty("target_schema", ultipa.DBType_DBEDGE, newEdgeProp, nil)
 	log.Println(resp2.Status.Code)
 
-	exist ,_ := client.CreatePropertyIfNotExist("target_schema", ultipa.DBType_DBEDGE, newEdgeProp, nil)
+	exist, _ := client.CreatePropertyIfNotExist("target_schema", ultipa.DBType_DBEDGE, newEdgeProp, nil)
 	log.Println(exist)
 }
 
@@ -318,7 +314,7 @@ func ExampleUltipaAPI_InsertNodesBatchBySchema() {
 		nodes = append(nodes, newNode)
 	}
 
-	_, err := client.InsertNodesBatchBySchema(schema, nodes, &configuration.RequestConfig{
+	_, err := client.InsertNodesBatchBySchema(schema, nodes, &configuration.InsertRequestConfig{
 		InsertType: ultipa.InsertType_OVERWRITE,
 	})
 
