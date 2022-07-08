@@ -28,15 +28,29 @@ func NewTime(datetime uint64) *UltipaTime {
 // StringToTime , layoutISO := "2006-01-02 15:04:05.000"
 // StringToTime , layoutISO := "2006-01-02 15:04:05"
 // StringToTime , layoutISO := "2006-01-02"
+func NewTimeFromStringFormat(dateString string, format string) (*UltipaTime, error) {
+
+	t, err := time.Parse(format, dateString)
+
+	if err != nil {
+		return nil, err
+	}
+
+	n := UltipaTime{}
+	n.Time = &t
+	n.Datetime = n.TimeToUint64(&t)
+
+	return &n, err
+}
 func NewTimeFromString(dateString string) (*UltipaTime, error) {
 	n := UltipaTime{}
 	layouts := []string{
+		"2006-01-02",
 		"2006-01-02T15:04:05Z07:00",
 		"2006-01-02 15:04:05.000",
 		"2006-01-02 15:04:05",
 		"2006-01-02 15:04",
 		"2006-01-02 15",
-		"2006-01-02",
 	}
 
 	for _, l := range layouts {
@@ -77,6 +91,7 @@ func NewTimeFromString(dateString string) (*UltipaTime, error) {
 //year += 2000;
 //}
 //
+
 func (t *UltipaTime) Uint64ToTime(datetime uint64) (_t *time.Time) {
 	year_month := (datetime >> 46) & 0x1FFFF
 
@@ -112,25 +127,31 @@ func (t *UltipaTime) Uint64ToTime(datetime uint64) (_t *time.Time) {
 //datetime |= macrosec;
 func (u *UltipaTime) TimeToUint64(time *time.Time) uint64 {
 
+	u.Datetime = TimeToUint64(*time)
+
+	return u.Datetime
+}
+
+
+func  TimeToUint64(time time.Time) uint64 {
+
 	datetime := uint64(0)
 
-	u.Year = uint64(time.Year())
-	u.Month = uint64(time.Month())
-	u.Day = uint64(time.Day())
-	u.Hour = uint64(time.Hour())
-	u.Minute = uint64(time.Minute())
-	u.Second = uint64(time.Second())
-	u.Macrosec = uint64(time.Nanosecond() / 1000)
+	Year := uint64(time.Year())
+	Month := uint64(time.Month())
+	Day := uint64(time.Day())
+	Hour := uint64(time.Hour())
+	Minute := uint64(time.Minute())
+	Second := uint64(time.Second())
+	Macrosec := uint64(time.Nanosecond() / 1000)
 
-	yearMonth := u.Year*13 + u.Month
+	yearMonth := Year*13 + Month
 	datetime = yearMonth << 46
-	datetime = datetime | (u.Day << 41)
-	datetime = datetime | (u.Hour << 36)
-	datetime = datetime | (u.Minute << 30)
-	datetime = datetime | (u.Second << 24)
-	datetime = datetime | u.Macrosec
-
-	u.Datetime = datetime
+	datetime = datetime | (Day << 41)
+	datetime = datetime | (Hour << 36)
+	datetime = datetime | (Minute << 30)
+	datetime = datetime | (Second << 24)
+	datetime = datetime | Macrosec
 
 	return datetime
 }

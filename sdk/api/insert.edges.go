@@ -49,6 +49,10 @@ func (api *UltipaAPI) 	InsertEdgesBatchBySchema(schema *structs.Schema, rows []*
 		config = &configuration.InsertRequestConfig{}
 	}
 
+	if config.RequestConfig == nil {
+		config.RequestConfig = &configuration.RequestConfig{}
+	}
+
 	config.UseMaster = true
 	client, conf, err := api.GetClient(config.RequestConfig)
 

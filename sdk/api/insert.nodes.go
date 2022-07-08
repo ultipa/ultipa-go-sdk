@@ -47,6 +47,13 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		config = &configuration.InsertRequestConfig{}
 	}
 
+	if config.RequestConfig == nil {
+		config.RequestConfig = &configuration.RequestConfig{}
+	}
+
+
+
+
 	config.UseMaster = true
 	client, conf, err := api.GetClient(config.RequestConfig)
 
