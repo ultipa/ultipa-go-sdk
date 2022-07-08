@@ -1,5 +1,9 @@
 # CHANGE LOGS
 
+## Version 4.0.5
+
+- Support more layouts when parsing string to UltipaTime
+- Support timestamp when deserializing from bytes to GoLang Type and return to an interface
 
 ## Version 4.0.5
 
