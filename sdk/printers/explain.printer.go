@@ -19,7 +19,14 @@ func PrintExplain(graphs []*structs.Explain) {
 		return
 	}
 
-	tree := constructTree(graphs)
+	//tree := constructTree(graphs)
+
+	explainChan := make(chan *structs.Explain, len(graphs))
+	for _, explain := range graphs {
+		explainChan <- explain
+	}
+	close(explainChan)
+	tree := buildTree(explainChan)
 
 	traverse(tree, 0)
 	root := putils.TreeFromLeveledList(leveledList)
@@ -54,6 +61,24 @@ func constructTree(graphs []*structs.Explain) *TreeNode {
 		}
 	}
 	return root
+}
+
+func buildTree(graphs chan *structs.Explain) *TreeNode {
+	if graphs == nil || len(graphs) == 0 {
+		return nil
+	}
+
+	record := <-graphs
+	tree := &TreeNode{
+		Explain:    record,
+		ChildNodes: []*TreeNode{},
+	}
+	for i := 1; i <= int(record.ChildrenNum); i++ {
+		node := buildTree(graphs)
+		tree.ChildNodes = append(tree.ChildNodes, node)
+	}
+
+	return tree
 }
 
 func traverse(tree *TreeNode, index int) {
