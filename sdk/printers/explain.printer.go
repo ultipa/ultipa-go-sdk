@@ -19,8 +19,6 @@ func PrintExplain(graphs []*structs.Explain) {
 		return
 	}
 
-	//tree := constructTree(graphs)
-
 	explainChan := make(chan *structs.Explain, len(graphs))
 	for _, explain := range graphs {
 		explainChan <- explain
@@ -32,35 +30,6 @@ func PrintExplain(graphs []*structs.Explain) {
 	root := putils.TreeFromLeveledList(leveledList)
 
 	pterm.DefaultTree.WithIndent(3).WithRoot(root).Render()
-}
-
-func constructTree(graphs []*structs.Explain) *TreeNode {
-	if graphs == nil || len(graphs) == 0 {
-		return &TreeNode{}
-	}
-	root := &TreeNode{
-		Explain:    graphs[0],
-		ChildNodes: []*TreeNode{},
-	}
-	var last *TreeNode
-	for i, record := range graphs {
-		if i == 0 {
-			last = root
-			continue
-		}
-
-		last.ChildNodes = append(last.ChildNodes, &TreeNode{
-			Explain:    record,
-			ChildNodes: []*TreeNode{},
-		})
-		if int(record.ChildrenNum) > 0 {
-			lastIndex := len(last.ChildNodes) - 1
-			last = last.ChildNodes[lastIndex]
-		} else if i > 0 {
-			last = root
-		}
-	}
-	return root
 }
 
 func buildTree(graphs chan *structs.Explain) *TreeNode {
