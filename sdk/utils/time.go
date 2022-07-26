@@ -17,6 +17,14 @@ type UltipaTime struct {
 	Time     *time.Time
 }
 
+func NewTimeStamp(datetime int64) *UltipaTime {
+	unix := time.Unix(datetime, 0)
+	n := UltipaTime{
+		Time: &unix,
+	}
+	return &n
+}
+
 func NewTime(datetime uint64) *UltipaTime {
 	n := UltipaTime{
 		Datetime: datetime,
