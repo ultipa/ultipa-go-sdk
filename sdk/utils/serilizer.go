@@ -141,7 +141,6 @@ func GetDefaultNilString(t ultipa.PropertyType) string {
 		fallthrough
 	case ultipa.PropertyType_UINT64:
 		fallthrough
-
 	case ultipa.PropertyType_FLOAT:
 		fallthrough
 	case ultipa.PropertyType_DOUBLE:
