@@ -123,7 +123,7 @@ func (api *UltipaAPI) DropNodeProperty(propertyName string, config *configuratio
 
 // Usage: DropEdgeProperty("@schemaName.propertyName", *RequestConfig)
 func (api *UltipaAPI) DropEdgeProperty(propertyName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
-	resp, err = api.UQL(fmt.Sprintf(`drop().node_property(%v)`, propertyName), config)
+	resp, err = api.UQL(fmt.Sprintf(`drop().edge_property(%v)`, propertyName), config)
 
 	return resp, err
 }

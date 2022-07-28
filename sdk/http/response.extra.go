@@ -21,6 +21,7 @@ type ResponseGraph struct {
 	Name       string
 	TotalNodes int64
 	TotalEdges int64
+	Status     string
 }
 
 type ResponseProperty struct {

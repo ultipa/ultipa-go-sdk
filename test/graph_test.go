@@ -4,6 +4,7 @@ import (
 	"log"
 	"testing"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/http"
 	"ultipa-go-sdk/sdk/printers"
 	"ultipa-go-sdk/sdk/structs"
 	"ultipa-go-sdk/utils"
@@ -11,6 +12,7 @@ import (
 
 func TestListGraph(t *testing.T) {
 	InitCases()
+	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
 	res, err := client.ListGraph(nil)
 	if err != nil {
 		log.Panic(err)
@@ -18,8 +20,7 @@ func TestListGraph(t *testing.T) {
 	log.Printf(utils.JSONString(res))
 }
 
-func TestCreateGraph(t *testing.T){
-
+func TestCreateGraph(t *testing.T) {
 
 	graphName := "test_creation"
 	hosts := []string{
@@ -52,7 +53,17 @@ func TestCreateGraph(t *testing.T){
 
 }
 
-
 func TestDeleteGraph(t *testing.T) {
 	client.DropGraph("zjs_amz", nil)
+}
+
+func TestAsGraph(t *testing.T) {
+	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	resp, _ := client.UQL("show().graph()", nil)
+	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphs()
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+	printers.PrintGraph(graphs)
 }
