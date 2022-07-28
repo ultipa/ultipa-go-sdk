@@ -13,6 +13,7 @@ type Graph struct {
 	Description string
 	TotalNodes  uint64
 	TotalEdges  uint64
+	Status      string
 }
 
 func GetDBTypeByString(str string) (ultipa.DBType, error) {

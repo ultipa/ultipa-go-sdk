@@ -263,13 +263,15 @@ func (di *DataItem) AsGraphs() (graphs []*structs.Graph, err error) {
 	}
 
 	for _, row := range table.TableRows {
-		//0:id, 1: name, 2: totalNodes ,3:totalEdges
+		//0:id, 1: name, 2: totalNodes ,3:totalEdges ,4:description ,5:status
 		values := row.GetValues()
 		graph := structs.Graph{}
 		graph.ID = string(values[0])
 		graph.Name = string(values[1])
 		graph.TotalNodes, _ = utils.Str2Uint64(utils.AsString(values[2]))
 		graph.TotalEdges, _ = utils.Str2Uint64(utils.AsString(values[3]))
+		graph.Description = string(values[4])
+		graph.Status = string(values[5])
 
 		graphs = append(graphs, &graph)
 	}

@@ -35,6 +35,7 @@ func (api *UltipaAPI) ListGraph(config *configuration.RequestConfig) (*http.Resp
 		id, _ := strconv.ParseInt(v.Get("id").(string), 10, 64)
 		totalNodes, _ := strconv.ParseInt(v.Get("totalNodes").(string), 10, 64)
 		totalEdges, _ := strconv.ParseInt(v.Get("totalEdges").(string), 10, 64)
+		status := v.Get("status").(string)
 		clusterId := ""
 		if v := v.Get("clusterId"); v != nil {
 			clusterId = v.(string)
@@ -45,6 +46,7 @@ func (api *UltipaAPI) ListGraph(config *configuration.RequestConfig) (*http.Resp
 			Name:       v.Get("name").(string),
 			TotalNodes: totalNodes,
 			TotalEdges: totalEdges,
+			Status:     status,
 		})
 	}
 	return &http.ResponseGraphs{
