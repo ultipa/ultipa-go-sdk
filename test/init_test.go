@@ -13,19 +13,17 @@ var client *api.UltipaAPI
 var hosts []string
 
 func TestMain(m *testing.M) {
-	//var err error
+	var err error
 
 	hosts = []string{
-		"210.13.32.147:60095",
+		//"210.13.32.147:60095",
+		"192.168.1.85:60701",
 	}
-	//client, err = GetClient([]string {
-	//
-	//	//"localhost:8088",
-	//},"default")
-	//
-	//if err != nil {
-	//	log.Fatalln(err)
-	//}
+	client, err = GetClient(hosts, "miniCircle")
+
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	m.Run()
 }
