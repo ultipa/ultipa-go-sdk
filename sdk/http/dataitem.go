@@ -328,8 +328,8 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		var props []*struct {
 			Name        string
 			Type        string
-			description string
-			lte         bool
+			Description string
+			Lte         string
 		}
 
 		err = json.Unmarshal(propertyJson, &props)
@@ -339,9 +339,15 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		}
 
 		for _, prop := range props {
+			lte, err := strconv.ParseBool(prop.Lte)
+			if err != nil {
+				log.Fatalln(err)
+			}
 			p := structs.Property{
-				Name: prop.Name,
-				Desc: prop.description,
+				Name:   prop.Name,
+				Desc:   prop.Description,
+				Lte:    lte,
+				Schema: schema.Name,
 			}
 			p.SetTypeByString(prop.Type)
 			schema.Properties = append(schema.Properties, &p)
@@ -351,6 +357,45 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 	}
 
 	return schemas, err
+}
+
+//AsProperties the types will be tables and alias is nodeProperty and edgeProperty
+func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return properties, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_NODE_PROPERTY_KEY && table.TableName != RESP_EDGE_PROPERTY_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a Property list")
+	}
+
+	for _, row := range table.TableRows {
+		//0:name, 1: type, 2: lte, 3: schema, 4: description
+		values := row.GetValues()
+
+		lte, err := strconv.ParseBool(string(values[2]))
+		if err != nil {
+			log.Fatalln(err)
+		}
+		p := structs.Property{
+			Name:   string(values[0]),
+			Desc:   string(values[4]),
+			Lte:    lte,
+			Schema: string(values[3]),
+		}
+		p.SetTypeByString(string(values[1]))
+		properties = append(properties, &p)
+
+	}
+
+	return properties, err
 }
 
 func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {

@@ -4,6 +4,8 @@ import (
 	"log"
 	"testing"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/http"
+	"ultipa-go-sdk/sdk/printers"
 	"ultipa-go-sdk/sdk/structs"
 	"ultipa-go-sdk/utils"
 )
@@ -95,4 +97,20 @@ func TestCompareSchema(t *testing.T) {
 		}
 	}
 
+}
+
+func TestShowSchema(t *testing.T) {
+	resp, _ := client.UQL("show().schema()", nil)
+
+	nodeSchemas, err := resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	edgeSchemas, err := resp.Alias(http.RESP_EDGE_SCHEMA_KEY).AsSchemas()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	printers.PrintSchema(nodeSchemas)
+	printers.PrintSchema(edgeSchemas)
 }

@@ -3,9 +3,11 @@ package structs
 import ultipa "ultipa-go-sdk/rpc"
 
 type Property struct {
-	Name string
-	Desc string
-	Type ultipa.PropertyType
+	Name   string
+	Desc   string
+	Lte    bool
+	Schema string
+	Type   ultipa.PropertyType
 }
 
 var PropertyMap = map[string]ultipa.PropertyType{
