@@ -8,6 +8,8 @@
 
 ## Version 4.0.5
 
+- Support more layouts when parsing string to UltipaTime
+- Support timestamp when deserializing from bytes to GoLang Type and return to an interface
 - Attr add PropertyType
 - Add more comments to request configurations and connection configurations
 

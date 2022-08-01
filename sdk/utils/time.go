@@ -53,6 +53,18 @@ func NewTimeFromStringFormat(dateString string, format string) (*UltipaTime, err
 func NewTimeFromString(dateString string) (*UltipaTime, error) {
 	n := UltipaTime{}
 	layouts := []string{
+		"2006-1-2",
+		"2006-1-2T15:04:05Z07:00",
+		"2006-1-2 15:04:05.000",
+		"2006-1-2 15:04:05",
+		"2006-1-2 15:04",
+		"2006-1-2 15",
+		"2006/1/2",
+		"2006/1/2T15:04:05Z07:00",
+		"2006/1/2 15:04:05.000",
+		"2006/1/2 15:04:05",
+		"2006/1/2 15:04",
+		"2006/1/2 15",
 		"2006-01-02",
 		"2006-01-02T15:04:05Z07:00",
 		"2006-01-02 15:04:05.000",
@@ -165,7 +177,7 @@ func  TimeToUint64(time time.Time) uint64 {
 }
 
 func (u *UltipaTime) String() string {
-	return u.Time.Format("2006-01-02 15:04:05.000Z")
+	return u.Time.Format("2006-01-02 15:04:05.000")
 }
 
 // Get Timestamp , Second
