@@ -32,6 +32,9 @@ func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType) interface{} {
 	case ultipa.PropertyType_DATETIME:
 		return NewTime(AsUint64(bs))
 	case ultipa.PropertyType_TIMESTAMP:
+		if len(bs) == 0 {
+			return uint32(0)
+		}
 		return NewTimeStamp(int64(AsUint32(bs)))
 	case ultipa.PropertyType_UNSET:
 		return nil
