@@ -96,6 +96,7 @@ func (r *UQLResponse) Alias(alias string) *DataItem {
 		Type: t,
 	}
 }
+
 func (r *UQLResponse) GetSingleTable() (*structs.Table, error) {
 	di := r.Get(0)
 	if di != nil {

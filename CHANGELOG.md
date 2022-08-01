@@ -1,6 +1,18 @@
 # CHANGE LOGS
 
-## Version 4.0.4
+## Version 4.0.5
+
+- Support more layouts when parsing string to UltipaTime
+- Support timestamp when deserializing from bytes to GoLang Type and return to an interface
+
+## Version 4.0.5
+
+- Attr add PropertyType
+- Add more comments to request configurations and connection configurations
+
+
+
+## Version 4.0.4 - release
 
 - Add Model Manager
   - manage model(graph)

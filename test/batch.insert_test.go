@@ -15,9 +15,10 @@ import (
 func TestBatchInsertNodes(t *testing.T) {
 
 	//client, _ := GetClient([]string{"192.168.1.85:60041"}, "zjstest")
-	client, _ := GetClient([]string{"192.168.1.71:60061"}, "default")
+	//client, _ := GetClient([]string{"192.168.1.71:60061"}, "default")
+	client, _ := GetClient([]string{"192.168.1.85:61111"}, "gongshang")
 
-	total := 80000000
+	total := 500000000
 	finished := 0
 
 	wg := waitgroup.NewWaitGroup(20)
@@ -34,9 +35,9 @@ func TestBatchInsertNodes(t *testing.T) {
 
 		node := structs.NewNode()
 
-		node.ID =  fmt.Sprint(total)
-		node.Set("name", "abcd yefx")
-		node.Set("age", int32(10))
+		node.ID = fmt.Sprint(total)
+		node.Set("n2", "abcd yefx abcd yefx")
+		node.Set("n1", int32(10))
 
 		nodes = append(nodes, node)
 
@@ -49,16 +50,15 @@ func TestBatchInsertNodes(t *testing.T) {
 				defer wg.Done()
 				schema := structs.NewSchema("default")
 				schema.Properties = append(schema.Properties, &structs.Property{
-					Name: "name",
+					Name: "n2",
 					Type: ultipa.PropertyType_STRING,
 				}, &structs.Property{
-					Name: "age",
+					Name: "n1",
 					Type: ultipa.PropertyType_INT32,
 				})
 
 				_, err := client.InsertNodesBatchBySchema(schema, nodes, &configuration.RequestConfig{
 					InsertType: ultipa.InsertType_OVERWRITE,
-
 				})
 
 				finished += len(nodes)
@@ -76,6 +76,85 @@ func TestBatchInsertNodes(t *testing.T) {
 
 	wg.Wait()
 
+}
 
+func TestBatchInsertEdges(t *testing.T) {
+
+	//client, _ := GetClient([]string{"192.168.1.85:60041"}, "zjstest")
+	//client, _ := GetClient([]string{"192.168.1.71:60061"}, "default")
+	client, _ := GetClient([]string{"192.168.1.85:61111"}, "gongshang")
+
+	total := 500000000
+	finished := 0
+
+	wg := waitgroup.NewWaitGroup(10)
+
+	var edges []*structs.Edge
+
+	schema := structs.NewSchema("default")
+	schema.Properties = append(schema.Properties, &structs.Property{
+		Name: "e1",
+		Type: ultipa.PropertyType_STRING,
+	}, &structs.Property{
+		Name: "e2",
+		Type: ultipa.PropertyType_STRING,
+	}, &structs.Property{
+		Name: "e3",
+		Type: ultipa.PropertyType_STRING,
+	}, &structs.Property{
+		Name: "e4",
+		Type: ultipa.PropertyType_STRING,
+	}, &structs.Property{
+		Name: "e5",
+		Type: ultipa.PropertyType_STRING,
+	})
+
+	start := time.Now()
+	rand.Seed(int64(time.Now().Second()))
+	for {
+
+		if total < 0 {
+			break
+		}
+
+		edge := structs.NewEdge()
+		edge.From = fmt.Sprint(total)
+		edge.To = fmt.Sprint(total - 1)
+
+		edge.Set("e1", "abc")
+		edge.Set("e2", "abc")
+		edge.Set("e3", "abc")
+		edge.Set("e4", "abc")
+		edge.Set("e5", "abc")
+
+		edges = append(edges, edge)
+
+		total--
+
+		if total%30000 == 0 || total < 0 {
+
+			wg.BlockAdd()
+			go func(edges []*structs.Edge) {
+				defer wg.Done()
+
+
+				_, err := client.InsertEdgesBatchBySchema(schema, edges, &configuration.RequestConfig{
+					InsertType: ultipa.InsertType_OVERWRITE,
+				})
+
+				finished += len(edges)
+				if err != nil {
+					log.Println(err)
+					return
+				}
+
+				log.Printf("finished: %v, speed: %v", finished, float64(finished)/time.Since(start).Seconds())
+			}(edges)
+
+			edges = []*structs.Edge{}
+		}
+	}
+
+	wg.Wait()
 
 }
