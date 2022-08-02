@@ -16,9 +16,9 @@ func TestBatchInsertNodes(t *testing.T) {
 
 	//client, _ := GetClient([]string{"192.168.1.85:60041"}, "zjstest")
 	//client, _ := GetClient([]string{"192.168.1.71:60061"}, "default")
-	client, _ := GetClient([]string{"192.168.1.85:61111"}, "gongshang")
+	client, _ := GetClient([]string{"192.168.1.85:61115"}, "gongshang")
 
-	total := 500000000
+	total := 500
 	finished := 0
 
 	wg := waitgroup.NewWaitGroup(20)
@@ -29,7 +29,7 @@ func TestBatchInsertNodes(t *testing.T) {
 	rand.Seed(int64(time.Now().Second()))
 	for {
 
-		if total < 0 {
+		if total < 1 {
 			break
 		}
 
@@ -82,9 +82,9 @@ func TestBatchInsertEdges(t *testing.T) {
 
 	//client, _ := GetClient([]string{"192.168.1.85:60041"}, "zjstest")
 	//client, _ := GetClient([]string{"192.168.1.71:60061"}, "default")
-	client, _ := GetClient([]string{"192.168.1.85:61111"}, "gongshang")
+	client, _ := GetClient([]string{"192.168.1.85:61115"}, "gongshang")
 
-	total := 500000000
+	total := 500
 	finished := 0
 
 	wg := waitgroup.NewWaitGroup(10)
@@ -113,7 +113,7 @@ func TestBatchInsertEdges(t *testing.T) {
 	rand.Seed(int64(time.Now().Second()))
 	for {
 
-		if total < 0 {
+		if total < 1 {
 			break
 		}
 
@@ -136,7 +136,6 @@ func TestBatchInsertEdges(t *testing.T) {
 			wg.BlockAdd()
 			go func(edges []*structs.Edge) {
 				defer wg.Done()
-
 
 				_, err := client.InsertEdgesBatchBySchema(schema, edges, &configuration.InsertRequestConfig{
 					InsertType: ultipa.InsertType_OVERWRITE,
