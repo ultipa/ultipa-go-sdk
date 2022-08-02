@@ -1,7 +1,9 @@
 package api
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"sync"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
@@ -87,42 +89,14 @@ func (api *UltipaAPI) 	InsertEdgesBatchBySchema(schema *structs.Schema, rows []*
 
 	wg := sync.WaitGroup{}
 	edgeRows := make([]*ultipa.EdgeRow, len(rows))
-	for index, row := range rows {
 
-		wg.Add(1)
+	err = setPropertiesToEdgeRow(schema, wg, edgeRows, rows)
 
-		go func(index int, row *structs.Edge) {
-			defer wg.Done()
-
-			newnode := &ultipa.EdgeRow{
-				FromId:     row.From,
-				FromUuid:   row.FromUUID,
-				ToId:       row.To,
-				ToUuid:     row.ToUUID,
-				SchemaName: schema.Name,
-				Uuid:       row.UUID,
-			}
-
-			for _, prop := range schema.Properties {
-
-				if prop.IsIDType() || prop.IsIgnore() {
-					continue
-				}
-
-				bs, err := row.GetBytes(prop.Name)
-
-				if err != nil {
-					printers.PrintError("Get row bytes value failed " + prop.Name + " " + err.Error())
-				}
-
-				newnode.Values = append(newnode.Values, bs)
-			}
-			edgeRows[index] = newnode
-		}(index, row)
-	}
 	wg.Wait()
-	table.EdgeRows =edgeRows
-
+	if err != nil {
+		return nil, err
+	}
+	table.EdgeRows = edgeRows
 	resp, err := client.InsertEdges(ctx, &ultipa.InsertEdgesRequest{
 		GraphName:            conf.CurrentGraph,
 		EdgeTable:            table,
@@ -140,6 +114,69 @@ func (api *UltipaAPI) 	InsertEdgesBatchBySchema(schema *structs.Schema, rows []*
 	}
 
 	return http.NewEdgesInsertResponse(resp)
+}
+
+func setPropertiesToEdgeRow(schema *structs.Schema, wg sync.WaitGroup, edgeRows []*ultipa.EdgeRow, rows []*structs.Edge) (err error) {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	for index, row := range rows {
+		if row == nil {
+			if err == nil {
+				err = errors.New(fmt.Sprintf("edge row [%d] error: node row is nil.", index))
+			}
+			return err
+		}
+
+		properties := schema.Properties
+		err = CheckEdgeRows(row, properties, index)
+		if err != nil {
+			return err
+		}
+
+		wg.Add(1)
+
+		go func(index int, row *structs.Edge) {
+			defer wg.Done()
+
+			newEdge := &ultipa.EdgeRow{
+				FromId:     row.From,
+				FromUuid:   row.FromUUID,
+				ToId:       row.To,
+				ToUuid:     row.ToUUID,
+				SchemaName: schema.Name,
+				Uuid:       row.UUID,
+			}
+
+			for _, prop := range schema.Properties {
+
+				if prop.IsIDType() || prop.IsIgnore() {
+					continue
+				}
+
+				if !row.Values.Has(prop.Name) {
+					cancel()
+					err = errors.New(fmt.Sprintf("edge row [%d] error: values doesn't contain property [%s]", index, prop.Name))
+				}
+
+				bs, err := row.GetBytes(prop.Name)
+
+				if err != nil {
+					printers.PrintError("Get row bytes value failed " + prop.Name + " " + err.Error())
+					err = errors.New(fmt.Sprintf("edge row [%d] error: failed to serialize value of property %s,value=%v", index, prop.Name, row.Values.Get(prop.Name)))
+					return
+				}
+
+				newEdge.Values = append(newEdge.Values, bs)
+			}
+			edgeRows[index] = newEdge
+		}(index, row)
+		select {
+		case <-ctx.Done():
+			return err
+		default:
+		}
+	}
+	return err
 }
 
 //InsertEdgesBatchAuto Nodes interface values should be string

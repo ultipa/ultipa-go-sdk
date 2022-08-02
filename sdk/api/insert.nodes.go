@@ -1,7 +1,9 @@
 package api
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"sync"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
@@ -24,10 +26,10 @@ func (api *UltipaAPI) InsertNodesBatch(table *ultipa.NodeTable, config *configur
 	defer cancel()
 
 	resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
-		GraphName: conf.CurrentGraph,
-		NodeTable: table,
+		GraphName:  conf.CurrentGraph,
+		NodeTable:  table,
 		InsertType: config.InsertType,
-		Silent:    config.Silent,
+		Silent:     config.Silent,
 	})
 
 	if err != nil {
@@ -50,9 +52,6 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 	if config.RequestConfig == nil {
 		config.RequestConfig = &configuration.RequestConfig{}
 	}
-
-
-
 
 	config.UseMaster = true
 	client, conf, err := api.GetClient(config.RequestConfig)
@@ -87,43 +86,14 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 
 	wg := sync.WaitGroup{}
 	nodeRows := make([]*ultipa.NodeRow, len(rows))
-	for index, row := range rows {
 
-		wg.Add(1)
-		go func(index int, row *structs.Node) {
-			defer wg.Done()
-
-			if row.Get("_id") != "" {
-
-			}
-
-			newnode := &ultipa.NodeRow{
-				Id:         row.ID,
-				Uuid:       row.UUID,
-				SchemaName: schema.Name,
-			}
-
-			for _, prop := range schema.Properties {
-
-				if prop.IsIDType() || prop.IsIgnore() {
-					continue
-				}
-
-				bs, err := row.GetBytes(prop.Name)
-
-				if err != nil {
-					 printers.PrintError("Get row bytes value failed  " + prop.Name + " " + err.Error())
-					 return
-				}
-
-				newnode.Values = append(newnode.Values, bs)
-			}
-			nodeRows[index] = newnode
-		}(index,row)
-	}
+	err = setPropertiesToNodeRow(schema, wg, nodeRows, rows)
 
 	wg.Wait()
-	table.NodeRows =nodeRows
+	if err != nil {
+		return nil, err
+	}
+	table.NodeRows = nodeRows
 	resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
 		GraphName:  conf.CurrentGraph,
 		NodeTable:  table,
@@ -142,15 +112,72 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 	return http.NewNodesInsertResponse(resp)
 }
 
+func setPropertiesToNodeRow(schema *structs.Schema, wg sync.WaitGroup, nodeRows []*ultipa.NodeRow, rows []*structs.Node) (err error) {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	for index, row := range rows {
+		if row == nil {
+			if err == nil {
+				err = errors.New(fmt.Sprintf("node row [%d] error: node row is nil.", index))
+			}
+			return err
+		}
+		values := row.GetValues()
+		properties := schema.Properties
+		err = CheckValuesAndProperties(properties, values, index)
+		if err != nil {
+			return err
+		}
+
+		wg.Add(1)
+		go func(index int, row *structs.Node) {
+			defer wg.Done()
+			newNode := &ultipa.NodeRow{
+				Id:         row.ID,
+				Uuid:       row.UUID,
+				SchemaName: schema.Name,
+			}
+
+			for _, prop := range properties {
+
+				if prop.IsIDType() || prop.IsIgnore() {
+					continue
+				}
+
+				if !row.Values.Has(prop.Name) {
+					cancel()
+					err = errors.New(fmt.Sprintf("node row [%d] error: values doesn't contain property [%s]", index, prop.Name))
+				}
+
+				bs, err := row.GetBytes(prop.Name)
+
+				if err != nil {
+					printers.PrintError("Get row bytes value failed  " + prop.Name + " " + err.Error())
+					err = errors.New(fmt.Sprintf("node row [%d] error: failed to serialize value of property %s,value=%v", index, prop.Name, row.Values.Get(prop.Name)))
+					return
+				}
+
+				newNode.Values = append(newNode.Values, bs)
+			}
+			nodeRows[index] = newNode
+		}(index, row)
+		select {
+		case <-ctx.Done():
+			return err
+		default:
+		}
+	}
+	return err
+}
+
 type Batch struct {
-	Nodes []*structs.Node
-	Edges []*structs.Edge
+	Nodes  []*structs.Node
+	Edges  []*structs.Edge
 	Schema *structs.Schema
 }
 
-
 //InsertNodesBatchAuto Nodes interface values should be string
-func(api *UltipaAPI)  InsertNodesBatchAuto(nodes []*structs.Node, config *configuration.InsertRequestConfig) (resps []*http.InsertResponse ,err error) {
+func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *configuration.InsertRequestConfig) (resps []*http.InsertResponse, err error) {
 
 	// collect schema and nodes
 
@@ -191,7 +218,7 @@ func(api *UltipaAPI)  InsertNodesBatchAuto(nodes []*structs.Node, config *config
 
 		structs.ConvertStringNodes(batch.Schema, batch.Nodes)
 
-		resp , err := api.InsertNodesBatchBySchema(batch.Schema, batch.Nodes, config)
+		resp, err := api.InsertNodesBatchBySchema(batch.Schema, batch.Nodes, config)
 
 		if err != nil {
 			return nil, err
@@ -202,5 +229,3 @@ func(api *UltipaAPI)  InsertNodesBatchAuto(nodes []*structs.Node, config *config
 
 	return resps, nil
 }
-
-
