@@ -1,7 +1,11 @@
 package test
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"log"
+	"sync"
 	"testing"
 	"time"
 )
@@ -116,4 +120,66 @@ func TestFormatDate(t *testing.T) {
 		}
 
 	}
+}
+
+func exit04() {
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				fmt.Println("退出协程")
+				return
+			default:
+				fmt.Println("监控01")
+				time.Sleep(1 * time.Second)
+
+			}
+
+		}
+
+	}()
+
+	time.Sleep(5 * time.Second)
+	cancel()
+	time.Sleep(2 * time.Second)
+	fmt.Println("退出程序")
+
+}
+
+func TestWg(t *testing.T) {
+	wg := sync.WaitGroup{}
+
+	err := funcName(wg)
+
+	wg.Wait()
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+}
+
+func funcName(wg sync.WaitGroup) (err error) {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	for i := 0; i < 100; i++ {
+		wg.Add(1)
+		go func(i1 int) {
+			defer wg.Done()
+			if i1%2 == 0 {
+				cancel()
+				err = errors.New("context.WithCancel(context.Background())")
+			}
+			log.Println(i1)
+		}(i)
+		select {
+		case <-ctx.Done():
+			//fmt.Println("退出 ，停止了。。。")
+			return err
+		default:
+			//time.Sleep(1 * time.Millisecond)
+			fmt.Println("运行中。。。")
+		}
+	}
+	return err
 }
