@@ -1,5 +1,10 @@
 package http
 
+import (
+	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/structs"
+)
+
 type ResponseGraphs struct {
 	Status *Status
 	Graphs []*ResponseGraph
@@ -38,4 +43,8 @@ type ResponseSchema struct {
 type ResponseNodeSchemas struct {
 	Status  *Status
 	Schemas []*ResponseSchema
+}
+type ResponseIndex struct {
+	Type    ultipa.DBType
+	Indexes []*structs.Index
 }

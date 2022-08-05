@@ -398,6 +398,74 @@ func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 	return properties, err
 }
 
+//AsIndexes the types will be tables and alias is nodeIndex and edgeIndex
+func (di *DataItem) AsIndexes() (indexes []*structs.Index, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return indexes, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_NODE_INDEX_KEY && table.TableName != RESP_EDGE_INDEX_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a Index list")
+	}
+
+	for _, row := range table.TableRows {
+		//0:name, 1: properties, 2: schema, 3: status
+		values := row.GetValues()
+
+		i := structs.Index{
+			Name:       string(values[0]),
+			Properties: string(values[1]),
+			Schema:     string(values[2]),
+			Status:     string(values[3]),
+		}
+		indexes = append(indexes, &i)
+
+	}
+
+	return indexes, err
+}
+
+//AsFullText the types will be tables and alias is node fulltext Index and edge fulltext Index
+func (di *DataItem) AsFullText() (fullTextIndexes []*structs.Index, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return fullTextIndexes, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_NODE_FULLTEXT_KEY && table.TableName != RESP_EDGE_FULLTEXT_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a Fulltext Index list")
+	}
+
+	for _, row := range table.TableRows {
+		//0:name, 1: properties, 2: schema, 3: status
+		values := row.GetValues()
+
+		i := structs.Index{
+			Name:       string(values[0]),
+			Properties: string(values[1]),
+			Schema:     string(values[2]),
+			Status:     string(values[3]),
+		}
+		fullTextIndexes = append(fullTextIndexes, &i)
+
+	}
+
+	return fullTextIndexes, err
+}
+
 func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
