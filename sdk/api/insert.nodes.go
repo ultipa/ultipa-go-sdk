@@ -85,9 +85,8 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 	}
 
 	wg := sync.WaitGroup{}
-	nodeRows := make([]*ultipa.NodeRow, len(rows))
 
-	err = setPropertiesToNodeRow(schema, wg, nodeRows, rows)
+	err, nodeRows := setPropertiesToNodeRow(schema, wg, rows)
 
 	wg.Wait()
 	if err != nil {
@@ -112,21 +111,23 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 	return http.NewNodesInsertResponse(resp)
 }
 
-func setPropertiesToNodeRow(schema *structs.Schema, wg sync.WaitGroup, nodeRows []*ultipa.NodeRow, rows []*structs.Node) (err error) {
+func setPropertiesToNodeRow(schema *structs.Schema, wg sync.WaitGroup, rows []*structs.Node) (error, []*ultipa.NodeRow) {
+	var err error
 	ctx, cancel := context.WithCancel(context.Background())
+	nodeRows := make([]*ultipa.NodeRow, len(rows))
 
 	for index, row := range rows {
 		if row == nil {
 			if err == nil {
 				err = errors.New(fmt.Sprintf("node row [%d] error: node row is nil.", index))
 			}
-			return err
+			return err, nodeRows
 		}
 		values := row.GetValues()
 		properties := schema.Properties
 		err = CheckValuesAndProperties(properties, values, index)
 		if err != nil {
-			return err
+			return err, nodeRows
 		}
 
 		wg.Add(1)
@@ -163,11 +164,11 @@ func setPropertiesToNodeRow(schema *structs.Schema, wg sync.WaitGroup, nodeRows 
 		}(index, row)
 		select {
 		case <-ctx.Done():
-			return err
+			return err, nodeRows
 		default:
 		}
 	}
-	return err
+	return err, nodeRows
 }
 
 type Batch struct {
