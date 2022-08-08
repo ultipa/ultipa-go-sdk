@@ -13,6 +13,6 @@ require (
 	github.com/pterm/pterm v0.12.42
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	google.golang.org/grpc v1.45.0
-	google.golang.org/protobuf v1.26.0
+	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )

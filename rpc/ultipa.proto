@@ -53,6 +53,17 @@ service UltipaControls{
   //9.remote graph loader
   rpc Uploader (stream UploaderRequest) returns (UploaderReply){
   }
+
+  //10.create graph by uploader
+  rpc CreateGraphByUploader (CreateGraphByUploaderRequest) returns (CreateGraphByUploaderReply){
+  }
+
+  //11.扩展算法安装
+  rpc InstallExta (stream InstallExtaRequest) returns (InstallExtaReply){
+  }
+  //12.扩展算法卸载
+  rpc UninstallExta (UninstallExtaRequest) returns (UninstallExtaReply){
+  }
 }
 
 /*------------------------1.SayHello------------------------------*/
@@ -278,7 +289,7 @@ message UploaderRequest {
   string graph_name = 2;
   uint64 total_file_counts = 3;
   string file_name = 4;
-  uint64 file_szie = 5;
+  uint64 file_size = 5;
   bytes chunk = 6;
 }
 
@@ -286,6 +297,39 @@ message UploaderReply {
   Status status = 1;
 }
 /*------------------------RemoteGraphLoader------------------------------*/
+
+/*------------------------13.RemoteGraphLoader------------------------------*/
+message CreateGraphByUploaderRequest {
+  string graph_name = 1;
+  string graph_description = 2;
+}
+
+message CreateGraphByUploaderReply {
+  Status status = 1;
+}
+/*------------------------RemoteGraphLoader------------------------------*/
+
+/*------------------------14.InstallExta------------------------------*/
+message InstallExtaRequest {
+  string file_name = 1;
+  string md5 = 2;
+  bytes chunk = 3;
+}
+
+message InstallExtaReply {
+  Status status = 1;
+}
+/*------------------------InstallExta------------------------------*/
+
+/*------------------------15.UninstallExta------------------------------*/
+message UninstallExtaRequest {
+  string exta_name = 1;
+}
+
+message UninstallExtaReply {
+  Status status = 1;
+}
+/*------------------------UninstallExta------------------------------*/
 
 /*------------------------public message-----------------------*/
 
@@ -360,6 +404,7 @@ message ClusterInfo {
 enum DBType {
   DBNODE = 0;
   DBEDGE = 1;
+  DBGLOBAL = 2;
 }
 
 message Path {
