@@ -14,7 +14,16 @@ import (
 )
 
 func CheckValuesAndProperties(properties []*structs.Property, values *structs.Values, index int) (err error) {
-	if properties != nil && len(properties) != 0 {
+	var props []*structs.Property
+
+	for _, prop := range properties {
+		if prop.IsIDType() || prop.IsIgnore() {
+			continue
+		}
+		props = append(props, prop)
+	}
+
+	if props != nil && len(props) != 0 {
 		if values == nil {
 			err = errors.New(fmt.Sprintf("row [%d] error: values are empty but properties size >0.", index))
 			return err
