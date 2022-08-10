@@ -78,11 +78,8 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		})
 	}
 
-	wg := sync.WaitGroup{}
+	err, nodeRows := setPropertiesToNodeRow(schema, rows)
 
-	err, nodeRows := setPropertiesToNodeRow(schema, wg, rows)
-
-	wg.Wait()
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +102,8 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 	return resp, err
 }
 
-func setPropertiesToNodeRow(schema *structs.Schema, wg sync.WaitGroup, rows []*structs.Node) (error, []*ultipa.NodeRow) {
+func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node) (error, []*ultipa.NodeRow) {
+	wg := sync.WaitGroup{}
 	var err error
 	ctx, cancel := context.WithCancel(context.Background())
 	nodeRows := make([]*ultipa.NodeRow, len(rows))
@@ -162,6 +160,7 @@ func setPropertiesToNodeRow(schema *structs.Schema, wg sync.WaitGroup, rows []*s
 		default:
 		}
 	}
+	wg.Wait()
 	return err, nodeRows
 }
 

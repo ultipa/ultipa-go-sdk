@@ -80,11 +80,8 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 		})
 	}
 
-	wg := sync.WaitGroup{}
+	err, edgeRows := setPropertiesToEdgeRow(schema, rows)
 
-	err, edgeRows := setPropertiesToEdgeRow(schema, wg, rows)
-
-	wg.Wait()
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +105,9 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 	return resp, err
 }
 
-func setPropertiesToEdgeRow(schema *structs.Schema, wg sync.WaitGroup, rows []*structs.Edge) (error, []*ultipa.EdgeRow) {
+func setPropertiesToEdgeRow(schema *structs.Schema, rows []*structs.Edge) (error, []*ultipa.EdgeRow) {
+	wg := sync.WaitGroup{}
+
 	var err error
 	ctx, cancel := context.WithCancel(context.Background())
 	edgeRows := make([]*ultipa.EdgeRow, len(rows))
@@ -170,6 +169,7 @@ func setPropertiesToEdgeRow(schema *structs.Schema, wg sync.WaitGroup, rows []*s
 		default:
 		}
 	}
+	wg.Wait()
 	return err, edgeRows
 }
 
