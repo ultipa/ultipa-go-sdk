@@ -28,11 +28,11 @@ func CheckValuesAndProperties(properties []*structs.Property, values *structs.Va
 			err = errors.New(fmt.Sprintf("row [%d] error: values are empty but properties size >0.", index))
 			return err
 		}
-		if len(values.Data) > len(properties) {
+		if len(values.Data) > len(props) {
 			err = errors.New(fmt.Sprintf("row [%d] error: values size larger than properties size.", index))
 			return err
 		}
-		if len(values.Data) < len(properties) {
+		if len(values.Data) < len(props) {
 			err = errors.New(fmt.Sprintf("row [%d] error: values size smaller than properties size.", index))
 			return err
 		}
