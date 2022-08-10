@@ -81,9 +81,8 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 	}
 
 	wg := sync.WaitGroup{}
-	edgeRows := make([]*ultipa.EdgeRow, len(rows))
 
-	err = setPropertiesToEdgeRow(schema, wg, edgeRows, rows)
+	err, edgeRows := setPropertiesToEdgeRow(schema, wg, rows)
 
 	wg.Wait()
 	if err != nil {
@@ -109,21 +108,23 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 	return resp, err
 }
 
-func setPropertiesToEdgeRow(schema *structs.Schema, wg sync.WaitGroup, edgeRows []*ultipa.EdgeRow, rows []*structs.Edge) (err error) {
+func setPropertiesToEdgeRow(schema *structs.Schema, wg sync.WaitGroup, rows []*structs.Edge) (error, []*ultipa.EdgeRow) {
+	var err error
 	ctx, cancel := context.WithCancel(context.Background())
+	edgeRows := make([]*ultipa.EdgeRow, len(rows))
 
 	for index, row := range rows {
 		if row == nil {
 			if err == nil {
 				err = errors.New(fmt.Sprintf("edge row [%d] error: node row is nil.", index))
 			}
-			return err
+			return err, edgeRows
 		}
 
 		properties := schema.Properties
 		err = CheckEdgeRows(row, properties, index)
 		if err != nil {
-			return err
+			return err, edgeRows
 		}
 
 		wg.Add(1)
@@ -165,11 +166,11 @@ func setPropertiesToEdgeRow(schema *structs.Schema, wg sync.WaitGroup, edgeRows 
 		}(index, row)
 		select {
 		case <-ctx.Done():
-			return err
+			return err, edgeRows
 		default:
 		}
 	}
-	return err
+	return err, edgeRows
 }
 
 //InsertNodesBatchAuto Nodes interface values should be string
