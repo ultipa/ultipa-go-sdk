@@ -1,5 +1,10 @@
 # CHANGE LOGS
 
+## Version 4.2.0
+
+- add InstallExta Methods
+- add UninstallExta Methods
+
 ## Version 4.0.10
 
 - add insertRequestConfig
