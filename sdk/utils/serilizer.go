@@ -30,9 +30,15 @@ func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType) interface{} {
 	case ultipa.PropertyType_DOUBLE:
 		return AsFloat64(bs)
 	case ultipa.PropertyType_DATETIME:
+		if AsUint64(bs) == 0 {
+			return ""
+		}
+		if len(bs) == 0 {
+			return NewTime(0)
+		}
 		return NewTime(AsUint64(bs))
 	case ultipa.PropertyType_TIMESTAMP:
-		if len(bs) == 0 {
+		if len(bs) == 0 || AsUint32(bs) == 0 {
 			return NewTimeStamp(0)
 		}
 		return NewTimeStamp(int64(AsUint32(bs)))
