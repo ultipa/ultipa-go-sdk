@@ -29,7 +29,12 @@ func NewTime(datetime uint64) *UltipaTime {
 	n := UltipaTime{
 		Datetime: datetime,
 	}
-	n.Uint64ToTime(datetime)
+	if datetime == 0 {
+		unix := time.Unix(0, 0)
+		n.Time = &unix
+	} else {
+		n.Uint64ToTime(datetime)
+	}
 	return &n
 }
 

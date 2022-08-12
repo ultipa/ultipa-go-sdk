@@ -46,11 +46,12 @@ func TestUQL1(t *testing.T) {
 	//client, _ := GetClient([]string{"192.168.1.94:60061"}, "default")
 	//client, _ := GetClient([]string{"192.168.1.86:60072"}, "default")
 	//client, _ := GetClient([]string{"192.168.1.87:62061"}, "maker_test")
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	//client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	client, _ := GetClient([]string{"192.168.1.85:61115"}, "gongshang")
 
 	//uql := `n({@user && _uuid == 1}).e({@relation.relation_type == 'has'}).n({@projects} as project).re({@relation.relation_type == 'has'}).n({@etl} as etl) group by project skip 0 return table(project._id,project._uuid,count(etl)) as t limit 15 order by project.created_at desc`
-	uql := `find().edges(2658) as edges return edges{*}`
-	//uql := `find().nodes({@movie}) as nodes return nodes{*} limit 10`
+	//uql := `find().edges(2658) as edges return edges{*}`
+	uql := `find().nodes() as nodes return nodes{*} limit 10`
 
 	log.Println("Exec : ", uql)
 
