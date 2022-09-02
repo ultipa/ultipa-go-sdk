@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"sync"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
@@ -29,7 +30,9 @@ func (api *UltipaAPI) InsertNodesBatch(table *ultipa.NodeTable, config *configur
 		GraphName:  conf.CurrentGraph,
 		NodeTable:  table,
 		InsertType: config.InsertType,
-		Silent:     config.Silent,
+		//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
+		//Silent:     config.Silent,
+		Silent: false,
 	})
 
 	if err != nil {
@@ -94,7 +97,9 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		GraphName:  conf.CurrentGraph,
 		NodeTable:  table,
 		InsertType: config.InsertType,
-		Silent:     config.Silent,
+		//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
+		//Silent:     config.Silent,
+		Silent: false,
 	})
 
 	if err != nil {
@@ -171,16 +176,22 @@ func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node) (error
 }
 
 type Batch struct {
-	Nodes  []*structs.Node
-	Edges  []*structs.Edge
+	Nodes  []*ultipa.NodeRow
+	Edges  []*ultipa.EdgeRow
 	Schema *structs.Schema
 }
 
 //InsertNodesBatchAuto Nodes interface values should be string
-func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *configuration.InsertRequestConfig) (resps []*http.InsertResponse, err error) {
+func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *configuration.InsertRequestConfig) (*http.InsertBatchAutoResponse, error) {
+
+	resps := &http.InsertBatchAutoResponse{
+		Resps:     map[string]*http.InsertResponse{},
+		ErrorItem: map[int]int{},
+		Statistic: &http.Statistic{},
+	}
 
 	// collect schema and nodes
-
+	m := map[string]map[int]int{}
 	schemas, err := api.ListSchema(ultipa.DBType_DBNODE, config.RequestConfig)
 
 	if err != nil {
@@ -189,8 +200,9 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 
 	batches := map[string]*Batch{}
 
-	for _, node := range nodes {
-
+	for index, node := range nodes {
+		m[node.Schema] = map[int]int{}
+		var rows []*ultipa.NodeRow
 		// init schema
 		if batches[node.Schema] == nil {
 
@@ -202,6 +214,11 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 
 			if schema, ok := s.(*structs.Schema); ok {
 				batches[node.Schema].Schema = schema
+
+				err, rows = setPropertiesToNodeRow(schema, []*structs.Node{node})
+				if err != nil {
+					return nil, errors.New(fmt.Sprintf("Data verification failed, index: [%s]", strconv.Itoa(index)))
+				}
 			} else {
 				// schema not exit
 				return nil, errors.New("Schema not found : " + node.Schema)
@@ -211,20 +228,90 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 		batch := batches[node.Schema]
 		// add nodes
 		//node.UpdateByValueID()
-		batch.Nodes = append(batch.Nodes, node)
+		if len(rows) != 0 {
+			batch.Nodes = append(batch.Nodes, rows[0])
+			m[node.Schema][len(batch.Nodes)-1] = index
+		}
+		//batch.Nodes = append(batch.Nodes, node)
 	}
 
 	for _, batch := range batches {
+		batchSchema := batch.Schema
 
-		structs.ConvertStringNodes(batch.Schema, batch.Nodes)
+		if config == nil {
+			config = &configuration.InsertRequestConfig{}
+		}
 
-		resp, err := api.InsertNodesBatchBySchema(batch.Schema, batch.Nodes, config)
+		if config.RequestConfig == nil {
+			config.RequestConfig = &configuration.RequestConfig{}
+		}
+
+		config.UseMaster = true
+		client, conf, err := api.GetClient(config.RequestConfig)
 
 		if err != nil {
 			return nil, err
 		}
 
-		resps = append(resps, resp)
+		ctx, cancel := api.Pool.NewContext(config.RequestConfig)
+		defer cancel()
+
+		table := &ultipa.NodeTable{}
+
+		table.Schemas = []*ultipa.Schema{
+			{
+				SchemaName: batchSchema.Name,
+				Properties: []*ultipa.Property{},
+			},
+		}
+
+		for _, prop := range batchSchema.Properties {
+
+			if prop.IsIDType() || prop.IsIgnore() {
+				continue
+			}
+
+			table.Schemas[0].Properties = append(table.Schemas[0].Properties, &ultipa.Property{
+				PropertyName: prop.Name,
+				PropertyType: prop.Type,
+			})
+		}
+
+		if err != nil {
+			return nil, err
+		}
+		table.NodeRows = batch.Nodes
+		resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
+			GraphName:  conf.CurrentGraph,
+			NodeTable:  table,
+			InsertType: config.InsertType,
+			//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
+			//Silent:     config.Silent,
+			Silent: false,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
+		if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+			if resps.ErrorCode == "" {
+				resps.ErrorCode = ultipa.ErrorCode_name[int32(resp.Status.ErrorCode)]
+			}
+			resps.Msg += batchSchema.Name + ":" + resp.Status.Msg + "\r\n"
+		}
+
+		response, err := http.NewNodesInsertResponse(resp)
+		resps.Resps[batchSchema.Name] = response
+
+		for k, v := range response.Data.ErrorItem {
+			m3 := m[batchSchema.Name]
+			vl := m3[k]
+			resps.ErrorItem[vl] = v
+		}
+		resps.Statistic.TotalCost += response.Statistic.TotalCost
+		resps.Statistic.EngineCost += response.Statistic.EngineCost
+
 	}
 
 	return resps, nil
