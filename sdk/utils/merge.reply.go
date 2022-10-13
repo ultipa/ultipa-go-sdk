@@ -160,6 +160,9 @@ func MergeUQLReply(reply1 *ultipa.UqlReply, reply2 *ultipa.UqlReply) *ultipa.Uql
 			data1.TableRows = append(data1.TableRows, data2.TableRows...)
 
 		case ultipa.ResultType_RESULT_TYPE_PATH:
+			if(reply2.Paths == nil ) {
+				continue
+			}
 			data1 := Find(reply1.Paths, func(index int) bool { return reply1.Paths[index].Alias == Alias.Alias }).(*ultipa.PathAlias)
 			data2 := Find(reply2.Paths, func(index int) bool { return reply2.Paths[index].Alias == Alias.Alias }).(*ultipa.PathAlias)
 			if data2 != nil {

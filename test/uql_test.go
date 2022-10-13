@@ -47,12 +47,17 @@ func TestUQL1(t *testing.T) {
 	//client, _ := GetClient([]string{"192.168.1.86:60072"}, "default")
 	//client, _ := GetClient([]string{"192.168.1.87:62061"}, "maker_test")
 	//client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
-	client, _ := GetClient([]string{"192.168.1.85:61115"}, "gongshang")
+	//client, _ := GetClient([]string{"192.168.1.85:61115"}, "gongshang")
+	client, _ := GetClient([]string{"192.168.1.87:60198"}, "ultipa_www")
 
 	//uql := `n({@user && _uuid == 1}).e({@relation.relation_type == 'has'}).n({@projects} as project).re({@relation.relation_type == 'has'}).n({@etl} as etl) group by project skip 0 return table(project._id,project._uuid,count(etl)) as t limit 15 order by project.created_at desc`
 	//uql := `find().edges(2658) as edges return edges{*}`
-	uql := `find().nodes() as nodes return nodes{*} limit 10`
-
+	//uql := `find().nodes() as nodes return nodes{*} limit 10`
+	uql := `n({@version}).e().n({@docs_tree.status == 1} as book2).e().n({@lang.code == "en"}) with book2 as vbook
+n(vbook).e().n({@docs_tree && is_root == "true" && @docs_tree.status == 1} as book1) with book1 as books
+n(books).re({@docs_tree}).n(vbook).re({@docs_tree})[:3].n({@docs.status == 1 && @docs.type == "technical"|| @docs_tree} as n100) as path  with path as docs_path, n100 as books2
+n({books || vbook || books2}).e({@docs_role || @docs_tree_role}).n({@role.name in ["public"]}) as p with p as role_path
+return docs_path{*}, role_path{*},books`
 	log.Println("Exec : ", uql)
 
 	//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
@@ -66,12 +71,14 @@ func TestUQL1(t *testing.T) {
 		log.Println(resp.Status.Message)
 	}
 
-	for _, a := range resp.AliasList {
-		dataitem := resp.Alias(a)
-		printers.PrintAny(dataitem)
-		log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
+	log.Println(resp.Statistic.TotalCost)
 
-	}
+	//for _, a := range resp.AliasList {
+	//	dataitem := resp.Alias(a)
+	//	printers.PrintAny(dataitem)
+	//	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
+	//
+	//}
 
 }
 

@@ -6,7 +6,6 @@ require (
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/codingsince1985/checksum v1.2.3
 	github.com/fatih/color v1.12.0
-	github.com/golang/protobuf v1.5.2
 	github.com/jinzhu/copier v0.3.2
 	github.com/lrita/cmap v0.0.0-20200818170753-e987cd3dfa73
 	github.com/pieterclaerhout/go-waitgroup v1.0.7

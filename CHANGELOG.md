@@ -1,5 +1,9 @@
 # CHANGE LOGS
 
+## Version 4.2.1
+
+- fixed bug: clear task should send to global graphset
+
 ## Version 4.2.0
 
 - add InstallExta Methods
