@@ -22,7 +22,7 @@ type InsertResponse struct {
 var InsertErrorCodeMsgMap = map[int]string{
 	10001: "uuid and id not match",
 	10002: "uuid/id and schema not match",
-	10003: "from_uuid and from_id not match",
+	10003: "from_uuid and from_id not match, or not exist",
 	10004: "to_uuid and to_id not match, or not exist",
 	10005: "id length exceed max length(128 bytes)",
 }
