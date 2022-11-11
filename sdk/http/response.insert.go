@@ -13,30 +13,29 @@ type InsertResponse struct {
 	Status    *Status
 	Statistic *Statistic
 	Data      struct {
-		UUIDs []types.UUID
-		IDs   []types.ID
+		UUIDs     []types.UUID
+		IDs       []types.ID
 		ErrorItem map[int]int // index : error code
 	}
 }
 
-var InsertErrorCodeMsgMap = map[int]string {
-	10001 : "uuid and id not match",
-	10002 : "uuid/id and schema not match",
-	10003 : "from_uuid and from_id not match",
-	10004 : "to_uuid and to_id not match",
-	10005 : "id length exceed max length(128 bytes)",
+var InsertErrorCodeMsgMap = map[int]string{
+	10001: "uuid and id not match",
+	10002: "uuid/id and schema not match",
+	10003: "from_uuid and from_id not match, or not exist",
+	10004: "to_uuid and to_id not match, or not exist",
+	10005: "id length exceed max length(128 bytes)",
 }
 
 func NewNodesInsertResponse(reply *ultipa.InsertNodesReply) (response *InsertResponse, err error) {
 
 	response = &InsertResponse{
-		Status:    &Status{
+		Status: &Status{
 			Message: reply.Status.Msg,
-			Code: reply.Status.ErrorCode,
-
+			Code:    reply.Status.ErrorCode,
 		},
 		Statistic: &Statistic{
-			TotalCost: int(reply.TimeCost),
+			TotalCost:  int(reply.TimeCost),
 			EngineCost: int(reply.EngineTimeCost),
 		},
 		Data: struct {
@@ -44,8 +43,8 @@ func NewNodesInsertResponse(reply *ultipa.InsertNodesReply) (response *InsertRes
 			IDs       []types.ID
 			ErrorItem map[int]int
 		}{
-			UUIDs: reply.Uuids,
-			IDs: reply.Ids,
+			UUIDs:     reply.Uuids,
+			IDs:       reply.Ids,
 			ErrorItem: map[int]int{},
 		},
 	}
@@ -61,13 +60,12 @@ func NewNodesInsertResponse(reply *ultipa.InsertNodesReply) (response *InsertRes
 func NewEdgesInsertResponse(reply *ultipa.InsertEdgesReply) (response *InsertResponse, err error) {
 
 	response = &InsertResponse{
-		Status:    &Status{
+		Status: &Status{
 			Message: reply.Status.Msg,
-			Code: reply.Status.ErrorCode,
-
+			Code:    reply.Status.ErrorCode,
 		},
 		Statistic: &Statistic{
-			TotalCost: int(reply.TimeCost),
+			TotalCost:  int(reply.TimeCost),
 			EngineCost: int(reply.EngineTimeCost),
 		},
 		Data: struct {
@@ -75,7 +73,7 @@ func NewEdgesInsertResponse(reply *ultipa.InsertEdgesReply) (response *InsertRes
 			IDs       []types.ID
 			ErrorItem map[int]int
 		}{
-			UUIDs: reply.Uuids,
+			UUIDs:     reply.Uuids,
 			ErrorItem: map[int]int{},
 		},
 	}
