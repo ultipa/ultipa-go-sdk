@@ -50,8 +50,9 @@ func NewNodesInsertResponse(reply *ultipa.InsertNodesReply) (response *InsertRes
 	}
 
 	for index := range reply.IgnoreIndexes {
+		v := int(reply.IgnoreIndexes[index])
 		code := reply.IgnoreErrorCode[index]
-		response.Data.ErrorItem[index] = int(code)
+		response.Data.ErrorItem[v] = int(code)
 	}
 
 	return response, nil
@@ -79,8 +80,9 @@ func NewEdgesInsertResponse(reply *ultipa.InsertEdgesReply) (response *InsertRes
 	}
 
 	for index := range reply.IgnoreIndexes {
+		v := int(reply.IgnoreIndexes[index])
 		code := reply.IgnoreErrorCode[index]
-		response.Data.ErrorItem[index] = int(code)
+		response.Data.ErrorItem[v] = int(code)
 	}
 
 	return response, nil
