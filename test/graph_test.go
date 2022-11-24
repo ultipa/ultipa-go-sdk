@@ -24,7 +24,7 @@ func TestCreateGraph(t *testing.T) {
 
 	graphName := "test_creation"
 	hosts := []string{
-		"192.168.1.87:60201",
+		"192.168.1.85:60701",
 	}
 	client, err := GetClient(hosts, "default")
 
@@ -54,7 +54,7 @@ func TestCreateGraph(t *testing.T) {
 }
 
 func TestDeleteGraph(t *testing.T) {
-	client.DropGraph("zjs_amz", nil)
+	client.DropGraph("test_creation", nil)
 }
 
 func TestAsGraph(t *testing.T) {

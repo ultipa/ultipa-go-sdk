@@ -76,7 +76,7 @@ func (api *UltipaAPI) GetEdgeProperty(schemaName string, propertyName string, co
 
 func (api *UltipaAPI) CreateNodeProperty(schemaName string, prop *structs.Property, conf *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 
-	if prop.Type == ultipa.PropertyType_IGNORE {
+	if prop.Type == structs.PropertyType_IGNORE {
 		return nil, err
 	}
 
@@ -89,7 +89,7 @@ func (api *UltipaAPI) CreateNodeProperty(schemaName string, prop *structs.Proper
 
 func (api *UltipaAPI) CreateEdgeProperty(schemaName string, prop *structs.Property, conf *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 
-	if prop.Type == ultipa.PropertyType_IGNORE {
+	if prop.Type == structs.PropertyType_IGNORE {
 		return nil, err
 	}
 

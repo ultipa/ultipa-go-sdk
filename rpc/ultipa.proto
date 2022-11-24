@@ -88,6 +88,7 @@ message UqlRequest {
   uint32 timeout = 2;
   string graph_name = 3;
   string user_name = 4;
+  uint32 thread_num = 5;
 }
 
 enum ResultType {
@@ -344,13 +345,8 @@ enum PropertyType {
   STRING = 7;
   DATETIME = 8;
   TIMESTAMP = 9;
-  UUID = 10;
-  ID = 11;
-  FROM = 12;
-  FROM_UUID = 13;
-  TO = 14;
-  TO_UUID = 15;
-  IGNORE = 16;
+  TEXT = 10;
+  BLOB = 11;
 }
 
 enum ErrorCode {
