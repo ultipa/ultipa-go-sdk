@@ -230,3 +230,10 @@ func (api *UltipaAPI) SetCurrentGraph(graphName string) error {
 func (api *UltipaAPI) Close() error {
 	return api.Pool.Close()
 }
+
+func (api *UltipaAPI) SafelyClose() error {
+	if api != nil && api.Pool != nil {
+		return api.Pool.Close()
+	}
+	return nil
+}
