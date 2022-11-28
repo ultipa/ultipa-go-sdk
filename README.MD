@@ -10,6 +10,7 @@ then execute the build shell:<br>
 cd ./rpc <br>
 sh ./build-proto.sh
 
+after this, remove protoc-gen-go and protoc-gen-go-grpc dependencies from go.mod
 
 ## Create Client
 
