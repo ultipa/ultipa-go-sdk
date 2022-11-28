@@ -114,3 +114,24 @@ func TestShowSchema(t *testing.T) {
 	printers.PrintSchema(nodeSchemas)
 	printers.PrintSchema(edgeSchemas)
 }
+
+func ExampleUltipaAPI_CreateSchema() {
+	// create schema with properties
+	newSchemaWithProperties := &structs.Schema{
+		Name: "my_node_schema_prop",
+		Desc: "A Schema with 2 properties",
+		Properties: []*structs.Property{
+			{
+				Name: "username",
+				Type: ultipa.PropertyType_STRING,
+			},
+			{
+				Name: "password",
+				Type: ultipa.PropertyType_STRING,
+			},
+		},
+	}
+
+	resp2, _ := client.CreateSchema(newSchemaWithProperties, true, nil)
+	log.Println(resp2)
+}

@@ -16,7 +16,25 @@ func TestBatchInsertNodes(t *testing.T) {
 
 	//client, _ := GetClient([]string{"192.168.1.85:60041"}, "zjstest")
 	//client, _ := GetClient([]string{"192.168.1.71:60061"}, "default")
-	client, _ := GetClient([]string{"192.168.1.85:61115"}, "gongshang")
+	conn, _ := GetClient([]string{"192.168.1.85:61095","192.168.1.87:61095","192.168.1.88:61095"}, "test")
+	schema := "my_node_schema_prop"
+	newSchemaWithProperties := &structs.Schema{
+		Name: schema,
+		Desc: "A Schema with 2 properties",
+		Properties: []*structs.Property{
+			{
+				Name: "username",
+				Type: ultipa.PropertyType_STRING,
+			},
+			{
+				Name: "password",
+				Type: ultipa.PropertyType_STRING,
+			},
+		},
+	}
+
+	resp2, _ := conn.CreateSchema(newSchemaWithProperties, true, nil)
+	log.Println(resp2)
 
 	total := 500
 	finished := 0
@@ -36,8 +54,9 @@ func TestBatchInsertNodes(t *testing.T) {
 		node := structs.NewNode()
 
 		node.ID = fmt.Sprint(total)
-		node.Set("n2", "abcd yefx abcd yefx")
-		node.Set("n1", int32(10))
+		value := rand.Intn(1000)
+		node.Set("username", fmt.Sprintf("username_%d", value))
+		node.Set("password", fmt.Sprintf("password_%d", value))
 
 		nodes = append(nodes, node)
 
@@ -48,16 +67,16 @@ func TestBatchInsertNodes(t *testing.T) {
 			wg.BlockAdd()
 			go func(nodes []*structs.Node) {
 				defer wg.Done()
-				schema := structs.NewSchema("default")
+				schema := structs.NewSchema(schema)
 				schema.Properties = append(schema.Properties, &structs.Property{
-					Name: "n2",
+					Name: "username",
 					Type: ultipa.PropertyType_STRING,
 				}, &structs.Property{
-					Name: "n1",
-					Type: ultipa.PropertyType_INT32,
+					Name: "password",
+					Type: ultipa.PropertyType_STRING,
 				})
 
-				_, err := client.InsertNodesBatchBySchema(schema, nodes, &configuration.InsertRequestConfig{
+				_, err := conn.InsertNodesBatchBySchema(schema, nodes, &configuration.InsertRequestConfig{
 					InsertType: ultipa.InsertType_OVERWRITE,
 				})
 
