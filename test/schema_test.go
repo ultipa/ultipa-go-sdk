@@ -115,10 +115,10 @@ func TestShowSchema(t *testing.T) {
 	printers.PrintSchema(edgeSchemas)
 }
 
-func ExampleUltipaAPI_CreateSchema() {
+func TestCreateSchema(t *testing.T) {
 	// create schema with properties
 	newSchemaWithProperties := &structs.Schema{
-		Name: "my_node_schema_prop",
+		Name: "text_schema",
 		Desc: "A Schema with 2 properties",
 		Properties: []*structs.Property{
 			{
@@ -127,7 +127,7 @@ func ExampleUltipaAPI_CreateSchema() {
 			},
 			{
 				Name: "password",
-				Type: ultipa.PropertyType_STRING,
+				Type: ultipa.PropertyType_TEXT,
 			},
 		},
 	}

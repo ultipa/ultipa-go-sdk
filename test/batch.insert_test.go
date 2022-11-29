@@ -8,7 +8,9 @@ import (
 	"testing"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/api"
 	"ultipa-go-sdk/sdk/configuration"
+	"ultipa-go-sdk/sdk/printers"
 	"ultipa-go-sdk/sdk/structs"
 )
 
@@ -16,26 +18,14 @@ func TestBatchInsertNodes(t *testing.T) {
 
 	//client, _ := GetClient([]string{"192.168.1.85:60041"}, "zjstest")
 	//client, _ := GetClient([]string{"192.168.1.71:60061"}, "default")
-	conn, _ := GetClient([]string{"192.168.1.85:61095","192.168.1.87:61095","192.168.1.88:61095"}, "test")
-	schema := "my_node_schema_prop"
-	newSchemaWithProperties := &structs.Schema{
-		Name: schema,
-		Desc: "A Schema with 2 properties",
-		Properties: []*structs.Property{
-			{
-				Name: "username",
-				Type: ultipa.PropertyType_STRING,
-			},
-			{
-				Name: "password",
-				Type: ultipa.PropertyType_STRING,
-			},
-		},
-	}
+	conn, _ := GetClient([]string{"192.168.1.85:64801", "192.168.1.85:64802", "192.168.1.85:64803"}, "default")
+	schema := "text_schema"
+	createSchema(t, schema, conn)
+	batchInsert(schema, conn)
+	checkInsertionResult(t, conn, schema)
+}
 
-	resp2, _ := conn.CreateSchema(newSchemaWithProperties, true, nil)
-	log.Println(resp2)
-
+func batchInsert(schema string, conn *api.UltipaAPI) []*structs.Node {
 	total := 500
 	finished := 0
 
@@ -55,7 +45,7 @@ func TestBatchInsertNodes(t *testing.T) {
 
 		node.ID = fmt.Sprint(total)
 		value := rand.Intn(1000)
-		node.Set("username", fmt.Sprintf("username_%d", value))
+		node.Set("username", fmt.Sprintf("用户_%d", value))
 		node.Set("password", fmt.Sprintf("password_%d", value))
 
 		nodes = append(nodes, node)
@@ -73,7 +63,7 @@ func TestBatchInsertNodes(t *testing.T) {
 					Type: ultipa.PropertyType_STRING,
 				}, &structs.Property{
 					Name: "password",
-					Type: ultipa.PropertyType_STRING,
+					Type: ultipa.PropertyType_TEXT,
 				})
 
 				_, err := conn.InsertNodesBatchBySchema(schema, nodes, &configuration.InsertRequestConfig{
@@ -94,7 +84,43 @@ func TestBatchInsertNodes(t *testing.T) {
 	}
 
 	wg.Wait()
+	return nodes
+}
 
+func createSchema(t *testing.T, schema string, conn *api.UltipaAPI) {
+	newSchemaWithProperties := &structs.Schema{
+		Name: schema,
+		Desc: "A Schema with 2 properties",
+		Properties: []*structs.Property{
+			{
+				Name: "username",
+				Type: ultipa.PropertyType_STRING,
+			},
+			{
+				Name: "password",
+				Type: ultipa.PropertyType_TEXT,
+			},
+		},
+	}
+
+	resp2, err := conn.CreateSchema(newSchemaWithProperties, true, nil)
+	if err != nil {
+		t.Error("failed to create schema", err)
+	}
+	log.Println(resp2)
+}
+
+func checkInsertionResult(t *testing.T, conn *api.UltipaAPI, schema string) {
+	resp3, err := conn.UQL(fmt.Sprintf("find().nodes({@%s}) as nodes return nodes{*}", schema), nil)
+	if err != nil {
+		t.Errorf("failed to query insertion result. %v", err)
+	}
+	log.Println(resp3)
+	nodes, schemas, err := resp3.Alias("nodes").AsNodes()
+	printers.PrintNodes(nodes, schemas)
+	if len(nodes) != 500 {
+		t.Errorf("expected 500, got %d", len(nodes))
+	}
 }
 
 func TestBatchInsertEdges(t *testing.T) {
