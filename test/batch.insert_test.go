@@ -46,7 +46,7 @@ func batchInsert(schema string, conn *api.UltipaAPI) []*structs.Node {
 		node.ID = fmt.Sprint(total)
 		value := rand.Intn(1000)
 		node.Set("username", fmt.Sprintf("用户_%d", value))
-		node.Set("password", fmt.Sprintf("password_%d", value))
+		node.Set("password", RandStr(2000))
 
 		nodes = append(nodes, node)
 
@@ -111,6 +111,8 @@ func createSchema(t *testing.T, schema string, conn *api.UltipaAPI) {
 }
 
 func checkInsertionResult(t *testing.T, conn *api.UltipaAPI, schema string) {
+	// wait for data saved
+	time.Sleep(time.Duration(2) * time.Second)
 	resp3, err := conn.UQL(fmt.Sprintf("find().nodes({@%s}) as nodes return nodes{*}", schema), nil)
 	if err != nil {
 		t.Errorf("failed to query insertion result. %v", err)
