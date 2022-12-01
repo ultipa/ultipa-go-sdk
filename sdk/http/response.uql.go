@@ -88,6 +88,14 @@ func (r *UQLResponse) NeedRedirect() bool {
 	return r.Status.Code == ultipa.ErrorCode_RAFT_REDIRECT
 }
 
+func (r *UQLResponse) IsSuccess() bool {
+	if r != nil && r.Status != nil {
+		return r.Status.Code == ultipa.ErrorCode_SUCCESS
+	}
+	return false
+
+}
+
 func (r *UQLResponse) Get(index int) (di *DataItem) {
 	if len(r.AliasList) > index {
 		return r.Alias(r.AliasList[index])
