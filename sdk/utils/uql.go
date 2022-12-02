@@ -43,7 +43,6 @@ var GlobalUqlCommandKeys = []string{
 	`top\(\).graph`,
 	`mount\(\).graph`,
 	`unmount\(\).graph`,
-	`clear\(\).task`,
 }
 
 func GetUqlRegExpMatcher(fnNames []string) *regexp.Regexp {
