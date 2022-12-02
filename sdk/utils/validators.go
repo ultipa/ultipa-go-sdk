@@ -21,3 +21,9 @@ func CheckCustomerName(name string) bool {
 	matcher := regexp.MustCompile(`^([a-zA-Z][a-zA-Z0-9_]+)|(_id|_uuid|_from|_to|_from_uuid|_to_uuid)$`)
 	return matcher.Match([]byte(name))
 }
+
+//CheckCustomerNonIdName check that non-id type property name should match REGEXP: ^([a-zA-Z][a-zA-Z0-9_]+)$
+func CheckCustomerNonIdName(name string) bool {
+	matcher := regexp.MustCompile(`^([a-zA-Z][a-zA-Z0-9_]+)$`)
+	return matcher.Match([]byte(name))
+}
