@@ -7,15 +7,15 @@ import (
 )
 
 func SprintError(str string) string {
-	return color.RedString("[ERROR]" + str)
+	return color.RedString("[ERROR] " + str)
 }
 
 func SprintWarn(str string) string {
-	return color.YellowString("[WARN]" + str)
+	return color.YellowString("[WARN] " + str)
 }
 
 func SprintInfo(str string) string {
-	return color.GreenString("[INFO]") + str
+	return color.GreenString("[INFO] ") + str
 }
 
 func PrintError(str string) {
