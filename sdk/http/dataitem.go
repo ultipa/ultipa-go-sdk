@@ -108,6 +108,8 @@ func (di *DataItem) AsNodes() (nodes []*structs.Node, schemas map[string]*struct
 
 	nodes, schemas = NodeTableToNodes(oNodes.NodeTable, oNodes.Alias)
 
+
+
 	return nodes, schemas, nil
 }
 

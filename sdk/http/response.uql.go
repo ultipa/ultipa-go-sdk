@@ -100,7 +100,10 @@ func (r *UQLResponse) Get(index int) (di *DataItem) {
 	if len(r.AliasList) > index {
 		return r.Alias(r.AliasList[index])
 	}
-	return nil
+	return &DataItem{
+		Data: nil,
+		Type: ultipa.ResultType_RESULT_TYPE_UNSET,
+	}
 }
 
 func (r *UQLResponse) Alias(alias string) *DataItem {

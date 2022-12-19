@@ -88,10 +88,10 @@ func TestUQL2(t *testing.T) {
 	//client, _ := GetClient([]string{"192.168.1.94:60061"}, "default")
 	//client, _ := GetClient([]string{"192.168.1.86:60072"}, "default")
 	//client, _ := GetClient([]string{"192.168.1.87:62061"}, "maker_test")
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	client, _ := GetClient([]string{"192.168.2.142:60062"}, "amz_zjs")
 
 	//uql := `n({@user && _uuid == 1}).e({@relation.relation_type == 'has'}).n({@projects} as project).re({@relation.relation_type == 'has'}).n({@etl} as etl) group by project skip 0 return table(project._id,project._uuid,count(etl)) as t limit 15 order by project.created_at desc`
-	uql := `n(2).e()[:2].n(459) as path return pnodes(path) as kk`
+	uql := `find().nodes() return nodes limit 10`
 	//uql := `find().nodes({@movie}) as nodes return nodes{*} limit 10`
 
 	log.Println("Exec : ", uql)
@@ -103,8 +103,8 @@ func TestUQL2(t *testing.T) {
 		log.Fatalln(err)
 	}
 
-	array, err := resp.Alias("kk").AsArray()
+	nodes, _, _ := resp.Get(0).AsNodes()
 
-	printers.PrintArray(array)
+	log.Println(nodes)
 
 }

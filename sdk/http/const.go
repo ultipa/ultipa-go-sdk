@@ -28,9 +28,9 @@ const (
 	RESP_EDGE_FULLTEXT_KEY string = "_edgeFulltext"
 	RESP_STATISTIC_KEY     string = "_statistic"
 	RESP_TOP_KEY           string = "_top"
-	RESP_TASK_KEY          string = "_task"
+	RESP_TASK_KEY          string = "_task" // asTask
 	RESP_POLICY_KEY        string = "_policy"
 	RESP_USER_KEY          string = "_user"
-	RESP_PRIVILEGE_KEY     string = "privilege"
+	RESP_PRIVILEGE_KEY     string = "_privilege"
 	RESP_ALGOS_KEY         string = "_algoList"
 )

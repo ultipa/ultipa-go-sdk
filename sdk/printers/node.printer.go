@@ -9,8 +9,10 @@ import (
 func PrintNodes(nodes []*structs.Node, schemas map[string]*structs.Schema) {
 	var lastSchema string
 	var table *simpletable.Table
+
 	for _, node := range nodes {
 		schema := schemas[node.Schema]
+
 		if node.Schema != lastSchema {
 
 			if table != nil {

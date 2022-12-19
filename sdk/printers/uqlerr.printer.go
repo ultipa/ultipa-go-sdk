@@ -13,6 +13,7 @@ func PrintUqlErr(errmsg string) {
 	strs := strings.Split(errmsg, "\n")
 
 	if len(strs) < 2 {
+		PrintError(errmsg)
 		return
 	}
 
@@ -47,7 +48,8 @@ func PrintUqlErr(errmsg string) {
 	style := color.New(color.FgHiRed).Add(color.Underline).Add(color.Bold).SprintFunc()
 
 
-	log.Printf("UQL Syntax Error: %s%s%s\n", color.YellowString(uql[0:start]), style(uql[start:end]), color.YellowString(uql[end:]))
+	log.Println( color.RedString("UQL Syntax Error:"))
+	log.Printf("%s%s%s", color.YellowString(uql[0:start]), style(uql[start:end]), color.YellowString(uql[end:]))
 	log.Println(color.YellowString(msg))
 
 }
