@@ -277,6 +277,8 @@ type UltipaControlsClient interface {
 	InstallExta(ctx context.Context, opts ...grpc.CallOption) (UltipaControls_InstallExtaClient, error)
 	//12.扩展算法卸载
 	UninstallExta(ctx context.Context, in *UninstallExtaRequest, opts ...grpc.CallOption) (*UninstallExtaReply, error)
+	//13.仅鉴权
+	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateReply, error)
 }
 
 type ultipaControlsClient struct {
@@ -539,6 +541,15 @@ func (c *ultipaControlsClient) UninstallExta(ctx context.Context, in *UninstallE
 	return out, nil
 }
 
+func (c *ultipaControlsClient) Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateReply, error) {
+	out := new(AuthenticateReply)
+	err := c.cc.Invoke(ctx, "/ultipa.UltipaControls/Authenticate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UltipaControlsServer is the server API for UltipaControls service.
 // All implementations must embed UnimplementedUltipaControlsServer
 // for forward compatibility
@@ -568,6 +579,8 @@ type UltipaControlsServer interface {
 	InstallExta(UltipaControls_InstallExtaServer) error
 	//12.扩展算法卸载
 	UninstallExta(context.Context, *UninstallExtaRequest) (*UninstallExtaReply, error)
+	//13.仅鉴权
+	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateReply, error)
 	mustEmbedUnimplementedUltipaControlsServer()
 }
 
@@ -610,6 +623,9 @@ func (UnimplementedUltipaControlsServer) InstallExta(UltipaControls_InstallExtaS
 }
 func (UnimplementedUltipaControlsServer) UninstallExta(context.Context, *UninstallExtaRequest) (*UninstallExtaReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UninstallExta not implemented")
+}
+func (UnimplementedUltipaControlsServer) Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Authenticate not implemented")
 }
 func (UnimplementedUltipaControlsServer) mustEmbedUnimplementedUltipaControlsServer() {}
 
@@ -873,6 +889,24 @@ func _UltipaControls_UninstallExta_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UltipaControls_Authenticate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AuthenticateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UltipaControlsServer).Authenticate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ultipa.UltipaControls/Authenticate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UltipaControlsServer).Authenticate(ctx, req.(*AuthenticateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UltipaControls_ServiceDesc is the grpc.ServiceDesc for UltipaControls service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -903,6 +937,10 @@ var UltipaControls_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UninstallExta",
 			Handler:    _UltipaControls_UninstallExta_Handler,
+		},
+		{
+			MethodName: "Authenticate",
+			Handler:    _UltipaControls_Authenticate_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

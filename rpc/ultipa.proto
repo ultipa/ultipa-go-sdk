@@ -64,6 +64,9 @@ service UltipaControls{
   //12.扩展算法卸载
   rpc UninstallExta (UninstallExtaRequest) returns (UninstallExtaReply){
   }
+  //13.仅鉴权
+  rpc Authenticate (AuthenticateRequest) returns (AuthenticateReply){
+  }
 }
 
 /*------------------------1.SayHello------------------------------*/
@@ -181,7 +184,7 @@ message UserSettingReply {
 //下载算法生成文件
 message DownloadFileRequestV2 {
   string file_name = 1;
-  uint64 task_id = 2 [jstype = JS_STRING];
+  string task_id = 2;
 }
 message DownloadFileReply {
   Status status = 1;
@@ -583,6 +586,29 @@ message PlanNode {
 
   string uql = 4;
   string infos = 5;
+}
+
+enum AuthenticateType {
+  PERMISSION_TYPE_UQL = 0;
+  PERMISSION_TYPE_INSERTNODES = 1;
+  PERMISSION_TYPE_INSERTEDGES = 2;
+  PERMISSION_TYPE_EXPORT = 3;
+  PERMISSION_TYPE_DOWNLOADFILE = 4;
+  PERMISSION_TYPE_INSTALLALGO = 5;
+  PERMISSION_TYPE_UNINSTALLALGO = 6;
+  PERMISSION_TYPE_UPLOADER = 7;
+  PERMISSION_TYPE_CREATEGRAPHBYUPLOADER = 8;
+  PERMISSION_TYPE_INSTALLEXTA = 9;
+  PERMISSION_TYPE_UNINSTALLEXTA = 10;
+}
+
+message AuthenticateRequest {
+  AuthenticateType type = 1;
+  string uql = 2;
+}
+
+message AuthenticateReply {
+  Status status = 1;
 }
 
 /*------------------------public message-----------------------*/

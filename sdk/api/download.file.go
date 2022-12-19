@@ -6,7 +6,7 @@ import (
 	"ultipa-go-sdk/sdk/configuration"
 )
 
-func (api *UltipaAPI) DownloadFileV2(fileName string, taskId uint64, config *configuration.RequestConfig, receive func(data []byte) error) error {
+func (api *UltipaAPI) DownloadFileV2(fileName string, taskId string, config *configuration.RequestConfig, receive func(data []byte) error) error {
 	var err error
 
 	client, err := api.GetControlClient(config)
