@@ -108,3 +108,26 @@ func TestUQL2(t *testing.T) {
 	log.Println(nodes)
 
 }
+
+func TestUQL3(t *testing.T) {
+
+	client, _ := GetClient([]string{"192.168.1.85:64801"}, "test_node_create8137")
+
+	uql := `find().nodes({@test_schema2}) as n1 order by n1._uuid desc limit 1 return n1.test_timestamp`
+
+	log.Println("Exec : ", uql)
+
+	//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	resp, err := client.UQL(uql, nil)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	attrs, _ := resp.Get(0).AsAttr()
+
+	for _, row := range attrs.Rows {
+		log.Println(row)
+	}
+
+}
