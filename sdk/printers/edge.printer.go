@@ -9,22 +9,26 @@ import (
 func PrintEdges(edges []*structs.Edge, schemas map[string]*structs.Schema) {
 	var lastSchema string
 	var table *simpletable.Table
+	switchSchema := false
 	for _, edge := range edges {
 		schema := schemas[edge.Schema]
-		if edge.Schema != lastSchema || (edge.Schema == "" && edge.Schema == lastSchema) {
-
-			if table != nil {
-				fmt.Println(table.String())
-			}
-
-			table = simpletable.New()
+		if edge.Schema != lastSchema {
+			switchSchema = true
 			lastSchema = edge.Schema
+		} else {
+			switchSchema = false
+		}
+
+		if table != nil && switchSchema {
+			fmt.Println(table.String())
+		}
+		if table == nil {
+			table = simpletable.New()
 			table.Header.Cells = append(table.Header.Cells,
 				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "UUID"},
 				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "FROM_UUID"},
 				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "TO_UUID"},
 				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "SCHEMA"})
-
 			for _, prop := range schema.Properties {
 				table.Header.Cells = append(table.Header.Cells, &simpletable.Cell{Align: simpletable.AlignCenter, Text: prop.Name})
 			}

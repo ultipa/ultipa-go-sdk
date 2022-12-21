@@ -74,3 +74,20 @@ func TestUQL1(t *testing.T) {
 	}
 
 }
+
+func TestUQL4(t *testing.T) {
+
+	client, _ := GetClient([]string{"192.168.1.87:61095"}, "miniCircle")
+
+	uql := `ab().src({_uuid == 1}).dest({_uuid == 3}).depth(:2) as paths with pnodes(paths) as nodeArray uncollect nodeArray as node return distinct(node)`
+
+	log.Println("Exec : ", uql)
+
+	//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	resp, err := client.UQL(uql, nil)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+	printers.PrintAny(resp.Get(0))
+}
