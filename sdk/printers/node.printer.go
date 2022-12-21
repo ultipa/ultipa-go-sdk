@@ -11,8 +11,7 @@ func PrintNodes(nodes []*structs.Node, schemas map[string]*structs.Schema) {
 	var table *simpletable.Table
 	for _, node := range nodes {
 		schema := schemas[node.Schema]
-		if node.Schema != lastSchema {
-
+		if node.Schema != lastSchema || (node.Schema == "" && node.Schema == lastSchema) {
 			if table != nil {
 				fmt.Println(table.String())
 			}

@@ -11,7 +11,7 @@ func PrintEdges(edges []*structs.Edge, schemas map[string]*structs.Schema) {
 	var table *simpletable.Table
 	for _, edge := range edges {
 		schema := schemas[edge.Schema]
-		if edge.Schema != lastSchema {
+		if edge.Schema != lastSchema || (edge.Schema == "" && edge.Schema == lastSchema) {
 
 			if table != nil {
 				fmt.Println(table.String())
