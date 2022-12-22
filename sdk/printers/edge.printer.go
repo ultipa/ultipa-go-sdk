@@ -21,13 +21,17 @@ func PrintEdges(edges []*structs.Edge, schemas map[string]*structs.Schema) {
 
 		if table != nil && switchSchema {
 			fmt.Println(table.String())
+			table = nil
+			switchSchema = false
 		}
 		if table == nil {
 			table = simpletable.New()
 			table.Header.Cells = append(table.Header.Cells,
 				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "UUID"},
 				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "FROM_UUID"},
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "FROM"},
 				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "TO_UUID"},
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "TO"},
 				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "SCHEMA"})
 			for _, prop := range schema.Properties {
 				table.Header.Cells = append(table.Header.Cells, &simpletable.Cell{Align: simpletable.AlignCenter, Text: prop.Name})
@@ -36,7 +40,9 @@ func PrintEdges(edges []*structs.Edge, schemas map[string]*structs.Schema) {
 
 		r := []*simpletable.Cell{
 			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetUUID())},
+			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.FromUUID)},
 			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetFrom())},
+			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.ToUUID)},
 			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetTo())},
 			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetSchema())},
 		}
