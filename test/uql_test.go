@@ -91,3 +91,42 @@ func TestUQL4(t *testing.T) {
 	}
 	printers.PrintAny(resp.Get(0))
 }
+
+func TestUQL5(t *testing.T) {
+
+	client, _ := GetClient([]string{"192.168.1.87:61095"}, "miniCircle")
+
+	uql := `find().nodes({@account.year==1978 && @account.name=="念敏"}) as nodes return nodes{*} limit 1`
+
+	log.Println("Exec : ", uql)
+
+	//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	resp, err := client.UQL(uql, nil)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+	printers.PrintAny(resp.Get(0))
+}
+
+func TestUQL6(t *testing.T) {
+
+	client, _ := GetClient([]string{"192.168.1.87:61095"}, "miniCircle")
+
+	uql := `find().edges({_uuid in [150,449]}) return edges{*}`
+
+	log.Println("Exec : ", uql)
+
+	//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	resp, err := client.UQL(uql, nil)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+	alias := resp.Alias("edges")
+	//printers.PrintAny(alias)
+
+	nodes, schema, err := alias.AsEdges()
+	printers.PrintEdges(nodes, schema)
+
+}

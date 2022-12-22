@@ -20,6 +20,8 @@ func PrintNodes(nodes []*structs.Node, schemas map[string]*structs.Schema) {
 		}
 		if table != nil && switchSchema {
 			fmt.Println(table.String())
+			table = nil
+			switchSchema = false
 		}
 		if table == nil {
 			table = simpletable.New()
