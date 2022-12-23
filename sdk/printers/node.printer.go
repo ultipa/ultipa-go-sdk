@@ -7,6 +7,9 @@ import (
 )
 
 func PrintNodes(nodes []*structs.Node, schemas map[string]*structs.Schema) {
+	if len(nodes) == 0 {
+		fmt.Println("No nodes data found.")
+	}
 	var lastSchema string
 	var table *simpletable.Table
 	switchSchema := false

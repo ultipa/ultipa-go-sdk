@@ -136,6 +136,15 @@ func MergeUQLReply(reply1 *ultipa.UqlReply, reply2 *ultipa.UqlReply) *ultipa.Uql
 				data1.NodeTable.NodeRows = append(data1.NodeTable.NodeRows, data2.NodeTable.NodeRows...)
 			}
 		case ultipa.ResultType_RESULT_TYPE_EDGE:
+			if reply1.Edges == nil && reply2.Edges == nil {
+				return reply1
+			}
+			if reply1.Edges == nil {
+				return reply2
+			}
+			if reply2.Edges == nil {
+				return reply1
+			}
 			data1 := Find(reply1.Edges, func(index int) bool { return reply1.Edges[index].Alias == Alias.Alias }).(*ultipa.EdgeAlias)
 			data2 := Find(reply2.Edges, func(index int) bool { return reply2.Edges[index].Alias == Alias.Alias }).(*ultipa.EdgeAlias)
 			if data2 != nil {
@@ -160,7 +169,7 @@ func MergeUQLReply(reply1 *ultipa.UqlReply, reply2 *ultipa.UqlReply) *ultipa.Uql
 			data1.TableRows = append(data1.TableRows, data2.TableRows...)
 
 		case ultipa.ResultType_RESULT_TYPE_PATH:
-			if(reply2.Paths == nil ) {
+			if reply2.Paths == nil {
 				continue
 			}
 			data1 := Find(reply1.Paths, func(index int) bool { return reply1.Paths[index].Alias == Alias.Alias }).(*ultipa.PathAlias)

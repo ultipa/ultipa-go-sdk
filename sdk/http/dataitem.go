@@ -103,12 +103,12 @@ func (di *DataItem) AsNodes() (nodes []*structs.Node, schemas map[string]*struct
 	if di.Type != ultipa.ResultType_RESULT_TYPE_NODE {
 		return nil, schemas, errors.New("DataItem " + di.Alias + " is not Type Node")
 	}
-
+	if di.Data == nil {
+		return nil, nil, nil
+	}
 	oNodes := di.Data.(*ultipa.NodeAlias)
 
 	nodes, schemas = NodeTableToNodes(oNodes.NodeTable, oNodes.Alias)
-
-
 
 	return nodes, schemas, nil
 }
@@ -121,6 +121,10 @@ func (di *DataItem) AsEdges() (edges []*structs.Edge, schemas map[string]*struct
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_EDGE {
 		return nil, schemas, errors.New("DataItem " + di.Alias + " is not Type Edge")
+	}
+
+	if di.Data == nil {
+		return nil, nil, nil
 	}
 
 	oEdges := di.Data.(*ultipa.EdgeAlias)
@@ -138,6 +142,10 @@ func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_PATH {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Paths")
+	}
+
+	if di.Data == nil {
+		return nil, nil
 	}
 
 	oPaths := di.Data.(*ultipa.PathAlias)

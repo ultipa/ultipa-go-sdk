@@ -170,20 +170,10 @@ func TestUQL6(t *testing.T) {
 
 	client, _ := GetClient([]string{"192.168.1.87:61095"}, "miniCircle")
 
-	uql := `find().edges({_uuid in [150,449]}) return edges{*}`
-
-	log.Println("Exec : ", uql)
-
-	//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	  uql := "find().edges({@wishlist && _uuid == 1}) as edges return edges{*}"
 	resp, err := client.UQL(uql, nil)
-
 	if err != nil {
 		log.Fatalln(err)
 	}
-	alias := resp.Alias("edges")
-	//printers.PrintAny(alias)
-
-	nodes, schema, err := alias.AsEdges()
-	printers.PrintEdges(nodes, schema)
-
+	printers.PrintAny(resp.Get(0))
 }
