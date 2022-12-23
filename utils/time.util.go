@@ -33,6 +33,8 @@ func (u *UltipaTime) NewFromString(dateString string) (*UltipaTime, error){
 	var err error
 	n := UltipaTime{}
 	layouts := []string {
+		"2006-1-2T15:04:05.000Z07:00",
+		"2006-1-2T15:04:05Z07:00",
 		"2006-01-02 15:04:05.000",
 		"2006-01-02 15:04:05",
 		"2006-01-02",
@@ -135,5 +137,5 @@ func (u *UltipaTime) TimeToUint64(time *time.Time) uint64 {
 
 
 func (u *UltipaTime) ToString() string {
-	return u.Time.Format("2006-01-02 15:04:05.000Z")
+	return u.Time.Format("2006-01-02T15:04:05.000Z07:00")
 }
