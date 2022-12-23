@@ -182,7 +182,7 @@ func  TimeToUint64(time time.Time) uint64 {
 }
 
 func (u *UltipaTime) String() string {
-	return u.Time.UTC().Format("2006-01-02T15:04:05.000Z")
+	return u.Time.Format("2006-01-02T15:04:05.000Z07:00")
 }
 
 // Get Timestamp , Second
