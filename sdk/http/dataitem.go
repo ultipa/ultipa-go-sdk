@@ -141,7 +141,7 @@ func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
 	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_PATH {
-		return nil, errors.New("DataItem " + di.Alias + " is not Type Paths")
+		return nil, errors.New("DataItem " + di.Alias + " is not Type Path")
 	}
 
 	if di.Data == nil {
