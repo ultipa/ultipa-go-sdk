@@ -34,7 +34,9 @@ func (u *UltipaTime) NewFromString(dateString string) (*UltipaTime, error){
 	n := UltipaTime{}
 	layouts := []string {
 		"2006-1-2T15:04:05.000Z07:00",
+		"2006-1-2T15:04:05.000Z0700",
 		"2006-1-2T15:04:05Z07:00",
+		"2006-1-2T15:04:05Z0700",
 		"2006-01-02 15:04:05.000",
 		"2006-01-02 15:04:05",
 		"2006-01-02",

@@ -170,7 +170,7 @@ func TestUQL6(t *testing.T) {
 
 	client, _ := GetClient([]string{"192.168.1.87:61095"}, "miniCircle")
 
-	  uql := "n(73).e({@agree})[2].n({@country} as country) as path return country"
+	  uql := "find().nodes({@movie}) return max(case when nodes.drating <=> [9.4,9.7] then nodes.frating else 0 end)"
 	resp, err := client.UQL(uql, nil)
 	if err != nil {
 		log.Fatalln(err)

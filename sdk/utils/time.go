@@ -2,6 +2,9 @@ package utils
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -56,10 +59,16 @@ func NewTimeFromStringFormat(dateString string, format string) (*UltipaTime, err
 	return &n, err
 }
 func NewTimeFromString(dateString string) (*UltipaTime, error) {
+	newDateString, err := compensateYear(strings.Trim(dateString, " "))
+	if err != nil {
+		return nil, err
+	}
 	n := UltipaTime{}
 	layouts := []string{
 		"2006-1-2",
+		"2006-1-2T15:04:05.000Z0700",
 		"2006-1-2T15:04:05.000Z07:00",
+		"2006-1-2T15:04:05Z0700",
 		"2006-1-2T15:04:05Z07:00",
 		"2006-1-2 15:04:05.000",
 		"2006-1-2 15:04:05",
@@ -67,22 +76,31 @@ func NewTimeFromString(dateString string) (*UltipaTime, error) {
 		"2006-1-2 15",
 		"2006/1/2",
 		"2006/1/2T15:04:05.000Z07:00",
+		"2006/1/2T15:04:05.000Z0700",
 		"2006/1/2T15:04:05Z07:00",
+		"2006/1/2T15:04:05Z0700",
 		"2006/1/2 15:04:05.000",
 		"2006/1/2 15:04:05",
 		"2006/1/2 15:04",
 		"2006/1/2 15",
 		"2006-01-02",
 		"2006-01-02T15:04:05.000Z07:00",
+		"2006-01-02T15:04:05.000Z0700",
 		"2006-01-02T15:04:05Z07:00",
+		"2006-01-02T15:04:05Z0700",
 		"2006-01-02 15:04:05.000",
+		"2006010215:04:05.000Z0700",
+		"2006010215:04:05.000Z07:00",
+		"2006010215:04:05Z0700",
+		"2006010215:04:05Z07:00",
+		"2006010215:04:05",
 		"2006-01-02 15:04:05",
 		"2006-01-02 15:04",
 		"2006-01-02 15",
 	}
 
 	for _, l := range layouts {
-		t, err := time.Parse(l, dateString)
+		t, err := time.Parse(l, newDateString)
 		n.Time = &t
 		v := n.TimeToUint64(&t)
 
@@ -92,7 +110,55 @@ func NewTimeFromString(dateString string) (*UltipaTime, error) {
 		}
 	}
 
-	return nil, errors.New("parse datetime string failed : " + dateString)
+	return nil, errors.New("parse datetime string failed : " + newDateString)
+}
+
+func compensateYear(dateString string) (string, error) {
+	if strings.Index(dateString, "-") > -1 {
+		return doCompensateYear(dateString, "-")
+	} else if strings.Index(dateString, "/") > -1 {
+		return doCompensateYear(dateString, "/")
+	} else if strings.Index(dateString, ":") > -1 {
+		idx := strings.Index(dateString, ":")
+		ymdh := dateString[0:idx]
+		ymdhLength := len(ymdh)
+		if ymdhLength > 10 || ymdhLength < 7 {
+			return "", errors.New(fmt.Sprintf("Unable to parse %s as UltipaTime", dateString))
+		} else if ymdhLength == 10 {
+			return dateString, nil
+		} else {
+			year := ymdh[:ymdhLength-6]
+			yearValue, err := strconv.Atoi(year)
+			if err != nil {
+				return "", err
+			}
+			if yearValue > 70 && yearValue < 100 {
+				yearValue += 1900
+			} else if yearValue < 70 {
+				yearValue += 2000
+			}
+			return fmt.Sprintf("%d%s%s", yearValue, ymdh[ymdhLength-6:], dateString[idx:]), nil
+		}
+	}
+	return dateString, nil
+}
+
+func doCompensateYear(dateString string, splitter string) (string, error) {
+	if idx := strings.Index(dateString, splitter); idx > 0 {
+		year := dateString[0:idx]
+		yearValue, err := strconv.Atoi(year)
+		if err != nil {
+			return "", err
+		}
+		if yearValue > 70 && yearValue < 100 {
+			yearValue += 1900
+		} else if yearValue < 70 {
+			yearValue += 2000
+		}
+		return fmt.Sprintf("%d%s", yearValue, dateString[idx:]), nil
+	} else {
+		return dateString, nil
+	}
 }
 
 // parse Bytes to year, month....
@@ -160,8 +226,7 @@ func (u *UltipaTime) TimeToUint64(time *time.Time) uint64 {
 	return u.Datetime
 }
 
-
-func  TimeToUint64(time time.Time) uint64 {
+func TimeToUint64(time time.Time) uint64 {
 
 	datetime := uint64(0)
 
