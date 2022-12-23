@@ -7,7 +7,10 @@ import (
 )
 
 func PrintPaths(paths []*structs.Path) {
-
+	if len(paths) == 0 {
+		fmt.Println("No path data found.")
+		return
+	}
 	table := simpletable.New()
 
 	table.Header.Cells = []*simpletable.Cell{

@@ -9,6 +9,7 @@ import (
 func PrintEdges(edges []*structs.Edge, schemas map[string]*structs.Schema) {
 	if len(edges) == 0 {
 		fmt.Println("No edge data found.")
+		return
 	}
 	var lastSchema string
 	var table *simpletable.Table
