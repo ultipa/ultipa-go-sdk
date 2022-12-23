@@ -47,7 +47,7 @@ func PrintEdges(edges []*structs.Edge, schemas map[string]*structs.Schema) {
 			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetSchema())},
 		}
 
-		for i := 4; i < len(table.Header.Cells); i++ {
+		for i := 6; i < len(table.Header.Cells); i++ {
 
 			headerKey := table.Header.Cells[i].Text
 			vv := edge.Values.Get(headerKey)
