@@ -170,7 +170,7 @@ func TestUQL6(t *testing.T) {
 
 	client, _ := GetClient([]string{"192.168.1.87:61095"}, "miniCircle")
 
-	  uql := "find().edges({@wishlist && _uuid == 1}) as edges return edges{*}"
+	  uql := "n(73).e({@agree})[2].n({@country} as country) as path return country"
 	resp, err := client.UQL(uql, nil)
 	if err != nil {
 		log.Fatalln(err)

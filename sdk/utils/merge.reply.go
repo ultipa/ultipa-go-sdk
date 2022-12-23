@@ -129,11 +129,31 @@ func MergeUQLReply(reply1 *ultipa.UqlReply, reply2 *ultipa.UqlReply) *ultipa.Uql
 	for _, Alias := range reply1.Alias {
 		switch Alias.ResultType {
 		case ultipa.ResultType_RESULT_TYPE_NODE:
-			data1 := Find(reply1.Nodes, func(index int) bool { return reply1.Nodes[index].Alias == Alias.Alias }).(*ultipa.NodeAlias)
-			data2 := Find(reply2.Nodes, func(index int) bool { return reply2.Nodes[index].Alias == Alias.Alias }).(*ultipa.NodeAlias)
+			if reply1.Nodes == nil && reply2.Nodes == nil {
+				return reply1
+			}
+			if reply1.Nodes == nil {
+				return reply2
+			}
+			if reply2.Nodes == nil {
+				return reply1
+			}
+			data1 := Find(reply1.Nodes, func(index int) bool { return reply1.Nodes[index].Alias == Alias.Alias })
+			data2 := Find(reply2.Nodes, func(index int) bool { return reply2.Nodes[index].Alias == Alias.Alias })
+
+			if data2 == nil {
+				continue
+			}
+
+			if data1 == nil && data2 != nil {
+				reply1.Nodes = append(reply1.Nodes, data2.(*ultipa.NodeAlias))
+				continue
+			}
 
 			if data2 != nil {
-				data1.NodeTable.NodeRows = append(data1.NodeTable.NodeRows, data2.NodeTable.NodeRows...)
+				nodes1 := data1.(*ultipa.NodeAlias)
+				nodes2 := data2.(*ultipa.NodeAlias)
+				nodes1.NodeTable.NodeRows = append(nodes1.NodeTable.NodeRows, nodes2.NodeTable.NodeRows...)
 			}
 		case ultipa.ResultType_RESULT_TYPE_EDGE:
 			if reply1.Edges == nil && reply2.Edges == nil {
@@ -145,13 +165,32 @@ func MergeUQLReply(reply1 *ultipa.UqlReply, reply2 *ultipa.UqlReply) *ultipa.Uql
 			if reply2.Edges == nil {
 				return reply1
 			}
-			data1 := Find(reply1.Edges, func(index int) bool { return reply1.Edges[index].Alias == Alias.Alias }).(*ultipa.EdgeAlias)
-			data2 := Find(reply2.Edges, func(index int) bool { return reply2.Edges[index].Alias == Alias.Alias }).(*ultipa.EdgeAlias)
+			data1 := Find(reply1.Edges, func(index int) bool { return reply1.Edges[index].Alias == Alias.Alias })
+			data2 := Find(reply2.Edges, func(index int) bool { return reply2.Edges[index].Alias == Alias.Alias })
+			if data2 == nil {
+				continue
+			}
+
+			if data1 == nil && data2 != nil {
+				reply1.Edges = append(reply1.Edges, data2.(*ultipa.EdgeAlias))
+				continue
+			}
+
 			if data2 != nil {
-				data1.EdgeTable.EdgeRows = append(data1.EdgeTable.EdgeRows, data2.EdgeTable.EdgeRows...)
+				edges1 := data1.(*ultipa.EdgeAlias)
+				edges2 := data2.(*ultipa.EdgeAlias)
+				edges1.EdgeTable.EdgeRows = append(edges1.EdgeTable.EdgeRows, edges2.EdgeTable.EdgeRows...)
 			}
 		case ultipa.ResultType_RESULT_TYPE_TABLE:
-
+			if reply1.Tables == nil && reply2.Tables == nil {
+				return reply1
+			}
+			if reply1.Tables == nil {
+				return reply2
+			}
+			if reply2.Tables == nil {
+				return reply1
+			}
 			table1 := Find(reply1.Tables, func(index int) bool { return reply1.Tables[index].TableName == Alias.Alias })
 			table2 := Find(reply2.Tables, func(index int) bool { return reply2.Tables[index].TableName == Alias.Alias })
 
@@ -163,31 +202,95 @@ func MergeUQLReply(reply1 *ultipa.UqlReply, reply2 *ultipa.UqlReply) *ultipa.Uql
 				reply1.Tables = append(reply1.Tables, table2.(*ultipa.Table))
 				continue
 			}
-			data1 := table1.(*ultipa.Table)
-			data2 := table2.(*ultipa.Table)
 
-			data1.TableRows = append(data1.TableRows, data2.TableRows...)
+			if table2 != nil {
+				data1 := table1.(*ultipa.Table)
+				data2 := table2.(*ultipa.Table)
+				data1.TableRows = append(data1.TableRows, data2.TableRows...)
+			}
 
 		case ultipa.ResultType_RESULT_TYPE_PATH:
+			if reply1.Paths == nil && reply2.Paths == nil {
+				return reply1
+			}
+			if reply1.Paths == nil {
+				return reply2
+			}
 			if reply2.Paths == nil {
+				return reply1
+			}
+			data1 := Find(reply1.Paths, func(index int) bool { return reply1.Paths[index].Alias == Alias.Alias })
+			data2 := Find(reply2.Paths, func(index int) bool { return reply2.Paths[index].Alias == Alias.Alias })
+
+			if data2 == nil {
 				continue
 			}
-			data1 := Find(reply1.Paths, func(index int) bool { return reply1.Paths[index].Alias == Alias.Alias }).(*ultipa.PathAlias)
-			data2 := Find(reply2.Paths, func(index int) bool { return reply2.Paths[index].Alias == Alias.Alias }).(*ultipa.PathAlias)
+
+			if data1 == nil && data2 != nil {
+				reply1.Paths = append(reply1.Paths, data2.(*ultipa.PathAlias))
+				continue
+			}
+
 			if data2 != nil {
-				data1.Paths = append(data1.Paths, data2.Paths...)
+				paths1 := data1.(*ultipa.PathAlias)
+				paths2 := data2.(*ultipa.PathAlias)
+				paths1.Paths = append(paths1.Paths, paths2.Paths...)
 			}
 		case ultipa.ResultType_RESULT_TYPE_ARRAY:
-			data1 := Find(reply1.Arrays, func(index int) bool { return reply1.Arrays[index].Alias == Alias.Alias }).(*ultipa.ArrayAlias)
-			data2 := Find(reply2.Arrays, func(index int) bool { return reply2.Arrays[index].Alias == Alias.Alias }).(*ultipa.ArrayAlias)
+			if reply1.Arrays == nil && reply2.Arrays == nil {
+				return reply1
+			}
+			if reply1.Arrays == nil {
+				return reply2
+			}
+			if reply2.Arrays == nil {
+				return reply1
+			}
+
+			data1 := Find(reply1.Arrays, func(index int) bool { return reply1.Arrays[index].Alias == Alias.Alias })
+			data2 := Find(reply2.Arrays, func(index int) bool { return reply2.Arrays[index].Alias == Alias.Alias })
+
+			if data2 == nil {
+				continue
+			}
+
+			if data1 == nil && data2 != nil {
+				reply1.Arrays = append(reply1.Arrays, data2.(*ultipa.ArrayAlias))
+				continue
+			}
+
 			if data2 != nil {
-				data1.Elements = append(data1.Elements, data2.Elements...)
+				array1 := data1.(*ultipa.ArrayAlias)
+				array2 := data2.(*ultipa.ArrayAlias)
+				array1.Elements = append(array1.Elements, array2.Elements...)
 			}
 		case ultipa.ResultType_RESULT_TYPE_ATTR:
-			data1 := Find(reply1.Attrs, func(index int) bool { return reply1.Attrs[index].Alias == Alias.Alias }).(*ultipa.AttrAlias)
-			data2 := Find(reply2.Attrs, func(index int) bool { return reply2.Attrs[index].Alias == Alias.Alias }).(*ultipa.AttrAlias)
+			if reply1.Attrs == nil && reply2.Attrs == nil {
+				return reply1
+			}
+			if reply1.Attrs == nil {
+				return reply2
+			}
+			if reply2.Attrs == nil {
+				return reply1
+			}
+			data1 := Find(reply1.Attrs, func(index int) bool { return reply1.Attrs[index].Alias == Alias.Alias })
+			data2 := Find(reply2.Attrs, func(index int) bool { return reply2.Attrs[index].Alias == Alias.Alias })
+
+			if data2 == nil {
+				continue
+			}
+
+			if data1 == nil && data2 != nil {
+				reply1.Attrs = append(reply1.Attrs, data2.(*ultipa.AttrAlias))
+				continue
+			}
+
 			if data2 != nil {
-				data1.Values = append(data1.Values, data2.Values...)
+				attr1 := data1.(*ultipa.AttrAlias)
+				attr2 := data2.(*ultipa.AttrAlias)
+
+				attr1.Values = append(attr1.Values, attr2.Values...)
 			}
 		}
 	}
