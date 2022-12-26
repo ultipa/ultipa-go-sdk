@@ -40,6 +40,8 @@ func FindAliasDataInReply(reply *ultipa.UqlReply, alias string) (data interface{
 		case ultipa.ResultType_RESULT_TYPE_ATTR:
 			data = Find(reply.Attrs, func(index int) bool { return reply.Attrs[index].Alias == alias })
 			t = Alias.ResultType
+		case ultipa.ResultType_RESULT_TYPE_UNSET:
+			t = Alias.ResultType
 		default:
 			panic("FindAliasDataInReply Not Supported Type")
 		}

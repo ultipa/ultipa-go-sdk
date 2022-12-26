@@ -7,6 +7,10 @@ import (
 )
 
 func PrintAttr(attr *structs.Attr) {
+	if attr == nil {
+		fmt.Println("No attr data found.")
+		return
+	}
 	table := simpletable.New()
 
 	table.Header.Cells = []*simpletable.Cell{

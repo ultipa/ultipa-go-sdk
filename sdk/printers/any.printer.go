@@ -1,6 +1,7 @@
 package printers
 
 import (
+	"fmt"
 	"log"
 	"strings"
 	ultipa "ultipa-go-sdk/rpc"
@@ -9,7 +10,10 @@ import (
 )
 
 func PrintAny(dataitem *http.DataItem) {
-
+	if dataitem == nil {
+		fmt.Println("No dataItem found.")
+		return
+	}
 	switch dataitem.Type {
 	case ultipa.ResultType_RESULT_TYPE_NODE:
 		nodes, schemas, _ := dataitem.AsNodes()

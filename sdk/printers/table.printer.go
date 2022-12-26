@@ -7,6 +7,10 @@ import (
 )
 
 func PrintTable(tableData *structs.Table) {
+	if tableData == nil {
+		fmt.Println("No table data found.")
+		return
+	}
 	table := simpletable.New()
 
 	for _, header := range tableData.GetHeaders() {
