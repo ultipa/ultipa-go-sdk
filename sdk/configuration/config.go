@@ -6,23 +6,24 @@ import (
 	"github.com/jinzhu/copier"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
+	"strconv"
 	"strings"
 )
 
 //
 type UltipaConfig struct {
-	Hosts            []string  // hosts with ports
-	Username         string // ultipa graph username
-	Password         string // ultipa graph password
-	DefaultGraph     string `yaml:"default_graph"` // default graph when connection established
-	Crt              []byte // certification file for encrypt messages
-	MaxRecvSize      int `yaml:"max_recv_size"` // grpc max receive size
-	Consistency      bool // if consistency, reading query will send to master
-	CurrentGraph     string `yaml:"current_graph"` // the current graph, used when user what get the connection's current graph name
-	CurrentClusterId string `yaml:"current_cluster_id"` // used for name server only
-	Timeout          uint32 // timeout - seconds
-	Debug            bool // debug, print more logs
-	HeartBeat        int `yaml:"heart_beat"` // frequency:second,  if 0 means no heart beat, to make sure the connection is alive
+	Hosts            []string // hosts with ports
+	Username         string   // ultipa graph username
+	Password         string   // ultipa graph password
+	DefaultGraph     string   `yaml:"default_graph"` // default graph when connection established
+	Crt              []byte   // certification file for encrypt messages
+	MaxRecvSize      int      `yaml:"max_recv_size"` // grpc max receive size
+	Consistency      bool     // if consistency, reading query will send to master
+	CurrentGraph     string   `yaml:"current_graph"`      // the current graph, used when user what get the connection's current graph name
+	CurrentClusterId string   `yaml:"current_cluster_id"` // used for name server only
+	Timeout          uint32   // timeout - seconds
+	Debug            bool     // debug, print more logs
+	HeartBeat        int      `yaml:"heart_beat"` // frequency:second,  if 0 means no heart beat, to make sure the connection is alive
 }
 
 func NewUltipaConfig(config *UltipaConfig) *UltipaConfig {
@@ -81,7 +82,7 @@ func (config *UltipaConfig) ToContextKV(rConfig *RequestConfig) []string {
 		graphName = rConfig.GraphName
 	}
 
-	return []string{
+	headers := []string{
 		"user",
 		config.Username,
 		"password",
@@ -91,6 +92,13 @@ func (config *UltipaConfig) ToContextKV(rConfig *RequestConfig) []string {
 		//"cluster_id",
 		//config.CurrentClusterId,
 	}
+	if rConfig.TimeZoneOffset != 0 {
+		headers = append(headers, "tz_offset", strconv.FormatInt(rConfig.TimeZoneOffset, 10))
+	} else if rConfig.TimeZone != "" {
+		headers = append(headers, "tz", rConfig.TimeZone)
+	}
+
+	return headers
 }
 
 func LoadConfigFromYAML(file string) (*UltipaConfig, error) {
