@@ -49,7 +49,10 @@ func (api *UltipaAPI) InstallExta(extaFilePath string, extaInfoFilePath string, 
 		return nil, err
 	}
 
-	ctx, cancel := api.Pool.NewContext(req)
+	ctx, cancel, err := api.Pool.NewContext(req)
+	if err != nil {
+		return nil, err
+	}
 	defer cancel()
 
 	streamClient, err := client.InstallExta(ctx)
@@ -127,8 +130,10 @@ func (api *UltipaAPI) UninstallExta(extaName string, req *configuration.RequestC
 		return nil, err
 	}
 
-	ctx, cancel := api.Pool.NewContext(req)
-
+	ctx, cancel, err := api.Pool.NewContext(req)
+	if err != nil {
+		return nil, err
+	}
 	defer cancel()
 
 	reply, err := client.UninstallExta(ctx, &ultipa.UninstallExtaRequest{

@@ -22,14 +22,14 @@ type GraphClusterInfo struct {
 
 // handle all connections
 type ConnectionPool struct {
-	GraphMgr    *GraphManager // graph name : ClusterInfo
-	Config      *configuration.UltipaConfig
-	Connections map[string]*Connection // Host : Connection
-	RandomTick  int
-	Actives     []*Connection
+	GraphMgr        *GraphManager // graph name : ClusterInfo
+	Config          *configuration.UltipaConfig
+	Connections     map[string]*Connection // Host : Connection
+	RandomTick      int
+	Actives         []*Connection
 	LastActivesTime time.Time
-	IsRaft      bool
-	muActiveSafely sync.Mutex
+	IsRaft          bool
+	muActiveSafely  sync.Mutex
 }
 
 func NewConnectionPool(config *configuration.UltipaConfig) (*ConnectionPool, error) {
@@ -79,7 +79,7 @@ func (pool *ConnectionPool) CreateConnections() error {
 func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds uint32) {
 	pool.muActiveSafely.Lock()
 	defer pool.muActiveSafely.Unlock()
-	if time.Now().Sub(pool.LastActivesTime) <= 5 * time.Second {
+	if time.Now().Sub(pool.LastActivesTime) <= 5*time.Second {
 		// 避免频繁刷新
 		return
 	}
@@ -95,9 +95,14 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds uint32) {
 		wg.Add(1)
 		go func(conn *Connection) {
 			defer wg.Done()
-			ctx, cancel := pool.NewContext(&configuration.RequestConfig{
+			ctx, cancel, err := pool.NewContext(&configuration.RequestConfig{
 				Timeout: seconds,
 			})
+			if err != nil {
+				printers.PrintWarn(conn.Host + "failed - " + err.Error())
+				conn.Active = ultipa.ServerStatus_DEAD
+				return
+			}
 			defer cancel()
 
 			resp, err := conn.GetControlClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
@@ -121,6 +126,7 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds uint32) {
 	}
 	wg.Wait()
 }
+
 // 更新查看哪些连接还有效
 func (pool *ConnectionPool) RefreshActives() {
 	pool.RefreshActivesWithSeconds(6)
@@ -148,8 +154,12 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 		return err
 	}
 
-	ctx, cancel := pool.NewContext(&configuration.RequestConfig{GraphName: graphName})
+	ctx, cancel, err := pool.NewContext(&configuration.RequestConfig{GraphName: graphName})
+	if err != nil {
+		return err
+	}
 	defer cancel()
+
 	client := conn.GetControlClient()
 	resp, err := client.GetLeader(ctx, &ultipa.GetLeaderRequest{})
 
@@ -294,10 +304,15 @@ func (pool *ConnectionPool) Close() error {
 }
 
 // set context with timeout and auth info
-func (pool *ConnectionPool) NewContext(config *configuration.RequestConfig) (context.Context, context.CancelFunc) {
+func (pool *ConnectionPool) NewContext(config *configuration.RequestConfig) (context.Context, context.CancelFunc, error) {
 
 	if config == nil {
 		config = &configuration.RequestConfig{}
+	} else if config.Timezone != "" {
+		_, err := time.LoadLocation(config.Timezone)
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 
 	timeout := config.Timeout
@@ -308,7 +323,7 @@ func (pool *ConnectionPool) NewContext(config *configuration.RequestConfig) (con
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(pool.Config.ToContextKV(config)...))
-	return ctx, cancel
+	return ctx, cancel, nil
 }
 
 // RunHeartBeat used for special network policy for long connection(such like : force disconnection idle socket)
@@ -320,9 +335,13 @@ func (pool *ConnectionPool) RunHeartBeat() {
 				//log.Println("Heart Beat Start... ")
 				for _, conn := range pool.Connections {
 
-					ctx, cancel := pool.NewContext(&configuration.RequestConfig{
+					ctx, cancel, err := pool.NewContext(&configuration.RequestConfig{
 						Timeout: 6,
 					})
+					if err != nil {
+						log.Printf("heart beat failed [%s] with error :%v ", conn.Host, err)
+						continue
+					}
 					defer cancel()
 					//log.Println("Heart Beat Item", conn.Host)
 					resp, err := conn.GetControlClient().SayHello(ctx, &ultipa.HelloUltipaRequest{

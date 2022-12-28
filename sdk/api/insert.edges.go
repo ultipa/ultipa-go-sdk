@@ -23,8 +23,10 @@ func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EdgeTable, config *configur
 		return nil, err
 	}
 
-	ctx, cancel := api.Pool.NewContext(config.RequestConfig)
-
+	ctx, cancel, err := api.Pool.NewContext(config.RequestConfig)
+	if err != nil {
+		return nil, err
+	}
 	defer cancel()
 
 	resp, err := client.InsertEdges(ctx, &ultipa.InsertEdgesRequest{
@@ -65,8 +67,10 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 		return nil, err
 	}
 
-	ctx, cancel := api.Pool.NewContext(config.RequestConfig)
-
+	ctx, cancel, err := api.Pool.NewContext(config.RequestConfig)
+	if err != nil {
+		return nil, err
+	}
 	defer cancel()
 
 	table := &ultipa.EdgeTable{}
@@ -256,7 +260,10 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 			return nil, err
 		}
 
-		ctx, cancel := api.Pool.NewContext(config.RequestConfig)
+		ctx, cancel, err := api.Pool.NewContext(config.RequestConfig)
+		if err != nil {
+			return nil, err
+		}
 		defer cancel()
 
 		table := &ultipa.EdgeTable{}

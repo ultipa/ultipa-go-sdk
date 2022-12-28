@@ -17,7 +17,10 @@ func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, conf
 		return err
 	}
 
-	ctx, cancel := api.Pool.NewContext(config)
+	ctx, cancel, err := api.Pool.NewContext(config)
+	if err != nil {
+		return err
+	}
 	defer cancel()
 
 	properties := []string{}

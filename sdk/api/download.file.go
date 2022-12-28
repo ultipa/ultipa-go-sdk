@@ -15,7 +15,10 @@ func (api *UltipaAPI) DownloadFileV2(fileName string, taskId string, config *con
 		return err
 	}
 
-	ctx, cancel := api.Pool.NewContext(config)
+	ctx, cancel, err := api.Pool.NewContext(config)
+	if err != nil {
+		return err
+	}
 	defer cancel()
 
 	resp, err := client.DownloadFileV2(ctx, &ultipa.DownloadFileRequestV2{

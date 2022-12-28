@@ -15,7 +15,10 @@ func (api *UltipaAPI) Authenticate(authenticateType ultipa.AuthenticateType, uql
 		return nil, err
 	}
 
-	ctx, cancel := api.Pool.NewContext(requestConfig)
+	ctx, cancel, err := api.Pool.NewContext(requestConfig)
+	if err != nil {
+		return nil, err
+	}
 	defer cancel()
 
 	resp, err := client.Authenticate(ctx, &ultipa.AuthenticateRequest{

@@ -56,7 +56,7 @@ func (api *UltipaAPI) GetConn(config *configuration.RequestConfig) (*connection.
 		} else if api.Pool.IsRaft {
 			if UqlItem.IsGlobal() || config.UseControl {
 				conn, err = api.Pool.GetGlobalMasterConn(conf)
-			} else if UqlItem.HasWrite() || config.UseMaster || conf.Consistency  {
+			} else if UqlItem.HasWrite() || config.UseMaster || conf.Consistency {
 				conn, err = api.Pool.GetMasterConn(conf)
 			} else if UqlItem.HasExecTask() {
 				conn, err = api.Pool.GetAnalyticsConn(conf)
@@ -92,7 +92,7 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 	return client, conf, nil
 }
 
-func (api *UltipaAPI) GetControlClient(config *configuration.RequestConfig) (ultipa.UltipaControlsClient,  error) {
+func (api *UltipaAPI) GetControlClient(config *configuration.RequestConfig) (ultipa.UltipaControlsClient, error) {
 
 	if config == nil {
 		config = &configuration.RequestConfig{}
@@ -128,7 +128,10 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 		return nil, err
 	}
 
-	ctx, cancel := api.Pool.NewContext(config)
+	ctx, cancel, err := api.Pool.NewContext(config)
+	if err != nil {
+		return nil, err
+	}
 	defer cancel()
 
 	resp, err := client.Uql(ctx, &ultipa.UqlRequest{
@@ -190,7 +193,10 @@ func (api *UltipaAPI) Test() (bool, error) {
 		return false, err
 	}
 	client := conn.GetClient()
-	ctx, cancel := api.Pool.NewContext(nil)
+	ctx, cancel, err := api.Pool.NewContext(nil)
+	if err != nil {
+		return false, err
+	}
 	defer cancel()
 	resp, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
 		Name: "Conn Test",
@@ -209,7 +215,10 @@ func (api *UltipaAPI) GetActiveClientTest() (bool, *connection.Connection, error
 		return false, nil, err
 	}
 	client := conn.GetClient()
-	ctx, cancel := api.Pool.NewContext(nil)
+	ctx, cancel, err := api.Pool.NewContext(nil)
+	if err != nil {
+		return false, nil, err
+	}
 	defer cancel()
 	resp, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
 		Name: "Conn Test",

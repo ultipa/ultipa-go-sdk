@@ -23,7 +23,10 @@ func (api *UltipaAPI) InsertNodesBatch(table *ultipa.NodeTable, config *configur
 		return nil, err
 	}
 
-	ctx, cancel := api.Pool.NewContext(config.RequestConfig)
+	ctx, cancel, err := api.Pool.NewContext(config.RequestConfig)
+	if err != nil {
+		return nil, err
+	}
 	defer cancel()
 
 	resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
@@ -63,7 +66,10 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		return nil, err
 	}
 
-	ctx, cancel := api.Pool.NewContext(config.RequestConfig)
+	ctx, cancel, err := api.Pool.NewContext(config.RequestConfig)
+	if err != nil {
+		return nil, err
+	}
 	defer cancel()
 
 	table := &ultipa.NodeTable{}
@@ -253,7 +259,10 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 			return nil, err
 		}
 
-		ctx, cancel := api.Pool.NewContext(config.RequestConfig)
+		ctx, cancel, err := api.Pool.NewContext(config.RequestConfig)
+		if err != nil {
+			return nil, err
+		}
 		defer cancel()
 
 		table := &ultipa.NodeTable{}
