@@ -3,11 +3,14 @@ package configuration
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 	"github.com/jinzhu/copier"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"strconv"
 	"strings"
+	"time"
+	"ultipa-go-sdk/sdk/printers"
 )
 
 //
@@ -95,6 +98,10 @@ func (config *UltipaConfig) ToContextKV(rConfig *RequestConfig) []string {
 	if rConfig.TimezoneOffset != 0 {
 		headers = append(headers, "tz_offset", strconv.FormatInt(rConfig.TimezoneOffset, 10))
 	} else if rConfig.Timezone != "" {
+		_, err := time.LoadLocation(rConfig.Timezone)
+		if err != nil {
+			printers.PrintErrAndExist(fmt.Sprintf("Invalid name of timezone %s, %v", rConfig.Timezone, err))
+		}
 		headers = append(headers, "tz", rConfig.Timezone)
 	}
 
