@@ -20,7 +20,9 @@ type UltipaTime struct {
 func NewTimeStamp(datetime int64) *UltipaTime {
 	unixTime := time.Unix(datetime, 0)
 	ultipaDateTime := TimeToUint64(unixTime)
-	return NewTime(ultipaDateTime)
+	ultipaTime := NewTime(ultipaDateTime)
+	ultipaTime.Time = &unixTime
+	return ultipaTime
 }
 
 func NewTime(datetime uint64) *UltipaTime {
