@@ -92,10 +92,10 @@ func (config *UltipaConfig) ToContextKV(rConfig *RequestConfig) []string {
 		//"cluster_id",
 		//config.CurrentClusterId,
 	}
-	if rConfig.TimeZoneOffset != 0 {
-		headers = append(headers, "tz_offset", strconv.FormatInt(rConfig.TimeZoneOffset, 10))
-	} else if rConfig.TimeZone != "" {
-		headers = append(headers, "tz", rConfig.TimeZone)
+	if rConfig.TimezoneOffset != 0 {
+		headers = append(headers, "tz_offset", strconv.FormatInt(rConfig.TimezoneOffset, 10))
+	} else if rConfig.Timezone != "" {
+		headers = append(headers, "tz", rConfig.Timezone)
 	}
 
 	return headers
