@@ -19,8 +19,8 @@ type RequestConfig struct {
 	UseControl     bool        // Use Control Node( global master )
 	RequestType    RequestType // choose connection by request type, write => master, task > algo, normal => random
 	Uql            string      // for Go Only, used for inner program
-	TimeZone       string      // name of time zone , e.g. Aisa/Shanghai
-	TimeZoneOffset int64         // seconds that elapse from UTC, prior to TimeZone
+	Timezone       string      // name of time zone , e.g. Aisa/Shanghai
+	TimezoneOffset int64         // seconds that elapse from UTC, prior to TimeZone
 }
 
 type InsertRequestConfig struct {
