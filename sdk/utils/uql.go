@@ -19,6 +19,7 @@ var WriteUqlCommandKeys = []string{
 	"insert", "update", "delete", "upsert",
 	"clear", "stop", "pause", "resume",
 	"top", "kill",
+	`mount\(\).graph`, `unmount\(\).graph`,
 }
 
 var GlobalUqlCommandKeys = []string{
@@ -41,12 +42,10 @@ var GlobalUqlCommandKeys = []string{
 	`drop\(\).graph`,
 	`kill\(\).graph`,
 	`top\(\).graph`,
-	`mount\(\).graph`,
-	`unmount\(\).graph`,
 }
 
 func GetUqlRegExpMatcher(fnNames []string) *regexp.Regexp {
-	return regexp.MustCompile(`(?i)(\s*|^|\n)(` + strings.Join(fnNames, "|")  + `)\(`)
+	return regexp.MustCompile(`(?i)(\s*|^|\n)(` + strings.Join(fnNames, "|") + `)\(`)
 }
 
 func NewUql(uql string) *UqlItem {
