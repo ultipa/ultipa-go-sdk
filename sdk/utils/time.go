@@ -3,24 +3,10 @@ package utils
 import (
 	"errors"
 	"fmt"
-	"github.com/fatih/color"
-	"log"
 	"strconv"
 	"strings"
 	"time"
 )
-
-var printingTimezoneLocation = time.Local //global timezone setting for print
-
-//SetTimestampPrintingLocation set time zone for timestamp printing
-func SetTimestampPrintingLocation(timezone string) {
-	loc, err := time.LoadLocation(timezone)
-	if err != nil {
-		log.Println(fmt.Sprintf(color.RedString("[ERROR] Invalid name of timezone [%s] for printing, will ignore the specify timezone. error: %v", timezone, err)))
-		return
-	}
-	printingTimezoneLocation = loc
-}
 
 type UltipaTime struct {
 	Datetime uint64
@@ -264,9 +250,6 @@ func TimeToUint64(time time.Time) uint64 {
 }
 
 func (u *UltipaTime) String() string {
-	if printingTimezoneLocation != nil {
-		return u.Time.In(printingTimezoneLocation).Format("2006-01-02T15:04:05.000Z07:00")
-	}
 	return u.Time.Format("2006-01-02T15:04:05.000Z07:00")
 }
 
