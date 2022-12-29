@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/connection"
@@ -88,7 +89,7 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 	}
 
 	client := conn.GetClient()
-
+	api.Logger.Log(fmt.Sprintf("fetch client,  hit host:[%s], role [%v]", conn.Host, conn.Role))
 	return client, conf, nil
 }
 
@@ -106,7 +107,7 @@ func (api *UltipaAPI) GetControlClient(config *configuration.RequestConfig) (ult
 		return nil, err
 	}
 	client := conn.GetControlClient()
-
+	api.Logger.Log(fmt.Sprintf("fetch control client, hit host:[%s], role [%v]", conn.Host, conn.Role))
 	return client, nil
 }
 
