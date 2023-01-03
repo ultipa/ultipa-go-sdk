@@ -23,22 +23,24 @@ func CheckValuesAndProperties(properties []*structs.Property, values *structs.Va
 		props = append(props, prop)
 	}
 
-	if props != nil && len(props) != 0 {
-		if values == nil {
+	if props != nil {
+		if len(props) > 0 && values == nil {
 			err = errors.New(fmt.Sprintf("row [%d] error: values are empty but properties size >0.", index))
 			return err
 		}
-		if len(values.Data) > len(props) {
-			err = errors.New(fmt.Sprintf("row [%d] error: values size larger than properties size.", index))
-			return err
-		}
-		if len(values.Data) < len(props) {
-			err = errors.New(fmt.Sprintf("row [%d] error: values size smaller than properties size.", index))
-			return err
-		}
-		for idx, prop := range props {
-			if !values.Has(prop.Name) {
-				return errors.New(fmt.Sprintf("row [%d] error: values doesn't contain property [%s]", idx, prop.Name))
+		if values != nil {
+			if len(values.Data) > len(props) {
+				err = errors.New(fmt.Sprintf("row [%d] error: values size larger than properties size.", index))
+				return err
+			}
+			if len(values.Data) < len(props) {
+				err = errors.New(fmt.Sprintf("row [%d] error: values size smaller than properties size.", index))
+				return err
+			}
+			for idx, prop := range props {
+				if !values.Has(prop.Name) {
+					return errors.New(fmt.Sprintf("row [%d] error: values doesn't contain property [%s]", idx, prop.Name))
+				}
 			}
 		}
 	} else {
