@@ -20,7 +20,8 @@ type RequestConfig struct {
 	RequestType    RequestType // choose connection by request type, write => master, task > algo, normal => random
 	Uql            string      // for Go Only, used for inner program
 	Timezone       string      // name of time zone , e.g. Aisa/Shanghai
-	TimezoneOffset int64         // seconds that elapse from UTC, prior to TimeZone
+	TimezoneOffset int64       // seconds that elapse from UTC, prior to TimeZone
+	ThreadNum      uint32      // used for uql request
 }
 
 type InsertRequestConfig struct {

@@ -135,11 +135,15 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 	}
 	defer cancel()
 
-	resp, err := client.Uql(ctx, &ultipa.UqlRequest{
+	uqlRequest := &ultipa.UqlRequest{
 		GraphName: conf.CurrentGraph,
 		Timeout:   conf.Timeout,
 		Uql:       uql,
-	})
+	}
+	if config.ThreadNum > 0 {
+		uqlRequest.ThreadNum = config.ThreadNum
+	}
+	resp, err := client.Uql(ctx, uqlRequest)
 
 	if err != nil {
 		// if get error, ex: unavailable
