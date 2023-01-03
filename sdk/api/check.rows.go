@@ -20,6 +20,7 @@ func CheckValuesAndProperties(properties []*structs.Property, values *structs.Va
 		if prop.IsIDType() || prop.IsIgnore() {
 			continue
 		}
+		props = append(props, prop)
 	}
 
 	if props != nil && len(props) != 0 {
