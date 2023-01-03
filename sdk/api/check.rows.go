@@ -16,14 +16,10 @@ import (
 func CheckValuesAndProperties(properties []*structs.Property, values *structs.Values, index int) (err error) {
 	var props []*structs.Property
 
-	for idx, prop := range properties {
+	for _, prop := range properties {
 		if prop.IsIDType() || prop.IsIgnore() {
 			continue
 		}
-		if !values.Has(prop.Name) {
-			return errors.New(fmt.Sprintf("row [%d] error: values doesn't contain property [%s]", idx, prop.Name))
-		}
-		props = append(props, prop)
 	}
 
 	if props != nil && len(props) != 0 {
@@ -39,12 +35,18 @@ func CheckValuesAndProperties(properties []*structs.Property, values *structs.Va
 			err = errors.New(fmt.Sprintf("row [%d] error: values size smaller than properties size.", index))
 			return err
 		}
+		for idx, prop := range props {
+			if !values.Has(prop.Name) {
+				return errors.New(fmt.Sprintf("row [%d] error: values doesn't contain property [%s]", idx, prop.Name))
+			}
+		}
 	} else {
 		if values != nil && len(values.Data) > 0 {
 			err = errors.New(fmt.Sprintf("row [%d] error: properties are empty but values size >0.", index))
 			return err
 		}
 	}
+
 	return err
 }
 
