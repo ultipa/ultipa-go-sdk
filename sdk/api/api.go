@@ -153,11 +153,7 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 			return nil, err
 		}
 
-		resp, err = client.Uql(ctx, &ultipa.UqlRequest{
-			GraphName: conf.CurrentGraph,
-			Timeout:   conf.Timeout,
-			Uql:       uql,
-		})
+		resp, err = client.Uql(ctx, uqlRequest)
 
 		if err != nil {
 			return nil, err
