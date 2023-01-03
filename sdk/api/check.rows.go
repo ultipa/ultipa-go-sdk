@@ -16,9 +16,12 @@ import (
 func CheckValuesAndProperties(properties []*structs.Property, values *structs.Values, index int) (err error) {
 	var props []*structs.Property
 
-	for _, prop := range properties {
+	for idx, prop := range properties {
 		if prop.IsIDType() || prop.IsIgnore() {
 			continue
+		}
+		if !values.Has(prop.Name) {
+			return errors.New(fmt.Sprintf("row [%d] error: values doesn't contain property [%s]", idx, prop.Name))
 		}
 		props = append(props, prop)
 	}
