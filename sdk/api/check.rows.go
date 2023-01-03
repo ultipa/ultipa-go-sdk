@@ -38,7 +38,7 @@ func CheckValuesAndProperties(properties []*structs.Property, values *structs.Va
 				return err
 			}
 			for idx, prop := range props {
-				if !values.Has(prop.Name) {
+				if _, ok := values.Data[prop.Name]; !ok {
 					return errors.New(fmt.Sprintf("row [%d] error: values doesn't contain property [%s].", idx, prop.Name))
 				}
 			}
