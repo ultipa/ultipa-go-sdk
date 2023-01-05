@@ -19,7 +19,6 @@ func NewNode() *Node {
 	return &Node{Values: NewValues()}
 }
 
-
 func (node *Node) GetID() types.ID {
 	return node.ID
 }
@@ -47,6 +46,12 @@ func (node *Node) GetBytes(key string) ([]byte, error) {
 	return utils.ConvertInterfaceToBytes(v)
 }
 
+// GetBytesSafe get []byte value by key, if value is nil, then return default value of PropertyType t
+func (node *Node) GetBytesSafe(key string, t ultipa.PropertyType) ([]byte, error) {
+	v := node.Values.Get(key)
+	return utils.ConvertInterfaceToBytesSafe(v, t)
+}
+
 // set a value by key
 func (node *Node) Set(key string, value interface{}) error {
 
@@ -55,15 +60,13 @@ func (node *Node) Set(key string, value interface{}) error {
 	return nil
 }
 
-
-func (node *Node) UpdateByValueID(){
+func (node *Node) UpdateByValueID() {
 	id := node.Get("_id")
 	//uuid := node.Get("_uuid")
 	if id != nil {
 		node.ID = id.(string)
 	}
 }
-
 
 func NewNodeFromNodeRow(schema *Schema, nodeRow *ultipa.NodeRow) *Node {
 	newNode := NewNode()
@@ -79,7 +82,6 @@ func NewNodeFromNodeRow(schema *Schema, nodeRow *ultipa.NodeRow) *Node {
 
 	return newNode
 }
-
 
 func ConvertStringNodes(schema *Schema, nodes []*Node) {
 
@@ -108,5 +110,3 @@ func ConvertStringNodes(schema *Schema, nodes []*Node) {
 		}
 	}
 }
-
-

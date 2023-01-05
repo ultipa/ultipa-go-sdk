@@ -52,6 +52,15 @@ func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType) interface{} {
 	}
 }
 
+//ConvertInterfaceToBytesSafe convert value to []byte, if value is nil, will set default value according to PropertyType t
+func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType) ([]byte, error) {
+	toConvertValue := value
+	if toConvertValue == nil {
+		toConvertValue = GetDefaultNilInterface(t)
+	}
+	return ConvertInterfaceToBytes(toConvertValue)
+}
+
 func ConvertInterfaceToBytes(value interface{}) ([]byte, error) {
 	v := []byte{}
 
@@ -162,6 +171,31 @@ func GetDefaultNilString(t ultipa.PropertyType) string {
 		return "1970-01-01"
 	case ultipa.PropertyType_TIMESTAMP:
 		return "1970-01-01"
+	default:
+		return ""
+	}
+
+}
+
+func GetDefaultNilInterface(t ultipa.PropertyType) interface{} {
+
+	switch t {
+	case ultipa.PropertyType_INT32:
+		return int32(0)
+	case ultipa.PropertyType_INT64:
+		return int64(0)
+	case ultipa.PropertyType_UINT32:
+		return uint32(0)
+	case ultipa.PropertyType_UINT64:
+		return uint64(0)
+	case ultipa.PropertyType_FLOAT:
+		return float32(0)
+	case ultipa.PropertyType_DOUBLE:
+		return float64(0)
+	case ultipa.PropertyType_DATETIME:
+		return uint64(0)
+	case ultipa.PropertyType_TIMESTAMP:
+		return uint32(0)
 	default:
 		return ""
 	}

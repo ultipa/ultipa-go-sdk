@@ -166,7 +166,7 @@ func setPropertiesToEdgeRow(schema *structs.Schema, rows []*structs.Edge) (error
 					err = errors.New(fmt.Sprintf("edge row [%d] error: values doesn't contain property [%s]", index, prop.Name))
 				}
 
-				bs, err := row.GetBytes(prop.Name)
+				bs, err := row.GetBytesSafe(prop.Name, prop.Type)
 
 				if err != nil {
 					printers.PrintError("Get row bytes value failed " + prop.Name + " " + err.Error())
