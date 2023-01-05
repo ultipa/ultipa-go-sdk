@@ -161,16 +161,12 @@ func setPropertiesToEdgeRow(schema *structs.Schema, rows []*structs.Edge) (error
 					continue
 				}
 
-				if !row.Values.Has(prop.Name) {
-					cancel()
-					err = errors.New(fmt.Sprintf("edge row [%d] error: values doesn't contain property [%s]", index, prop.Name))
-				}
-
 				bs, err := row.GetBytesSafe(prop.Name, prop.Type)
 
 				if err != nil {
 					printers.PrintError("Get row bytes value failed " + prop.Name + " " + err.Error())
 					err = errors.New(fmt.Sprintf("edge row [%d] error: failed to serialize value of property %s,value=%v", index, prop.Name, row.Values.Get(prop.Name)))
+					cancel()
 					return
 				}
 
