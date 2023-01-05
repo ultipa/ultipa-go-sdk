@@ -13,6 +13,8 @@ type UqlItem struct {
 	Uql []byte
 }
 
+var ParseGraphCommandKeys = `(mount|unmount|truncate)\(\s*\)\.graph\(\s*["'](?P<graph>\w+)["']\s*\)`
+
 var WriteUqlCommandKeys = []string{
 	"create", "alter", "drop", "grant", "revoke",
 	"LTE", "UFE", "truncate", "compact",
@@ -74,4 +76,18 @@ func (t *UqlItem) HasExecTask() bool {
 func (t *UqlItem) IsGlobal() bool {
 	matcher := GetUqlRegExpMatcher(GlobalUqlCommandKeys)
 	return matcher.Match(t.Uql)
+}
+
+//ParseGraph check whether fetch graph name from uql or not
+func (t *UqlItem) 	ParseGraph() (bool, string) {
+	matcher := regexp.MustCompile(ParseGraphCommandKeys)
+	result := matcher.FindSubmatch(t.Uql)
+	if result != nil {
+		idx := matcher.SubexpIndex("graph")
+		if idx > -1 {
+			return true, string(result[idx])
+		}
+		return false, ""
+	}
+	return false, ""
 }

@@ -58,6 +58,10 @@ func (api *UltipaAPI) GetConn(config *configuration.RequestConfig) (*connection.
 			if UqlItem.IsGlobal() || config.UseControl {
 				conn, err = api.Pool.GetGlobalMasterConn(conf)
 			} else if UqlItem.HasWrite() || config.UseMaster || conf.Consistency {
+				ok, graph := UqlItem.ParseGraph()
+				if ok && graph != "" {
+					conf.CurrentGraph = graph
+				}
 				conn, err = api.Pool.GetMasterConn(conf)
 			} else if UqlItem.HasExecTask() {
 				conn, err = api.Pool.GetAnalyticsConn(conf)

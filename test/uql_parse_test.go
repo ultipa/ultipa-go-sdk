@@ -21,7 +21,6 @@ func TestEasyUqlParse(t *testing.T) {
     update().nodes({_id == neighbors._id && balance > C002.balance}).set({level: level + 1})`,
 	}
 
-
 	for _, uql := range uqls {
 		Uql := utils.NewUql(uql)
 		log.Printf("🧪 uql: %s", Uql.Uql)
@@ -32,5 +31,24 @@ func TestEasyUqlParse(t *testing.T) {
 	}
 }
 
+func TestParseGraph(t *testing.T) {
+	uqls := []string{
+		`mount( ).graph("abcde")`,
+		`mount( ).graph('abcde')`,
+		`unmount( ).graph("abcde")`,
+		`unmount( ).graph('abcde')`,
+		`truncate().graph("abcde")`,
+		`truncate().graph('abcde')`,
+		`show().graph(name)`,
+		`create().graph("abcde", "desc")`,
+		`exec task algo(degree).params({})`,
+		`alter().node_property()`,
+	}
 
+	for idx, uql := range uqls {
+		Uql := utils.NewUql(uql)
+		ok, graph := Uql.ParseGraph()
+		t.Logf("uql[%d]:%v, graph:%s", idx, ok, graph)
+	}
 
+}
