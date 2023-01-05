@@ -42,6 +42,7 @@ var GlobalUqlCommandKeys = []string{
 	`show\(\).graph`,
 	`get\(\).graph`,
 	`create\(\).graph`,
+	`alter\(\).graph`,
 	`drop\(\).graph`,
 	`kill\(\).graph`,
 	`top\(\).graph`,
