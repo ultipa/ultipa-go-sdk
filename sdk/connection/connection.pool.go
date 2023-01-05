@@ -3,6 +3,7 @@ package connection
 import (
 	"context"
 	"errors"
+	"fmt"
 	"google.golang.org/grpc/metadata"
 	"log"
 	"sync"
@@ -211,6 +212,8 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 			pool.GraphMgr.AddFollower(graphName, fconn)
 			pool.RefreshActives()
 		}
+	} else {
+		err = errors.New(fmt.Sprintf("failed to fetch leader of graph %s, errInfo:%d,%s", graphName, resp.Status.ErrorCode, resp.Status.Msg))
 	}
 
 	return err

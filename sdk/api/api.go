@@ -70,17 +70,16 @@ func (api *UltipaAPI) GetConn(config *configuration.RequestConfig) (*connection.
 
 	}
 
+	if err != nil {
+		return nil, conf, err
+	}
+
 	if conn == nil {
 		conn, err = api.Pool.GetConn(conf)
 		if err != nil {
 			return nil, nil, err
 		}
 	}
-
-	if err != nil {
-		return nil, conf, err
-	}
-
 	return conn, conf, nil
 }
 

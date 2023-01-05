@@ -188,3 +188,26 @@ func TestUQL6(t *testing.T) {
 	}
 	printers.PrintTable(table)
 }
+
+func TestUQL7(t *testing.T) {
+
+	client, _ := GetClient([]string{"192.168.2.41:60061"}, "default")
+
+	uql := "alter().graph('abcd').set({name:'ddddd'})"
+	resp, err := client.UQL(uql, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	//断言响应码
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		log.Println(resp.Status.Message)
+		t.Log(resp.Status.Message)
+	}
+	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
+	//断言返回数据
+	table, err := resp.Alias("table(nodes.timestamp,nodes.frating)").AsTable()
+	if err != nil {
+		return
+	}
+	printers.PrintTable(table)
+}
