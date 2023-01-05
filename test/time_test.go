@@ -22,3 +22,8 @@ func TestNewTimeFromString(t *testing.T) {
 		t.Log(ultipatime)
 	}
 }
+
+func TestTimeToUltipaTime(t *testing.T) {
+	ut := utils.TimeToUltipaTime(nil)
+	t.Log(ut)
+}

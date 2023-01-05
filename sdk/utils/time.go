@@ -22,10 +22,7 @@ type UltipaTime struct {
 
 func NewTimeStamp(datetime int64) *UltipaTime {
 	unixTime := time.Unix(datetime, 0)
-	ultipaDateTime := TimeToUint64(unixTime)
-	ultipaTime := NewTime(ultipaDateTime)
-	ultipaTime.Time = &unixTime
-	return ultipaTime
+	return TimeToUltipaTime(&unixTime)
 }
 
 func NewTime(datetime uint64) *UltipaTime {
@@ -63,7 +60,6 @@ func NewTimeFromString(dateString string) (*UltipaTime, error) {
 	if err != nil {
 		return nil, err
 	}
-	n := UltipaTime{}
 	layouts := []string{
 		"2006-1-2",
 		"2006-1-2T15:04:05.000Z0700",
@@ -101,13 +97,10 @@ func NewTimeFromString(dateString string) (*UltipaTime, error) {
 
 	for _, l := range layouts {
 		t, err := time.Parse(l, newDateString)
-		n.Time = &t
-		v := n.TimeToUint64(&t)
-
-		if err == nil {
-			n.Datetime = v
-			return &n, err
+		if err != nil {
+			continue
 		}
+		return TimeToUltipaTime(&t), err
 	}
 
 	return nil, errors.New("parse datetime string failed : " + newDateString)
@@ -247,6 +240,48 @@ func TimeToUint64(time time.Time) uint64 {
 	datetime = datetime | Macrosec
 
 	return datetime
+}
+
+func TimeToUltipaTime(t *time.Time) *UltipaTime {
+	toConvertTime := t
+	if t == nil {
+		defaultTime := time.Unix(0, 0)
+		toConvertTime = &defaultTime
+	}
+
+	ultipaDateTime := TimeToUint64(*toConvertTime)
+	ultipaTime := NewTime(ultipaDateTime)
+	ultipaTime.Time = toConvertTime
+
+	datetime := uint64(0)
+
+	year := uint64(toConvertTime.Year())
+	month := uint64(toConvertTime.Month())
+	day := uint64(toConvertTime.Day())
+	hour := uint64(toConvertTime.Hour())
+	minute := uint64(toConvertTime.Minute())
+	second := uint64(toConvertTime.Second())
+	microsec := uint64(toConvertTime.Nanosecond() / 1000)
+
+	yearMonth := year*13 + month
+	datetime = yearMonth << 46
+	datetime = datetime | (day << 41)
+	datetime = datetime | (hour << 36)
+	datetime = datetime | (minute << 30)
+	datetime = datetime | (second << 24)
+	datetime = datetime | microsec
+
+	return &UltipaTime{
+		Datetime: datetime,
+		Year:     year,
+		Month:    month,
+		Day:      day,
+		Hour:     hour,
+		Minute:   minute,
+		Second:   second,
+		Macrosec: microsec,
+		Time:     toConvertTime,
+	}
 }
 
 func (u *UltipaTime) String() string {
