@@ -42,7 +42,7 @@ var GlobalUqlCommandKeys = []string{
 	`show\(\).graph`,
 	`get\(\).graph`,
 	`create\(\).graph`,
-	`alter\(\).graph`,
+	//`alter\(\).graph`,
 	`drop\(\).graph`,
 	`kill\(\).graph`,
 	`top\(\).graph`,
@@ -80,7 +80,7 @@ func (t *UqlItem) IsGlobal() bool {
 }
 
 //ParseGraph check whether fetch graph name from uql or not
-func (t *UqlItem) 	ParseGraph() (bool, string) {
+func (t *UqlItem) ParseGraph() (bool, string) {
 	matcher := regexp.MustCompile(ParseGraphCommandKeys)
 	result := matcher.FindSubmatch(t.Uql)
 	if result != nil {
