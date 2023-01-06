@@ -193,7 +193,7 @@ func TestUQL7(t *testing.T) {
 
 	client, _ := GetClient([]string{"192.168.2.41:60061"}, "default")
 
-	uql := "alter().graph('abcd').set({name:'ddddd'})"
+	uql := "alter().graph('c1').set({name:'ddddd'})"
 	resp, err := client.UQL(uql, nil)
 	if err != nil {
 		log.Fatalln(err)

@@ -131,7 +131,8 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 	if err != nil {
 		return nil, err
 	}
-
+	//CurrentGraph of conf may be changed by uql
+	config.GraphName = conf.CurrentGraph
 	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return nil, err
