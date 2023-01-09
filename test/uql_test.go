@@ -4,6 +4,7 @@ import (
 	"log"
 	"testing"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/printers"
 )
 
@@ -189,7 +190,7 @@ func TestUQL6(t *testing.T) {
 	printers.PrintTable(table)
 }
 
-func TestUQL7(t *testing.T) {
+func TestUQLAlterGraph(t *testing.T) {
 
 	client, _ := GetClient([]string{"192.168.2.41:60061"}, "default")
 
@@ -210,4 +211,37 @@ func TestUQL7(t *testing.T) {
 		return
 	}
 	printers.PrintTable(table)
+}
+
+func TestUQLCompact(t *testing.T) {
+
+	client, _ := GetClient([]string{"192.168.2.41:60062"}, "default")
+
+	uql := `compact().graph("random_test_js_1672976970614")`
+	//ty, leader, follower, global, err := client.GetConnByUQL(uql, "random_test_js_1672976970614")
+	//if err != nil {
+	//	log.Fatalln(err)
+	//}
+	//t.Logf("uql type:%v", ty)
+	//t.Logf("leader:%s", leader.Host)
+	//sb := strings.Builder{}
+	//for _, f := range follower {
+	//	sb.WriteString(f.Host)
+	//	sb.WriteString(",")
+	//}
+	//t.Logf("followers:%s", sb.String())
+	//
+	//t.Logf("global leader:%s", global.Host)
+
+	resp, err := client.UQL(uql, &configuration.RequestConfig{
+		GraphName: "random_test_js_1672976970614",
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		log.Println(resp.Status.Message)
+		t.Log(resp.Status.Message)
+	}
 }
