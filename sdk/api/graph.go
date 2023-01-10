@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
@@ -83,7 +82,7 @@ func (api *UltipaAPI) CreateGraph(graph *structs.Graph, config *configuration.Re
 		api.Logger.Log("Detecting New Graph - " + graph.Name + " Leader")
 		err := api.Pool.RefreshClusterInfo(graph.Name)
 
-		if err != nil && !strings.Contains(err.Error(), "error graph name") {
+		if err != nil {
 			return nil, err
 		}
 

@@ -192,9 +192,9 @@ func TestUQL6(t *testing.T) {
 
 func TestUQLAlterGraph(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.2.41:60061"}, "default")
+	client, _ := GetClient([]string{"192.168.1.85:61095"}, "default")
 
-	uql := "alter().graph('c1').set({name:'ddddd'})"
+	uql := "alter().graph('alter_graph_1').set({name:'alter_graph'})" //test123
 	resp, err := client.UQL(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
@@ -206,18 +206,13 @@ func TestUQLAlterGraph(t *testing.T) {
 	}
 	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
 	//断言返回数据
-	table, err := resp.Alias("table(nodes.timestamp,nodes.frating)").AsTable()
-	if err != nil {
-		return
-	}
-	printers.PrintTable(table)
 }
 
-func TestUQLCompact(t *testing.T) {
+func TestUQLCompactWithNotExistGraph(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.2.41:60062"}, "default")
+	client, _ := GetClient([]string{"192.168.1.85:61095"}, "default")
 
-	uql := `compact().graph("random_test_js_1672976970614")`
+	uql := `compact().graph("c1")`
 	//ty, leader, follower, global, err := client.GetConnByUQL(uql, "random_test_js_1672976970614")
 	//if err != nil {
 	//	log.Fatalln(err)
@@ -234,14 +229,13 @@ func TestUQLCompact(t *testing.T) {
 	//t.Logf("global leader:%s", global.Host)
 
 	resp, err := client.UQL(uql, &configuration.RequestConfig{
-		GraphName: "random_test_js_1672976970614",
+		GraphName: "c1",
 	})
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatalf("fail to compact:%v", err)
 	}
 
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		log.Println(resp.Status.Message)
-		t.Log(resp.Status.Message)
+		log.Fatalf(resp.Status.Message)
 	}
 }

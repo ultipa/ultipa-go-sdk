@@ -143,34 +143,49 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 	var conn *Connection
 
 	var err error
-	// 如果该图集暂无初始化时
-	if pool.GraphMgr.GetLeader(graphName) == nil {
-		conn, err = pool.GetConn(&configuration.UltipaConfig{CurrentGraph: graphName})
-	} else {
-		// 已经初始化后
-		conn = pool.GraphMgr.GetLeader(graphName)
-	}
 
-	if err != nil {
-		return err
+	activeConns := pool.Actives
+
+	for _, activeConn := range activeConns {
+		// 如果该图集暂无初始化时
+		if pool.GraphMgr.GetLeader(graphName) == nil {
+			conn = activeConn
+		} else {
+			// 已经初始化后
+			conn = pool.GraphMgr.GetLeader(graphName)
+		}
+		log.Println(fmt.Sprintf("refresh cluster info with connection to host [%s]", conn.Host))
+		err = pool.resolveClusterInfo(graphName, conn)
+		if err != nil {
+			continue
+		}
 	}
+	return err
+}
+
+//resolveClusterInfo resolve graphName cluster info with connection conn
+func (pool *ConnectionPool) resolveClusterInfo(graphName string, conn *Connection) error {
 
 	ctx, cancel, err := pool.NewContext(&configuration.RequestConfig{GraphName: graphName})
+	defer cancel()
 	if err != nil {
 		return err
 	}
-	defer cancel()
-
 	client := conn.GetControlClient()
 	resp, err := client.GetLeader(ctx, &ultipa.GetLeaderRequest{})
 
-	if resp == nil || err != nil {
+	if err != nil {
 		return err
+	}
+
+	if resp == nil {
+		return errors.New("no resp when get leader")
 	}
 
 	if resp.Status.ErrorCode == ultipa.ErrorCode_NOT_RAFT_MODE {
 		pool.IsRaft = false
 		pool.GraphMgr.SetLeader(graphName, conn)
+		return nil
 	}
 
 	if resp.Status.ErrorCode == ultipa.ErrorCode_RAFT_REDIRECT {
@@ -182,10 +197,15 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 			}
 			pool.Connections[resp.Status.ClusterInfo.Redirect] = c
 		}
-
 		pool.GraphMgr.SetLeader(graphName, pool.Connections[resp.Status.ClusterInfo.Redirect])
 		pool.RefreshActives()
-		return pool.RefreshClusterInfo(graphName)
+		return nil
+	}
+
+	if resp.Status.ErrorCode == ultipa.ErrorCode_RAFT_LEADER_NOT_YET_ELECTED {
+		pool.IsRaft = true
+		time.Sleep(time.Millisecond * 300)
+		return errors.New("raft leader not yet elected")
 	}
 
 	if resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS {
@@ -195,27 +215,22 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 		pool.GraphMgr.ClearFollower(graphName)
 		for _, follower := range resp.Status.ClusterInfo.Followers {
 			fconn := pool.Connections[follower.Address]
-
 			if fconn == nil {
-				fconn, err = NewConnection(follower.Address, pool.Config)
-
-				if err != nil {
-					return err
+				fconn2, err5 := NewConnection(follower.Address, pool.Config)
+				if err5 != nil {
+					continue
 				}
-
+				fconn = fconn2
 				pool.Connections[follower.Address] = fconn
 			}
-
 			fconn.Host = follower.Address
 			fconn.Active = follower.Status
 			fconn.SetRoleFromInt32(follower.Role)
 			pool.GraphMgr.AddFollower(graphName, fconn)
-			pool.RefreshActives()
 		}
-	} else {
-		err = errors.New(fmt.Sprintf("failed to fetch leader of graph %s, errInfo:%d,%s", graphName, resp.Status.ErrorCode, resp.Status.Msg))
+		pool.RefreshActives()
+		return nil
 	}
-
 	return err
 }
 
