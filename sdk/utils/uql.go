@@ -13,7 +13,7 @@ type UqlItem struct {
 	Uql []byte
 }
 
-var ParseGraphCommandKeys = `(alter|mount|unmount|truncate)\(\s*\)\.graph\(\s*["'](?P<graph>\w+)["']\s*\)`
+var ParseGraphCommandKeys = `(mount|unmount|truncate)\(\s*\)\.graph\(\s*["'](?P<graph>\w+)["']\s*\)`
 
 var WriteUqlCommandKeys = []string{
 	"create", "alter", "drop", "grant", "revoke",
@@ -42,7 +42,7 @@ var GlobalUqlCommandKeys = []string{
 	`show\(\).graph`,
 	`get\(\).graph`,
 	`create\(\).graph`,
-	//`alter\(\).graph`,
+	`alter\(\).graph`,
 	`drop\(\).graph`,
 	`kill\(\).graph`,
 	`top\(\).graph`,
