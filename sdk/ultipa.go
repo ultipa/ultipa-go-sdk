@@ -7,6 +7,10 @@ import (
 	"ultipa-go-sdk/sdk/connection"
 )
 
+var (
+	Version  = "v4.2.0-1" //主版本号
+)
+
 // New an Ultipa Instance !!!!
 func NewUltipa(config *configuration.UltipaConfig) (*api.UltipaAPI, error){
 
