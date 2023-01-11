@@ -145,7 +145,7 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 	if err != nil && reflect.TypeOf(err).Elem().String() == "utils.LeaderNotYetElectedError" {
 		//若是leader未选出的错误类型，再重试一次
 		pool.RefreshActives()
-		err = pool.RefreshClusterInfo(graphName)
+		err = pool.doRefreshClusterInfo(graphName)
 	}
 	return err
 }

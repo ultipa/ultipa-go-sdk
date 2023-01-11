@@ -38,7 +38,7 @@ func TestClient(t *testing.T) {
 	hosts := []string{
 		"192.168.1.85:61095",
 	}
-	client, err := GetClient(hosts, "default")
+	client, err := GetClient(hosts, "global")
 
 	if err != nil {
 		log.Fatalln(err)
