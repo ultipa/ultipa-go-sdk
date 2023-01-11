@@ -24,7 +24,7 @@ func TestCreateGraph(t *testing.T) {
 
 	graphName := "test_creation"
 	hosts := []string{
-		"192.168.1.85:60701",
+		"192.168.1.85:61095",
 	}
 	client, err := GetClient(hosts, "default")
 

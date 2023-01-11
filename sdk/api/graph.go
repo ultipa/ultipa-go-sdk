@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"strconv"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
@@ -73,17 +74,21 @@ func (api *UltipaAPI) CreateGraph(graph *structs.Graph, config *configuration.Re
 	api.Logger.Log("Creating Graph Request OK! - " + graph.Name)
 
 	// Try to detect the graph is created, default times is 600
-	times := 600
+	times := 60
 	for {
 		if times < 0 {
 			break
 		}
 
 		api.Logger.Log("Detecting New Graph - " + graph.Name + " Leader")
-		err := api.Pool.RefreshClusterInfo(graph.Name)
+		clusterErr := api.Pool.RefreshClusterInfo(graph.Name)
 
-		if err != nil {
-			return nil, err
+		if clusterErr != nil {
+			if reflect.TypeOf(clusterErr).Elem().String() != "utils.LeaderNotYetElectedError" {
+				api.Logger.Log(fmt.Sprintf("failed to detect New Graph - %s Leader", graph.Name))
+				return nil, clusterErr
+			}
+			continue
 		}
 
 		conn := api.Pool.GraphMgr.GetLeader(graph.Name)

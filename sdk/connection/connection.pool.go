@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"google.golang.org/grpc/metadata"
 	"log"
+	"reflect"
 	"sync"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/printers"
+	"ultipa-go-sdk/sdk/utils"
 )
 
 type GraphClusterInfo struct {
@@ -80,7 +82,7 @@ func (pool *ConnectionPool) CreateConnections() error {
 func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds uint32) {
 	pool.muActiveSafely.Lock()
 	defer pool.muActiveSafely.Unlock()
-	if time.Now().Sub(pool.LastActivesTime) <= 5*time.Second {
+	if time.Now().Sub(pool.LastActivesTime) <= 5*time.Second && len(pool.Connections) == len(pool.Actives) {
 		// 避免频繁刷新
 		return
 	}
@@ -139,7 +141,16 @@ func (pool *ConnectionPool) ForceRefreshClusterInfo(graphName string) error {
 
 // sync cluster info from server
 func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
+	err := pool.doRefreshClusterInfo(graphName)
+	if err != nil && reflect.TypeOf(err).Elem().String() == "utils.LeaderNotYetElectedError" {
+		//若是leader未选出的错误类型，再重试一次
+		pool.RefreshActives()
+		err = pool.RefreshClusterInfo(graphName)
+	}
+	return err
+}
 
+func (pool *ConnectionPool) doRefreshClusterInfo(graphName string) error {
 	var conn *Connection
 
 	var err error
@@ -154,10 +165,10 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 			// 已经初始化后
 			conn = pool.GraphMgr.GetLeader(graphName)
 		}
-		log.Println(fmt.Sprintf("refresh cluster info with connection to host [%s]", conn.Host))
+		printers.PrintInfo(fmt.Sprintf("refresh graph [%s] cluster info with connection to host [%s]", graphName, conn.Host))
 		err = pool.resolveClusterInfo(graphName, conn)
-		if err != nil {
-			continue
+		if err == nil {
+			return nil
 		}
 	}
 	return err
@@ -205,7 +216,7 @@ func (pool *ConnectionPool) resolveClusterInfo(graphName string, conn *Connectio
 	if resp.Status.ErrorCode == ultipa.ErrorCode_RAFT_LEADER_NOT_YET_ELECTED {
 		pool.IsRaft = true
 		time.Sleep(time.Millisecond * 300)
-		return errors.New("raft leader not yet elected")
+		return utils.NewLeaderNotYetElectedError("")
 	}
 
 	if resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS {
@@ -230,6 +241,8 @@ func (pool *ConnectionPool) resolveClusterInfo(graphName string, conn *Connectio
 		}
 		pool.RefreshActives()
 		return nil
+	} else {
+		err = errors.New(fmt.Sprintf("falied to refresh cluster of graph %s: %v,%s", graphName, resp.Status.ErrorCode, resp.Status.Msg))
 	}
 	return err
 }
@@ -337,6 +350,10 @@ func (pool *ConnectionPool) NewContext(config *configuration.RequestConfig) (con
 
 	if timeout == 0 {
 		timeout = pool.Config.Timeout
+	}
+
+	if timeout == 0 {
+		timeout = 1
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
