@@ -2,6 +2,7 @@ package test
 
 import (
 	"testing"
+	"time"
 	"ultipa-go-sdk/sdk/utils"
 )
 
@@ -26,4 +27,9 @@ func TestNewTimeFromString(t *testing.T) {
 func TestTimeToUltipaTime(t *testing.T) {
 	ut := utils.TimeToUltipaTime(nil)
 	t.Log(ut)
+}
+
+
+func TestTimeZone(t *testing.T) {
+ 	t.Log(time.Now().Zone())
 }

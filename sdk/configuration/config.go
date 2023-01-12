@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"strconv"
 	"strings"
+	"time"
 )
 
 //
@@ -92,7 +93,10 @@ func (config *UltipaConfig) ToContextKV(rConfig *RequestConfig) []string {
 		//"cluster_id",
 		//config.CurrentClusterId,
 	}
-	if rConfig.TimezoneOffset != 0 {
+	if rConfig.TimezoneOffset == 0 && rConfig.Timezone == "" {
+		_, offset := time.Now().Zone()
+		headers = append(headers, "tz_offset", strconv.Itoa(offset))
+	} else if rConfig.TimezoneOffset != 0 {
 		headers = append(headers, "tz_offset", strconv.FormatInt(rConfig.TimezoneOffset, 10))
 	} else if rConfig.Timezone != "" {
 		headers = append(headers, "tz", rConfig.Timezone)
