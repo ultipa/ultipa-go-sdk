@@ -11,24 +11,24 @@ const (
 )
 
 type RequestConfig struct {
-	GraphName string // Graphset Name
-	Timeout   uint32 // timeout (Seconds)
-	ClusterId string // Name Server Only
-	Host      string // set for force host test
-	UseMaster bool // Use Master( graphSet master )
-	UseControl bool // Use Control Node( global master )
+	GraphName   string      // Graphset Name
+	Timeout     uint32      // timeout (Seconds)
+	ClusterId   string      // Name Server Only
+	Host        string      // set for force host test
+	UseMaster   bool        // Use Master( graphSet master )
+	UseControl  bool        // Use Control Node( global master )
 	RequestType RequestType // choose connection by request type, write => master, task > algo, normal => random
-	Uql string // for Go Only, used for inner program
+	Uql         string      // for Go Only, used for inner program
+	MaxPkgSize  int         // max package size in bytes, for both sending and receiving, if not set, default is 10M
 }
-
 
 type InsertRequestConfig struct {
 	*RequestConfig
-	InsertType ultipa.InsertType // used for insertBulkNodes/Edges
-	CreateNodeIfNotExist bool // used for insertBulkEdges
-	Silent bool // if returns new ids
+	InsertType           ultipa.InsertType // used for insertBulkNodes/Edges
+	CreateNodeIfNotExist bool              // used for insertBulkEdges
+	Silent               bool              // if returns new ids
 }
 
-func (rc * RequestConfig) SetRequestTypeByUql(uql string) {
+func (rc *RequestConfig) SetRequestTypeByUql(uql string) {
 
 }
