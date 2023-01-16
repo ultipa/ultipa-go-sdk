@@ -21,7 +21,7 @@ func NewDataItem() *DataItem {
 	return &DataItem{}
 }
 
-func NodeTableToNodes(nt *ultipa.NodeTable, alias string) ([]*structs.Node, map[string]*structs.Schema) {
+func NodeTableToNodes(nt *ultipa.EntityTable, alias string) ([]*structs.Node, map[string]*structs.Schema) {
 
 	schemas := map[string]*structs.Schema{}
 	nodes := []*structs.Node{}
@@ -34,7 +34,7 @@ func NodeTableToNodes(nt *ultipa.NodeTable, alias string) ([]*structs.Node, map[
 		}
 	}
 
-	for _, oNode := range nt.NodeRows {
+	for _, oNode := range nt.EntityRows {
 		node := &structs.Node{
 			Name:   alias,
 			ID:     oNode.Id,
@@ -56,7 +56,7 @@ func NodeTableToNodes(nt *ultipa.NodeTable, alias string) ([]*structs.Node, map[
 	return nodes, schemas
 }
 
-func EdgeTableToEdges(et *ultipa.EdgeTable, alias string) ([]*structs.Edge, map[string]*structs.Schema) {
+func EdgeTableToEdges(et *ultipa.EntityTable, alias string) ([]*structs.Edge, map[string]*structs.Schema) {
 
 	schemas := map[string]*structs.Schema{}
 	edges := []*structs.Edge{}
@@ -69,7 +69,7 @@ func EdgeTableToEdges(et *ultipa.EdgeTable, alias string) ([]*structs.Edge, map[
 		}
 	}
 
-	for _, oEdge := range et.EdgeRows {
+	for _, oEdge := range et.EntityRows {
 		edge := &structs.Edge{
 			Name:     alias,
 			UUID:     oEdge.Uuid,
@@ -247,10 +247,11 @@ func (di *DataItem) AsAttr() (attr *structs.Attr, err error) {
 	oAttr := di.Data.(*ultipa.AttrAlias)
 
 	attr.Name = oAttr.Alias
-	attr.PropertyType = oAttr.PropertyType
-
-	for _, v := range oAttr.Values {
-		attr.Rows = append(attr.Rows, utils.ConvertBytesToInterface(v, oAttr.PropertyType))
+	if oAttr.Attr != nil {
+		attr.PropertyType = oAttr.Attr.PropertyType
+		for _, v := range oAttr.Attr.Values {
+			attr.Rows = append(attr.Rows, utils.ConvertBytesToInterface(v, attr.PropertyType))
+		}
 	}
 
 	return attr, err

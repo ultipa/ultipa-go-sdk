@@ -155,7 +155,7 @@ func MergeUQLReply(reply1 *ultipa.UqlReply, reply2 *ultipa.UqlReply) *ultipa.Uql
 			if data2 != nil {
 				nodes1 := data1.(*ultipa.NodeAlias)
 				nodes2 := data2.(*ultipa.NodeAlias)
-				nodes1.NodeTable.NodeRows = append(nodes1.NodeTable.NodeRows, nodes2.NodeTable.NodeRows...)
+				nodes1.NodeTable.EntityRows = append(nodes1.NodeTable.EntityRows, nodes2.NodeTable.EntityRows...)
 			}
 		case ultipa.ResultType_RESULT_TYPE_EDGE:
 			if reply1.Edges == nil && reply2.Edges == nil {
@@ -181,7 +181,7 @@ func MergeUQLReply(reply1 *ultipa.UqlReply, reply2 *ultipa.UqlReply) *ultipa.Uql
 			if data2 != nil {
 				edges1 := data1.(*ultipa.EdgeAlias)
 				edges2 := data2.(*ultipa.EdgeAlias)
-				edges1.EdgeTable.EdgeRows = append(edges1.EdgeTable.EdgeRows, edges2.EdgeTable.EdgeRows...)
+				edges1.EdgeTable.EntityRows = append(edges1.EdgeTable.EntityRows, edges2.EdgeTable.EntityRows...)
 			}
 		case ultipa.ResultType_RESULT_TYPE_TABLE:
 			if reply1.Tables == nil && reply2.Tables == nil {
@@ -292,7 +292,14 @@ func MergeUQLReply(reply1 *ultipa.UqlReply, reply2 *ultipa.UqlReply) *ultipa.Uql
 				attr1 := data1.(*ultipa.AttrAlias)
 				attr2 := data2.(*ultipa.AttrAlias)
 
-				attr1.Values = append(attr1.Values, attr2.Values...)
+				if attr2.Attr == nil {
+					continue
+				}
+				if attr1.Attr == nil && attr2.Attr != nil {
+					reply1.Attrs = append(reply1.Attrs, attr2)
+					continue
+				}
+				attr1.Attr.Values = append(attr1.Attr.Values, attr2.Attr.Values...)
 			}
 		}
 	}

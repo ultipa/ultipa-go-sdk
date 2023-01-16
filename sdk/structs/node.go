@@ -68,7 +68,7 @@ func (node *Node) UpdateByValueID() {
 	}
 }
 
-func NewNodeFromNodeRow(schema *Schema, nodeRow *ultipa.NodeRow) *Node {
+func NewNodeFromNodeRow(schema *Schema, nodeRow *ultipa.EntityRow) *Node {
 	newNode := NewNode()
 
 	newNode.ID = nodeRow.Id

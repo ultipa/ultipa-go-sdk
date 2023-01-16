@@ -64,14 +64,14 @@ func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, conf
 
 		wg := sync.WaitGroup{}
 		if record.NodeTable != nil {
-			wg.Add(len(record.NodeTable.NodeRows))
+			wg.Add(len(record.NodeTable.EntityRows))
 
 			//record.NodeTable
 			nodeSchemaMap := structs.NewSchemaMapFromProtoSchema(record.NodeTable.Schemas, ultipa.DBType_DBNODE)
-			nodes := make([]*structs.Node, len(record.NodeTable.NodeRows))
-			for index, nodeRow := range record.NodeTable.NodeRows {
+			nodes := make([]*structs.Node, len(record.NodeTable.EntityRows))
+			for index, nodeRow := range record.NodeTable.EntityRows {
 
-				go func(index int, row *ultipa.NodeRow) {
+				go func(index int, row *ultipa.EntityRow) {
 					defer wg.Done()
 					node := structs.NewNodeFromNodeRow(nodeSchemaMap[schema.Name], row)
 					nodes[index] = node
@@ -84,13 +84,13 @@ func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, conf
 		}
 
 		if record.EdgeTable != nil {
-			wg.Add(len(record.EdgeTable.EdgeRows))
+			wg.Add(len(record.EdgeTable.EntityRows))
 			//record.EdgeTable
 			edgeSchemaMap := structs.NewSchemaMapFromProtoSchema(record.EdgeTable.Schemas, ultipa.DBType_DBEDGE)
-			edges := make([]*structs.Edge, len(record.EdgeTable.EdgeRows))
-			for index, edgeRow := range record.EdgeTable.EdgeRows {
+			edges := make([]*structs.Edge, len(record.EdgeTable.EntityRows))
+			for index, edgeRow := range record.EdgeTable.EntityRows {
 
-				go func(index int, row *ultipa.EdgeRow) {
+				go func(index int, row *ultipa.EntityRow) {
 					defer wg.Done()
 					edge := structs.NewEdgeFromEdgeRow(edgeSchemaMap[schema.Name], row)
 					edges[index] = edge

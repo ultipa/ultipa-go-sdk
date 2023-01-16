@@ -33,7 +33,7 @@ func NewEdgeFromMetaData(md *MetaData) *Edge {
 	}
 }
 
-func NewEdgeFromEdgeRow(schema *Schema, edgeRow *ultipa.EdgeRow) *Edge {
+func NewEdgeFromEdgeRow(schema *Schema, edgeRow *ultipa.EntityRow) *Edge {
 	newEdge := NewEdge()
 
 	newEdge.UUID = edgeRow.Uuid

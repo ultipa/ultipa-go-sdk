@@ -14,7 +14,7 @@ import (
 	"ultipa-go-sdk/sdk/utils"
 )
 
-func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EdgeTable, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
+func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EntityTable, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
 
 	config.UseMaster = true
 	client, conf, err := api.GetClient(config.RequestConfig)
@@ -73,7 +73,7 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 	}
 	defer cancel()
 
-	table := &ultipa.EdgeTable{}
+	table := &ultipa.EntityTable{}
 
 	table.Schemas = []*ultipa.Schema{
 		{
@@ -99,7 +99,7 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 	if err != nil {
 		return nil, err
 	}
-	table.EdgeRows = edgeRows
+	table.EntityRows = edgeRows
 	resp, err := client.InsertEdges(ctx, &ultipa.InsertEdgesRequest{
 		GraphName:            conf.CurrentGraph,
 		EdgeTable:            table,
@@ -121,11 +121,11 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 	return http.NewEdgesInsertResponse(resp)
 }
 
-func setPropertiesToEdgeRow(schema *structs.Schema, rows []*structs.Edge) (error, []*ultipa.EdgeRow) {
+func setPropertiesToEdgeRow(schema *structs.Schema, rows []*structs.Edge) (error, []*ultipa.EntityRow) {
 	wg := sync.WaitGroup{}
 	var err error
 	ctx, cancel := context.WithCancel(context.Background())
-	edgeRows := make([]*ultipa.EdgeRow, len(rows))
+	edgeRows := make([]*ultipa.EntityRow, len(rows))
 
 	for index, row := range rows {
 		if row == nil {
@@ -146,7 +146,7 @@ func setPropertiesToEdgeRow(schema *structs.Schema, rows []*structs.Edge) (error
 		go func(index int, row *structs.Edge) {
 			defer wg.Done()
 
-			newEdge := &ultipa.EdgeRow{
+			newEdge := &ultipa.EntityRow{
 				FromId:     row.From,
 				FromUuid:   row.FromUUID,
 				ToId:       row.To,
@@ -206,7 +206,7 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 	for index, edge := range edges {
 
 		m[edge.Schema] = map[int]int{}
-		var rows []*ultipa.EdgeRow
+		var rows []*ultipa.EntityRow
 		// init schema
 		if batches[edge.Schema] == nil {
 
@@ -262,7 +262,7 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 		}
 		defer cancel()
 
-		table := &ultipa.EdgeTable{}
+		table := &ultipa.EntityTable{}
 
 		table.Schemas = []*ultipa.Schema{
 			{
@@ -286,7 +286,7 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 		if err != nil {
 			return nil, err
 		}
-		table.EdgeRows = batch.Edges
+		table.EntityRows = batch.Edges
 		resp, err := client.InsertEdges(ctx, &ultipa.InsertEdgesRequest{
 			GraphName:            conf.CurrentGraph,
 			EdgeTable:            table,

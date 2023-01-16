@@ -92,6 +92,8 @@ message UqlRequest {
   string graph_name = 3;
   string user_name = 4;
   uint32 thread_num = 5;
+  string tz = 6;
+  string tz_offset = 7;
 }
 
 enum ResultType {
@@ -132,19 +134,36 @@ message PathAlias {
 }
 
 message EdgeAlias {
-  EdgeTable edge_table = 1;
+  EntityTable edge_table = 1;
   string alias = 2;
 }
 
 message NodeAlias {
-  NodeTable node_table = 1;
+  EntityTable node_table = 1;
   string alias = 2;
 }
 //key = alias.name, value = ly
 message AttrAlias {
   string alias = 1;
-  PropertyType property_type = 2;
-  repeated bytes values = 3;
+  Attr attr = 2;
+}
+
+message Attr {
+  PropertyType property_type = 1;
+  repeated bytes values = 2;
+}
+
+message AttrListData {
+  ResultType type = 1;
+  EntityTable nodes = 2;
+  EntityTable edges = 3;
+  repeated Path paths = 4;
+  repeated Attr attrs = 5;
+}
+
+message AttrMapData {
+  Attr key = 1;
+  Attr value = 2;
 }
 
 message ArrayElement {
@@ -206,8 +225,8 @@ message ExportRequest {
 
 message ExportReply {
   Status status = 1;
-  NodeTable node_table = 2;
-  EdgeTable edge_table = 3;
+  EntityTable node_table = 2;
+  EntityTable edge_table = 3;
 }
 /*------------------------Export------------------------------*/
 
@@ -227,7 +246,7 @@ enum InsertType {
 }
 /*------------------------7.InsertNodes------------------------------*/
 message InsertNodesRequest {
-  NodeTable node_table = 1;
+  EntityTable node_table = 1;
   //if true return ids
   bool silent = 2;
   string graph_name = 3;
@@ -247,7 +266,7 @@ message InsertNodesReply {
 
 /*------------------------8.InsertEdges------------------------------*/
 message InsertEdgesRequest {
-  EdgeTable edge_table = 1;
+  EntityTable edge_table = 1;
   //if true return ids
   bool silent = 2;
   string graph_name = 3;
@@ -350,6 +369,11 @@ enum PropertyType {
   TIMESTAMP = 9;
   TEXT = 10;
   BLOB = 11;
+  POINT = 12;
+  DECIMAL = 13;
+  LIST = 14;
+  SET = 15;
+  MAP = 16;
 }
 
 enum ErrorCode {
@@ -407,8 +431,8 @@ enum DBType {
 }
 
 message Path {
-  NodeTable node_table = 1;
-  EdgeTable edge_table = 2;
+  EntityTable node_table = 1;
+  EntityTable edge_table = 2;
 }
 
 message Table {
@@ -421,31 +445,20 @@ message TableRow {
   repeated bytes values = 1;
 }
 
-message NodeTable {
+message EntityTable {
   repeated Schema schemas = 1;
-  repeated NodeRow node_rows = 2;
+  repeated EntityRow entity_rows = 3;
 }
 
-message EdgeTable {
-  repeated Schema schemas = 1;
-  repeated EdgeRow edge_rows = 3;
-}
-
-message NodeRow {
+message EntityRow {
   uint64 uuid = 1 [jstype = JS_STRING];
   string id = 2;
   string schema_name = 3;
-  repeated bytes values = 4;
-}
-
-message EdgeRow {
-  uint64 uuid = 1 [jstype = JS_STRING];
-  string schema_name = 2;
-  uint64 from_uuid = 3 [jstype = JS_STRING];
-  uint64 to_uuid = 4 [jstype = JS_STRING];
-  string from_id = 5;
-  string to_id = 6;
-  repeated bytes values = 7;
+  uint64 from_uuid = 4 [jstype = JS_STRING];
+  uint64 to_uuid = 5 [jstype = JS_STRING];
+  string from_id = 6;
+  string to_id = 7;
+  repeated bytes values = 8;
 }
 
 message Schema {
@@ -456,6 +469,7 @@ message Schema {
 message Property {
   string property_name = 1;
   PropertyType property_type = 2;
+  repeated PropertyType sub_types = 3;
 }
 
 message Header {
@@ -467,6 +481,30 @@ message Value {
   string key = 1;
   string value = 2;
 }
+
+message List {
+  PropertyType base_type = 1;
+  repeated ListValue values = 2;
+}
+message ListValue {
+  PropertyType type = 1;
+  bytes value = 2;
+}
+//for rpc insert
+message ListData {
+  repeated bytes values = 1;
+}
+message SetData {
+  repeated bytes values = 1;
+}
+message MapValue {
+  bytes key = 1;
+  bytes value = 2;
+}
+message MapData {
+  repeated MapValue values = 1;
+}
+
 
 enum TASK_STATUS {
   TASK_PENDING = 0;

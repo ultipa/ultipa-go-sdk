@@ -14,7 +14,7 @@ import (
 	"ultipa-go-sdk/sdk/utils"
 )
 
-func (api *UltipaAPI) InsertNodesBatch(table *ultipa.NodeTable, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
+func (api *UltipaAPI) InsertNodesBatch(table *ultipa.EntityTable, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
 
 	config.UseMaster = true
 	client, conf, err := api.GetClient(config.RequestConfig)
@@ -72,7 +72,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 	}
 	defer cancel()
 
-	table := &ultipa.NodeTable{}
+	table := &ultipa.EntityTable{}
 
 	table.Schemas = []*ultipa.Schema{
 		{
@@ -98,7 +98,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 	if err != nil {
 		return nil, err
 	}
-	table.NodeRows = nodeRows
+	table.EntityRows = nodeRows
 	resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
 		GraphName:  conf.CurrentGraph,
 		NodeTable:  table,
@@ -119,11 +119,11 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 	return http.NewNodesInsertResponse(resp)
 }
 
-func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node) (error, []*ultipa.NodeRow) {
+func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node) (error, []*ultipa.EntityRow) {
 	wg := sync.WaitGroup{}
 	var err error
 	ctx, cancel := context.WithCancel(context.Background())
-	nodeRows := make([]*ultipa.NodeRow, len(rows))
+	nodeRows := make([]*ultipa.EntityRow, len(rows))
 
 	for index, row := range rows {
 		if row == nil {
@@ -142,7 +142,7 @@ func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node) (error
 		wg.Add(1)
 		go func(index int, row *structs.Node) {
 			defer wg.Done()
-			newNode := &ultipa.NodeRow{
+			newNode := &ultipa.EntityRow{
 				Id:         row.ID,
 				Uuid:       row.UUID,
 				SchemaName: schema.Name,
@@ -178,8 +178,8 @@ func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node) (error
 }
 
 type Batch struct {
-	Nodes  []*ultipa.NodeRow
-	Edges  []*ultipa.EdgeRow
+	Nodes  []*ultipa.EntityRow
+	Edges  []*ultipa.EntityRow
 	Schema *structs.Schema
 }
 
@@ -204,7 +204,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 
 	for index, node := range nodes {
 		m[node.Schema] = map[int]int{}
-		var rows []*ultipa.NodeRow
+		var rows []*ultipa.EntityRow
 		// init schema
 		if batches[node.Schema] == nil {
 
@@ -261,7 +261,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 		}
 		defer cancel()
 
-		table := &ultipa.NodeTable{}
+		table := &ultipa.EntityTable{}
 
 		table.Schemas = []*ultipa.Schema{
 			{
@@ -285,7 +285,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 		if err != nil {
 			return nil, err
 		}
-		table.NodeRows = batch.Nodes
+		table.EntityRows = batch.Nodes
 		resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
 			GraphName:  conf.CurrentGraph,
 			NodeTable:  table,
