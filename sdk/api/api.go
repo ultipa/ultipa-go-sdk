@@ -2,6 +2,8 @@ package api
 
 import (
 	"fmt"
+	"strconv"
+	"time"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/connection"
@@ -139,14 +141,8 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 	}
 	defer cancel()
 
-	uqlRequest := &ultipa.UqlRequest{
-		GraphName: conf.CurrentGraph,
-		Timeout:   conf.Timeout,
-		Uql:       uql,
-	}
-	if config.ThreadNum > 0 {
-		uqlRequest.ThreadNum = config.ThreadNum
-	}
+	uqlRequest := api.buildUqlRequest(uql, config, conf)
+
 	resp, err := client.Uql(ctx, uqlRequest)
 
 	if err != nil {
@@ -183,6 +179,27 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 	}
 
 	return uqlResp, nil
+}
+
+// buildUqlRequest build uqlRequest according to requestConfig and configuration
+func (api *UltipaAPI) buildUqlRequest(uql string, config *configuration.RequestConfig, conf *configuration.UltipaConfig) *ultipa.UqlRequest {
+	uqlRequest := &ultipa.UqlRequest{
+		GraphName: conf.CurrentGraph,
+		Timeout:   conf.Timeout,
+		Uql:       uql,
+	}
+	if config.ThreadNum > 0 {
+		uqlRequest.ThreadNum = config.ThreadNum
+	}
+	if config.TimezoneOffset == 0 && config.Timezone == "" {
+		_, offset := time.Now().Zone()
+		uqlRequest.TzOffset = strconv.Itoa(offset)
+	} else if config.TimezoneOffset != 0 {
+		uqlRequest.TzOffset = strconv.FormatInt(config.TimezoneOffset, 10)
+	} else if config.Timezone != "" {
+		uqlRequest.Tz = config.Timezone
+	}
+	return uqlRequest
 }
 
 func (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
