@@ -22,7 +22,9 @@ type RequestConfig struct {
 	Timezone       string      // name of time zone , e.g. Aisa/Shanghai
 	TimezoneOffset int64       // seconds that elapse from UTC, prior to TimeZone
 	ThreadNum      uint32      // used for uql request
+	MaxPkgSize  int         // max package size in bytes, for both sending and receiving, if not set, default is 10M
 }
+
 
 type InsertRequestConfig struct {
 	*RequestConfig

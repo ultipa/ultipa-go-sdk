@@ -1,6 +1,7 @@
 package api
 
 import (
+	"google.golang.org/grpc"
 	"io"
 	"sync"
 	ultipa "ultipa-go-sdk/rpc"
@@ -29,15 +30,27 @@ func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, conf
 		properties = append(properties, prop.Name)
 	}
 
-	resp, err := client.Export(ctx, &ultipa.ExportRequest{
-		Schema:           schema.Name,
-		Limit:            int32(limit),
-		SelectProperties: properties,
-		DbType:           schema.DBType,
-	})
+	var resp ultipa.UltipaControls_ExportClient
+	var respErr error
+	if config != nil && config.MaxPkgSize > 0 {
+		resp, respErr = client.Export(ctx, &ultipa.ExportRequest{
+			Schema:           schema.Name,
+			Limit:            int32(limit),
+			SelectProperties: properties,
+			DbType:           schema.DBType,
+		}, grpc.MaxCallRecvMsgSize(config.MaxPkgSize), grpc.MaxCallSendMsgSize(config.MaxPkgSize),
+		)
+	} else {
+		resp, respErr = client.Export(ctx, &ultipa.ExportRequest{
+			Schema:           schema.Name,
+			Limit:            int32(limit),
+			SelectProperties: properties,
+			DbType:           schema.DBType,
+		})
+	}
 
-	if err != nil {
-		return err
+	if respErr != nil {
+		return respErr
 	}
 
 	for {

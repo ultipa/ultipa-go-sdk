@@ -74,7 +74,7 @@ func NewNodeFromNodeRow(schema *Schema, nodeRow *ultipa.NodeRow) *Node {
 	newNode.ID = nodeRow.Id
 	newNode.UUID = nodeRow.Uuid
 	newNode.Name = nodeRow.SchemaName
-
+	newNode.Schema = schema.Name
 	for index, v := range nodeRow.GetValues() {
 		prop := schema.Properties[index]
 		newNode.Values.Set(prop.Name, utils.ConvertBytesToInterface(v, prop.Type))
