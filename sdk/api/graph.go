@@ -58,6 +58,17 @@ func (api *UltipaAPI) ListGraph(config *configuration.RequestConfig) (*http.Resp
 	}, nil
 }
 
+func (api *UltipaAPI) CreateGraphIfNotExit(graph *structs.Graph, config *configuration.RequestConfig) (resp *http.UQLResponse, exist bool, err error) {
+	exist , err = api.HasGraph(graph.Name, config)
+
+	if exist {
+		return nil, exist, err
+	}
+
+	resp, err = api.CreateGraph(graph, config)
+	return resp, exist, err
+}
+
 func (api *UltipaAPI) CreateGraph(graph *structs.Graph, config *configuration.RequestConfig) (*http.UQLResponse, error) {
 
 	resp, err := api.UQL(fmt.Sprintf(`create().graph("%v", "%v")`, graph.Name, graph.Description), config)
@@ -115,6 +126,7 @@ func (api *UltipaAPI) DropGraph(graphName string, config *configuration.RequestC
 
 	return resp, err
 }
+
 
 func (api *UltipaAPI) HasGraph(graphName string, config *configuration.RequestConfig) (bool, error) {
 	resp, err := api.ListGraph(config)
