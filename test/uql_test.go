@@ -239,3 +239,26 @@ func TestUQLCompactWithNotExistGraph(t *testing.T) {
 		log.Fatalf(resp.Status.Message)
 	}
 }
+
+func TestUQLFindNodesWithList(t *testing.T) {
+
+	client, _ := GetClient([]string{"192.168.1.87:50051"}, "default")
+
+	uql := "find().nodes({@default}) as nodes return nodes{*}"
+	resp, err := client.UQL(uql, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	//断言响应码
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		log.Println(resp.Status.Message)
+		t.Log(resp.Status.Message)
+	}
+	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
+	//断言返回数据
+	nodes, schemas, err := resp.Alias("nodes").AsNodes()
+	if err != nil {
+		t.Fatal(err)
+	}
+	printers.PrintNodes(nodes, schemas)
+}

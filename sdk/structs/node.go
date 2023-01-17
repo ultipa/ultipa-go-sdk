@@ -47,9 +47,9 @@ func (node *Node) GetBytes(key string) ([]byte, error) {
 }
 
 // GetBytesSafe get []byte value by key, if value is nil, then return default value of PropertyType t
-func (node *Node) GetBytesSafe(key string, t ultipa.PropertyType) ([]byte, error) {
+func (node *Node) GetBytesSafe(key string, t ultipa.PropertyType, subTypes []ultipa.PropertyType) ([]byte, error) {
 	v := node.Values.Get(key)
-	return utils.ConvertInterfaceToBytesSafe(v, t)
+	return utils.ConvertInterfaceToBytesSafe(v, t, subTypes)
 }
 
 // set a value by key
@@ -68,7 +68,7 @@ func (node *Node) UpdateByValueID() {
 	}
 }
 
-func NewNodeFromNodeRow(schema *Schema, nodeRow *ultipa.EntityRow) *Node {
+func NewNodeFromNodeRow(schema *Schema, nodeRow *ultipa.EntityRow) (*Node, error) {
 	newNode := NewNode()
 
 	newNode.ID = nodeRow.Id
@@ -77,10 +77,13 @@ func NewNodeFromNodeRow(schema *Schema, nodeRow *ultipa.EntityRow) *Node {
 	newNode.Schema = schema.Name
 	for index, v := range nodeRow.GetValues() {
 		prop := schema.Properties[index]
-		newNode.Values.Set(prop.Name, utils.ConvertBytesToInterface(v, prop.Type))
+		value, err := utils.ConvertBytesToInterface(v, prop.Type, prop.SubTypes)
+		if err != nil {
+			return nil, err
+		}
+		newNode.Values.Set(prop.Name, value)
 	}
-
-	return newNode
+	return newNode, nil
 }
 
 func ConvertStringNodes(schema *Schema, nodes []*Node) {

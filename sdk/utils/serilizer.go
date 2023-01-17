@@ -5,7 +5,9 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"google.golang.org/protobuf/proto"
 	"math"
+	"reflect"
 	"strconv"
 	"strings"
 	ultipa "ultipa-go-sdk/rpc"
@@ -13,52 +15,161 @@ import (
 )
 
 // Convert Bytes to GoLang Type and return to an interface
-func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType) interface{} {
+func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType, subTypes []ultipa.PropertyType) (interface{}, error) {
 	switch t {
 	case ultipa.PropertyType_STRING:
-		return AsString(bs)
+		return AsString(bs), nil
 	case ultipa.PropertyType_INT32:
-		return AsInt32(bs)
+		return AsInt32(bs), nil
 	case ultipa.PropertyType_INT64:
-		return AsInt64(bs)
+		return AsInt64(bs), nil
 	case ultipa.PropertyType_UINT32:
-		return AsUint32(bs)
+		return AsUint32(bs), nil
 	case ultipa.PropertyType_UINT64:
-		return AsUint64(bs)
+		return AsUint64(bs), nil
 	case ultipa.PropertyType_FLOAT:
-		return AsFloat32(bs)
+		return AsFloat32(bs), nil
 	case ultipa.PropertyType_DOUBLE:
-		return AsFloat64(bs)
+		return AsFloat64(bs), nil
 	case ultipa.PropertyType_DATETIME:
 		if AsUint64(bs) == 0 {
-			return nil
+			return nil, nil
 		}
 		if len(bs) == 0 {
-			return NewTime(0)
+			return NewTime(0), nil
 		}
-		return NewTime(AsUint64(bs))
+		return NewTime(AsUint64(bs)), nil
 	case ultipa.PropertyType_TIMESTAMP:
 		if len(bs) == 0 || AsUint32(bs) == 0 {
-			return NewTimeStamp(0)
+			return NewTimeStamp(0), nil
 		}
-		return NewTimeStamp(int64(AsUint32(bs)))
+		return NewTimeStamp(int64(AsUint32(bs))), nil
 	case ultipa.PropertyType_TEXT:
-		return AsString(bs)
-	case ultipa.PropertyType_UNSET:
-		return nil
+		return AsString(bs), nil
+	case ultipa.PropertyType_BLOB:
+		return bs, nil
+	//case ultipa.PropertyType_POINT:
+	//	//TODO
+	//case ultipa.PropertyType_DECIMAL:
+	//TODO
+	case ultipa.PropertyType_LIST:
+		return deserializeList(bs, subTypes)
+	//	//TODO
+	//case ultipa.PropertyType_SET:
+	//	//TODO
+	//case ultipa.PropertyType_MAP:
+	//	//TODO
+	//case ultipa.PropertyType_UNSET:
+	//	return nil
 	default:
-		return nil
-
+		return nil, nil
 	}
 }
 
+//deserializeList deserialize bs to list
+func deserializeList(bs []byte, subTypes []ultipa.PropertyType) (interface{}, error) {
+	listData := &ultipa.ListData{}
+	if err := proto.Unmarshal(bs, listData); err != nil {
+		return nil, err
+	}
+	var list []interface{}
+	if listData.Values != nil {
+		for _, value := range listData.Values {
+			element, err := ConvertBytesToInterface(value, subTypes[0], nil)
+			if err != nil {
+				return nil, err
+			}
+			list = append(list, element)
+		}
+	}
+	return list, nil
+}
+
 //ConvertInterfaceToBytesSafe convert value to []byte, if value is nil, will set default value according to PropertyType t
-func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType) ([]byte, error) {
+func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTypes []ultipa.PropertyType) ([]byte, error) {
 	toConvertValue := value
 	if toConvertValue == nil {
-		toConvertValue = GetDefaultNilInterface(t)
+		switch t {
+		case ultipa.PropertyType_LIST:
+			return ConvertListToBytes(value, subTypes)
+		case ultipa.PropertyType_SET:
+			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+		case ultipa.PropertyType_MAP:
+			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+		case ultipa.PropertyType_POINT:
+			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+		case ultipa.PropertyType_DECIMAL:
+			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+		default:
+			toConvertValue = GetDefaultNilInterface(t)
+			return ConvertInterfaceToBytes(toConvertValue)
+		}
 	}
-	return ConvertInterfaceToBytes(toConvertValue)
+	switch t {
+	case ultipa.PropertyType_LIST:
+		return ConvertListToBytes(value, subTypes)
+	case ultipa.PropertyType_POINT:
+		return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+	case ultipa.PropertyType_DECIMAL:
+		return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+	case ultipa.PropertyType_SET:
+		return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+	case ultipa.PropertyType_MAP:
+		return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+	case ultipa.PropertyType_DATETIME:
+		switch v := value.(type) {
+		case UltipaTime:
+			return ConvertInterfaceToBytes(v.Datetime)
+		case string:
+			uTime, err := NewTimeFromString(v)
+			if err != nil {
+				return nil, err
+			}
+			return ConvertInterfaceToBytes(uTime.Datetime)
+		default:
+			return ConvertInterfaceToBytes(value)
+		}
+	case ultipa.PropertyType_TIMESTAMP:
+		switch v := value.(type) {
+		case UltipaTime:
+			return ConvertInterfaceToBytes(v.GetTimeStamp())
+		case string:
+			uTime, err := NewTimeFromString(v)
+			if err != nil {
+				return nil, err
+			}
+			return ConvertInterfaceToBytes(uTime.GetTimeStamp())
+		default:
+			return ConvertInterfaceToBytes(value)
+		}
+	default:
+		return ConvertInterfaceToBytes(toConvertValue)
+	}
+}
+
+func ConvertListToBytes(list interface{}, subTypes []ultipa.PropertyType) ([]byte, error) {
+	if subTypes == nil && len(subTypes) == 0 {
+		return nil, errors.New("subTypes is nil, unable to serialize list")
+	}
+	if len(subTypes) == 0 {
+		return nil, errors.New("subTypes is not specified, unable to serialize list")
+	}
+	if list == nil {
+		listData := &ultipa.ListData{}
+		//TODO set is null
+		return proto.Marshal(listData)
+	}
+	vi := reflect.ValueOf(list)
+	listData := &ultipa.ListData{}
+	for index := 0; index < vi.Len(); index++ {
+		//TODO if vi.Index(index) is ListValue?
+		bs, err := ConvertInterfaceToBytesSafe(vi.Index(index).Interface(), subTypes[0], nil)
+		if err != nil {
+			return nil, err
+		}
+		listData.Values = append(listData.Values, bs)
+	}
+	return proto.Marshal(listData)
 }
 
 func ConvertInterfaceToBytes(value interface{}) ([]byte, error) {
@@ -181,25 +292,24 @@ func GetDefaultNilInterface(t ultipa.PropertyType) interface{} {
 
 	switch t {
 	case ultipa.PropertyType_INT32:
-		return int32(0)
+		return math.MaxInt32
 	case ultipa.PropertyType_INT64:
-		return int64(0)
+		return math.MaxInt64
 	case ultipa.PropertyType_UINT32:
-		return uint32(0)
+		return math.MaxUint32
 	case ultipa.PropertyType_UINT64:
-		return uint64(0)
+		return uint64(math.MaxUint64)
 	case ultipa.PropertyType_FLOAT:
-		return float32(0)
+		return math.MaxFloat32
 	case ultipa.PropertyType_DOUBLE:
-		return float64(0)
+		return math.MaxFloat64
 	case ultipa.PropertyType_DATETIME:
-		return uint64(0)
+		return uint64(math.MaxUint64)
 	case ultipa.PropertyType_TIMESTAMP:
-		return uint32(0)
+		return math.MaxUint32
 	default:
-		return ""
+		return string([]byte{0x00})
 	}
-
 }
 
 func StringAsInterface(str string, t ultipa.PropertyType) (interface{}, error) {

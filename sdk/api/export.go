@@ -70,13 +70,18 @@ func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, conf
 			nodeSchemaMap := structs.NewSchemaMapFromProtoSchema(record.NodeTable.Schemas, ultipa.DBType_DBNODE)
 			nodes := make([]*structs.Node, len(record.NodeTable.EntityRows))
 			for index, nodeRow := range record.NodeTable.EntityRows {
-
+				var parseErr error
 				go func(index int, row *ultipa.EntityRow) {
 					defer wg.Done()
-					node := structs.NewNodeFromNodeRow(nodeSchemaMap[schema.Name], row)
+					node, err := structs.NewNodeFromNodeRow(nodeSchemaMap[schema.Name], row)
+					if err != nil {
+						parseErr = err
+					}
 					nodes[index] = node
 				}(index, nodeRow)
-
+				if parseErr != nil {
+					return parseErr
+				}
 			}
 
 			wg.Wait()
@@ -89,13 +94,18 @@ func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, conf
 			edgeSchemaMap := structs.NewSchemaMapFromProtoSchema(record.EdgeTable.Schemas, ultipa.DBType_DBEDGE)
 			edges := make([]*structs.Edge, len(record.EdgeTable.EntityRows))
 			for index, edgeRow := range record.EdgeTable.EntityRows {
-
+				var parseErr error
 				go func(index int, row *ultipa.EntityRow) {
 					defer wg.Done()
-					edge := structs.NewEdgeFromEdgeRow(edgeSchemaMap[schema.Name], row)
+					edge, err := structs.NewEdgeFromEdgeRow(edgeSchemaMap[schema.Name], row)
+					if err != nil {
+						parseErr = err
+					}
 					edges[index] = edge
 				}(index, edgeRow)
-
+				if parseErr != nil {
+					return parseErr
+				}
 			}
 
 			wg.Wait()

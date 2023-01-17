@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 )
 
 type UltipaTime struct {
@@ -55,7 +56,16 @@ func NewTimeFromStringFormat(dateString string, format string) (*UltipaTime, err
 
 	return &n, err
 }
+
+//NewTimeFromString converts dateString to UltipaTime, supports layouts and timestamp in Second, Millisecond,Microsecond,Nanosecond
 func NewTimeFromString(dateString string) (*UltipaTime, error) {
+	if dateString == "" {
+		return nil, errors.New("unable to convert empty string to UltipaTime")
+	}
+	ultipaTime, err := ParseTimeStamp(dateString)
+	if err == nil && ultipaTime != nil {
+		return ultipaTime, nil
+	}
 	newDateString, err := compensateYear(strings.Trim(dateString, " "))
 	if err != nil {
 		return nil, err
@@ -104,6 +114,38 @@ func NewTimeFromString(dateString string) (*UltipaTime, error) {
 	}
 
 	return nil, errors.New("parse datetime string failed : " + newDateString)
+}
+
+// ParseTimeStamp convert timestamp string value to UltipaTime, if v can be converted to int, then determine time unit by its length, otherwise raise an error
+func ParseTimeStamp(v string) (*UltipaTime, error) {
+	if v == "" {
+		return nil, errors.New("unable to convert empty string to UltipaTime")
+	}
+	for _, r := range []rune(v) {
+		if !unicode.IsDigit(r) {
+			return nil, errors.New(fmt.Sprintf("Unable convert value to int for UltipaTime:%s", v))
+		}
+	}
+	length := len(v)
+	timestamp, err := strconv.ParseInt(v, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	var timeValue time.Time
+	if length == 13 {
+		//毫秒
+		timeValue = time.Unix(0, timestamp*1e6)
+	} else if length == 16 {
+		//微秒
+		timeValue = time.Unix(0, timestamp*1000)
+	} else if length == 19 {
+		//纳秒
+		timeValue = time.Unix(0, timestamp)
+	} else {
+		//默认秒
+		timeValue = time.Unix(timestamp, 0)
+	}
+	return TimeToUltipaTime(&timeValue), nil
 }
 
 func compensateYear(dateString string) (string, error) {

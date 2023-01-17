@@ -33,7 +33,7 @@ func NewEdgeFromMetaData(md *MetaData) *Edge {
 	}
 }
 
-func NewEdgeFromEdgeRow(schema *Schema, edgeRow *ultipa.EntityRow) *Edge {
+func NewEdgeFromEdgeRow(schema *Schema, edgeRow *ultipa.EntityRow) (*Edge, error) {
 	newEdge := NewEdge()
 
 	newEdge.UUID = edgeRow.Uuid
@@ -45,10 +45,14 @@ func NewEdgeFromEdgeRow(schema *Schema, edgeRow *ultipa.EntityRow) *Edge {
 
 	for index, v := range edgeRow.GetValues() {
 		prop := schema.Properties[index]
-		newEdge.Values.Set(prop.Name, utils.ConvertBytesToInterface(v, prop.Type))
+		value, err := utils.ConvertBytesToInterface(v, prop.Type, prop.SubTypes)
+		if err != nil {
+			return nil, err
+		}
+		newEdge.Values.Set(prop.Name, value)
 	}
 
-	return newEdge
+	return newEdge, nil
 }
 
 func (edge *Edge) GetUUID() types.UUID {
@@ -83,9 +87,9 @@ func (edge *Edge) GetBytes(key string) ([]byte, error) {
 }
 
 // GetBytesSafe get []byte value by key, if value is nil, then return default value of PropertyType t
-func (edge *Edge) GetBytesSafe(key string, t ultipa.PropertyType) ([]byte, error) {
+func (edge *Edge) GetBytesSafe(key string, t ultipa.PropertyType, subTypes []ultipa.PropertyType) ([]byte, error) {
 	v := edge.Values.Get(key)
-	return utils.ConvertInterfaceToBytesSafe(v, t)
+	return utils.ConvertInterfaceToBytesSafe(v, t, subTypes)
 }
 
 // set a value by key

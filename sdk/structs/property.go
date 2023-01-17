@@ -3,11 +3,12 @@ package structs
 import ultipa "ultipa-go-sdk/rpc"
 
 type Property struct {
-	Name   string
-	Desc   string
-	Lte    bool
-	Schema string
-	Type   ultipa.PropertyType
+	Name     string
+	Desc     string
+	Lte      bool
+	Schema   string
+	Type     ultipa.PropertyType
+	SubTypes []ultipa.PropertyType
 }
 
 const (
@@ -21,6 +22,13 @@ const (
 )
 
 var PropertyMap = map[string]ultipa.PropertyType{
+	"_id":        PropertyType_ID,
+	"_uuid":      PropertyType_UUID,
+	"_from":      PropertyType_FROM,
+	"_to":        PropertyType_TO,
+	"_from_uuid": PropertyType_FROM_UUID,
+	"_to_uuid":   PropertyType_TO_UUID,
+	"_ignore":    PropertyType_IGNORE,
 	"string":     ultipa.PropertyType_STRING,
 	"int32":      ultipa.PropertyType_INT32,
 	"int64":      ultipa.PropertyType_INT64,
@@ -32,16 +40,21 @@ var PropertyMap = map[string]ultipa.PropertyType{
 	"timestamp":  ultipa.PropertyType_TIMESTAMP,
 	"text":       ultipa.PropertyType_TEXT,
 	"blob":       ultipa.PropertyType_BLOB,
-	"_id":        PropertyType_ID,
-	"_uuid":      PropertyType_UUID,
-	"_from":      PropertyType_FROM,
-	"_to":        PropertyType_TO,
-	"_from_uuid": PropertyType_FROM_UUID,
-	"_to_uuid":   PropertyType_TO_UUID,
-	"_ignore":    PropertyType_IGNORE,
+	"point":      ultipa.PropertyType_POINT,
+	"decimal":    ultipa.PropertyType_DECIMAL,
+	"list":       ultipa.PropertyType_LIST,
+	"set":        ultipa.PropertyType_SET,
+	"map":        ultipa.PropertyType_MAP,
 }
 
 var PropertyReverseMap = map[ultipa.PropertyType]string{
+	PropertyType_ID:               "_id",
+	PropertyType_UUID:             "_uuid",
+	PropertyType_FROM:             "_from",
+	PropertyType_TO:               "_to",
+	PropertyType_FROM_UUID:        "_from_uuid",
+	PropertyType_TO_UUID:          "_to_uuid",
+	PropertyType_IGNORE:           "_ignore",
 	ultipa.PropertyType_STRING:    "string",
 	ultipa.PropertyType_INT32:     "int32",
 	ultipa.PropertyType_INT64:     "int64",
@@ -53,13 +66,11 @@ var PropertyReverseMap = map[ultipa.PropertyType]string{
 	ultipa.PropertyType_TIMESTAMP: "timestamp",
 	ultipa.PropertyType_TEXT:      "text",
 	ultipa.PropertyType_BLOB:      "blob",
-	PropertyType_ID:               "_id",
-	PropertyType_UUID:             "_uuid",
-	PropertyType_FROM:             "_from",
-	PropertyType_TO:               "_to",
-	PropertyType_FROM_UUID:        "_from_uuid",
-	PropertyType_TO_UUID:          "_to_uuid",
-	PropertyType_IGNORE:           "_ignore",
+	ultipa.PropertyType_POINT:     "point",
+	ultipa.PropertyType_DECIMAL:   "decimal",
+	ultipa.PropertyType_LIST:      "list",
+	ultipa.PropertyType_SET:       "set",
+	ultipa.PropertyType_MAP:       "map",
 }
 
 func (p *Property) IsIDType() bool {

@@ -154,7 +154,7 @@ func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node) (error
 					continue
 				}
 
-				bs, err := row.GetBytesSafe(prop.Name, prop.Type)
+				bs, err := row.GetBytesSafe(prop.Name, prop.Type, prop.SubTypes)
 
 				if err != nil {
 					printers.PrintError("Get row bytes value failed  " + prop.Name + " " + err.Error())
