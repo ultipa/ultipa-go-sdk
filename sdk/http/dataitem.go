@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"google.golang.org/protobuf/proto"
 	"log"
 	"strconv"
 	ultipa "ultipa-go-sdk/rpc"
@@ -152,12 +153,15 @@ func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
 		return nil, nil
 	}
 
-	oPaths := di.Data.(*ultipa.PathAlias)
+	pathAlias := di.Data.(*ultipa.PathAlias)
 
-	for _, oPath := range oPaths.Paths {
+	return parsePaths(pathAlias.Paths, pathAlias.Alias)
+}
 
+func parsePaths(oPaths []*ultipa.Path, name string) (paths []*structs.Path, err error) {
+	for _, oPath := range oPaths {
 		path := structs.NewPath()
-		path.Name = oPaths.Alias
+		path.Name = name
 		path.Nodes, path.NodeSchemas, err = NodeTableToNodes(oPath.NodeTable, path.Name)
 		if err != nil {
 			return nil, err
@@ -167,10 +171,8 @@ func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
 			return nil, err
 		}
 		paths = append(paths, path)
-
 	}
-
-	return paths, err
+	return paths, nil
 }
 
 func (di *DataItem) AsTable() (table *structs.Table, err error) {
@@ -183,10 +185,9 @@ func (di *DataItem) AsTable() (table *structs.Table, err error) {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Table")
 	}
 
-	table = structs.NewTable()
-
 	oTable := di.Data.(*ultipa.Table)
 
+	table = structs.NewTable()
 	table.Name = oTable.TableName
 
 	for _, header := range oTable.Headers {
@@ -216,39 +217,39 @@ func (di *DataItem) AsTable() (table *structs.Table, err error) {
 }
 
 //AsArray find().nodes() as nodes group by nodes.year as y return y,collect(nodes._id)
-func (di *DataItem) AsArray() (arr *structs.Array, err error) {
-
-	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
-		return arr, nil
-	}
-
-	if di.Type != ultipa.ResultType_RESULT_TYPE_ARRAY {
-		return nil, errors.New("DataItem " + di.Alias + " is not Type Array")
-	}
-
-	arr = structs.NewArray()
-
-	oArray := di.Data.(*ultipa.ArrayAlias)
-
-	arr.Name = oArray.Alias
-
-	for _, oRow := range oArray.Elements {
-		r := structs.Row{}
-
-		for _, field := range oRow.Values {
-			//TODO, check has subTypes or not?
-			value, err := utils.ConvertBytesToInterface(field, oArray.PropertyType, nil)
-			if err != nil {
-				return nil, err
-			}
-			r = append(r, value)
-		}
-
-		arr.Rows = append(arr.Rows, &r)
-	}
-
-	return arr, err
-}
+//func (di *DataItem) AsArray() (arr *structs.Array, err error) {
+//
+//	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+//		return arr, nil
+//	}
+//
+//	if di.Type != ultipa.ResultType_RESULT_TYPE_ARRAY {
+//		return nil, errors.New("DataItem " + di.Alias + " is not Type Array")
+//	}
+//
+//	arr = structs.NewArray()
+//
+//	oArray := di.Data.(*ultipa.ArrayAlias)
+//
+//	arr.Name = oArray.Alias
+//
+//	for _, oRow := range oArray.Elements {
+//		r := structs.Row{}
+//
+//		for _, field := range oRow.Values {
+//			//TODO, check has subTypes or not?
+//			value, err := utils.ConvertBytesToInterface(field, oArray.PropertyType, nil)
+//			if err != nil {
+//				return nil, err
+//			}
+//			r = append(r, value)
+//		}
+//
+//		arr.Rows = append(arr.Rows, &r)
+//	}
+//
+//	return arr, err
+//}
 
 func (di *DataItem) AsAttr() (attr *structs.Attr, err error) {
 
@@ -260,24 +261,119 @@ func (di *DataItem) AsAttr() (attr *structs.Attr, err error) {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Attribute list")
 	}
 
-	attr = structs.NewAttr()
+	attrAlias := di.Data.(*ultipa.AttrAlias)
+	oAttr := attrAlias.Attr
 
-	oAttr := di.Data.(*ultipa.AttrAlias)
+	return parseAttr(oAttr, attrAlias.Alias)
+}
 
-	attr.Name = oAttr.Alias
-	if oAttr.Attr != nil {
-		attr.PropertyType = oAttr.Attr.PropertyType
-		//TODO,check if attr.PropertyType is List
-		for _, v := range oAttr.Attr.Values {
-			value, err := utils.ConvertBytesToInterface(v, attr.PropertyType, nil)
+func parseAttr(oAttr *ultipa.Attr, name string) (*structs.Attr, error) {
+	attr := structs.NewAttr()
+	attr.Name = name
+
+	if oAttr != nil {
+		attr.PropertyType = oAttr.PropertyType
+		switch oAttr.PropertyType {
+		case ultipa.PropertyType_SET:
+			fallthrough
+		case ultipa.PropertyType_LIST:
+			listDataRows, err := parseAttrList(oAttr)
 			if err != nil {
 				return nil, err
 			}
-			attr.Rows = append(attr.Rows, value)
+			for _, row := range listDataRows {
+				attr.Rows = append(attr.Rows, row)
+			}
+		case ultipa.PropertyType_MAP:
+			mapDataRows, err := parseAttrMap(oAttr)
+			if err != nil {
+				return nil, err
+			}
+			for _, row := range mapDataRows {
+				attr.Rows = append(attr.Rows, row)
+			}
+		default:
+			for _, v := range oAttr.Values {
+				value, err := utils.ConvertBytesToInterface(v, attr.PropertyType, nil)
+				if err != nil {
+					return nil, err
+				}
+				attr.Rows = append(attr.Rows, value)
+			}
 		}
 	}
+	return attr, nil
+}
 
-	return attr, err
+// parseAttrList parse the Attr that PropertyType is ultipa.PropertyType_LIST
+func parseAttrList(oAttr *ultipa.Attr) ([]*structs.AttrListData, error) {
+	var listDataRows []*structs.AttrListData
+	for _, v := range oAttr.Values {
+		oListData := &ultipa.AttrListData{}
+		listData := structs.NewAttrListData()
+		err := proto.Unmarshal(v, oListData)
+		if err != nil {
+			return nil, err
+		}
+		switch oListData.Type {
+		case ultipa.ResultType_RESULT_TYPE_ATTR:
+			for _, subOAttr := range oListData.Attrs {
+				subAttr, err := parseAttr(subOAttr, "")
+				if err != nil {
+					return nil, err
+				}
+				listData.Attrs = append(listData.Attrs, subAttr)
+			}
+		case ultipa.ResultType_RESULT_TYPE_NODE:
+			nodes, _, err := NodeTableToNodes(oListData.Nodes, "")
+			if err != nil {
+				return nil, err
+			}
+			listData.Nodes = append(listData.Nodes, nodes...)
+
+		case ultipa.ResultType_RESULT_TYPE_EDGE:
+			edges, _, err := EdgeTableToEdges(oListData.Edges, "")
+			if err != nil {
+				return nil, err
+			}
+			listData.Edges = append(listData.Edges, edges...)
+
+		case ultipa.ResultType_RESULT_TYPE_PATH:
+			paths, err := parsePaths(oListData.Paths, "")
+			if err != nil {
+				return nil, err
+			}
+			listData.Paths = append(listData.Paths, paths...)
+		}
+		listDataRows = append(listDataRows, listData)
+	}
+	return listDataRows, nil
+}
+
+// parseAttrMap parse the Attr that PropertyType is ultipa.PropertyType_MAP
+func parseAttrMap(oAttr *ultipa.Attr) ([]*structs.AttrMapData, error) {
+	var mapDataRows []*structs.AttrMapData
+	for _, v := range oAttr.Values {
+		oMapData := &ultipa.AttrMapData{}
+		mapData := structs.NewAttrMapData()
+		err := proto.Unmarshal(v, oMapData)
+		if err != nil {
+			return nil, err
+		}
+
+		key, err := parseAttr(oMapData.Key, "")
+		if err != nil {
+			return nil, err
+		}
+		value, err := parseAttr(oMapData.Value, "")
+		if err != nil {
+			return nil, err
+		}
+		mapData.Key = key
+		mapData.Value = value
+		mapDataRows = append(mapDataRows, mapData)
+	}
+	return mapDataRows, nil
 }
 
 //AsGraphs the types will be tables and alias is nodeSchema and edgeSchema
@@ -535,8 +631,8 @@ func (di *DataItem) AsAny() (interface{}, error) {
 	switch di.Type {
 	case ultipa.ResultType_RESULT_TYPE_ATTR:
 		return di.AsAttr()
-	case ultipa.ResultType_RESULT_TYPE_ARRAY:
-		return di.AsArray()
+	//case ultipa.ResultType_RESULT_TYPE_ARRAY:
+	//	return di.AsArray()
 	case ultipa.ResultType_RESULT_TYPE_EDGE:
 		edges, _, err := di.AsEdges()
 		return edges, err

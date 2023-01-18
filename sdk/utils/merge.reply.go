@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	ultipa "ultipa-go-sdk/rpc"
 )
 
@@ -34,16 +35,16 @@ func FindAliasDataInReply(reply *ultipa.UqlReply, alias string) (data interface{
 		case ultipa.ResultType_RESULT_TYPE_PATH:
 			data = Find(reply.Paths, func(index int) bool { return reply.Paths[index].Alias == alias })
 			t = Alias.ResultType
-		case ultipa.ResultType_RESULT_TYPE_ARRAY:
-			data = Find(reply.Arrays, func(index int) bool { return reply.Arrays[index].Alias == alias })
-			t = Alias.ResultType
+		//case ultipa.ResultType_RESULT_TYPE_ARRAY:
+		//	data = Find(reply.Arrays, func(index int) bool { return reply.Arrays[index].Alias == alias })
+		//	t = Alias.ResultType
 		case ultipa.ResultType_RESULT_TYPE_ATTR:
 			data = Find(reply.Attrs, func(index int) bool { return reply.Attrs[index].Alias == alias })
 			t = Alias.ResultType
 		case ultipa.ResultType_RESULT_TYPE_UNSET:
 			t = Alias.ResultType
 		default:
-			panic("FindAliasDataInReply Not Supported Type")
+			panic(fmt.Sprintf("FindAliasDataInReply Not Supported Type %v", Alias.ResultType))
 		}
 
 		if data != nil {
@@ -239,33 +240,33 @@ func MergeUQLReply(reply1 *ultipa.UqlReply, reply2 *ultipa.UqlReply) *ultipa.Uql
 				paths1.Paths = append(paths1.Paths, paths2.Paths...)
 			}
 		case ultipa.ResultType_RESULT_TYPE_ARRAY:
-			if reply1.Arrays == nil && reply2.Arrays == nil {
-				return reply1
-			}
-			if reply1.Arrays == nil {
-				return reply2
-			}
-			if reply2.Arrays == nil {
-				return reply1
-			}
-
-			data1 := Find(reply1.Arrays, func(index int) bool { return reply1.Arrays[index].Alias == Alias.Alias })
-			data2 := Find(reply2.Arrays, func(index int) bool { return reply2.Arrays[index].Alias == Alias.Alias })
-
-			if data2 == nil {
-				continue
-			}
-
-			if data1 == nil && data2 != nil {
-				reply1.Arrays = append(reply1.Arrays, data2.(*ultipa.ArrayAlias))
-				continue
-			}
-
-			if data2 != nil {
-				array1 := data1.(*ultipa.ArrayAlias)
-				array2 := data2.(*ultipa.ArrayAlias)
-				array1.Elements = append(array1.Elements, array2.Elements...)
-			}
+			//if reply1.Arrays == nil && reply2.Arrays == nil {
+			//	return reply1
+			//}
+			//if reply1.Arrays == nil {
+			//	return reply2
+			//}
+			//if reply2.Arrays == nil {
+			//	return reply1
+			//}
+			//
+			//data1 := Find(reply1.Arrays, func(index int) bool { return reply1.Arrays[index].Alias == Alias.Alias })
+			//data2 := Find(reply2.Arrays, func(index int) bool { return reply2.Arrays[index].Alias == Alias.Alias })
+			//
+			//if data2 == nil {
+			//	continue
+			//}
+			//
+			//if data1 == nil && data2 != nil {
+			//	reply1.Arrays = append(reply1.Arrays, data2.(*ultipa.ArrayAlias))
+			//	continue
+			//}
+			//
+			//if data2 != nil {
+			//	array1 := data1.(*ultipa.ArrayAlias)
+			//	array2 := data2.(*ultipa.ArrayAlias)
+			//	array1.Elements = append(array1.Elements, array2.Elements...)
+			//}
 		case ultipa.ResultType_RESULT_TYPE_ATTR:
 			if reply1.Attrs == nil && reply2.Attrs == nil {
 				return reply1

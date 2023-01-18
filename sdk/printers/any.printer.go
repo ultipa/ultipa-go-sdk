@@ -71,13 +71,13 @@ func PrintAny(dataitem *http.DataItem) {
 
 		PrintAttr(attr)
 
-	case ultipa.ResultType_RESULT_TYPE_ARRAY:
-		arr, err := dataitem.AsArray()
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		PrintArray(arr)
+	//case ultipa.ResultType_RESULT_TYPE_ARRAY:
+	//	arr, err := dataitem.AsArray()
+	//	if err != nil {
+	//		log.Fatalln(err)
+	//	}
+	//
+	//	PrintArray(arr)
 	default:
 		log.Printf("Printer Got UnHandled Alias %v Type %v \n", dataitem.Alias, dataitem.Type)
 	}

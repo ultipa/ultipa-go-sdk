@@ -8,6 +8,7 @@ import (
 	"sync"
 	"testing"
 	"time"
+	ultipa "ultipa-go-sdk/rpc"
 )
 
 func TestSlice(t *testing.T) {
@@ -182,4 +183,10 @@ func funcName(wg sync.WaitGroup) (err error) {
 		}
 	}
 	return err
+}
+
+func TestEnumName(t *testing.T) {
+	r := ultipa.ResultType_RESULT_TYPE_ATTR
+	fmt.Printf("resultType:%s", r)
+
 }
