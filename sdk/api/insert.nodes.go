@@ -219,7 +219,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 
 				err, rows = setPropertiesToNodeRow(schema, []*structs.Node{node})
 				if err != nil {
-					return nil, errors.New(fmt.Sprintf("Data verification failed, index: [%s]", strconv.Itoa(index)))
+					return nil, errors.New(fmt.Sprintf("Data verification failed, index: [%s], caused by:%v", strconv.Itoa(index), err))
 				}
 			} else {
 				// schema not exit
