@@ -307,6 +307,9 @@ func parseAttr(oAttr *ultipa.Attr, name string) (*structs.Attr, error) {
 
 // parseAttrList parse the Attr that PropertyType is ultipa.PropertyType_LIST
 func parseAttrList(oAttr *ultipa.Attr) ([]*structs.AttrListData, error) {
+	if oAttr.Values == nil {
+		return []*structs.AttrListData{}, nil
+	}
 	var listDataRows []*structs.AttrListData
 	for _, v := range oAttr.Values {
 		oListData := &ultipa.AttrListData{}

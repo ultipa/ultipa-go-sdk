@@ -262,3 +262,26 @@ func TestUQLFindNodesWithList(t *testing.T) {
 	}
 	printers.PrintNodes(nodes, schemas)
 }
+
+func TestUQLFindNodesWithAttrList(t *testing.T) {
+
+	client, _ := GetClient([]string{"192.168.1.87:50051"}, "default")
+
+	uql := "find().nodes() as nodes return collect(distinct(nodes)) as arrNode"
+	resp, err := client.UQL(uql, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	//断言响应码
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		log.Println(resp.Status.Message)
+		t.Log(resp.Status.Message)
+	}
+	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
+	//断言返回数据
+	attrs, err := resp.Alias("arrNode").AsAttr()
+	if err != nil {
+		t.Fatal(err)
+	}
+	printers.PrintAttr(attrs)
+}
