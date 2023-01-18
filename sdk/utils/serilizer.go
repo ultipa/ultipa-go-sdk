@@ -156,7 +156,7 @@ func ConvertListToBytes(list interface{}, subTypes []ultipa.PropertyType) ([]byt
 	}
 	if list == nil {
 		listData := &ultipa.ListData{}
-		//TODO set is null
+		listData.IsNull = true
 		return proto.Marshal(listData)
 	}
 	vi := reflect.ValueOf(list)
