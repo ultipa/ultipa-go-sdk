@@ -121,7 +121,7 @@ message UqlReply {
   repeated NodeAlias nodes = 6;
   repeated EdgeAlias edges = 7;
   repeated AttrAlias attrs = 8;
-  repeated ArrayAlias arrays = 9;
+//  repeated ArrayAlias arrays = 9;
   repeated Table tables = 10;
 
   Table statistics = 11;
@@ -166,15 +166,15 @@ message AttrMapData {
   Attr value = 2;
 }
 
-message ArrayElement {
-  repeated bytes values = 1;
-}
-
-message ArrayAlias {
-  string alias = 1;
-  PropertyType property_type = 2;
-  repeated ArrayElement elements = 3;
-}
+//message ArrayElement {
+//  repeated bytes values = 1;
+//}
+//
+//message ArrayAlias {
+//  string alias = 1;
+//  PropertyType property_type = 2;
+//  repeated ArrayElement elements = 3;
+//}
 
 /*------------------------2.Uql------------------------------*/
 
