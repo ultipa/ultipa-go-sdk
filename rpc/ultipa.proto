@@ -493,9 +493,11 @@ message ListValue {
 //for rpc insert
 message ListData {
   repeated bytes values = 1;
+  bool is_null = 2;
 }
 message SetData {
   repeated bytes values = 1;
+  bool is_null = 2;
 }
 message MapValue {
   bytes key = 1;
@@ -503,6 +505,7 @@ message MapValue {
 }
 message MapData {
   repeated MapValue values = 1;
+  bool is_null = 2;
 }
 
 
