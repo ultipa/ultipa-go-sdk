@@ -91,9 +91,9 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 	if toConvertValue == nil {
 		switch t {
 		case ultipa.PropertyType_LIST:
-			return ConvertListToBytes(value, subTypes)
+			return SerializeListData(value, subTypes)
 		case ultipa.PropertyType_SET:
-			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+			return SerializeSetData(value, subTypes)
 		case ultipa.PropertyType_MAP:
 			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 		case ultipa.PropertyType_POINT:
@@ -107,13 +107,13 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 	}
 	switch t {
 	case ultipa.PropertyType_LIST:
-		return ConvertListToBytes(value, subTypes)
+		return SerializeListData(value, subTypes)
 	case ultipa.PropertyType_POINT:
 		return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 	case ultipa.PropertyType_DECIMAL:
 		return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 	case ultipa.PropertyType_SET:
-		return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+		return SerializeSetData(value, subTypes)
 	case ultipa.PropertyType_MAP:
 		return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 	case ultipa.PropertyType_DATETIME:
@@ -147,7 +147,7 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 	}
 }
 
-func ConvertListToBytes(list interface{}, subTypes []ultipa.PropertyType) ([]byte, error) {
+func SerializeListData(list interface{}, subTypes []ultipa.PropertyType) ([]byte, error) {
 	if subTypes == nil && len(subTypes) == 0 {
 		return nil, errors.New("subTypes is nil, unable to serialize list")
 	}
@@ -170,6 +170,70 @@ func ConvertListToBytes(list interface{}, subTypes []ultipa.PropertyType) ([]byt
 		listData.Values = append(listData.Values, bs)
 	}
 	return proto.Marshal(listData)
+}
+
+func SerializeSetData(set interface{}, subTypes []ultipa.PropertyType) ([]byte, error) {
+	if subTypes == nil && len(subTypes) == 0 {
+		return nil, errors.New("subTypes is nil, unable to serialize SetData")
+	}
+	if len(subTypes) == 0 {
+		return nil, errors.New("subTypes is not specified, unable to serialize SetData")
+	}
+	if set == nil {
+		setData := &ultipa.SetData{}
+		setData.IsNull = true
+		return proto.Marshal(setData)
+	}
+	vi := reflect.ValueOf(set)
+	setData := &ultipa.SetData{}
+	for index := 0; index < vi.Len(); index++ {
+		//TODO if vi.Index(index) is ListValue?
+		bs, err := ConvertInterfaceToBytesSafe(vi.Index(index).Interface(), subTypes[0], nil)
+		if err != nil {
+			return nil, err
+		}
+		setData.Values = append(setData.Values, bs)
+	}
+	return proto.Marshal(setData)
+}
+
+func SerializeMapData(value interface{}, subTypes []ultipa.PropertyType) ([]byte, error) {
+	if subTypes == nil && len(subTypes) == 0 {
+		return nil, errors.New("subTypes is nil, unable to serialize SetData")
+	}
+	if len(subTypes) == 0 {
+		return nil, errors.New("subTypes is not specified, unable to serialize SetData")
+	}
+	if value == nil {
+		mapData := &ultipa.MapData{}
+		mapData.IsNull = true
+		return proto.Marshal(mapData)
+	}
+
+	switch t := value.(type) {
+	case map[interface{}]interface{}:
+		toSerializeValue := value.(map[interface{}]interface{})
+		var mapValues []*ultipa.MapValue
+		for k, v := range toSerializeValue {
+			kb, err := ConvertInterfaceToBytesSafe(k, subTypes[0], nil)
+			if err != nil {
+				return nil, err
+			}
+			vb, err := ConvertInterfaceToBytesSafe(v, subTypes[0], nil)
+			if err != nil {
+				return nil, err
+			}
+			mapValue := &ultipa.MapValue{
+				Key:   kb,
+				Value: vb,
+			}
+			mapValues = append(mapValues, mapValue)
+		}
+		mapData := &ultipa.MapData{Values: mapValues}
+		return proto.Marshal(mapData)
+	default:
+		return nil, errors.New(fmt.Sprintf("value is not a map, but %s, unable to serialize as MapData", t))
+	}
 }
 
 func ConvertInterfaceToBytes(value interface{}) ([]byte, error) {
