@@ -32,5 +32,8 @@ type AttrMapData struct {
 }
 
 func NewAttrMapData() *AttrMapData {
-	return &AttrMapData{}
+	return &AttrMapData{
+		Key:   NewAttr(),
+		Value: NewAttr(),
+	}
 }

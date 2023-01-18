@@ -315,6 +315,7 @@ func parseAttrList(oAttr *ultipa.Attr) ([]*structs.AttrListData, error) {
 		if err != nil {
 			return nil, err
 		}
+		listData.ResultType = oListData.Type
 		switch oListData.Type {
 		case ultipa.ResultType_RESULT_TYPE_ATTR:
 			for _, subOAttr := range oListData.Attrs {
