@@ -148,7 +148,7 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 }
 
 func SerializeListData(list interface{}, subTypes []ultipa.PropertyType) ([]byte, error) {
-	if subTypes == nil && len(subTypes) == 0 {
+	if subTypes == nil{
 		return nil, errors.New("subTypes is nil, unable to serialize list")
 	}
 	if len(subTypes) == 0 {
