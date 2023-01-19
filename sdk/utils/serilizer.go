@@ -148,19 +148,18 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 }
 
 func SerializeListData(list interface{}, subTypes []ultipa.PropertyType) ([]byte, error) {
-	if subTypes == nil{
+	if subTypes == nil {
 		return nil, errors.New("subTypes is nil, unable to serialize list")
 	}
 	if len(subTypes) == 0 {
 		return nil, errors.New("subTypes is not specified, unable to serialize list")
 	}
+	listData := &ultipa.ListData{}
 	if list == nil {
-		listData := &ultipa.ListData{}
 		listData.IsNull = true
 		return proto.Marshal(listData)
 	}
 	vi := reflect.ValueOf(list)
-	listData := &ultipa.ListData{}
 	for index := 0; index < vi.Len(); index++ {
 		//TODO if vi.Index(index) is ListValue?
 		bs, err := ConvertInterfaceToBytesSafe(vi.Index(index).Interface(), subTypes[0], nil)
