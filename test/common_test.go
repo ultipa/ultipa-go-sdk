@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -187,6 +189,10 @@ func funcName(wg sync.WaitGroup) (err error) {
 
 func TestEnumName(t *testing.T) {
 	r := ultipa.ResultType_RESULT_TYPE_ATTR
-	fmt.Printf("resultType:%s", r)
+	fmt.Println(fmt.Sprintf("resultType:%s", r))
 
+	fmt.Println(uint64(math.MaxUint64))
+	fmt.Println(uint32(math.MaxUint32))
+	fmt.Println(strconv.FormatUint(uint64(math.MaxUint64), 2))
+	fmt.Println(strconv.FormatUint(uint64(math.MaxUint32), 2))
 }

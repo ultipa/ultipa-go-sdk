@@ -14,38 +14,77 @@ import (
 	"ultipa-go-sdk/sdk/types"
 )
 
+var default_nil_string = string([]byte{0x00})
+
 // Convert Bytes to GoLang Type and return to an interface
 func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType, subTypes []ultipa.PropertyType) (interface{}, error) {
 	switch t {
 	case ultipa.PropertyType_STRING:
-		return AsString(bs), nil
-	case ultipa.PropertyType_INT32:
-		return AsInt32(bs), nil
-	case ultipa.PropertyType_INT64:
-		return AsInt64(bs), nil
-	case ultipa.PropertyType_UINT32:
-		return AsUint32(bs), nil
-	case ultipa.PropertyType_UINT64:
-		return AsUint64(bs), nil
-	case ultipa.PropertyType_FLOAT:
-		return AsFloat32(bs), nil
-	case ultipa.PropertyType_DOUBLE:
-		return AsFloat64(bs), nil
-	case ultipa.PropertyType_DATETIME:
-		if AsUint64(bs) == 0 {
-			return nil, nil
+		value := AsString(bs)
+		if default_nil_string == value {
+			return "", nil
 		}
+		return value, nil
+	case ultipa.PropertyType_INT32:
+		value := AsInt32(bs)
+		if value == math.MaxInt32 {
+			return int32(0), nil
+		}
+		return value, nil
+	case ultipa.PropertyType_INT64:
+		value := AsInt64(bs)
+		if value == math.MaxInt64 {
+			return int64(0), nil
+		}
+		return value, nil
+	case ultipa.PropertyType_UINT32:
+		value := AsUint32(bs)
+		if value == math.MaxUint32 {
+			return uint32(0), nil
+		}
+		return value, nil
+	case ultipa.PropertyType_UINT64:
+		value := AsUint64(bs)
+		if value == math.MaxUint64 {
+			return uint64(0), nil
+		}
+		return value, nil
+	case ultipa.PropertyType_FLOAT:
+		value := AsFloat32(bs)
+		if value == math.MaxFloat32 {
+			return float32(0), nil
+		}
+		return value, nil
+	case ultipa.PropertyType_DOUBLE:
+		value := AsFloat64(bs)
+		if value == math.MaxFloat64 {
+			return float64(0), nil
+		}
+		return value, nil
+	case ultipa.PropertyType_DATETIME:
 		if len(bs) == 0 {
 			return NewTime(0), nil
 		}
-		return NewTime(AsUint64(bs)), nil
+		value := AsUint64(bs)
+		if value == math.MaxUint64 {
+			return nil, nil
+		}
+		return NewTime(value), nil
 	case ultipa.PropertyType_TIMESTAMP:
-		if len(bs) == 0 || AsUint32(bs) == 0 {
+		value := AsUint32(bs)
+		if len(bs) == 0 || value == 0 {
 			return NewTimeStamp(0), nil
 		}
-		return NewTimeStamp(int64(AsUint32(bs))), nil
+		if value == math.MaxUint32 {
+			return nil, nil
+		}
+		return NewTimeStamp(int64(value)), nil
 	case ultipa.PropertyType_TEXT:
-		return AsString(bs), nil
+		value := AsString(bs)
+		if default_nil_string == value {
+			return "", nil
+		}
+		return value, nil
 	case ultipa.PropertyType_BLOB:
 		return bs, nil
 	//case ultipa.PropertyType_POINT:
@@ -73,6 +112,9 @@ func deserializeList(bs []byte, subTypes []ultipa.PropertyType) (interface{}, er
 		return nil, err
 	}
 	var list []interface{}
+	if listData.IsNull {
+		return list, nil
+	}
 	if listData.Values != nil {
 		for _, value := range listData.Values {
 			element, err := ConvertBytesToInterface(value, subTypes[0], nil)
@@ -371,7 +413,7 @@ func GetDefaultNilInterface(t ultipa.PropertyType) interface{} {
 	case ultipa.PropertyType_TIMESTAMP:
 		return math.MaxUint32
 	default:
-		return string([]byte{0x00})
+		return default_nil_string
 	}
 }
 
