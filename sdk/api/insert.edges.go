@@ -159,7 +159,7 @@ func checkEdgeProperties(schema *structs.Schema, row *structs.Edge, index int) e
 	if row == nil {
 		return errors.New(fmt.Sprintf("node row [%d] error: node row is nil.", index))
 	}
-	err := CheckValuesAndProperties(schema.Properties, row.GetValues(), index)
+	err := CheckEdgeRows(row,schema.Properties, index)
 	if err != nil {
 		return err
 	}
