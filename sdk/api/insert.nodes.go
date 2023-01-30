@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
 	"sync"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
@@ -117,51 +116,22 @@ func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node) (error
 	wg := sync.WaitGroup{}
 	var err error
 	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	nodeRows := make([]*ultipa.NodeRow, len(rows))
 
 	for index, row := range rows {
-		if row == nil {
-			if err == nil {
-				err = errors.New(fmt.Sprintf("node row [%d] error: node row is nil.", index))
-			}
-			return err, nodeRows
-		}
-		values := row.GetValues()
-		properties := schema.Properties
-		err = CheckValuesAndProperties(properties, values, index)
+		err = checkNodeProperties(schema, row, index)
 		if err != nil {
 			return err, nodeRows
 		}
-
 		wg.Add(1)
 		go func(index int, row *structs.Node) {
 			defer wg.Done()
-			newNode := &ultipa.NodeRow{
-				Id:         row.ID,
-				Uuid:       row.UUID,
-				SchemaName: schema.Name,
-			}
-
-			for _, prop := range properties {
-
-				if prop.IsIDType() || prop.IsIgnore() {
-					continue
-				}
-
-				if !row.Values.Has(prop.Name) {
-					cancel()
-					err = errors.New(fmt.Sprintf("node row [%d] error: values doesn't contain property [%s]", index, prop.Name))
-				}
-
-				bs, err := row.GetBytes(prop.Name)
-
-				if err != nil {
-					printers.PrintError("Get row bytes value failed  " + prop.Name + " " + err.Error())
-					err = errors.New(fmt.Sprintf("node row [%d] error: failed to serialize value of property %s,value=%v", index, prop.Name, row.Values.Get(prop.Name)))
-					return
-				}
-
-				newNode.Values = append(newNode.Values, bs)
+			var newNode *ultipa.NodeRow
+			newNode, err = doConvertSdkNodeRowToUltipaNodeRow(schema, row, index)
+			if err != nil {
+				cancel()
+				return
 			}
 			nodeRows[index] = newNode
 		}(index, row)
@@ -173,6 +143,49 @@ func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node) (error
 	}
 	wg.Wait()
 	return err, nodeRows
+}
+
+func checkNodeProperties(schema *structs.Schema, row *structs.Node, index int) error {
+	if row == nil {
+		return errors.New(fmt.Sprintf("node row [%d] error: node row is nil.", index))
+	}
+	err := CheckValuesAndProperties(schema.Properties, row.GetValues(), index)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func convertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Node, index int) (*ultipa.NodeRow, error) {
+	err := checkNodeProperties(schema, row, index)
+	if err != nil {
+		return nil, err
+	}
+	return doConvertSdkNodeRowToUltipaNodeRow(schema, row, index)
+}
+
+func doConvertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Node, index int) (*ultipa.NodeRow, error) {
+	newNode := &ultipa.NodeRow{
+		Id:         row.ID,
+		Uuid:       row.UUID,
+		SchemaName: schema.Name,
+	}
+	for _, prop := range schema.Properties {
+		if prop.IsIDType() || prop.IsIgnore() {
+			continue
+		}
+		if !row.Values.Has(prop.Name) {
+			return nil, errors.New(fmt.Sprintf("node row [%d] error: values doesn't contain property [%s]", index, prop.Name))
+		}
+		bs, err := row.GetBytes(prop.Name)
+		if err != nil {
+			printers.PrintError("Get row bytes value failed  " + prop.Name + " " + err.Error())
+			err = errors.New(fmt.Sprintf("node row [%d] error: failed to serialize value of property %s,value=%v", index, prop.Name, row.Values.Get(prop.Name)))
+			return nil, err
+		}
+		newNode.Values = append(newNode.Values, bs)
+	}
+	return newNode, nil
 }
 
 type Batch struct {
@@ -202,8 +215,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 
 	for index, node := range nodes {
 		m[node.Schema] = map[int]int{}
-		var rows []*ultipa.NodeRow
-		// init schema
+ 		// init schema
 		if batches[node.Schema] == nil {
 
 			batches[node.Schema] = &Batch{}
@@ -214,11 +226,6 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 
 			if schema, ok := s.(*structs.Schema); ok {
 				batches[node.Schema].Schema = schema
-
-				err, rows = setPropertiesToNodeRow(schema, []*structs.Node{node})
-				if err != nil {
-					return nil, errors.New(fmt.Sprintf("Data verification failed, index: [%s], caused by:%v", strconv.Itoa(index), err))
-				}
 			} else {
 				// schema not exit
 				return nil, errors.New("Schema not found : " + node.Schema)
@@ -227,9 +234,13 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 
 		batch := batches[node.Schema]
 		// add nodes
+		row, err := convertSdkNodeRowToUltipaNodeRow(batch.Schema, node, index)
+		if err != nil {
+			return nil, err
+		}
 		//node.UpdateByValueID()
-		if len(rows) != 0 {
-			batch.Nodes = append(batch.Nodes, rows[0])
+		if row != nil {
+			batch.Nodes = append(batch.Nodes, row)
 			m[node.Schema][len(batch.Nodes)-1] = index
 		}
 		//batch.Nodes = append(batch.Nodes, node)

@@ -10,6 +10,7 @@ import (
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/structs"
+	"ultipa-go-sdk/sdk/utils"
 )
 
 func TestBatchInsertNodes(t *testing.T) {
@@ -156,4 +157,60 @@ func TestBatchInsertEdges(t *testing.T) {
 
 	wg.Wait()
 
+}
+
+func TestCheckPropAndValueAutoData(t *testing.T) {
+	var graph = "grapthInsertTest"
+	hosts := []string{"192.168.1.85:61095", "192.168.1.87:61095", "192.168.1.88:61095"}
+	client, _ := GetClient(hosts, graph)
+	timestamp1, _ := utils.NewTimeFromString("2018-08-17T09:57:33+08:00")
+	timestamp2, _ := utils.NewTimeFromString("2018-08-17 09:57:33")
+	node1 := structs.Node{
+		Values: &structs.Values{
+			Data: map[string]interface {
+			}{
+				"typeTimestamp": timestamp1.GetTimeStamp(), "typeInt32": int32(1), "typeNotMatch": timestamp1.GetTimeStamp()}}, Schema: "nodeSchema2"}
+	node2 := structs.Node{
+		Values: &structs.Values{
+			Data: map[string]interface {
+			}{
+				"typeTimestamp": timestamp1.GetTimeStamp(), "typeInt32": int32(1), "typeNotMatch": timestamp1.GetTimeStamp(), "typeInt32Error": int32(1)}}, Schema: "nodeSchema2"}
+	node3 := structs.Node{
+		Values: &structs.Values{
+			Data: map[string]interface {
+			}{
+				"typeTimestamp": "2019-12-12 15:59:59"}}, Schema: "nodeSchema2"}
+	node4 := structs.Node{
+		Values: &structs.Values{
+			Data: map[string]interface {
+			}{}}, Schema: "nodeSchema2"}
+	node5 := structs.Node{
+		Values: &structs.Values{
+			Data: map[string]interface {
+			}{
+				"typeTimestamp": "2019-12-12 15:59:59", "typeInt32": int32(1), "typeInt32Error": int32(1)}}, Schema: "nodeSchema2"}
+	rows1 := []*structs.Node{&node1, &node2}
+	rows2 := []*structs.Node{&node1, &node1, &node3}
+	rows3 := []*structs.Node{&node1, &node1, &node4}
+	rows4 := []*structs.Node{&node5}
+	t.Log(timestamp2)
+	cases := []struct {
+		propertiesList []*structs.Property
+		rows           []*structs.Node
+		message        string
+	}{
+		{nil, rows1, "node row [1] error: values size larger than properties size."},
+		{nil, rows2, "node row [2] error: values size smaller than properties size."},
+		{nil, rows3, "node row [2] error: values size smaller than properties size."},
+		{nil, rows4, "node row [0] error: values doesn't contain property [typeNotMatch]."},
+	}
+	for _, c := range cases {
+		_, err1 := client.InsertNodesBatchAuto(c.rows, &configuration.InsertRequestConfig{
+			InsertType: ultipa.InsertType_NORMAL})
+		fmt.Println(c.rows)
+		//fmt.Println(re)
+		if err1.Error() != c.message {
+			t.Errorf("返回信息与期望不一致，期望返回信息为%s\n实际返回信息为%s", c.message, err1.Error())
+		}
+	}
 }
