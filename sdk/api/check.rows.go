@@ -37,9 +37,9 @@ func CheckValuesAndProperties(properties []*structs.Property, values *structs.Va
 				err = errors.New(fmt.Sprintf("row [%d] error: values size smaller than properties size.", index))
 				return err
 			}
-			for idx, prop := range props {
+			for _, prop := range props {
 				if _, ok := values.Data[prop.Name]; !ok {
-					return errors.New(fmt.Sprintf("row [%d] error: values doesn't contain property [%s].", idx, prop.Name))
+					return errors.New(fmt.Sprintf("row [%d] error: values doesn't contain property [%s].", index, prop.Name))
 				}
 			}
 		}
