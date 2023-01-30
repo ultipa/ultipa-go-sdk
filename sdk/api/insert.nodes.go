@@ -180,7 +180,7 @@ func doConvertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Nod
 		if prop.IsIDType() || prop.IsIgnore() {
 			continue
 		}
-		if !row.Values.Has(prop.Name) {
+		if !row.Values.Contain(prop.Name) {
 			return nil, errors.New(fmt.Sprintf("node row [%d] error: values doesn't contain property [%s]", index, prop.Name))
 		}
 		bs, err := row.GetBytesSafe(prop.Name, prop.Type)
