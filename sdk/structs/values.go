@@ -24,6 +24,11 @@ func (v *Values) Has(key string) bool {
 	return v.Get(key) != nil
 }
 
+func (v *Values) Contain(key string) bool {
+	_, ok := v.Data[key]
+	return ok
+}
+
 func (v *Values) ForEach(cb func(v interface{}, key string) error, order []string) error {
 
 	if order == nil {
