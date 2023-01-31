@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
 	"sync"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
@@ -125,18 +124,11 @@ func setPropertiesToEdgeRow(schema *structs.Schema, rows []*structs.Edge) (error
 	wg := sync.WaitGroup{}
 	var err error
 	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	edgeRows := make([]*ultipa.EntityRow, len(rows))
 
 	for index, row := range rows {
-		if row == nil {
-			if err == nil {
-				err = errors.New(fmt.Sprintf("edge row [%d] error: node row is nil.", index))
-			}
-			return err, edgeRows
-		}
-
-		properties := schema.Properties
-		err = CheckEdgeRows(row, properties, index)
+		err = checkEdgeProperties(schema, row, index)
 		if err != nil {
 			return err, edgeRows
 		}
@@ -145,32 +137,11 @@ func setPropertiesToEdgeRow(schema *structs.Schema, rows []*structs.Edge) (error
 
 		go func(index int, row *structs.Edge) {
 			defer wg.Done()
-
-			newEdge := &ultipa.EntityRow{
-				FromId:     row.From,
-				FromUuid:   row.FromUUID,
-				ToId:       row.To,
-				ToUuid:     row.ToUUID,
-				SchemaName: schema.Name,
-				Uuid:       row.UUID,
-			}
-
-			for _, prop := range schema.Properties {
-
-				if prop.IsIDType() || prop.IsIgnore() {
-					continue
-				}
-
-				bs, err := row.GetBytesSafe(prop.Name, prop.Type, prop.SubTypes)
-
-				if err != nil {
-					printers.PrintError("Get row bytes value failed " + prop.Name + " " + err.Error())
-					err = errors.New(fmt.Sprintf("edge row [%d] error: failed to serialize value of property %s,value=%v", index, prop.Name, row.Values.Get(prop.Name)))
-					cancel()
-					return
-				}
-
-				newEdge.Values = append(newEdge.Values, bs)
+			var newEdge *ultipa.EntityRow
+			newEdge, err = doConvertSdkEdgeRowToUltipaEdgeRow(schema, row, index)
+			if err != nil {
+				cancel()
+				return
 			}
 			edgeRows[index] = newEdge
 		}(index, row)
@@ -182,6 +153,57 @@ func setPropertiesToEdgeRow(schema *structs.Schema, rows []*structs.Edge) (error
 	}
 	wg.Wait()
 	return err, edgeRows
+}
+
+func checkEdgeProperties(schema *structs.Schema, row *structs.Edge, index int) error {
+	if row == nil {
+		return errors.New(fmt.Sprintf("node row [%d] error: node row is nil.", index))
+	}
+	err := CheckEdgeRows(row, schema.Properties, index)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func convertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edge, index int) (*ultipa.EntityRow, error) {
+	err := checkEdgeProperties(schema, row, index)
+	if err != nil {
+		return nil, err
+	}
+	return doConvertSdkEdgeRowToUltipaEdgeRow(schema, row, index)
+}
+
+func doConvertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edge, index int) (*ultipa.EntityRow, error) {
+	newEdge := &ultipa.EntityRow{
+		FromId:     row.From,
+		FromUuid:   row.FromUUID,
+		ToId:       row.To,
+		ToUuid:     row.ToUUID,
+		SchemaName: schema.Name,
+		Uuid:       row.UUID,
+	}
+	for _, prop := range schema.Properties {
+
+		if prop.IsIDType() || prop.IsIgnore() {
+			continue
+		}
+
+		if !row.Values.Contain(prop.Name) {
+			return nil, errors.New(fmt.Sprintf("edge row [%d] error: values doesn't contain property [%s]", index, prop.Name))
+		}
+
+		bs, err := row.GetBytesSafe(prop.Name, prop.Type, prop.SubTypes)
+
+		if err != nil {
+			printers.PrintError("Get row bytes value failed " + prop.Name + " " + err.Error())
+			err = errors.New(fmt.Sprintf("edge row [%d] error: failed to serialize value of property %s,value=%v", index, prop.Name, row.Values.Get(prop.Name)))
+			return nil, err
+		}
+
+		newEdge.Values = append(newEdge.Values, bs)
+	}
+	return newEdge, nil
 }
 
 //InsertEdgesBatchAuto Nodes interface values should be string
@@ -206,7 +228,6 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 	for index, edge := range edges {
 
 		m[edge.Schema] = map[int]int{}
-		var rows []*ultipa.EntityRow
 		// init schema
 		if batches[edge.Schema] == nil {
 
@@ -218,11 +239,6 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 
 			if schema, ok := s.(*structs.Schema); ok {
 				batches[edge.Schema].Schema = schema
-
-				err, rows = setPropertiesToEdgeRow(schema, []*structs.Edge{edge})
-				if err != nil {
-					return nil, errors.New(fmt.Sprintf("Data verification failed, index: [%s], caused by:%v", strconv.Itoa(index), err))
-				}
 			} else {
 				// schema not exit
 				return nil, errors.New("Edge Schema not found : " + edge.Schema)
@@ -231,8 +247,13 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 
 		batch := batches[edge.Schema]
 		// add edges
-		if len(rows) != 0 {
-			batch.Edges = append(batch.Edges, rows[0])
+		row, err := convertSdkEdgeRowToUltipaEdgeRow(batch.Schema, edge, index)
+		if err != nil {
+			return nil, err
+		}
+
+		if row != nil {
+			batch.Edges = append(batch.Edges, row)
 			m[edge.Schema][len(batch.Edges)-1] = index
 		}
 		//batch.Edges = append(batch.Edges, edge)
