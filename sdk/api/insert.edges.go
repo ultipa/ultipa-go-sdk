@@ -35,7 +35,7 @@ func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EdgeTable, config *configur
 		InsertType:           config.InsertType,
 		//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
 		//Silent:     config.Silent,
-		Silent: false,
+		Silent: true,
 	})
 
 	if err != nil {
@@ -315,7 +315,7 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 			CreateNodeIfNotExist: config.CreateNodeIfNotExist,
 			//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
 			//Silent:     config.Silent,
-			Silent: false,
+			Silent: true,
 		})
 
 		if err != nil {
