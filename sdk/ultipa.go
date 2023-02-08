@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	Version  = "v4.2.0" //主版本号
+	Version  = "v4.3.0" //主版本号
 )
 
 // New an Ultipa Instance !!!!
