@@ -34,7 +34,7 @@ func (api *UltipaAPI) InsertNodesBatch(table *ultipa.EntityTable, config *config
 		InsertType: config.InsertType,
 		//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
 		//Silent:     config.Silent,
-		Silent: false,
+		Silent: true,
 	})
 
 	if err != nil {
@@ -104,7 +104,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		InsertType: config.InsertType,
 		//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
 		//Silent:     config.Silent,
-		Silent: false,
+		Silent: true,
 	})
 
 	if err != nil {
@@ -307,7 +307,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 			InsertType: config.InsertType,
 			//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
 			//Silent:     config.Silent,
-			Silent: false,
+			Silent: true,
 		})
 
 		if err != nil {
