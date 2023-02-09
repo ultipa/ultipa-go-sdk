@@ -95,7 +95,7 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 	}
 
 	client := conn.GetClient()
-	api.Logger.Log(fmt.Sprintf("fetch client,  hit host:[%s], role [%v]", conn.Host, conn.Role))
+	api.Logger.Log(fmt.Sprintf("fetch client,  hit host:[%s], role [%v], graph=[%s]", conn.Host, conn.Role, conf.CurrentGraph))
 	return client, conf, nil
 }
 
@@ -119,7 +119,7 @@ func (api *UltipaAPI) GetControlClientAndConfig(config *configuration.RequestCon
 		return nil, conf, err
 	}
 	client := conn.GetControlClient()
-	api.Logger.Log(fmt.Sprintf("fetch control client, hit host:[%s], role [%v]", conn.Host, conn.Role))
+	api.Logger.Log(fmt.Sprintf("fetch control client, hit host:[%s], role [%v], graph=[%s]", conn.Host, conn.Role, conf.CurrentGraph))
 	return client, conf, nil
 }
 
