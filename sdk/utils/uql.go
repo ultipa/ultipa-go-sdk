@@ -106,18 +106,41 @@ func (t *UqlItem) IsGlobal() bool {
 
 //IsExtra check whether the uql is extra, if yes, then it should be sent to uqlEx via ControlClient
 func (t *UqlItem) IsExtra() bool {
-	matcher := regexp.MustCompile(`([a-z_A-Z]*)(?:\((?:[^\(|^\)]*)\))?(?:[.]*([a-z_A-Z]*))*`)
-	result := matcher.FindStringSubmatch(string(t.Uql))
+	matcher := regexp.MustCompile(`(?P<first>[a-z_A-Z]*)(?:\((?P<param>[^\(|^\)]*)\))?(?:[.]*(?P<second>[a-z_A-Z]*))*`)
+	result := matcher.FindStringSubmatch(strings.TrimSpace(string(t.Uql)))
 	if len(result) == 0 {
 		return false
 	}
 	if _, ok := ExtraUqlCommandKeys[result[0]]; ok {
 		return true
 	}
-	if len(result) > 1 {
-		if _, ok := ExtraUqlCommandKeys[result[0]+"()."+result[1]]; ok {
+
+	firstCmd := ""
+	param := ""
+	secondCmd := ""
+	firstIdx := matcher.SubexpIndex("first")
+	if firstIdx > -1 {
+		firstCmd = result[firstIdx]
+	}
+	paramIdx := matcher.SubexpIndex("param")
+	if paramIdx > -1 {
+		param = result[paramIdx]
+	}
+	secondIdx := matcher.SubexpIndex("second")
+	if secondIdx > -1 {
+		secondCmd = result[secondIdx]
+	}
+
+	if firstCmd != "" && secondCmd != "" {
+		if _, ok := ExtraUqlCommandKeys[firstCmd+"()."+secondCmd]; ok {
 			return true
 		}
+	}
+
+	//主要处理类似kill(1)命令中有参数的语句
+	_, firstCmdIsExtra := ExtraUqlCommandKeys[firstCmd]
+	if len(result) > 1 && result[0] != "" && firstCmdIsExtra && param != "" {
+		return true
 	}
 	return false
 }

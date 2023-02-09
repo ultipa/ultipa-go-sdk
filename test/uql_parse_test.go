@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"strings"
 	"testing"
 	"ultipa-go-sdk/sdk/utils"
 )
@@ -61,7 +62,8 @@ func TestIsExtra(t *testing.T) {
 	for uql, _ := range utils.ExtraUqlCommandKeys {
 		uqls[uql] = true
 	}
-
+	uqls[`kill("*")`] = true
+	uqls[`  top()`] = true
 	nonExtraUql := []string{
 		`find().nodes({(_id == 1 && c == 2)})`,
 		`create().graph("<name>", "<desc?>")`,
@@ -148,6 +150,7 @@ func TestRegularExpress(t *testing.T) {
 		"show().edge_schema(@amz).limit(100)",
 		"show().edge_schema(@amz) limit 10",
 		"top()",
+		"stats()",
 		"kill()",
 		"grant().user",
 	}
@@ -155,5 +158,54 @@ func TestRegularExpress(t *testing.T) {
 	matcher := regexp.MustCompile(`([a-z_A-Z]*)(?:\((?:[^\(|^\)]*)\))?(?:[.]*([a-z_A-Z]*))*`)
 	for idx, uql := range uqls {
 		fmt.Printf("%d:%q\n", idx, matcher.FindStringSubmatch(uql))
+	}
+}
+
+
+func TestRegularExpressWithGroupName(t *testing.T) {
+	uqls := []string{
+		"find().nodes({(_id == 1 && c == 2)})",
+		"show().graph()",
+		`show().graph("name")`,
+		`show().graph(name)`,
+		`create().graph("<name>", "<desc?>")`,
+		`algo(degree).params({})`,
+		`exec task algo(degree).params({})`,
+		`alert().node_property()`,
+		`n({_id == "C001"}).e().n({@card} as neighbors)
+	find().nodes({_id == "C002"}) as C002
+	with neighbors, C002
+	update().nodes({_id == neighbors._id && balance > C002.balance}).set({level: level + 1})`,
+		"",
+		"show().edge_schema(@amz).limit(100)",
+		"show().edge_schema(@amz) limit 10",
+		" top()",
+		"stats()",
+		"kill(1)",
+		`kill("*")`,
+		"grant().user",
+	}
+	//matcher := regexp.MustCompile(`([a-z_A-Z]*)\(([^\(|^\)]*)\)`)
+	matcher := regexp.MustCompile(`(?P<first>[a-z_A-Z]*)(?:\((?P<param>[^\(|^\)]*)\))?(?:[.]*(?P<second>[a-z_A-Z]*))*`)
+	for idx, uql := range uqls {
+		result := matcher.FindStringSubmatch(strings.TrimSpace(uql))
+
+		first := ""
+		param := ""
+		second := ""
+		firstIdx := matcher.SubexpIndex("first")
+		if firstIdx > -1 {
+			first = result[firstIdx]
+		}
+		paramIdx := matcher.SubexpIndex("param")
+		if paramIdx > -1 {
+			param = result[paramIdx]
+		}
+		secondIdx := matcher.SubexpIndex("second")
+		if secondIdx > -1 {
+			second = result[secondIdx]
+		}
+
+		fmt.Printf("%d:%q, first=%s, param=%s,second=%s \n", idx, result, first, param, second)
 	}
 }
