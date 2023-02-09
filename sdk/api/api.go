@@ -57,6 +57,9 @@ func (api *UltipaAPI) GetConn(config *configuration.RequestConfig) (*connection.
 		} else if api.Pool.IsRaft {
 			if UqlItem.IsGlobal() || config.UseControl {
 				conn, err = api.Pool.GetGlobalMasterConn(conf)
+				if UqlItem.IsGlobal() {
+					conf.CurrentGraph = "global"
+				}
 			} else if UqlItem.HasWrite() || config.UseMaster || conf.Consistency {
 				ok, graph := UqlItem.ParseGraph()
 				if ok && graph != "" {
@@ -98,20 +101,26 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 
 func (api *UltipaAPI) GetControlClient(config *configuration.RequestConfig) (ultipa.UltipaControlsClient, error) {
 
+	client, _, err := api.GetControlClientAndConfig(config)
+	return client, err
+}
+
+func (api *UltipaAPI) GetControlClientAndConfig(config *configuration.RequestConfig) (ultipa.UltipaControlsClient, *configuration.UltipaConfig, error) {
+
 	if config == nil {
 		config = &configuration.RequestConfig{}
 	}
 
 	config.UseControl = true
 
-	conn, _, err := api.GetConn(config)
+	conn, conf, err := api.GetConn(config)
 
 	if err != nil {
-		return nil, err
+		return nil, conf, err
 	}
 	client := conn.GetControlClient()
 	api.Logger.Log(fmt.Sprintf("fetch control client, hit host:[%s], role [%v]", conn.Host, conn.Role))
-	return client, nil
+	return client, conf, nil
 }
 
 // UQL send a uql string to ultipa graph, and return a http UQL Response
@@ -126,7 +135,16 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 	}
 
 	config.Uql = uql
-	client, conf, err := api.GetClient(config)
+	uqlItem := utils.NewUql(uql)
+	isExtra := uqlItem.IsExtra()
+	var client ultipa.UltipaRpcsClient
+	var uqlExClient ultipa.UltipaControlsClient
+	var conf *configuration.UltipaConfig
+	if isExtra {
+		uqlExClient, conf, err = api.GetControlClientAndConfig(config)
+	} else {
+		client, conf, err = api.GetClient(config)
+	}
 
 	if err != nil {
 		return nil, err
@@ -147,7 +165,12 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 	if config.ThreadNum > 0 {
 		uqlRequest.ThreadNum = config.ThreadNum
 	}
-	resp, err := client.Uql(ctx, uqlRequest)
+	var resp ultipa.UltipaRpcs_UqlClient
+	if isExtra {
+		resp, err = uqlExClient.UqlEx(ctx, uqlRequest)
+	} else {
+		resp, err = client.Uql(ctx, uqlRequest)
+	}
 
 	if err != nil {
 		// if get error, ex: unavailable
@@ -157,7 +180,11 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 			return nil, err
 		}
 
-		resp, err = client.Uql(ctx, uqlRequest)
+		if isExtra {
+			resp, err = uqlExClient.UqlEx(ctx, uqlRequest)
+		} else {
+			resp, err = client.Uql(ctx, uqlRequest)
+		}
 
 		if err != nil {
 			return nil, err

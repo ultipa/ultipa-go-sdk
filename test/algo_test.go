@@ -11,7 +11,7 @@ import (
 func TestListAlgo(t *testing.T) {
 
 	//client, _ := GetClient([]string{"210.13.32.146:60074"}, "default")
-	client, _ := GetClient([]string{"192.168.1.60:60061"}, "default")
+	client, _ := GetClient([]string{"192.168.1.85:61095"}, "default")
 
 	algos, err := client.ShowAlgo(nil)
 
