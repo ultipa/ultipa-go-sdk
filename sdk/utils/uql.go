@@ -48,6 +48,29 @@ var GlobalUqlCommandKeys = []string{
 	`top\(\).graph`,
 }
 
+var ExtraUqlCommandKeys = map[string]struct{}{
+	`top()`:            {},
+	`kill`:             {},
+	`show().task`:      {},
+	`stop().task`:      {},
+	`clear().task`:     {},
+	`stats()`:          {},
+	`show().graph`:     {},
+	`show().algo`:      {},
+	`create().policy`:  {},
+	`drop().policy`:    {},
+	`show().policy`:    {},
+	`grant().user`:     {},
+	`revoke().user`:    {},
+	`show().privilege`: {},
+	`show().user`:      {},
+	`show().self`:      {},
+	`create().user`:    {},
+	`alter().user`:     {},
+	`drop().user`:      {},
+	`show().index`:     {},
+}
+
 func GetUqlRegExpMatcher(fnNames []string) *regexp.Regexp {
 	return regexp.MustCompile(`(?i)(\s*|^|\n)(` + strings.Join(fnNames, "|") + `)\(`)
 }
@@ -77,6 +100,24 @@ func (t *UqlItem) HasExecTask() bool {
 func (t *UqlItem) IsGlobal() bool {
 	matcher := GetUqlRegExpMatcher(GlobalUqlCommandKeys)
 	return matcher.Match(t.Uql)
+}
+
+//IsExtra check whether the uql is extra, if yes, then it should be sent to uqlEx via ControlClient
+func (t *UqlItem) IsExtra() bool {
+	matcher := regexp.MustCompile(`([a-z_A-Z]*)(?:\((?:[^\(|^\)]*)\))?(?:[.]*([a-z_A-Z]*))*`)
+	result := matcher.FindStringSubmatch(string(t.Uql))
+	if len(result) == 0 {
+		return false
+	}
+	if _, ok := ExtraUqlCommandKeys[result[0]]; ok {
+		return true
+	}
+	if len(result) > 1 {
+		if _, ok := ExtraUqlCommandKeys[result[0]+"()."+result[1]]; ok {
+			return true
+		}
+	}
+	return false
 }
 
 //ParseGraph check whether fetch graph name from uql or not
