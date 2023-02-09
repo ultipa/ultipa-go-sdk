@@ -85,6 +85,51 @@ func TestIsExtra(t *testing.T) {
 	}
 }
 
+func TestIsGlobal(t *testing.T) {
+
+	uqls := map[string]bool{
+		`show().user`:                          true,
+		`get().user`:                           true,
+		`create().user`:                        true,
+		`delete().user`:                        true,
+		`drop().user`:                          true,
+		`grant().user`:                         true,
+		`revoke().user`:                        true,
+		`alter().user`:                         true,
+		`show().policy`:                        true,
+		`get().policy`:                         true,
+		`create().policy`:                      true,
+		`delete().policy`:                      true,
+		`drop().policy`:                        true,
+		`alter().policy`:                       true,
+		`show().privilege`:                     true,
+		`stats()`:                              true,
+		`show().graph`:                         true,
+		`get().graph`:                          true,
+		`create().graph`:                       true,
+		`alter().graph`:                        true,
+		`drop().graph`:                         true,
+		`kill()`:                               true,
+		`top()`:                                true,
+		"exec task algo(degree).params({})":    false,
+		"show().edge_schema(@amz).limit(100)":  false,
+		`find().nodes({(_id == 1 && c == 2)})`: false,
+		`algo(degree).params({})`:              false,
+		`show().node_property({@customer})`:    false,
+	}
+
+	for uql, isGlobal := range uqls {
+		Uql := utils.NewUql(uql)
+		actual := Uql.IsGlobal()
+		log.Printf("🧪 uql: %s", Uql.Uql)
+		log.Printf("  IsGlobal: %t", actual)
+		log.Println("-------")
+		if isGlobal != actual {
+			t.Errorf("%s isGlobal? expected:%t,actual:%t", uql, isGlobal, actual)
+		}
+	}
+}
+
 func TestRegularExpress(t *testing.T) {
 	uqls := []string{
 		"find().nodes({(_id == 1 && c == 2)})",

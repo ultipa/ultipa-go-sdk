@@ -29,6 +29,7 @@ var GlobalUqlCommandKeys = []string{
 	`get\(\).user`,
 	`create\(\).user`,
 	`delete\(\).user`,
+	`drop\(\).user`,
 	`grant\(\).user`,
 	`revoke\(\).user`,
 	`alter\(\).user`,
@@ -36,6 +37,7 @@ var GlobalUqlCommandKeys = []string{
 	`get\(\).policy`,
 	`create\(\).policy`,
 	`delete\(\).policy`,
+	`drop\(\).policy`,
 	`alter\(\).policy`,
 	`show\(\).privilege`,
 	`stats\(\)`,
@@ -44,8 +46,8 @@ var GlobalUqlCommandKeys = []string{
 	`create\(\).graph`,
 	`alter\(\).graph`,
 	`drop\(\).graph`,
-	`kill\(\).graph`,
-	`top\(\).graph`,
+	`kill\(\)`,
+	`top\(\)`,
 }
 
 var ExtraUqlCommandKeys = map[string]struct{}{
@@ -72,7 +74,7 @@ var ExtraUqlCommandKeys = map[string]struct{}{
 }
 
 func GetUqlRegExpMatcher(fnNames []string) *regexp.Regexp {
-	return regexp.MustCompile(`(?i)(\s*|^|\n)(` + strings.Join(fnNames, "|") + `)\(`)
+	return regexp.MustCompile(`(?i)(` + strings.Join(fnNames, "|") + `)(\()?`)
 }
 
 func NewUql(uql string) *UqlItem {
