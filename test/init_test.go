@@ -13,17 +13,19 @@ var client *api.UltipaAPI
 var hosts []string
 
 func TestMain(m *testing.M) {
-	//var err error
+	var err error
 
-	//hosts = []string{
-	//	//"210.13.32.147:60095",
-	//	"192.168.1.85:60701",
-	//}
-	//client, err = GetClient(hosts, "miniCircle")
-	//
-	//if err != nil {
-	//	log.Fatalln(err)
-	//}
+	hosts = []string{
+		//"210.13.32.147:60095",
+		"192.168.1.85:61090",
+		"192.168.1.87:61090",
+		"192.168.1.88:61090",
+	}
+	client, err = GetClient(hosts, "gosdk")
+
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	m.Run()
 }

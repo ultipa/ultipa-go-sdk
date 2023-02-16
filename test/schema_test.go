@@ -115,7 +115,7 @@ func TestShowSchema(t *testing.T) {
 	printers.PrintSchema(edgeSchemas)
 }
 
-func TestCreateSchema(t *testing.T) {
+func TestCreateSchemaWithProperties(t *testing.T) {
 	// create schema with properties
 	newSchemaWithProperties := &structs.Schema{
 		Name: "text_schema",
@@ -133,5 +133,16 @@ func TestCreateSchema(t *testing.T) {
 	}
 
 	resp2, _ := client.CreateSchema(newSchemaWithProperties, true, nil)
+	log.Println(resp2)
+}
+
+func TestCreateSchema(t *testing.T) {
+	// create schema with properties
+	newSchemaWithoutProperties := &structs.Schema{
+		Name: "People",
+		Desc: "People",
+	}
+
+	resp2, _ := client.CreateSchema(newSchemaWithoutProperties, false, nil)
 	log.Println(resp2)
 }

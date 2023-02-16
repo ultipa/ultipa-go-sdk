@@ -242,9 +242,9 @@ func TestUQLCompactWithNotExistGraph(t *testing.T) {
 
 func TestUQLFindNodesWithList(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.87:50051"}, "default")
+	client, _ := GetClient([]string{"192.168.1.85:61090"}, "gosdk")
 
-	uql := "find().nodes({@default}) as nodes return nodes{*}"
+	uql := "find().nodes({@People}) as nodes return nodes{*}"
 	resp, err := client.UQL(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
@@ -284,4 +284,17 @@ func TestUQLFindNodesWithAttrList(t *testing.T) {
 		t.Fatal(err)
 	}
 	printers.PrintAttr(attrs)
+}
+
+func TestUqlInsertListProperty(t *testing.T) {
+	client, _ := GetClient([]string{"192.168.1.85:61090"}, "gosdk")
+
+	uql := `insert().nodes({name:["zhangsan","lisi"]}).into(@People)`
+	resp, err := client.UQL(uql, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		t.Fatal(resp.Status.Message)
+	}
 }

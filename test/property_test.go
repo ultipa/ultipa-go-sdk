@@ -10,6 +10,7 @@ package test
 import (
 	"log"
 	"testing"
+	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/http"
 	"ultipa-go-sdk/sdk/printers"
 )
@@ -48,4 +49,21 @@ func TestShowEdgeProperty(t *testing.T) {
 		log.Fatalln(err)
 	}
 	printers.PrintProperty(edgeProperties)
+}
+
+func TestCreateProperty(t *testing.T) {
+	resp, err := client.UQL(`create().node_property(@People, "age", "int32[]")`, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		t.Fatal(resp.Status.Message)
+	}
+
+	resp, _ = client.UQL("show().node_property(@People)", nil)
+	nodeProperties, err := resp.Alias(http.RESP_NODE_PROPERTY_KEY).AsProperties()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	printers.PrintProperty(nodeProperties)
 }
