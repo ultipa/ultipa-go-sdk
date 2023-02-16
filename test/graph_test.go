@@ -13,7 +13,7 @@ import (
 
 func TestListGraph(t *testing.T) {
 	InitCases()
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	client, _ := GetClient([]string{"192.168.1.85:61095"}, "miniCircle")
 	res, err := client.ListGraph(nil)
 	if err != nil {
 		log.Panic(err)
