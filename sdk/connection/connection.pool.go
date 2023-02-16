@@ -11,8 +11,8 @@ import (
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/printers"
 	"ultipa-go-sdk/sdk/utils"
+	"ultipa-go-sdk/sdk/utils/logger"
 )
 
 type GraphClusterInfo struct {
@@ -102,7 +102,7 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds uint32) {
 				Timeout: seconds,
 			})
 			if err != nil {
-				printers.PrintWarn(conn.Host + "failed - " + err.Error())
+				logger.PrintWarn(conn.Host + "failed - " + err.Error())
 				conn.Active = ultipa.ServerStatus_DEAD
 				return
 			}
@@ -113,7 +113,7 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds uint32) {
 			})
 
 			if err != nil {
-				printers.PrintWarn(conn.Host + "failed - " + err.Error())
+				logger.PrintWarn(conn.Host + "failed - " + err.Error())
 				conn.Active = ultipa.ServerStatus_DEAD
 				return
 			}
@@ -122,7 +122,7 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds uint32) {
 				conn.Active = ultipa.ServerStatus_ALIVE
 				pool.Actives = append(pool.Actives, conn)
 			} else {
-				printers.PrintWarn(conn.Host + "failed - " + resp.Status.Msg)
+				logger.PrintWarn(conn.Host + "failed - " + resp.Status.Msg)
 				conn.Active = ultipa.ServerStatus_DEAD
 			}
 		}(conn)
@@ -169,7 +169,7 @@ func (pool *ConnectionPool) doRefreshClusterInfo(graphName string) error {
 			// 已经初始化后
 			conn = pool.GraphMgr.GetLeader(graphName)
 		}
-		printers.PrintInfo(fmt.Sprintf("refresh graph [%s] cluster info with connection to host [%s]", graphName, conn.Host))
+		logger.PrintInfo(fmt.Sprintf("refresh graph [%s] cluster info with connection to host [%s]", graphName, conn.Host))
 		err = pool.resolveClusterInfo(graphName, conn)
 		if err == nil {
 			return nil

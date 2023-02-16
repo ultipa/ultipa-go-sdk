@@ -8,9 +8,9 @@ import (
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/http"
-	"ultipa-go-sdk/sdk/printers"
 	"ultipa-go-sdk/sdk/structs"
 	"ultipa-go-sdk/sdk/utils"
+	"ultipa-go-sdk/sdk/utils/logger"
 )
 
 func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EntityTable, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
@@ -196,7 +196,7 @@ func doConvertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edg
 		bs, err := row.GetBytesSafe(prop.Name, prop.Type, prop.SubTypes)
 
 		if err != nil {
-			printers.PrintError("Get row bytes value failed " + prop.Name + " " + err.Error())
+			logger.PrintError("Get row bytes value failed " + prop.Name + " " + err.Error())
 			err = errors.New(fmt.Sprintf("edge row [%d] error: failed to serialize value of property %s,value=%v", index, prop.Name, row.Values.Get(prop.Name)))
 			return nil, err
 		}

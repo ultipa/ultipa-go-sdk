@@ -11,7 +11,7 @@ import (
 	"os"
 	"testing"
 	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/printers"
+	"ultipa-go-sdk/sdk/utils/logger"
 )
 
 func TestInstallExta(t *testing.T) {
@@ -21,12 +21,12 @@ func TestInstallExta(t *testing.T) {
 	resp, err := client.InstallExta("./test_algo_lib/libexta_page_rank.so", "./test_algo_lib/page_rank.yml", nil)
 
 	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		printers.PrintError(resp.Status.Msg)
+		logger.PrintError(resp.Status.Msg)
 		os.Exit(1)
 	}
 
 	if err != nil {
-		printers.PrintErrAndExist(err.Error())
+		logger.PrintErrAndExist(err.Error())
 	}
 }
 
@@ -38,12 +38,12 @@ func TestUninstallExta(t *testing.T) {
 	resp, err := client.UninstallExta("page_rank", nil)
 
 	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		printers.PrintError(resp.Status.Msg)
+		logger.PrintError(resp.Status.Msg)
 		os.Exit(1)
 	}
 
 	if err != nil {
-		printers.PrintErrAndExist(err.Error())
+		logger.PrintErrAndExist(err.Error())
 	}
 
 }

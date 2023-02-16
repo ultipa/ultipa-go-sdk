@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"ultipa-go-sdk/sdk/utils/logger"
 )
 
 func PrintUqlErr(errmsg string) {
@@ -13,7 +14,7 @@ func PrintUqlErr(errmsg string) {
 	strs := strings.Split(errmsg, "\n")
 
 	if len(strs) < 2 {
-		PrintError(errmsg)
+		logger.PrintError(errmsg)
 		return
 	}
 

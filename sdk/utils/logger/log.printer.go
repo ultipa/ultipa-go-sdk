@@ -1,4 +1,4 @@
-package printers
+package logger
 
 import (
 	"github.com/fatih/color"

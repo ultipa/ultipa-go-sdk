@@ -7,6 +7,7 @@ import (
 	"ultipa-go-sdk/sdk/http"
 	"ultipa-go-sdk/sdk/printers"
 	"ultipa-go-sdk/sdk/structs"
+	"ultipa-go-sdk/sdk/utils/logger"
 	"ultipa-go-sdk/utils"
 )
 
@@ -44,11 +45,11 @@ func TestCreateGraph(t *testing.T) {
 	resp, err := client.UQL("insert().nodes({}).into(@default)", nil)
 
 	if err != nil {
-		printers.PrintError(err.Error())
+		logger.PrintError(err.Error())
 	}
 
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		printers.PrintError(resp.Status.Message)
+		logger.PrintError(resp.Status.Message)
 	}
 
 }
@@ -66,4 +67,25 @@ func TestAsGraph(t *testing.T) {
 		log.Fatalln(err)
 	}
 	printers.PrintGraph(graphs)
+}
+
+func TestCreateGraphIfNotExist(t *testing.T) {
+	graphName := "gosdk"
+	hosts := []string{
+		"192.168.1.85:61090",
+	}
+	client, err := GetClient(hosts, "default")
+
+	if err != nil {
+		t.Fatalf("failed to connect to server %v", err)
+	}
+
+	client.DropGraph(graphName, nil)
+
+	_, _, err = client.CreateGraphIfNotExit(&structs.Graph{
+		Name: graphName,
+	}, nil)
+	if err != nil {
+		t.Fatalf("failed to create graph %v", err)
+	}
 }

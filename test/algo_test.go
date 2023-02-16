@@ -6,6 +6,7 @@ import (
 	"testing"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/printers"
+	"ultipa-go-sdk/sdk/utils/logger"
 )
 
 func TestListAlgo(t *testing.T) {
@@ -29,12 +30,12 @@ func TestInstallAlgo(t *testing.T) {
 	resp, err := client.InstallAlgo("./test_algo_lib/libplugin_lpa.so", "./test_algo_lib/lpa.yml", nil)
 
 	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		printers.PrintError(resp.Status.Msg)
+		logger.PrintError(resp.Status.Msg)
 		os.Exit(1)
 	}
 
 	if err != nil {
-		printers.PrintErrAndExist(err.Error())
+		logger.PrintErrAndExist(err.Error())
 	}
 
 	TestListAlgo(t)
@@ -48,12 +49,12 @@ func TestUninstallAlgo(t *testing.T) {
 	resp, err := client.UninstallAlgo("lpa", nil)
 
 	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		printers.PrintError(resp.Status.Msg)
+		logger.PrintError(resp.Status.Msg)
 		os.Exit(1)
 	}
 
 	if err != nil {
-		printers.PrintErrAndExist(err.Error())
+		logger.PrintErrAndExist(err.Error())
 	}
 
 	TestListAlgo(t)

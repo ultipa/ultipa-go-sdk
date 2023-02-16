@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"google.golang.org/protobuf/proto"
 	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/printers"
+	"ultipa-go-sdk/sdk/utils/logger"
 )
 
 var nullBytes map[ultipa.PropertyType][]byte
@@ -57,7 +57,7 @@ func getListNullValue() []byte {
 	}
 	bs, err := proto.Marshal(listData)
 	if err != nil {
-		printers.PrintError(fmt.Sprintf("failed to get bytes of null list, %v", err))
+		logger.PrintError(fmt.Sprintf("failed to get bytes of null list, %v", err))
 	}
 	return bs
 }
@@ -66,7 +66,7 @@ func getMapNullValue() []byte {
 	mapData := &ultipa.MapData{IsNull: true}
 	bs, err := proto.Marshal(mapData)
 	if err != nil {
-		printers.PrintError(fmt.Sprintf("failed to get bytes of null map, %v", err))
+		logger.PrintError(fmt.Sprintf("failed to get bytes of null map, %v", err))
 	}
 	return bs
 }
