@@ -242,7 +242,7 @@ func TestUQLCompactWithNotExistGraph(t *testing.T) {
 
 func TestTopUql(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.87:61095"}, "miniCircle")
+	client, _ := GetClient([]string{"192.168.1.87:61090"}, "miniCircle")
 
 	uql := `top()`
 
