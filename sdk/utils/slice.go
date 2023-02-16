@@ -55,3 +55,19 @@ func Contains(slice interface{}, target interface{}) bool {
 
 	return false
 }
+
+// BytesEqual checks whether []bytes bs1 and bs2 equals or not
+func BytesEqual(bs1 []byte, bs2 []byte) bool {
+	if bs1 == nil || bs2 == nil {
+		return false
+	}
+	if len(bs1) != len(bs2) {
+		return false
+	}
+	for i, b := range bs1 {
+		if b != bs2[i] {
+			return false
+		}
+	}
+	return true
+}
