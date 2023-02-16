@@ -102,8 +102,7 @@ enum ResultType {
   RESULT_TYPE_NODE = 2;
   RESULT_TYPE_EDGE = 3;
   RESULT_TYPE_ATTR = 4;
-  RESULT_TYPE_ARRAY = 5;
-  RESULT_TYPE_TABLE = 6;
+  RESULT_TYPE_TABLE = 5;
 }
 
 message ResultAlias {
@@ -121,7 +120,6 @@ message UqlReply {
   repeated NodeAlias nodes = 6;
   repeated EdgeAlias edges = 7;
   repeated AttrAlias attrs = 8;
-//  repeated ArrayAlias arrays = 9;
   repeated Table tables = 10;
 
   Table statistics = 11;
@@ -151,6 +149,7 @@ message AttrAlias {
 message Attr {
   PropertyType property_type = 1;
   repeated bytes values = 2;
+  bool is_null = 3;
 }
 
 message AttrListData {
@@ -165,16 +164,6 @@ message AttrMapData {
   Attr key = 1;
   Attr value = 2;
 }
-
-//message ArrayElement {
-//  repeated bytes values = 1;
-//}
-//
-//message ArrayAlias {
-//  string alias = 1;
-//  PropertyType property_type = 2;
-//  repeated ArrayElement elements = 3;
-//}
 
 /*------------------------2.Uql------------------------------*/
 
@@ -459,6 +448,7 @@ message EntityRow {
   string from_id = 6;
   string to_id = 7;
   repeated bytes values = 8;
+  bool is_null = 9;
 }
 
 message Schema {
@@ -482,14 +472,6 @@ message Value {
   string value = 2;
 }
 
-message List {
-  PropertyType base_type = 1;
-  repeated ListValue values = 2;
-}
-message ListValue {
-  PropertyType type = 1;
-  bytes value = 2;
-}
 //for rpc insert
 message ListData {
   repeated bytes values = 1;
@@ -523,110 +505,12 @@ message ExplainPlan {
   repeated PlanNode plan_nodes = 1;
 }
 
-enum  PlanNodeType{
-  CLAUSE_UNSET = 0;
-
-  ORDER_BY_CLAUSE = 1;
-  AGGREGATION_CLAUSE = 2;
-  WITH_CLAUSE = 3;
-  WHERE_CLAUSE = 4;
-  UNCOLLECT_CLAUSE = 5;
-  TABLE_CLAUSE = 6;
-  RETURN_CLAUSE = 7;
-  LIMIT_SKIP_CLAUSE = 8;
-
-  TEMPLATE_CLAUSE = 9;
-  KHOP_TEMPLATE_CLAUSE = 10;
-  KHOP_CLAUSE = 11;
-  AB_CLAUSE = 12;
-  SPREAD_CLAUSE = 13;
-  AUTO_NET_CLAUSE = 14;
-
-  NODE_SEARCH_CLAUSE = 15;
-  EDGE_SEARCH_CLAUSE = 16;
-  NODE_INSERT_CLAUSE = 17;
-  EDGE_INSERT_CLAUSE = 18;
-  NODE_UPSERT_CLAUSE = 19;
-  EDGE_UPSERT_CLAUSE = 20;
-  NODE_UPDATE_CLAUSE = 21;
-  EDGE_UPDATE_CLAUSE = 22;
-  NODE_DELETE_CLAUSE = 23;
-  EDGE_DELETE_CLAUSE = 24;
-
-  TRUNCATE_CLAUSE = 25;
-  COMPACT_CLAUSE = 26;
-
-  GRAPH_CREATE_CLAUSE =27;
-  GRAPH_DROP_CLAUSE = 28;
-  GRAPH_UPDATE_CLAUSE = 29;
-  GRAPH_SHOW_CLAUSE = 30;
-  GRAPH_MOUNT_CLAUSE = 31;
-  GRAPH_UNMOUNT_CLAUSE = 32;
-
-  SCHEMA_CREATE_CLAUSE = 33;
-  SCHEMA_DROP_CLAUSE = 34;
-  SCHEMA_ALTER_CLAUSE = 35;
-  SCHEMA_SHOW_CLAUSE = 36;
-
-  PROPERTY_CREATE_CLAUSE = 37;
-  PROPERTY_DROP_CLAUSE = 38;
-  PROPERTY_ALTER_CLAUSE = 39;
-  PROPERTY_SHOW_CLAUSE = 40;
-
-  FULLTEXT_CREATE_CLAUSE = 41;
-  FULLTEXT_DROP_CLAUSE = 42;
-  FULLTEXT_SHOW_CLAUSE = 43;
-
-  INDEX_CREATE_CLAUSE = 44;
-  INDEX_DROP_CLAUSE = 45;
-  INDEX_SHOW_CLAUSE = 46;
-
-  LTE_CLAUSE = 47;
-  UFE_CLAUSE = 48;
-
-  TASK_CLEAR_CLAUSE = 49;
-  TASK_STOP_CLAUSE = 50;
-  TASK_PAUSE_CLAUSE = 51;
-  TASK_RESUME_CLAUSE = 52;
-  TASK_SHOW_CLAUSE = 53;
-
-  TOP_CLAUSE = 54;
-  KILL_CLAUSE = 55;
-  STAT_CLAUSE = 56;
-
-  POLICY_SHOW_CLAUSE = 57;
-  POLICY_CREATE_CLAUSE = 58;
-  POLICY_DELETE_CLAUSE = 59;
-  POLICY_UPDATE_CLAUSE = 60;
-
-  USER_SHOW_CLAUSE = 61;
-  USER_CREATE_CLAUSE = 62;
-  USER_DELETE_CLAUSE = 63;
-  USER_UPDATE_CLAUSE = 64;
-
-  PRIVILEGE_SHOW_CLAUSE = 65;
-  GRANT_CLAUSE = 66;
-  REVOKE_CLAUSE = 67;
-  SELF_INFO_GET_CLAUSE = 68;
-
-  ALGO_CLAUSE = 69;
-  ALGO_WRITE_CLAUSE = 70;
-  ALGO_LIST_CLAUSE = 71;
-
-  SUB_GRAPH_CLAUSE = 72;
-  OPTIONAL_TEMPLATE_CLAUSE = 73;
-
-  SUBQUERY_CLAUSE = 74;
-  UNION_CLAUSE = 75;
-}
-
 message PlanNode {
-  PlanNodeType type = 1;
-  string alias = 2;
-  uint32 children_num = 3;
+  string alias = 1;
+  uint32 children_num = 2;
 
-  string uql = 4;
-  string infos = 5;
+  string uql = 3;
+  string infos = 4;
 }
 
 enum AuthenticateType {

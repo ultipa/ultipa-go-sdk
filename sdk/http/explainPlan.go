@@ -20,7 +20,7 @@ func ParseExplainPlan(ex *ultipa.ExplainPlan) (*ExplainPlan, error) {
 
 	for _, planNode := range ex.PlanNodes {
 		explain := structs.Explain{
-			Type:        planNode.GetType(),
+			//Type:        planNode.GetType(),
 			Alias:       planNode.GetAlias(),
 			ChildrenNum: planNode.GetChildrenNum(),
 			Uql:         planNode.GetUql(),

@@ -134,7 +134,7 @@ func traverse(tree *printers.TreeNode, index int) {
 	}
 
 	s := tree.Explain
-	leveledList = append(leveledList, pterm.LeveledListItem{Level: index, Text: "Type: " + s.Type.String()})
+	//leveledList = append(leveledList, pterm.LeveledListItem{Level: index, Text: "Type: " + s.Type.String()})
 	leveledList = append(leveledList, pterm.LeveledListItem{Level: index, Text: "Alias: " + s.Alias})
 	leveledList = append(leveledList, pterm.LeveledListItem{Level: index, Text: "ChildrenNum: " + fmt.Sprint(s.ChildrenNum)})
 	leveledList = append(leveledList, pterm.LeveledListItem{Level: index, Text: "Uql: " + s.Uql})

@@ -239,7 +239,7 @@ func MergeUQLReply(reply1 *ultipa.UqlReply, reply2 *ultipa.UqlReply) *ultipa.Uql
 				paths2 := data2.(*ultipa.PathAlias)
 				paths1.Paths = append(paths1.Paths, paths2.Paths...)
 			}
-		case ultipa.ResultType_RESULT_TYPE_ARRAY:
+		//case ultipa.ResultType_RESULT_TYPE_ARRAY:
 			//if reply1.Arrays == nil && reply2.Arrays == nil {
 			//	return reply1
 			//}
