@@ -3,6 +3,7 @@ package structs
 import (
 	"errors"
 	"fmt"
+	"strings"
 	ultipa "ultipa-go-sdk/rpc"
 )
 
@@ -102,6 +103,11 @@ func (p *Property) IsIgnore() bool {
 }
 
 func (p *Property) SetTypeByString(s string) {
+	if strings.HasSuffix(s, "[]") {
+		p.Type = ultipa.PropertyType_LIST
+		p.SubTypes = append(p.SubTypes, GetPropertyTypeByString(strings.TrimSuffix(s, "[]")))
+		return
+	}
 	p.Type = GetPropertyTypeByString(s)
 }
 
