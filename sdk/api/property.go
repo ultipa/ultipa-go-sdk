@@ -79,8 +79,11 @@ func (api *UltipaAPI) CreateNodeProperty(schemaName string, prop *structs.Proper
 	if prop.Type == structs.PropertyType_IGNORE {
 		return nil, err
 	}
-
-	uql := fmt.Sprintf(`create().node_property(@%v,"%v",%v,"%v")`, schemaName, prop.Name, prop.GetStringType(), prop.Desc)
+	propertyTypeStr, err := prop.GetStringType()
+	if err != nil {
+		return nil, err
+	}
+	uql := fmt.Sprintf(`create().node_property(@%v,"%v",%v,"%v")`, schemaName, prop.Name, propertyTypeStr, prop.Desc)
 
 	resp, err = api.UQL(uql, conf)
 
@@ -92,8 +95,11 @@ func (api *UltipaAPI) CreateEdgeProperty(schemaName string, prop *structs.Proper
 	if prop.Type == structs.PropertyType_IGNORE {
 		return nil, err
 	}
-
-	resp, err = api.UQL(fmt.Sprintf(`create().edge_property(@%v,"%v",%v,"%v")`, schemaName, prop.Name, prop.GetStringType(), prop.Desc), conf)
+	propertyTypeStr, err := prop.GetStringType()
+	if err != nil {
+		return nil, err
+	}
+	resp, err = api.UQL(fmt.Sprintf(`create().edge_property(@%v,"%v",%v,"%v")`, schemaName, prop.Name, propertyTypeStr, prop.Desc), conf)
 
 	return resp, err
 }

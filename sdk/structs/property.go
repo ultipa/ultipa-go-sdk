@@ -1,6 +1,10 @@
 package structs
 
-import ultipa "ultipa-go-sdk/rpc"
+import (
+	"errors"
+	"fmt"
+	ultipa "ultipa-go-sdk/rpc"
+)
 
 type Property struct {
 	Name     string
@@ -101,8 +105,14 @@ func (p *Property) SetTypeByString(s string) {
 	p.Type = GetPropertyTypeByString(s)
 }
 
-func (p *Property) GetStringType() string {
-	return GetStringByPropertyType(p.Type)
+func (p *Property) GetStringType() (string, error) {
+	if p.Type == ultipa.PropertyType_LIST {
+		if len(p.SubTypes) == 0 {
+			return "", errors.New(fmt.Sprintf("Property [%s] is List but not specified subTypes", p.Name))
+		}
+		return GetStringByPropertyType(p.SubTypes[0]) + "[]", nil
+	}
+	return GetStringByPropertyType(p.Type), nil
 }
 
 func GetPropertyTypeByString(s string) ultipa.PropertyType {

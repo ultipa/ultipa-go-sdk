@@ -3,6 +3,7 @@ package printers
 import (
 	"fmt"
 	"github.com/alexeyco/simpletable"
+	"log"
 	"strconv"
 	"ultipa-go-sdk/sdk/structs"
 )
@@ -17,13 +18,21 @@ func PrintSchema(schemas []*structs.Schema) {
 		//table.Footer.Cells = []*simpletable.Cell{&simpletable.Cell{Span: 4, Text: fmt.Sprint("[", schema.Type, "]Schema : "+schema.Name, "(", schema.Total, ")")}}
 
 		for _, prop := range schema.Properties {
-			table.Body.Cells = append(table.Body.Cells, []*simpletable.Cell{
+
+			propertyTypeStr, err := prop.GetStringType()
+			if err != nil {
+				log.Panic(err)
+			}
+
+			rowCells := []*simpletable.Cell{
 				&simpletable.Cell{Text: prop.Name},
 				&simpletable.Cell{Text: prop.Desc},
-				&simpletable.Cell{Text: prop.GetStringType()},
+				&simpletable.Cell{Text: propertyTypeStr},
 				&simpletable.Cell{Text: strconv.FormatBool(prop.Lte)},
 				&simpletable.Cell{Text: prop.Schema},
-			})
+			}
+
+			table.Body.Cells = append(table.Body.Cells, rowCells)
 		}
 
 		if len(table.Body.Cells) > 0 {
