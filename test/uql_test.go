@@ -314,3 +314,17 @@ func TestUqlInsertListProperty(t *testing.T) {
 		t.Fatal(resp.Status.Message)
 	}
 }
+
+func TestUQLWithLimit(t *testing.T) {
+	client, _ := GetClient([]string{"192.168.1.87:61090", "192.168.1.85:61090", "192.168.1.88:61090"}, "gosdk")
+	uql := "find().edges({@insertEdge}) as edges return edges{*} limit 40"
+	//uql := "find().nodes({@insertNode}) as n return n{typeListString,typeListInt32,typeListInt64,typeListUint32,typeListUint64,typeListFloat,typeListDouble,typeListDatetime,typeListTimestamp,typeListText}"
+	//uql := "find().nodes({@insertNode}) as nodes return nodes{*}"
+	resp, _ := client.UQL(uql, nil)
+	edges, e, _ := resp.Alias("edges").AsEdges()
+
+	printers.PrintEdges(edges, e)
+	//var nodes1 []*structs.Node
+	//nodes1 = append(nodes1, nodes[0])
+	//fmt.Println(nodes1)
+}

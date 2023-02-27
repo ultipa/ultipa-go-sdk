@@ -70,7 +70,7 @@ func EdgeTableToEdges(et *ultipa.EntityTable, alias string) ([]*structs.Edge, ma
 		schema := structs.NewSchema(oSchema.SchemaName)
 		schemas[schema.Name] = schema
 		for _, header := range oSchema.Properties {
-			schema.Properties = append(schema.Properties, &structs.Property{Name: header.PropertyName, Type: header.PropertyType})
+			schema.Properties = append(schema.Properties, &structs.Property{Name: header.PropertyName, Type: header.PropertyType, SubTypes: header.SubTypes})
 		}
 	}
 
