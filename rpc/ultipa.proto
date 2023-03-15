@@ -67,6 +67,9 @@ service UltipaControls{
   //13.仅鉴权
   rpc Authenticate (AuthenticateRequest) returns (AuthenticateReply){
   }
+  //14.backup data
+  rpc Backup (BackupRequest) returns (BackupReply){
+  }
 }
 
 /*------------------------1.SayHello------------------------------*/
@@ -147,9 +150,8 @@ message AttrAlias {
 }
 
 message Attr {
-  PropertyType property_type = 1;
+  PropertyType value_type = 1;
   repeated bytes values = 2;
-  bool is_null = 3;
 }
 
 message AttrListData {
@@ -343,6 +345,16 @@ message UninstallExtaReply {
 }
 /*------------------------UninstallExta------------------------------*/
 
+/*------------------------16.Backup------------------------------*/
+message BackupRequest {
+  string backup_path = 1;
+}
+
+message BackupReply {
+  Status status = 1;
+}
+/*------------------------UninstallExta------------------------------*/
+
 /*------------------------public message-----------------------*/
 
 enum PropertyType {
@@ -363,6 +375,7 @@ enum PropertyType {
   LIST = 14;
   SET = 15;
   MAP = 16;
+  NULL_ = 17;
 }
 
 enum ErrorCode {

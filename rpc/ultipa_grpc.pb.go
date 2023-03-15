@@ -279,6 +279,8 @@ type UltipaControlsClient interface {
 	UninstallExta(ctx context.Context, in *UninstallExtaRequest, opts ...grpc.CallOption) (*UninstallExtaReply, error)
 	//13.仅鉴权
 	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateReply, error)
+	//14.backup data
+	Backup(ctx context.Context, in *BackupRequest, opts ...grpc.CallOption) (*BackupReply, error)
 }
 
 type ultipaControlsClient struct {
@@ -550,6 +552,15 @@ func (c *ultipaControlsClient) Authenticate(ctx context.Context, in *Authenticat
 	return out, nil
 }
 
+func (c *ultipaControlsClient) Backup(ctx context.Context, in *BackupRequest, opts ...grpc.CallOption) (*BackupReply, error) {
+	out := new(BackupReply)
+	err := c.cc.Invoke(ctx, "/ultipa.UltipaControls/Backup", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UltipaControlsServer is the server API for UltipaControls service.
 // All implementations must embed UnimplementedUltipaControlsServer
 // for forward compatibility
@@ -581,6 +592,8 @@ type UltipaControlsServer interface {
 	UninstallExta(context.Context, *UninstallExtaRequest) (*UninstallExtaReply, error)
 	//13.仅鉴权
 	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateReply, error)
+	//14.backup data
+	Backup(context.Context, *BackupRequest) (*BackupReply, error)
 	mustEmbedUnimplementedUltipaControlsServer()
 }
 
@@ -626,6 +639,9 @@ func (UnimplementedUltipaControlsServer) UninstallExta(context.Context, *Uninsta
 }
 func (UnimplementedUltipaControlsServer) Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Authenticate not implemented")
+}
+func (UnimplementedUltipaControlsServer) Backup(context.Context, *BackupRequest) (*BackupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Backup not implemented")
 }
 func (UnimplementedUltipaControlsServer) mustEmbedUnimplementedUltipaControlsServer() {}
 
@@ -907,6 +923,24 @@ func _UltipaControls_Authenticate_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UltipaControls_Backup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BackupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UltipaControlsServer).Backup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ultipa.UltipaControls/Backup",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UltipaControlsServer).Backup(ctx, req.(*BackupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UltipaControls_ServiceDesc is the grpc.ServiceDesc for UltipaControls service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -941,6 +975,10 @@ var UltipaControls_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Authenticate",
 			Handler:    _UltipaControls_Authenticate_Handler,
+		},
+		{
+			MethodName: "Backup",
+			Handler:    _UltipaControls_Backup_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
