@@ -3,7 +3,9 @@ package printers
 import (
 	"fmt"
 	"github.com/alexeyco/simpletable"
+	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/structs"
+	"ultipa-go-sdk/sdk/utils"
 )
 
 func PrintNodes(nodes []*structs.Node, schemas map[string]*structs.Schema) {
@@ -11,6 +13,47 @@ func PrintNodes(nodes []*structs.Node, schemas map[string]*structs.Schema) {
 		fmt.Println("No node data found.")
 		return
 	}
+	fmt.Println(getNodeTableString(nodes, schemas))
+}
+
+func PrintNodesWithoutSchema(nodes []*structs.Node) {
+	if len(nodes) == 0 {
+		fmt.Println("No node data found.")
+		return
+	}
+	fmt.Println(getNodeTableStringWithoutSchema(nodes))
+}
+
+func getNodeTableStringWithoutSchema(nodes []*structs.Node) string {
+	var schemaPropertiesMap = make(map[string][]string)
+	for _, node := range nodes {
+		propertyList, ok := schemaPropertiesMap[node.Schema]
+		if !ok {
+			schemaPropertiesMap[node.Schema] = []string{}
+		}
+		for property, _ := range node.Values.Data {
+			if !utils.Contains(propertyList, property) {
+				propertyList = append(propertyList, property)
+				schemaPropertiesMap[node.Schema] = propertyList
+			}
+		}
+	}
+	var schemaMap = make(map[string]*structs.Schema)
+	for schemaName, propertyList := range schemaPropertiesMap {
+		schema := structs.NewSchema(schemaName)
+		schema.DBType = ultipa.DBType_DBNODE
+		for _, propertyName := range propertyList {
+			schema.Properties = append(schema.Properties, &structs.Property{
+				Name:   propertyName,
+				Schema: schemaName,
+			})
+		}
+		schemaMap[schemaName] = schema
+	}
+	return getNodeTableString(nodes, schemaMap)
+}
+
+func getNodeTableString(nodes []*structs.Node, schemas map[string]*structs.Schema) string {
 	var lastSchema string
 	var table *simpletable.Table
 	switchSchema := false
@@ -52,6 +95,7 @@ func PrintNodes(nodes []*structs.Node, schemas map[string]*structs.Schema) {
 	}
 
 	if table != nil {
-		table.Println()
+		return table.String()
 	}
+	return ""
 }

@@ -11,6 +11,10 @@ func PrintPaths(paths []*structs.Path) {
 		fmt.Println("No path data found.")
 		return
 	}
+	fmt.Println(getPathTableString(paths))
+}
+
+func getPathTableString(paths []*structs.Path) string {
 	table := simpletable.New()
 
 	table.Header.Cells = []*simpletable.Cell{
@@ -41,5 +45,5 @@ func PrintPaths(paths []*structs.Path) {
 		table.Body.Cells = append(table.Body.Cells, row)
 	}
 
-	table.Println()
+	return table.String()
 }

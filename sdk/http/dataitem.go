@@ -272,8 +272,8 @@ func parseAttr(oAttr *ultipa.Attr, name string) (*structs.Attr, error) {
 	attr.Name = name
 
 	if oAttr != nil {
-		attr.PropertyType = oAttr.PropertyType
-		switch oAttr.PropertyType {
+		attr.PropertyType = oAttr.ValueType
+		switch oAttr.ValueType {
 		case ultipa.PropertyType_SET:
 			fallthrough
 		case ultipa.PropertyType_LIST:
@@ -313,11 +313,11 @@ func parseAttrList(oAttr *ultipa.Attr) ([]*structs.AttrListData, error) {
 	var listDataRows []*structs.AttrListData
 	for _, v := range oAttr.Values {
 		oListData := &ultipa.AttrListData{}
-		listData := structs.NewAttrListData()
 		err := proto.Unmarshal(v, oListData)
 		if err != nil {
 			return nil, err
 		}
+		listData := structs.NewAttrListData()
 		listData.ResultType = oListData.Type
 		switch oListData.Type {
 		case ultipa.ResultType_RESULT_TYPE_ATTR:

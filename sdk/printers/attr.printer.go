@@ -3,6 +3,7 @@ package printers
 import (
 	"fmt"
 	"github.com/alexeyco/simpletable"
+	"strings"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/structs"
 )
@@ -12,12 +13,6 @@ func PrintAttr(attr *structs.Attr) {
 		fmt.Println("No attr data found.")
 		return
 	}
-	table := attrToTable(attr)
-
-	table.Println()
-}
-
-func attrToTable(attr *structs.Attr) *simpletable.Table {
 	table := simpletable.New()
 
 	table.Header.Cells = []*simpletable.Cell{
@@ -25,36 +20,51 @@ func attrToTable(attr *structs.Attr) *simpletable.Table {
 			Text: attr.Name,
 		},
 	}
-
-	switch attr.PropertyType {
-	case ultipa.PropertyType_SET:
-		fallthrough
-	case ultipa.PropertyType_LIST:
-		//TODO
-		//listDataRows := attr.Rows
-		//for _, row := range listDataRows {
-		//	listDataRow := row.(*structs.AttrListData)
-		//
-		//}
-	case ultipa.PropertyType_MAP:
-		mapDataRows := attr.Rows
-		for _, row := range mapDataRows {
-			mapDataRow := row.(*structs.AttrMapData)
-			table.Body.Cells = append(table.Body.Cells, []*simpletable.Cell{
-				{
-					Text: fmt.Sprintf("%v:%v", mapDataRow.Key.Rows, mapDataRow.Value.Rows),
-				},
-			})
-		}
-	default:
-		for _, row := range attr.Rows {
-
-			table.Body.Cells = append(table.Body.Cells, []*simpletable.Cell{
-				{
-					Text: fmt.Sprint(row),
-				},
-			})
-		}
+	stringList := getAttrStr(attr)
+	for _, str := range stringList {
+		table.Body.Cells = append(table.Body.Cells, []*simpletable.Cell{
+			{
+				Text: str,
+			},
+		})
 	}
-	return table
+	table.Println()
+}
+
+func getAttrStr(attr *structs.Attr) []string {
+	switch attr.PropertyType {
+	case ultipa.PropertyType_NULL_:
+		return []string{}
+	case ultipa.PropertyType_LIST:
+		var result []string
+		for _, row := range attr.Rows {
+			result = append(result, getAttrListCellString(row.(*structs.AttrListData)))
+		}
+		return result
+	default:
+		var result []string
+		for _, row := range attr.Rows {
+			result = append(result, fmt.Sprintf("%v", row))
+		}
+		return result
+	}
+}
+
+func getAttrListCellString(attrListData *structs.AttrListData) string {
+	switch attrListData.ResultType {
+	case ultipa.ResultType_RESULT_TYPE_NODE:
+		return getNodeTableStringWithoutSchema(attrListData.Nodes)
+	case ultipa.ResultType_RESULT_TYPE_PATH:
+		return getPathTableString(attrListData.Paths)
+	case ultipa.ResultType_RESULT_TYPE_EDGE:
+		return getEdgeTableStringWithoutSchema(attrListData.Edges)
+	case ultipa.ResultType_RESULT_TYPE_ATTR:
+		var result []string
+		for _, subAttr := range attrListData.Attrs {
+			subStrList := getAttrStr(subAttr)
+			result = append(result, strings.Join(subStrList, ","))
+		}
+		return strings.Join(result, ",")
+	}
+	return ""
 }

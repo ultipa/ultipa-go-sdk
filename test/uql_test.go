@@ -302,6 +302,29 @@ func TestUQLFindNodesWithAttrList(t *testing.T) {
 	printers.PrintAttr(attrs)
 }
 
+func TestUQLFindNodesAsAttrList(t *testing.T) {
+
+	client, _ := GetClient([]string{"192.168.1.85:61090"}, "miniCircle")
+
+	uql := "find().nodes({_uuid < 10}) return collect(nodes)"
+	resp, err := client.UQL(uql, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	//断言响应码
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		log.Println(resp.Status.Message)
+		t.Log(resp.Status.Message)
+	}
+	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
+	//断言返回数据
+	attr, err := resp.Alias("collect(nodes)").AsAttr()
+	if err != nil {
+		t.Fatal(err)
+	}
+	printers.PrintAttr(attr)
+}
+
 func TestUqlInsertListProperty(t *testing.T) {
 	client, _ := GetClient([]string{"192.168.1.85:61090"}, "gosdk")
 
