@@ -119,6 +119,8 @@ func (attr *Attr) parseAttrOfAttrListDataToInterface() []interface{} {
 		}
 	case ultipa.PropertyType_SET:
 	case ultipa.PropertyType_MAP:
+	case ultipa.PropertyType_NULL_:
+		result = append(result, nil)
 	default:
 		//non-collection type, return List<>
 		result = append(result, attr.Rows...)
