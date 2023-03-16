@@ -57,6 +57,20 @@ func (r *UQLResponseStream) Recv(fetch bool) (response *UQLResponse, err error) 
 		return nil, err
 	}
 
+	if response.Statistic == nil {
+		response.Statistic, err = ParseStatistic(record.Statistics)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if response.ExplainPlan == nil {
+		response.ExplainPlan, err = ParseExplainPlan(record.ExplainPlan)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	response.Reply = record
 	response.Status.Code = record.Status.ErrorCode
 	response.Status.Message = record.Status.Msg
