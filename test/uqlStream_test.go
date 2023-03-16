@@ -30,6 +30,7 @@ func TestUQLStream(t *testing.T) {
 		}
 		i++
 		if resp != nil {
+			printers.PrintStatistics(resp.Statistic)
 			nodes, schema, err := resp.Get(0).AsNodes()
 			if err != nil {
 				log.Fatalln(err)
