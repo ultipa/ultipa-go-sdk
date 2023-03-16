@@ -37,8 +37,6 @@ func TestUQLStream(t *testing.T) {
 		} else {
 			break
 		}
-
-		break
 	}
 	stream.Close()
 }
