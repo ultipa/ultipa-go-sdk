@@ -160,7 +160,9 @@ func (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig)
 		return nil, err
 	}
 	uqlResp, err := http.NewUQLResponseStream(resp)
-
+	if config != nil && config.Host != "" {
+		return uqlResp, err
+	}
 	if uqlResp.NeedRedirect() {
 		err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
 		if err != nil {
