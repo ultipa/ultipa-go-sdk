@@ -12,7 +12,7 @@ func TestUQLStream(t *testing.T) {
 	//client, _ := GetClient([]string{"192.168.1.94:60061"}, "default")
 	client, _ := GetClient([]string{"192.168.1.85:61848"}, "twitter")
 
-	uql := `find().nodes({@nodx}) limit 2000000 return nodes{*} `
+	uql := `find().nodes({@nodx}) limit 1000000 return nodes{*} `
 
 	log.Println("Exec : ", uql)
 
@@ -22,18 +22,23 @@ func TestUQLStream(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
+	i := 0
 	for true {
 		resp, err := stream.Recv(true)
 		if err != nil {
 			log.Fatalln(err)
 		}
+		i++
 		if resp != nil {
 			nodes, schema, err := resp.Get(0).AsNodes()
 			if err != nil {
 				log.Fatalln(err)
 			}
 			printers.PrintNodes(nodes, schema)
+			if i > 3 {
+				stream.Recv(false)
+				break
+			}
 		} else {
 			break
 		}
