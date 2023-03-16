@@ -50,8 +50,10 @@ func (r *UQLResponseStream) Recv(fetch bool) (response *UQLResponse, err error) 
 	record, err := r.Resp.Recv()
 
 	if err == io.EOF {
+		_ = r.Resp.CloseSend()
 		return nil, io.EOF
 	} else if err != nil {
+		_ = r.Resp.CloseSend()
 		return nil, err
 	}
 
