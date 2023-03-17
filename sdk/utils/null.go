@@ -72,6 +72,9 @@ func getMapNullValue() []byte {
 }
 
 func IsNull(propertyType ultipa.PropertyType, bs []byte) bool {
+	if ultipa.PropertyType_NULL_ == propertyType {
+		return true
+	}
 	nullBs := GetNullBytes(propertyType)
 	return BytesEqual(bs, nullBs)
 }
