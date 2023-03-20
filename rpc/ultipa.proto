@@ -160,6 +160,7 @@ message AttrListData {
   EntityTable edges = 3;
   repeated Path paths = 4;
   repeated Attr attrs = 5;
+  bool is_null = 6;
 }
 
 message AttrMapData {
