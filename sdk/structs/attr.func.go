@@ -2,107 +2,133 @@ package structs
 
 import (
 	"errors"
+	"fmt"
 	ultipa "ultipa-go-sdk/rpc"
 )
 
-//AsNodes returns node list if PropertyType of Attr is LIST & result type is Node
-func (attr *Attr) AsNodes() ([]*Node, error) {
-	if ultipa.PropertyType_NULL_ == attr.PropertyType || attr.Rows == nil {
-		return nil, nil
+//ListAttrAsNodes returns node list, if PropertyType of attr is LIST and inner result type is Node
+func (attr *Attr) ListAttrAsNodes() ([]*Node, map[string]*Schema, error) {
+	if ultipa.PropertyType_LIST != attr.PropertyType {
+		return nil, nil, errors.New(fmt.Sprintf("value of this %v is not a LIST type", attr.Name))
+	}
+	var result []*Node
+	if attr.Rows == nil {
+		return result, nil, nil
 	}
 	if len(attr.Rows) == 0 {
-		return []*Node{}, nil
+		result = []*Node{}
+		return result, nil, nil
 	}
 
-	if ultipa.PropertyType_LIST == attr.PropertyType {
-		attrListData := attr.Rows[0].(*AttrListData)
+	toDetectTypeAttrListData := attr.Rows[0].(*AttrListData)
+	if ultipa.ResultType_RESULT_TYPE_NODE != toDetectTypeAttrListData.ResultType {
+		return nil, nil, errors.New(fmt.Sprintf("value of this %v is not a LIST Node type", attr.Name))
+	}
 
-		if ultipa.ResultType_RESULT_TYPE_NODE != attrListData.ResultType {
-			return nil, errors.New("value in list is not *Node type")
-		}
+	for _, row := range attr.Rows {
+		attrListData := row.(*AttrListData)
+		result = append(result, attrListData.Nodes...)
+	}
+	return result, GetSchemasOfNodeList(result), nil
+}
 
-		var result []*Node
-		for _, row := range attr.Rows {
-			attrListData := row.(*AttrListData)
-			result = append(result, attrListData.Nodes...)
-		}
+//ListAttrAsEdges returns edge list, if PropertyType of attr is LIST and inner result type is Edge
+func (attr *Attr) ListAttrAsEdges() ([]*Edge, map[string]*Schema, error) {
+	if ultipa.PropertyType_LIST != attr.PropertyType {
+		return nil, nil, errors.New(fmt.Sprintf("value of this %v is not a LIST type", attr.Name))
+	}
+	var result []*Edge
+	if attr.Rows == nil {
+		return result, nil, nil
+	}
+	if len(attr.Rows) == 0 {
+		result = []*Edge{}
+		return result, nil, nil
+	}
+
+	toDetectTypeAttrListData := attr.Rows[0].(*AttrListData)
+	if ultipa.ResultType_RESULT_TYPE_EDGE != toDetectTypeAttrListData.ResultType {
+		return nil, nil, errors.New(fmt.Sprintf("value of this %v is not a LIST Edge type", attr.Name))
+	}
+
+	for _, row := range attr.Rows {
+		attrListData := row.(*AttrListData)
+		result = append(result, attrListData.Edges...)
+	}
+	return result, GetSchemasOfEdgeList(result), nil
+}
+
+//ListAttrAsPaths returns path list, if PropertyType of attr is LIST and inner result type is Path
+func (attr *Attr) ListAttrAsPaths() ([]*Path, error) {
+	if ultipa.PropertyType_LIST != attr.PropertyType {
+		return nil, errors.New(fmt.Sprintf("value of this %v is not a LIST type", attr.Name))
+	}
+	var result []*Path
+	if attr.Rows == nil {
 		return result, nil
 	}
-	return nil, errors.New("value of this attr is not a []*Node type")
-}
-
-//AsEdges returns edge list if PropertyType of Attr is LIST & result type is Edge
-func (attr *Attr) AsEdges() ([]*Edge, error) {
-	if ultipa.PropertyType_NULL_ == attr.PropertyType || attr.Rows == nil {
-		return nil, nil
-	}
 	if len(attr.Rows) == 0 {
-		return []*Edge{}, nil
-	}
-
-	if ultipa.PropertyType_LIST == attr.PropertyType {
-		attrListData := attr.Rows[0].(*AttrListData)
-
-		if ultipa.ResultType_RESULT_TYPE_EDGE != attrListData.ResultType {
-			return nil, errors.New("value in list is not *Edge type")
-		}
-
-		var result []*Edge
-		for _, row := range attr.Rows {
-			attrListData := row.(*AttrListData)
-			result = append(result, attrListData.Edges...)
-		}
+		result = []*Path{}
 		return result, nil
 	}
-	return nil, errors.New("value of this attr is not a []*Edge type")
+
+	toDetectTypeAttrListData := attr.Rows[0].(*AttrListData)
+
+	if ultipa.ResultType_RESULT_TYPE_PATH != toDetectTypeAttrListData.ResultType {
+		return nil, errors.New(fmt.Sprintf("value of this %v is not a LIST Path type", attr.Name))
+	}
+
+	for _, row := range attr.Rows {
+		attrListData := row.(*AttrListData)
+		result = append(result, attrListData.Paths...)
+	}
+	return result, nil
+
 }
 
-//AsPaths returns path list if PropertyType of Attr is LIST & result type is Path
-func (attr *Attr) AsPaths() ([]*Path, error) {
-	if ultipa.PropertyType_NULL_ == attr.PropertyType || attr.Rows == nil {
-		return nil, nil
+//ListAttrAsAttr returns an attr, if PropertyType of attr is LIST and inner result type is Attr.
+//inner result type is attr, then regarded it as basic type, e.g. string,uint64, float64 etc.
+func (attr *Attr) ListAttrAsAttr() (*Attr, error) {
+	if ultipa.PropertyType_LIST != attr.PropertyType {
+		return nil, errors.New(fmt.Sprintf("value of this %v is not a LIST type", attr.Name))
 	}
-	if len(attr.Rows) == 0 {
-		return []*Path{}, nil
-	}
-
-	if ultipa.PropertyType_LIST == attr.PropertyType {
-		attrListData := attr.Rows[0].(*AttrListData)
-
-		if ultipa.ResultType_RESULT_TYPE_PATH != attrListData.ResultType {
-			return nil, errors.New("value in list is not *Path type")
-		}
-
-		var result []*Path
-		for _, row := range attr.Rows {
-			attrListData := row.(*AttrListData)
-			result = append(result, attrListData.Paths...)
-		}
+	result := NewAttr()
+	result.Name = attr.Name
+	if attr.Rows == nil {
+		result.Rows = nil
 		return result, nil
 	}
-	return nil, errors.New("value of this attr is not a []*Path type")
-}
-
-//AsAttr returns attr list if PropertyType of Attr is LIST & result type is Attr
-func (attr *Attr) AsAttr() ([]interface{}, error) {
-	if ultipa.PropertyType_NULL_ == attr.PropertyType || attr.Rows == nil {
-		return nil, nil
-	}
 	if len(attr.Rows) == 0 {
-		return []interface{}{}, nil
+		return result, nil
 	}
-
-	if ultipa.PropertyType_LIST == attr.PropertyType {
-		attrListData := attr.Rows[0].(*AttrListData)
-
-		if ultipa.ResultType_RESULT_TYPE_ATTR != attrListData.ResultType {
-			return nil, errors.New("value in list is not *Attr type")
+	toDetectTypeAttrListData := attr.Rows[0].(*AttrListData)
+	// if inner result type is attr, then regarded it as basic type, e.g. string,uint64, float64 etc.
+	if ultipa.ResultType_RESULT_TYPE_ATTR == toDetectTypeAttrListData.ResultType {
+		var resultPropertyType ultipa.PropertyType
+		for _, row := range attr.Rows {
+			var resultRow Row
+			attrListData := row.(*AttrListData)
+			if attrListData.Attrs == nil {
+				resultRow = nil
+			} else if len(attrListData.Attrs) == 0 {
+				resultRow = Row{}
+			} else {
+				if resultPropertyType == 0 {
+					result.PropertyType = attrListData.Attrs[0].PropertyType
+				}
+				for _, innerAttr := range attrListData.Attrs {
+					resultRow = append(resultRow, innerAttr.Rows...)
+				}
+			}
+			result.Rows = append(result.Rows, resultRow)
 		}
-		return attr.parseAttrOfAttrListDataToInterface(), nil
+		result.PropertyType = resultPropertyType
+		return result, nil
 	}
-	return nil, errors.New("value of this attr is not a []*Attr type")
+	return nil, errors.New(fmt.Sprintf("value of this %v is not a LIST Attr type", attr.Name))
 }
 
+//@depreacated
 func (attr *Attr) parseAttrOfAttrListDataToInterface() []interface{} {
 	var result []interface{}
 	switch attr.PropertyType {

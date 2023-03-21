@@ -3,9 +3,7 @@ package printers
 import (
 	"fmt"
 	"github.com/alexeyco/simpletable"
-	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/structs"
-	"ultipa-go-sdk/sdk/utils"
 )
 
 func PrintEdges(edges []*structs.Edge, schemas map[string]*structs.Schema) {
@@ -25,30 +23,9 @@ func PrintEdgesWithoutSchema(edges []*structs.Edge) {
 }
 
 func getEdgeTableStringWithoutSchema(edges []*structs.Edge) string {
-	var schemaPropertiesMap = make(map[string][]string)
-	for _, edge := range edges {
-		propertyList, ok := schemaPropertiesMap[edge.Schema]
-		if !ok {
-			schemaPropertiesMap[edge.Schema] = []string{}
-		}
-		for property, _ := range edge.Values.Data {
-			if !utils.Contains(propertyList, property) {
-				propertyList = append(propertyList, property)
-				schemaPropertiesMap[edge.Schema] = propertyList
-			}
-		}
-	}
-	var schemaMap = make(map[string]*structs.Schema)
-	for schemaName, propertyList := range schemaPropertiesMap {
-		schema := structs.NewSchema(schemaName)
-		schema.DBType = ultipa.DBType_DBEDGE
-		for _, propertyName := range propertyList {
-			schema.Properties = append(schema.Properties, &structs.Property{
-				Name:   propertyName,
-				Schema: schemaName,
-			})
-		}
-		schemaMap[schemaName] = schema
+	schemaMap := structs.GetSchemasOfEdgeList(edges)
+	if schemaMap == nil {
+		schemaMap = map[string]*structs.Schema{}
 	}
 	return getEdgeTableString(edges, schemaMap)
 }

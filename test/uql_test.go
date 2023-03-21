@@ -306,7 +306,7 @@ func TestUQLFindNodesWithAttrListNullValue(t *testing.T) {
 
 	client, _ := GetClient([]string{"192.168.1.85:61090"}, "listPropertyGraphTest")
 
-	uql := "find().nodes({@nodeSchemaList && _uuid in [1,2]}) return nodes.stringList"
+	uql := "find().nodes({@nodeSchemaList && _uuid in [3,5]}) return nodes.stringList"
 	resp, err := client.UQL(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
@@ -325,7 +325,6 @@ func TestUQLFindNodesWithAttrListNullValue(t *testing.T) {
 	printers.PrintAttr(attrs)
 }
 
-
 func TestUQLFindNodesAsAttrList(t *testing.T) {
 
 	client, _ := GetClient([]string{"192.168.1.85:61090"}, "miniCircle")
@@ -342,11 +341,11 @@ func TestUQLFindNodesAsAttrList(t *testing.T) {
 	}
 	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
 	//断言返回数据
-	attr, err := resp.Alias("collect(nodes)").AsAttr()
+	nodes, schemas, err := resp.Alias("collect(nodes)").AsNodes()
 	if err != nil {
 		t.Fatal(err)
 	}
-	printers.PrintAttr(attr)
+	printers.PrintNodes(nodes, schemas)
 }
 
 func TestUqlInsertListProperty(t *testing.T) {

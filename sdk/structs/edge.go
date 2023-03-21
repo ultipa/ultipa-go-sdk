@@ -122,3 +122,32 @@ func ConvertStringEdges(schema *Schema, edges []*Edge) {
 		}
 	}
 }
+
+func GetSchemasOfEdgeList(edges []*Edge) map[string]*Schema {
+	var schemaPropertiesMap = make(map[string][]string)
+	for _, edge := range edges {
+		propertyList, ok := schemaPropertiesMap[edge.Schema]
+		if !ok {
+			schemaPropertiesMap[edge.Schema] = []string{}
+		}
+		for property, _ := range edge.Values.Data {
+			if !utils.Contains(propertyList, property) {
+				propertyList = append(propertyList, property)
+				schemaPropertiesMap[edge.Schema] = propertyList
+			}
+		}
+	}
+	var schemaMap = make(map[string]*Schema)
+	for schemaName, propertyList := range schemaPropertiesMap {
+		schema := NewSchema(schemaName)
+		schema.DBType = ultipa.DBType_DBEDGE
+		for _, propertyName := range propertyList {
+			schema.Properties = append(schema.Properties, &Property{
+				Name:   propertyName,
+				Schema: schemaName,
+			})
+		}
+		schemaMap[schemaName] = schema
+	}
+	return schemaMap
+}

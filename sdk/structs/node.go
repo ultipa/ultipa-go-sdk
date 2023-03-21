@@ -113,3 +113,32 @@ func ConvertStringNodes(schema *Schema, nodes []*Node) {
 		}
 	}
 }
+
+func GetSchemasOfNodeList(nodes []*Node) map[string]*Schema {
+	var schemaPropertiesMap = make(map[string][]string)
+	for _, node := range nodes {
+		propertyList, ok := schemaPropertiesMap[node.Schema]
+		if !ok {
+			schemaPropertiesMap[node.Schema] = []string{}
+		}
+		for property, _ := range node.Values.Data {
+			if !utils.Contains(propertyList, property) {
+				propertyList = append(propertyList, property)
+				schemaPropertiesMap[node.Schema] = propertyList
+			}
+		}
+	}
+	var schemaMap = make(map[string]*Schema)
+	for schemaName, propertyList := range schemaPropertiesMap {
+		schema := NewSchema(schemaName)
+		schema.DBType = ultipa.DBType_DBNODE
+		for _, propertyName := range propertyList {
+			schema.Properties = append(schema.Properties, &Property{
+				Name:   propertyName,
+				Schema: schemaName,
+			})
+		}
+		schemaMap[schemaName] = schema
+	}
+	return schemaMap
+}

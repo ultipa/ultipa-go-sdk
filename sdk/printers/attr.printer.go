@@ -32,6 +32,15 @@ func PrintAttr(attr *structs.Attr) {
 }
 
 func getAttrStr(attr *structs.Attr) []string {
+	var result []string
+	for _, row := range attr.Rows {
+		result = append(result, fmt.Sprintf("%v", row))
+	}
+	return result
+}
+
+// getAttrStrWithList @Deprecated
+func getAttrStrWithList(attr *structs.Attr) []string {
 	switch attr.PropertyType {
 	case ultipa.PropertyType_NULL_:
 		return []string{}
@@ -50,6 +59,7 @@ func getAttrStr(attr *structs.Attr) []string {
 	}
 }
 
+// getAttrStrWithList @Deprecated
 func getAttrListCellString(attrListData *structs.AttrListData) string {
 	switch attrListData.ResultType {
 	case ultipa.ResultType_RESULT_TYPE_NODE:

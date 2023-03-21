@@ -32,15 +32,15 @@ func getPathTableString(paths []*structs.Path) string {
 			d1 := "-"
 			d2 := "-"
 
-			if edge.GetFrom() == node.GetID() {
+			if edge.FromUUID == node.UUID {
 				d2 = "->"
 			} else {
 				d1 = "<-"
 			}
 
-			pathString += fmt.Sprintf("(%v) %v [%v] %v ", node.ID, d1, edge.UUID, d2)
+			pathString += fmt.Sprintf("(%v) %v [%v] %v ", node.UUID, d1, edge.UUID, d2)
 		}
-		pathString += fmt.Sprintf("(%v)", path.GetLastNode().GetID())
+		pathString += fmt.Sprintf("(%v)", path.GetLastNode().UUID)
 		row = append(row, &simpletable.Cell{Text: pathString})
 		table.Body.Cells = append(table.Body.Cells, row)
 	}

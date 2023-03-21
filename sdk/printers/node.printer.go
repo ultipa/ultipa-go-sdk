@@ -3,9 +3,7 @@ package printers
 import (
 	"fmt"
 	"github.com/alexeyco/simpletable"
-	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/structs"
-	"ultipa-go-sdk/sdk/utils"
 )
 
 func PrintNodes(nodes []*structs.Node, schemas map[string]*structs.Schema) {
@@ -25,30 +23,10 @@ func PrintNodesWithoutSchema(nodes []*structs.Node) {
 }
 
 func getNodeTableStringWithoutSchema(nodes []*structs.Node) string {
-	var schemaPropertiesMap = make(map[string][]string)
-	for _, node := range nodes {
-		propertyList, ok := schemaPropertiesMap[node.Schema]
-		if !ok {
-			schemaPropertiesMap[node.Schema] = []string{}
-		}
-		for property, _ := range node.Values.Data {
-			if !utils.Contains(propertyList, property) {
-				propertyList = append(propertyList, property)
-				schemaPropertiesMap[node.Schema] = propertyList
-			}
-		}
-	}
-	var schemaMap = make(map[string]*structs.Schema)
-	for schemaName, propertyList := range schemaPropertiesMap {
-		schema := structs.NewSchema(schemaName)
-		schema.DBType = ultipa.DBType_DBNODE
-		for _, propertyName := range propertyList {
-			schema.Properties = append(schema.Properties, &structs.Property{
-				Name:   propertyName,
-				Schema: schemaName,
-			})
-		}
-		schemaMap[schemaName] = schema
+
+	schemaMap := structs.GetSchemasOfNodeList(nodes)
+	if schemaMap == nil {
+		schemaMap = map[string]*structs.Schema{}
 	}
 	return getNodeTableString(nodes, schemaMap)
 }
