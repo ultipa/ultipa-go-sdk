@@ -185,7 +185,7 @@ func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
 
 		return parsePaths(pathAlias.Paths, pathAlias.Alias)
 	} else {
-		//attr LIST EDGE
+		//attr LIST PATH
 		attrAlias, ok := di.Data.(*ultipa.AttrAlias)
 		if !ok {
 			return nil, errors.New(fmt.Sprintf("dataItem %s is not LIST EDGE type", di.Alias))
