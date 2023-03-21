@@ -180,7 +180,7 @@ func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
 	if di.Data == nil {
 		return nil, nil
 	}
-	if di.Type == ultipa.ResultType_RESULT_TYPE_EDGE {
+	if di.Type == ultipa.ResultType_RESULT_TYPE_PATH {
 		pathAlias := di.Data.(*ultipa.PathAlias)
 
 		return parsePaths(pathAlias.Paths, pathAlias.Alias)
