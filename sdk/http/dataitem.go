@@ -155,7 +155,7 @@ func (di *DataItem) AsEdges() (edges []*structs.Edge, schemas map[string]*struct
 		//attr LIST EDGE
 		attrAlias, ok := di.Data.(*ultipa.AttrAlias)
 		if !ok {
-			return nil, nil, errors.New(fmt.Sprintf("dataItem %s is not LIST EDGE type", di.Alias))
+			return nil, nil, errors.New(fmt.Sprintf("dataItem %s is not LIST Edge type", di.Alias))
 		}
 		oAttr := attrAlias.Attr
 
@@ -188,7 +188,7 @@ func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
 		//attr LIST PATH
 		attrAlias, ok := di.Data.(*ultipa.AttrAlias)
 		if !ok {
-			return nil, errors.New(fmt.Sprintf("dataItem %s is not LIST EDGE type", di.Alias))
+			return nil, errors.New(fmt.Sprintf("dataItem %s is not LIST Path type", di.Alias))
 		}
 		oAttr := attrAlias.Attr
 
