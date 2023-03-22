@@ -20,8 +20,8 @@ func (attr *Attr) ListAttrAsNodes() ([]*Node, map[string]*Schema, error) {
 		return result, nil, nil
 	}
 
-	toDetectTypeAttrListData := attr.Rows[0].(*AttrListData)
-	if ultipa.ResultType_RESULT_TYPE_NODE != toDetectTypeAttrListData.ResultType {
+	detectedInnerResultType := attr.detectListAttrInnerResultType()
+	if ultipa.ResultType_RESULT_TYPE_NODE != detectedInnerResultType {
 		return nil, nil, errors.New(fmt.Sprintf("value of this %v is not a LIST Node type", attr.Name))
 	}
 
@@ -46,8 +46,8 @@ func (attr *Attr) ListAttrAsEdges() ([]*Edge, map[string]*Schema, error) {
 		return result, nil, nil
 	}
 
-	toDetectTypeAttrListData := attr.Rows[0].(*AttrListData)
-	if ultipa.ResultType_RESULT_TYPE_EDGE != toDetectTypeAttrListData.ResultType {
+	detectedInnerResultType := attr.detectListAttrInnerResultType()
+	if ultipa.ResultType_RESULT_TYPE_EDGE != detectedInnerResultType {
 		return nil, nil, errors.New(fmt.Sprintf("value of this %v is not a LIST Edge type", attr.Name))
 	}
 
@@ -72,9 +72,9 @@ func (attr *Attr) ListAttrAsPaths() ([]*Path, error) {
 		return result, nil
 	}
 
-	toDetectTypeAttrListData := attr.Rows[0].(*AttrListData)
+	detectedInnerResultType := attr.detectListAttrInnerResultType()
 
-	if ultipa.ResultType_RESULT_TYPE_PATH != toDetectTypeAttrListData.ResultType {
+	if ultipa.ResultType_RESULT_TYPE_PATH != detectedInnerResultType {
 		return nil, errors.New(fmt.Sprintf("value of this %v is not a LIST Path type", attr.Name))
 	}
 
@@ -101,10 +101,10 @@ func (attr *Attr) ListAttrAsAttr() (*Attr, error) {
 	if len(attr.Rows) == 0 {
 		return result, nil
 	}
-	toDetectTypeAttrListData := attr.Rows[0].(*AttrListData)
+
+	detectedInnerResultType := attr.detectListAttrInnerResultType()
 	// if inner result type is attr, then regarded it as basic type, e.g. string,uint64, float64 etc.
-	if ultipa.ResultType_RESULT_TYPE_ATTR == toDetectTypeAttrListData.ResultType {
-		var resultPropertyType ultipa.PropertyType
+	if ultipa.ResultType_RESULT_TYPE_ATTR == detectedInnerResultType {
 		for _, row := range attr.Rows {
 			var resultRow Row
 			attrListData := row.(*AttrListData)
@@ -113,16 +113,15 @@ func (attr *Attr) ListAttrAsAttr() (*Attr, error) {
 			} else if len(attrListData.Attrs) == 0 {
 				resultRow = Row{}
 			} else {
-				if resultPropertyType == 0 {
-					result.PropertyType = attrListData.Attrs[0].PropertyType
-				}
 				for _, innerAttr := range attrListData.Attrs {
 					resultRow = append(resultRow, innerAttr.Rows...)
+					if innerAttr.PropertyType != 0 && result.PropertyType == 0 {
+						result.PropertyType = innerAttr.PropertyType
+					}
 				}
 			}
 			result.Rows = append(result.Rows, resultRow)
 		}
-		result.PropertyType = resultPropertyType
 		return result, nil
 	}
 	return nil, errors.New(fmt.Sprintf("value of this %v is not a LIST Attr type", attr.Name))
@@ -152,4 +151,15 @@ func (attr *Attr) parseAttrOfAttrListDataToInterface() []interface{} {
 		result = append(result, attr.Rows...)
 	}
 	return result
+}
+
+// detectListAttrInnerResultType detects inner result type of Attr with List property type.
+func (attr *Attr) detectListAttrInnerResultType() ultipa.ResultType {
+	for _, row := range attr.Rows {
+		toDetectTypeAttrListData := row.(*AttrListData)
+		if toDetectTypeAttrListData.ResultType != ultipa.ResultType_RESULT_TYPE_UNSET {
+			return toDetectTypeAttrListData.ResultType
+		}
+	}
+	return ultipa.ResultType_RESULT_TYPE_UNSET
 }

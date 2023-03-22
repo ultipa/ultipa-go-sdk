@@ -350,12 +350,16 @@ func parseAttr(oAttr *ultipa.Attr, name string) (*structs.Attr, error) {
 				attr.Rows = append(attr.Rows, row)
 			}
 		default:
-			for _, v := range oAttr.Values {
-				value, err := utils.ConvertBytesToInterface(v, attr.PropertyType, nil)
-				if err != nil {
-					return nil, err
+			if oAttr.Values == nil {
+				attr.Rows = nil
+			} else {
+				for _, v := range oAttr.Values {
+					value, err := utils.ConvertBytesToInterface(v, attr.PropertyType, nil)
+					if err != nil {
+						return nil, err
+					}
+					attr.Rows = append(attr.Rows, value)
 				}
-				attr.Rows = append(attr.Rows, value)
 			}
 		}
 	}
@@ -376,51 +380,43 @@ func parseAttrList(oAttr *ultipa.Attr) ([]*structs.AttrListData, error) {
 		}
 		listData := structs.NewAttrListData()
 		listData.ResultType = oListData.Type
-		switch oListData.Type {
-		case ultipa.ResultType_RESULT_TYPE_ATTR:
-			if oListData.IsNull {
-				listData.Attrs = nil
-				continue
-			}
-			for _, subOAttr := range oListData.Attrs {
-				subAttr, err := parseAttr(subOAttr, "")
+		if !oListData.IsNull {
+			switch oListData.Type {
+			case ultipa.ResultType_RESULT_TYPE_NODE:
+				nodes, _, err := NodeTableToNodes(oListData.Nodes, "")
 				if err != nil {
 					return nil, err
 				}
-				listData.Attrs = append(listData.Attrs, subAttr)
-			}
-		case ultipa.ResultType_RESULT_TYPE_NODE:
-			if oListData.IsNull {
-				listData.Nodes = nil
-				continue
-			}
-			nodes, _, err := NodeTableToNodes(oListData.Nodes, "")
-			if err != nil {
-				return nil, err
-			}
-			listData.Nodes = append(listData.Nodes, nodes...)
+				listData.Nodes = append(listData.Nodes, nodes...)
 
-		case ultipa.ResultType_RESULT_TYPE_EDGE:
-			if oListData.IsNull {
-				listData.Edges = nil
-				continue
-			}
-			edges, _, err := EdgeTableToEdges(oListData.Edges, "")
-			if err != nil {
-				return nil, err
-			}
-			listData.Edges = append(listData.Edges, edges...)
+			case ultipa.ResultType_RESULT_TYPE_EDGE:
+				edges, _, err := EdgeTableToEdges(oListData.Edges, "")
+				if err != nil {
+					return nil, err
+				}
+				listData.Edges = append(listData.Edges, edges...)
 
-		case ultipa.ResultType_RESULT_TYPE_PATH:
-			if oListData.IsNull {
-				listData.Paths = nil
-				continue
+			case ultipa.ResultType_RESULT_TYPE_PATH:
+				paths, err := parsePaths(oListData.Paths, "")
+				if err != nil {
+					return nil, err
+				}
+				listData.Paths = append(listData.Paths, paths...)
+
+			case ultipa.ResultType_RESULT_TYPE_ATTR:
+				//not null but len==0, then set an empty []*structs.Attr
+				if len(oListData.Attrs) == 0 {
+					listData.Attrs = []*structs.Attr{}
+				} else {
+					for _, subOAttr := range oListData.Attrs {
+						subAttr, err := parseAttr(subOAttr, "")
+						if err != nil {
+							return nil, err
+						}
+						listData.Attrs = append(listData.Attrs, subAttr)
+					}
+				}
 			}
-			paths, err := parsePaths(oListData.Paths, "")
-			if err != nil {
-				return nil, err
-			}
-			listData.Paths = append(listData.Paths, paths...)
 		}
 		listDataRows = append(listDataRows, listData)
 	}

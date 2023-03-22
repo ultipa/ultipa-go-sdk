@@ -34,7 +34,11 @@ func PrintAttr(attr *structs.Attr) {
 func getAttrStr(attr *structs.Attr) []string {
 	var result []string
 	for _, row := range attr.Rows {
-		result = append(result, fmt.Sprintf("%v", row))
+		if row == nil {
+			result = append(result, "<nil>")
+		} else {
+			result = append(result, fmt.Sprintf("%v", row))
+		}
 	}
 	return result
 }
