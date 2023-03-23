@@ -23,7 +23,7 @@ func PrintAttr(attr *structs.Attr) {
 					continue
 				}
 				attrNodes := row.(*structs.AttrNodes)
-				printAttrNodes(attrNodes)
+				PrintAttrNodes(attrNodes)
 			}
 			return
 		case ultipa.ResultType_RESULT_TYPE_EDGE:
@@ -32,7 +32,7 @@ func PrintAttr(attr *structs.Attr) {
 					continue
 				}
 				attrEdges := row.(*structs.AttrEdges)
-				printAttrEdges(attrEdges)
+				PrintAttrEdges(attrEdges)
 			}
 			return
 		case ultipa.ResultType_RESULT_TYPE_PATH:
@@ -41,7 +41,7 @@ func PrintAttr(attr *structs.Attr) {
 					continue
 				}
 				attrPaths := row.(*structs.AttrPaths)
-				printAttrPaths(attrPaths)
+				PrintAttrPaths(attrPaths)
 			}
 			return
 		default:
@@ -54,8 +54,8 @@ func PrintAttr(attr *structs.Attr) {
 	}
 }
 
-//printAttrNodes print Attr with values as List<List<Node>>
-func printAttrNodes(attrNodes *structs.AttrNodes) {
+//PrintAttrNodes print Attr with values as List<List<Node>>
+func PrintAttrNodes(attrNodes *structs.AttrNodes) {
 	if attrNodes.NodesList == nil {
 		logger.PrintInfo(fmt.Sprintf("Alias:%s, Type:%s, resultType:%s, nodes is null.\r\n", attrNodes.Name, ultipa.PropertyType_LIST, attrNodes.ResultType))
 		return
@@ -66,8 +66,8 @@ func printAttrNodes(attrNodes *structs.AttrNodes) {
 	}
 }
 
-//printAttrEdges print Attr with values as List<List<Edge>>
-func printAttrEdges(attrEdges *structs.AttrEdges) {
+//PrintAttrEdges print Attr with values as List<List<Edge>>
+func PrintAttrEdges(attrEdges *structs.AttrEdges) {
 	if attrEdges.EdgesList == nil {
 		logger.PrintInfo(fmt.Sprintf("Alias:%s, Type:%s, resultType:%s, edges is null.\r\n", attrEdges.Name, ultipa.PropertyType_LIST, attrEdges.ResultType))
 		return
@@ -78,8 +78,8 @@ func printAttrEdges(attrEdges *structs.AttrEdges) {
 	}
 }
 
-//printAttrPaths print Attr with values as List<List<Path>>
-func printAttrPaths(attrPaths *structs.AttrPaths) {
+//PrintAttrPaths print Attr with values as List<List<Path>>
+func PrintAttrPaths(attrPaths *structs.AttrPaths) {
 	if attrPaths.PathsList == nil {
 		logger.PrintInfo(fmt.Sprintf("Alias:%s, Type:%s, resultType:%s, paths is null.\r\n", attrPaths.Name, ultipa.PropertyType_LIST, attrPaths.ResultType))
 		return
