@@ -5,6 +5,7 @@ import ultipa "ultipa-go-sdk/rpc"
 type Attr struct {
 	Name         string
 	PropertyType ultipa.PropertyType
+	ResultType   ultipa.ResultType
 	Rows         Row
 }
 

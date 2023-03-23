@@ -341,11 +341,40 @@ func TestUQLFindNodesAsAttrList(t *testing.T) {
 	}
 	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
 	//断言返回数据
-	nodes, schemas, err := resp.Alias("collect(nodes)").AsNodes()
+	attr, err := resp.Alias("collect(nodes)").AsAttr()
 	if err != nil {
 		t.Fatal(err)
 	}
-	printers.PrintNodes(nodes, schemas)
+	printers.PrintAttr(attr)
+}
+
+func TestUQLFindPathsWithGroupByAttr(t *testing.T) {
+
+	client, _ := GetClient([]string{"192.168.1.85:61090"}, "miniCircle")
+
+	uql := "n({_uuid in [4,5,6]} as n1).e().n(as n2) as paths group by n1 return n1{*}, collect(paths)"
+	resp, err := client.UQL(uql, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	//断言响应码
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		log.Println(resp.Status.Message)
+		t.Log(resp.Status.Message)
+	}
+	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
+	//断言返回数据
+	node, schemas, err := resp.Alias("n1").AsNodes()
+	if err != nil {
+		t.Fatal(err)
+	}
+	printers.PrintNodes(node, schemas)
+
+	attr, err := resp.Alias("collect(paths)").AsAttr()
+	if err != nil {
+		t.Fatal(err)
+	}
+	printers.PrintAttr(attr)
 }
 
 func TestUqlInsertListProperty(t *testing.T) {

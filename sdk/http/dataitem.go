@@ -115,24 +115,9 @@ func (di *DataItem) AsNodes() (nodes []*structs.Node, schemas map[string]*struct
 	if di.Data == nil {
 		return nil, nil, nil
 	}
-	if di.Type == ultipa.ResultType_RESULT_TYPE_NODE {
-		oNodes := di.Data.(*ultipa.NodeAlias)
-		return NodeTableToNodes(oNodes.NodeTable, oNodes.Alias)
-	} else {
-		//attr  LIST NODE
-		attrAlias, ok := di.Data.(*ultipa.AttrAlias)
-		if !ok {
-			return nil, nil, errors.New(fmt.Sprintf("dataItem %s is not LIST Node type", di.Alias))
-		}
-		oAttr := attrAlias.Attr
+	oNodes := di.Data.(*ultipa.NodeAlias)
 
-		midAttr, err := parseAttr(oAttr, attrAlias.Alias)
-		if err != nil {
-			return nil, nil, err
-		}
-		return midAttr.ListAttrAsNodes()
-	}
-
+	return NodeTableToNodes(oNodes.NodeTable, oNodes.Alias)
 }
 
 func (di *DataItem) AsEdges() (edges []*structs.Edge, schemas map[string]*structs.Schema, err error) {
@@ -148,23 +133,10 @@ func (di *DataItem) AsEdges() (edges []*structs.Edge, schemas map[string]*struct
 	if di.Data == nil {
 		return nil, nil, nil
 	}
-	if di.Type == ultipa.ResultType_RESULT_TYPE_EDGE {
-		oEdges := di.Data.(*ultipa.EdgeAlias)
-		return EdgeTableToEdges(oEdges.EdgeTable, oEdges.Alias)
-	} else {
-		//attr LIST EDGE
-		attrAlias, ok := di.Data.(*ultipa.AttrAlias)
-		if !ok {
-			return nil, nil, errors.New(fmt.Sprintf("dataItem %s is not LIST Edge type", di.Alias))
-		}
-		oAttr := attrAlias.Attr
 
-		midAttr, err := parseAttr(oAttr, attrAlias.Alias)
-		if err != nil {
-			return nil, nil, err
-		}
-		return midAttr.ListAttrAsEdges()
-	}
+	oEdges := di.Data.(*ultipa.EdgeAlias)
+
+	return EdgeTableToEdges(oEdges.EdgeTable, oEdges.Alias)
 }
 
 func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
@@ -180,24 +152,9 @@ func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
 	if di.Data == nil {
 		return nil, nil
 	}
-	if di.Type == ultipa.ResultType_RESULT_TYPE_PATH {
-		pathAlias := di.Data.(*ultipa.PathAlias)
+	pathAlias := di.Data.(*ultipa.PathAlias)
 
-		return parsePaths(pathAlias.Paths, pathAlias.Alias)
-	} else {
-		//attr LIST PATH
-		attrAlias, ok := di.Data.(*ultipa.AttrAlias)
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("dataItem %s is not LIST Path type", di.Alias))
-		}
-		oAttr := attrAlias.Attr
-
-		midAttr, err := parseAttr(oAttr, attrAlias.Alias)
-		if err != nil {
-			return nil, err
-		}
-		return midAttr.ListAttrAsPaths()
-	}
+	return parsePaths(pathAlias.Paths, pathAlias.Alias)
 }
 
 func parsePaths(oPaths []*ultipa.Path, name string) (paths []*structs.Path, err error) {
@@ -324,103 +281,194 @@ func (di *DataItem) AsAttr() (*structs.Attr, error) {
 	return nil, err
 }
 
+//AsAttrEdges parse DataItem as Attr with Rows that is List<List<Node>>
+func (di *DataItem) AsAttrNodes() (*structs.AttrNodes, error) {
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
+		return nil, errors.New("DataItem " + di.Alias + " is not Type Attr")
+	}
+
+	attrAlias := di.Data.(*ultipa.AttrAlias)
+	oAttr := attrAlias.Attr
+
+	midAttr, err := parseAttr(oAttr, attrAlias.Alias)
+	if err != nil {
+		return nil, err
+	}
+	return midAttr.ListAttrAsAttrNodes()
+}
+
+//AsAttrEdges parse DataItem as Attr with Rows that is List<List<Edge>>
+func (di *DataItem) AsAttrEdges() (*structs.AttrEdges, error) {
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
+		return nil, errors.New("DataItem " + di.Alias + " is not Type Attr")
+	}
+
+	attrAlias := di.Data.(*ultipa.AttrAlias)
+	oAttr := attrAlias.Attr
+
+	midAttr, err := parseAttr(oAttr, attrAlias.Alias)
+	if err != nil {
+		return nil, err
+	}
+	return midAttr.ListAttrAsAttrEdges()
+}
+
+//AsAttrPaths parse DataItem as Attr with Rows that is List<List<Path>>
+func (di *DataItem) AsAttrPaths() (*structs.AttrPaths, error) {
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
+		return nil, errors.New("DataItem " + di.Alias + " is not Type Attr")
+	}
+
+	attrAlias := di.Data.(*ultipa.AttrAlias)
+	oAttr := attrAlias.Attr
+
+	midAttr, err := parseAttr(oAttr, attrAlias.Alias)
+	if err != nil {
+		return nil, err
+	}
+	return midAttr.ListAttrAsAttrPaths()
+}
+
 func parseAttr(oAttr *ultipa.Attr, name string) (*structs.Attr, error) {
 	attr := structs.NewAttr()
 	attr.Name = name
+	attr.PropertyType = oAttr.ValueType
+	if oAttr == nil || oAttr.Values == nil {
+		return attr, nil
+	}
 
-	if oAttr != nil {
-		attr.PropertyType = oAttr.ValueType
-		switch oAttr.ValueType {
-		case ultipa.PropertyType_SET:
-			fallthrough
-		case ultipa.PropertyType_LIST:
-			listDataRows, err := parseAttrList(oAttr)
-			if err != nil {
-				return nil, err
-			}
-			for _, row := range listDataRows {
-				attr.Rows = append(attr.Rows, row)
-			}
-		case ultipa.PropertyType_MAP:
-			mapDataRows, err := parseAttrMap(oAttr)
-			if err != nil {
-				return nil, err
-			}
-			for _, row := range mapDataRows {
-				attr.Rows = append(attr.Rows, row)
-			}
-		default:
-			if oAttr.Values == nil {
-				attr.Rows = nil
-			} else {
-				for _, v := range oAttr.Values {
-					value, err := utils.ConvertBytesToInterface(v, attr.PropertyType, nil)
-					if err != nil {
-						return nil, err
-					}
-					attr.Rows = append(attr.Rows, value)
-				}
-			}
-		}
+	err := handleAttrValues(oAttr, attr)
+	if err != nil {
+		return attr, err
 	}
 	return attr, nil
 }
 
-// parseAttrList parse the Attr that PropertyType is ultipa.PropertyType_LIST
-func parseAttrList(oAttr *ultipa.Attr) ([]*structs.AttrListData, error) {
-	if oAttr.Values == nil {
-		return []*structs.AttrListData{}, nil
+func handleAttrValues(oAttr *ultipa.Attr, attr *structs.Attr) error {
+	switch oAttr.ValueType {
+	case ultipa.PropertyType_SET:
+		fallthrough
+	case ultipa.PropertyType_LIST:
+		err := parseAttrList(oAttr, attr)
+		if err != nil {
+			return err
+		}
+	case ultipa.PropertyType_MAP:
+		mapDataRows, err := parseAttrMap(oAttr)
+		if err != nil {
+			return err
+		}
+		for _, row := range mapDataRows {
+			attr.Rows = append(attr.Rows, row)
+		}
+	default:
+		attr.ResultType = ultipa.ResultType_RESULT_TYPE_ATTR
+		if oAttr.Values == nil {
+			attr.Rows = nil
+		} else {
+			for _, v := range oAttr.Values {
+				value, err := utils.ConvertBytesToInterface(v, attr.PropertyType, nil)
+				if err != nil {
+					return err
+				}
+				attr.Rows = append(attr.Rows, value)
+			}
+		}
 	}
-	var listDataRows []*structs.AttrListData
+	return nil
+}
+
+// parseAttrList parse the oAttr that PropertyType is ultipa.PropertyType_LIST, set the parsed value to attr.
+func parseAttrList(oAttr *ultipa.Attr, attr *structs.Attr) error {
+	var resultType ultipa.ResultType
 	for _, v := range oAttr.Values {
 		oListData := &ultipa.AttrListData{}
 		err := proto.Unmarshal(v, oListData)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		listData := structs.NewAttrListData()
-		listData.ResultType = oListData.Type
-		if !oListData.IsNull {
-			switch oListData.Type {
-			case ultipa.ResultType_RESULT_TYPE_NODE:
-				nodes, _, err := NodeTableToNodes(oListData.Nodes, "")
-				if err != nil {
-					return nil, err
-				}
-				listData.Nodes = append(listData.Nodes, nodes...)
-
-			case ultipa.ResultType_RESULT_TYPE_EDGE:
-				edges, _, err := EdgeTableToEdges(oListData.Edges, "")
-				if err != nil {
-					return nil, err
-				}
-				listData.Edges = append(listData.Edges, edges...)
-
-			case ultipa.ResultType_RESULT_TYPE_PATH:
-				paths, err := parsePaths(oListData.Paths, "")
-				if err != nil {
-					return nil, err
-				}
-				listData.Paths = append(listData.Paths, paths...)
-
-			case ultipa.ResultType_RESULT_TYPE_ATTR:
-				//not null but len==0, then set an empty []*structs.Attr
-				if len(oListData.Attrs) == 0 {
-					listData.Attrs = []*structs.Attr{}
-				} else {
-					for _, subOAttr := range oListData.Attrs {
-						subAttr, err := parseAttr(subOAttr, "")
-						if err != nil {
-							return nil, err
-						}
-						listData.Attrs = append(listData.Attrs, subAttr)
+		if oListData.IsNull {
+			attr.Rows = append(attr.Rows, nil)
+			continue
+		}
+		switch oListData.Type {
+		case ultipa.ResultType_RESULT_TYPE_NODE:
+			nodes, _, err := NodeTableToNodes(oListData.Nodes, "")
+			if err != nil {
+				return err
+			}
+			listData := structs.NewAttrListData()
+			listData.ResultType = oListData.Type
+			listData.Nodes = append(listData.Nodes, nodes...)
+			attr.Rows = append(attr.Rows, listData)
+			if ultipa.ResultType_RESULT_TYPE_UNSET == resultType {
+				resultType = listData.ResultType
+			}
+		case ultipa.ResultType_RESULT_TYPE_EDGE:
+			edges, _, err := EdgeTableToEdges(oListData.Edges, "")
+			if err != nil {
+				return err
+			}
+			listData := structs.NewAttrListData()
+			listData.ResultType = oListData.Type
+			listData.Edges = append(listData.Edges, edges...)
+			attr.Rows = append(attr.Rows, listData)
+			if ultipa.ResultType_RESULT_TYPE_UNSET == resultType {
+				resultType = listData.ResultType
+			}
+		case ultipa.ResultType_RESULT_TYPE_PATH:
+			paths, err := parsePaths(oListData.Paths, "")
+			if err != nil {
+				return err
+			}
+			listData := structs.NewAttrListData()
+			listData.ResultType = oListData.Type
+			listData.Paths = append(listData.Paths, paths...)
+			attr.Rows = append(attr.Rows, listData)
+			if ultipa.ResultType_RESULT_TYPE_UNSET == resultType {
+				resultType = listData.ResultType
+			}
+		case ultipa.ResultType_RESULT_TYPE_ATTR:
+			if ultipa.ResultType_RESULT_TYPE_UNSET == resultType {
+				resultType = ultipa.ResultType_RESULT_TYPE_ATTR
+			}
+			//not null but len==0, then set an empty slice
+			row := structs.Row{}
+			if len(oListData.Attrs) == 0 {
+				attr.Rows = append(attr.Rows, row)
+			} else {
+				for _, subOAttr := range oListData.Attrs {
+					subAttr, err := parseAttr(subOAttr, "")
+					if err != nil {
+						return err
+					}
+					if subAttr == nil {
+						row = append(row, nil)
+					} else {
+						row = append(row, subAttr.Rows...)
 					}
 				}
 			}
+			attr.Rows = append(attr.Rows, row)
 		}
-		listDataRows = append(listDataRows, listData)
 	}
-	return listDataRows, nil
+	if ultipa.ResultType_RESULT_TYPE_UNSET == resultType {
+		resultType = ultipa.ResultType_RESULT_TYPE_ATTR
+	}
+	attr.ResultType = resultType
+	return nil
 }
 
 // parseAttrMap parse the Attr that PropertyType is ultipa.PropertyType_MAP
