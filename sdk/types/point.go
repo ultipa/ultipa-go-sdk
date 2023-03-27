@@ -49,5 +49,5 @@ func PointFromStr(pointStr string) (*Point, error) {
 }
 
 func (p *Point) String() string {
-	return fmt.Sprintf(`point(%f %f)`, p.Latitude, p.Longitude)
+	return fmt.Sprintf(`POINT(%f %f)`, p.Latitude, p.Longitude)
 }
