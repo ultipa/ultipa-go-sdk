@@ -10,23 +10,23 @@ import (
 )
 
 type UQLResponseStream struct {
-	DataItemMap map[string]struct{
+	DataItemMap map[string]struct {
 		DataItem *DataItem
-		Index int
+		Index    int
 	}
-	Reply *ultipa.UqlReply
-	Status *Status
+	Reply     *ultipa.UqlReply
+	Status    *Status
 	Statistic *Statistic
 	AliasList []string
-	Resp ultipa.UltipaRpcs_UqlClient
+	Resp      ultipa.UltipaRpcs_UqlClient
 }
 
 func NewUQLResponseStream(resp ultipa.UltipaRpcs_UqlClient) (response *UQLResponseStream, err error) {
 
 	response = &UQLResponseStream{
-		Resp: resp,
+		Resp:   resp,
 		Status: &Status{},
-		DataItemMap : map[string]struct {
+		DataItemMap: map[string]struct {
 			DataItem *DataItem
 			Index    int
 		}{},
@@ -35,11 +35,13 @@ func NewUQLResponseStream(resp ultipa.UltipaRpcs_UqlClient) (response *UQLRespon
 	return response, nil
 }
 
-func (r *UQLResponseStream) Recv(index int) ( response *UQLResponse, err error) {
-
+func (r *UQLResponseStream) Recv(fetch bool) (response *UQLResponse, err error) {
+	if !fetch {
+		return nil, r.Resp.CloseSend()
+	}
 	response = &UQLResponse{
 		Status: &Status{},
-		DataItemMap : map[string]struct {
+		DataItemMap: map[string]struct {
 			DataItem *DataItem
 			Index    int
 		}{},
@@ -48,9 +50,25 @@ func (r *UQLResponseStream) Recv(index int) ( response *UQLResponse, err error) 
 	record, err := r.Resp.Recv()
 
 	if err == io.EOF {
+		_ = r.Resp.CloseSend()
 		return nil, io.EOF
 	} else if err != nil {
-		return nil ,err
+		_ = r.Resp.CloseSend()
+		return nil, err
+	}
+
+	if response.Statistic == nil {
+		response.Statistic, err = ParseStatistic(record.Statistics)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if response.ExplainPlan == nil {
+		response.ExplainPlan, err = ParseExplainPlan(record.ExplainPlan)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	response.Reply = record
@@ -61,5 +79,20 @@ func (r *UQLResponseStream) Recv(index int) ( response *UQLResponse, err error) 
 		return response, nil
 	}
 
-	return response,nil
+	var aliasList []string
+
+	for _, alias := range response.Reply.Alias {
+		aliasList = append(aliasList, alias.GetAlias())
+	}
+	response.AliasList = aliasList
+
+	return response, nil
+}
+
+func (r *UQLResponseStream) NeedRedirect() bool {
+	return r.Status.Code == ultipa.ErrorCode_RAFT_REDIRECT
+}
+
+func (r *UQLResponseStream) Close() error {
+	return r.Resp.CloseSend()
 }

@@ -124,6 +124,8 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 		switch v := value.(type) {
 		case UltipaTime:
 			return ConvertInterfaceToBytes(v.Datetime)
+		case *UltipaTime:
+			return ConvertInterfaceToBytes(v.Datetime)
 		case string:
 			uTime, err := NewTimeFromString(v)
 			if err != nil {
@@ -136,6 +138,8 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 	case ultipa.PropertyType_TIMESTAMP:
 		switch v := value.(type) {
 		case UltipaTime:
+			return ConvertInterfaceToBytes(v.GetTimeStamp())
+		case *UltipaTime:
 			return ConvertInterfaceToBytes(v.GetTimeStamp())
 		case string:
 			uTime, err := NewTimeFromString(v)
@@ -377,6 +381,7 @@ func GetDefaultNilInterface(t ultipa.PropertyType) interface{} {
 	default:
 		return default_nil_string
 	}
+
 }
 
 func StringAsInterface(str string, t ultipa.PropertyType) (interface{}, error) {

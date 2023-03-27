@@ -130,6 +130,52 @@ func (api *UltipaAPI) GetControlClientAndConfig(config *configuration.RequestCon
 // Check DataItem to learn more about UQL Response
 func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
 
+	resp, conf, err := api.doExecuteUql(uql, config)
+	if err != nil {
+		return nil, err
+	}
+
+	uqlResp, err := http.NewUQLResponse(resp)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if config != nil && config.Host != "" {
+		return uqlResp, err
+	}
+
+	if uqlResp.NeedRedirect() {
+		err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
+		if err != nil {
+			return nil, err
+		}
+		return api.UQL(uql, config)
+	}
+
+	return uqlResp, nil
+}
+
+func (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig) (*http.UQLResponseStream, error) {
+	resp, conf, err := api.doExecuteUql(uql, config)
+	if err != nil {
+		return nil, err
+	}
+	uqlResp, err := http.NewUQLResponseStream(resp)
+	if config != nil && config.Host != "" {
+		return uqlResp, err
+	}
+	if uqlResp.NeedRedirect() {
+		err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
+		if err != nil {
+			return nil, err
+		}
+		return api.UQLStream(uql, config)
+	}
+	return uqlResp, nil
+}
+
+func (api *UltipaAPI) doExecuteUql(uql string, config *configuration.RequestConfig) (ultipa.UltipaRpcs_UqlClient, *configuration.UltipaConfig, error) {
 	var err error
 
 	if config == nil {
@@ -149,16 +195,15 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, conf, err
 	}
 	//CurrentGraph of conf may be changed by uql
 	config.GraphName = conf.CurrentGraph
 	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
-		return nil, err
+		defer cancel()
+		return nil, conf, err
 	}
-	defer cancel()
-
 	uqlRequest := api.buildUqlRequest(uql, config, conf)
 	var resp ultipa.UltipaRpcs_UqlClient
 	if isExtra {
@@ -172,7 +217,7 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 		err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
 
 		if err != nil {
-			return nil, err
+			return nil, conf, err
 		}
 
 		if isExtra {
@@ -182,29 +227,10 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 		}
 
 		if err != nil {
-			return nil, err
+			return nil, conf, err
 		}
 	}
-
-	uqlResp, err := http.NewUQLResponse(resp)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if config.Host != "" {
-		return uqlResp, err
-	}
-
-	if uqlResp.NeedRedirect() {
-		err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
-		if err != nil {
-			return nil, err
-		}
-		return api.UQL(uql, config)
-	}
-
-	return uqlResp, nil
+	return resp, conf, nil
 }
 
 // buildUqlRequest build uqlRequest according to requestConfig and configuration
@@ -226,11 +252,6 @@ func (api *UltipaAPI) buildUqlRequest(uql string, config *configuration.RequestC
 		uqlRequest.Tz = config.Timezone
 	}
 	return uqlRequest
-}
-
-func (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
-	panic("not implemented")
-	return nil, nil
 }
 
 // test connections
