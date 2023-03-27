@@ -421,3 +421,11 @@ func TestUqlFindPointProperty(t *testing.T) {
 	}
 	printers.PrintAttr(attr)
 }
+
+func TestOnePathAsPaths(t *testing.T) {
+	client, _ := GetClient([]string{"192.168.1.87:61090", "192.168.1.85:61090", "192.168.1.88:61090"}, "miniCircle")
+	var uql = "ab().src(51).dest(103).depth(1) as paths return paths{}"
+	resp, _ := client.UQL(uql, nil)
+	paths, _ := resp.Alias("paths").AsPaths()
+	printers.PrintPaths(paths)
+}

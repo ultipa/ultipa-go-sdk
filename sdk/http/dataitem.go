@@ -29,6 +29,7 @@ func NodeTableToNodes(nt *ultipa.EntityTable, alias string) ([]*structs.Node, ma
 
 	for _, oSchema := range nt.Schemas {
 		schema := structs.NewSchema(oSchema.SchemaName)
+		schema.DBType = ultipa.DBType_DBNODE
 		schemas[schema.Name] = schema
 		for _, header := range oSchema.Properties {
 			schema.Properties = append(schema.Properties, &structs.Property{Name: header.PropertyName, Type: header.PropertyType, SubTypes: header.SubTypes})
@@ -68,6 +69,7 @@ func EdgeTableToEdges(et *ultipa.EntityTable, alias string) ([]*structs.Edge, ma
 
 	for _, oSchema := range et.Schemas {
 		schema := structs.NewSchema(oSchema.SchemaName)
+		schema.DBType = ultipa.DBType_DBEDGE
 		schemas[schema.Name] = schema
 		for _, header := range oSchema.Properties {
 			schema.Properties = append(schema.Properties, &structs.Property{Name: header.PropertyName, Type: header.PropertyType, SubTypes: header.SubTypes})
