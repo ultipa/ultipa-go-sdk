@@ -52,8 +52,10 @@ func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType, subTypes []ultipa
 		return AsString(bs), nil
 	case ultipa.PropertyType_BLOB:
 		return bs, nil
-	//case ultipa.PropertyType_POINT:
-	//	//TODO
+	case ultipa.PropertyType_POINT:
+		str := AsString(bs)
+		return types.PointFromStr(str)
+		//TODO
 	//case ultipa.PropertyType_DECIMAL:
 	//TODO
 	case ultipa.PropertyType_LIST:
@@ -101,8 +103,6 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 		case ultipa.PropertyType_MAP:
 			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
-		case ultipa.PropertyType_POINT:
-			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 		case ultipa.PropertyType_DECIMAL:
 			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 		default:
@@ -113,7 +113,23 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 	case ultipa.PropertyType_LIST:
 		return SerializeListData(value, subTypes)
 	case ultipa.PropertyType_POINT:
-		return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+		switch v := value.(type) {
+		case types.Point:
+			return []byte(v.String()), nil
+
+		case *types.Point:
+			return []byte(v.String()), nil
+
+		case string:
+			point, err := types.PointFromStr(v)
+			if err != nil {
+				return nil, err
+			}
+			return []byte(point.String()), nil
+		default:
+			return ConvertInterfaceToBytes(value)
+		}
+
 	case ultipa.PropertyType_DECIMAL:
 		return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 	case ultipa.PropertyType_SET:

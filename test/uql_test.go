@@ -403,3 +403,21 @@ func TestUQLWithLimit(t *testing.T) {
 	//nodes1 = append(nodes1, nodes[0])
 	//fmt.Println(nodes1)
 }
+
+func TestUqlFindPointProperty(t *testing.T) {
+	client, _ := GetClient([]string{"192.168.1.85:61090"}, "listPropertyGraphTest")
+
+	uql := `find().nodes([11,12]) as nodes return nodes.typePoint`
+	resp, err := client.UQL(uql, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		t.Fatal(resp.Status.Message)
+	}
+	attr, err := resp.Alias("nodes.typePoint").AsAttr()
+	if err != nil {
+		t.Fatal(err)
+	}
+	printers.PrintAttr(attr)
+}
