@@ -46,8 +46,9 @@ func ConvertProtoSchemaToSdkSchema(pSchema *ultipa.Schema, DBType ultipa.DBType)
 	s.DBType = DBType
 	for _, prop := range pSchema.Properties {
 		s.Properties = append(s.Properties, &Property{
-			Name: prop.PropertyName,
-			Type: prop.PropertyType,
+			Name:     prop.PropertyName,
+			Type:     prop.PropertyType,
+			SubTypes: prop.SubTypes,
 		})
 	}
 
