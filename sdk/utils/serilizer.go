@@ -404,8 +404,10 @@ func StringAsInterface(str string, t ultipa.PropertyType) (interface{}, error) {
 
 	str = strings.Trim(str, " ")
 
-	if str == "" {
-		str = GetDefaultNilString(t)
+	if str == "" && t != ultipa.PropertyType_STRING && t != ultipa.PropertyType_TEXT {
+		//str = GetDefaultNilString(t)
+		// SDK 4.3 support nil value, won't set default value again
+		return nil, nil
 	}
 
 	switch t {
