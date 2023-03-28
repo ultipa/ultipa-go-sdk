@@ -50,6 +50,7 @@ var PropertyMap = map[string]ultipa.PropertyType{
 	"list":       ultipa.PropertyType_LIST,
 	"set":        ultipa.PropertyType_SET,
 	"map":        ultipa.PropertyType_MAP,
+	"NULL_":      ultipa.PropertyType_NULL_,
 }
 
 var PropertyReverseMap = map[ultipa.PropertyType]string{
@@ -76,6 +77,7 @@ var PropertyReverseMap = map[ultipa.PropertyType]string{
 	ultipa.PropertyType_LIST:      "list",
 	ultipa.PropertyType_SET:       "set",
 	ultipa.PropertyType_MAP:       "map",
+	ultipa.PropertyType_NULL_:     "NULL_",
 }
 
 func (p *Property) IsIDType() bool {
