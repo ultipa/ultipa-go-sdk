@@ -3,6 +3,7 @@ package printers
 import (
 	"fmt"
 	"github.com/alexeyco/simpletable"
+	"reflect"
 	"strings"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/structs"
@@ -115,10 +116,37 @@ func getAttrStr(attr *structs.Attr) []string {
 		if row == nil {
 			result = append(result, "<nil>")
 		} else {
-			result = append(result, fmt.Sprintf("%v", row))
+			result = append(result, formatRow(row))
 		}
 	}
 	return result
+}
+
+func formatRow(row interface{}) string {
+	if row == nil {
+		return "<nil>"
+	} else {
+		value := reflect.ValueOf(row)
+		switch value.Type().Kind() {
+		case reflect.Array, reflect.Slice:
+			if value.Len() == 0 {
+				return fmt.Sprintf("%v", row)
+			} else if value.Len() == 1 && value.Index(0).Interface() == nil {
+				// A list has and only has a nil element, will return [null]
+				return "[<nil>]"
+			} else {
+				var subStrs []string
+				for index := 0; index < value.Len(); index++ {
+					subStr := formatRow(value.Index(index).Interface())
+					subStrs = append(subStrs, subStr)
+				}
+				return "[" + strings.Join(subStrs, ", ") + "]"
+			}
+
+		default:
+			return fmt.Sprintf("%v", row)
+		}
+	}
 }
 
 // getAttrStrWithList @Deprecated

@@ -304,9 +304,9 @@ func TestUQLFindNodesWithAttrList(t *testing.T) {
 
 func TestUQLFindNodesWithAttrListNullValue(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.85:61090"}, "gosdk")
+	client, _ := GetClient([]string{"192.168.1.85:61090"}, "listPropertyGraphTest")
 
-	uql := "find().nodes({@listProperty}) as n return collect(n.typeListString)"
+	uql := "find().nodes({@nodeSchemaList}) as n return collect(n.stringList)"
 	resp, err := client.UQL(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
@@ -318,7 +318,7 @@ func TestUQLFindNodesWithAttrListNullValue(t *testing.T) {
 	}
 	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
 	//断言返回数据
-	attrs, err := resp.Alias("collect(n.typeListString)").AsAttr()
+	attrs, err := resp.Alias("collect(n.stringList)").AsAttr()
 	if err != nil {
 		t.Fatal(err)
 	}
