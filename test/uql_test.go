@@ -429,3 +429,10 @@ func TestOnePathAsPaths(t *testing.T) {
 	paths, _ := resp.Alias("paths").AsPaths()
 	printers.PrintPaths(paths)
 }
+func TestDateTime(t *testing.T) {
+	client, _ := GetClient([]string{"192.168.1.87:61090", "192.168.1.85:61090", "192.168.1.88:61090"}, "testCLI")
+	var uql = "find().nodes({@`nodeSchema3`}) as nodes return table(nodes.typeListDatetime[0])"
+	resp, _ := client.UQL(uql, nil)
+	table, _ := resp.Alias("table(nodes.typeListDatetime[0])").AsTable()
+	printers.PrintTable(table)
+}
