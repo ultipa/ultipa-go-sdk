@@ -448,22 +448,20 @@ func parseAttrList(oAttr *ultipa.Attr, attr *structs.Attr) error {
 			}
 			//not null but len==0, then set an empty slice
 			row := structs.Row{}
-			if len(oListData.Attrs) == 0 {
-				attr.Rows = append(attr.Rows, row)
-			} else {
-				for _, subOAttr := range oListData.Attrs {
-					subAttr, err := parseAttr(subOAttr, "")
-					if err != nil {
-						return err
-					}
-					if subAttr == nil {
-						row = append(row, nil)
-					} else {
-						row = append(row, subAttr.Rows...)
-					}
+
+			for _, subOAttr := range oListData.Attrs {
+				subAttr, err := parseAttr(subOAttr, "")
+				if err != nil {
+					return err
+				}
+				if subAttr == nil {
+					row = append(row, nil)
+				} else {
+					row = append(row, subAttr.Rows...)
 				}
 			}
 			attr.Rows = append(attr.Rows, row)
+
 		}
 	}
 	if ultipa.ResultType_RESULT_TYPE_UNSET == resultType {
