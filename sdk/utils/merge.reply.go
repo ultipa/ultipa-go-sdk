@@ -44,7 +44,7 @@ func FindAliasDataInReply(reply *ultipa.UqlReply, alias string) (data interface{
 		case ultipa.ResultType_RESULT_TYPE_UNSET:
 			t = Alias.ResultType
 		default:
-			panic(fmt.Sprintf("FindAliasDataInReply Not Supported Type %v", Alias.ResultType))
+			panic(fmt.Sprintf("FindAliasDataInReply Not Supported Type %v, it usually caused by unsupported server version.", Alias.ResultType))
 		}
 
 		if data != nil {
