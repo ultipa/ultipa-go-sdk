@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	ultipa "ultipa-go-sdk/rpc"
 )
 
@@ -43,7 +44,7 @@ func FindAliasDataInReply(reply *ultipa.UqlReply, alias string) (data interface{
 		case ultipa.ResultType_RESULT_TYPE_UNSET:
 			t = Alias.ResultType
 		default:
-			panic("FindAliasDataInReply Not Supported Type")
+			panic(fmt.Sprintf("FindAliasDataInReply Not Supported Type %v, it usually caused by unsupported server version.", Alias.ResultType))
 		}
 
 		if data != nil {
