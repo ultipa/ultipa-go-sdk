@@ -7,11 +7,13 @@ import "regexp"
 func CheckGraphName(name string) bool {
 	return CheckCustomerName(name)
 }
+
 // CheckPropertyName check property name
 // deprecated since 4.2.28
 func CheckPropertyName(name string) bool {
 	return CheckCustomerName(name)
 }
+
 // CheckSchemaName check schema name
 // deprecated since 4.2.28
 func CheckSchemaName(name string) bool {
@@ -26,8 +28,13 @@ func CheckCustomerName(name string) bool {
 }
 
 //CheckCustomerNonIdName check that non-id type property name should match REGEXP: ^([a-zA-Z][a-zA-Z0-9_]+)$
-// deprecated since 4.2.28
 func CheckCustomerNonIdName(name string) bool {
 	matcher := regexp.MustCompile(`^([a-zA-Z][a-zA-Z0-9_]+)$`)
+	return matcher.Match([]byte(name))
+}
+
+//CheckIsEscapedName check that  whether name is surrounded by `` or not
+func CheckIsEscapedName(name string) bool {
+	matcher := regexp.MustCompile("^`.+`$")
 	return matcher.Match([]byte(name))
 }

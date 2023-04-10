@@ -3,19 +3,26 @@ package api
 import (
 	"errors"
 	"fmt"
+	"strings"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/http"
 	"ultipa-go-sdk/sdk/structs"
+	"ultipa-go-sdk/sdk/utils"
 )
 
 func (api *UltipaAPI) CreateProperty(schemaName string, dbType ultipa.DBType, prop *structs.Property, conf *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
-	api.Logger.Log("Creating Property : @" + schemaName + "." + prop.Name)
+	escapeSchemaName := schemaName
+	if !utils.CheckCustomerNonIdName(schemaName) && !strings.HasPrefix(schemaName, "`") && !strings.HasSuffix(schemaName, "`") {
+		escapeSchemaName = fmt.Sprintf("`%v`", schemaName)
+	}
+
+	api.Logger.Log("Creating Property : @" + escapeSchemaName + "." + prop.Name)
 	switch dbType {
 	case ultipa.DBType_DBNODE:
-		resp, err = api.CreateNodeProperty(schemaName, prop, conf)
+		resp, err = api.CreateNodeProperty(escapeSchemaName, prop, conf)
 	case ultipa.DBType_DBEDGE:
-		resp, err = api.CreateEdgeProperty(schemaName, prop, conf)
+		resp, err = api.CreateEdgeProperty(escapeSchemaName, prop, conf)
 	default:
 		return nil, errors.New("create property: unknown db type")
 	}
@@ -83,7 +90,11 @@ func (api *UltipaAPI) CreateNodeProperty(schemaName string, prop *structs.Proper
 	if err != nil {
 		return nil, err
 	}
-	uql := fmt.Sprintf(`create().node_property(@%v,"%v","%v","%v")`, schemaName, prop.Name, propertyTypeStr, prop.Desc)
+	escapeSchemaName := schemaName
+	if !utils.CheckCustomerNonIdName(schemaName) && !strings.HasPrefix(schemaName, "`") && !strings.HasSuffix(schemaName, "`") {
+		escapeSchemaName = fmt.Sprintf("`%v`", schemaName)
+	}
+	uql := fmt.Sprintf(`create().node_property(@%v,"%v","%v","%v")`, escapeSchemaName, prop.Name, propertyTypeStr, prop.Desc)
 
 	resp, err = api.UQL(uql, conf)
 
@@ -99,7 +110,11 @@ func (api *UltipaAPI) CreateEdgeProperty(schemaName string, prop *structs.Proper
 	if err != nil {
 		return nil, err
 	}
-	resp, err = api.UQL(fmt.Sprintf(`create().edge_property(@%v,"%v","%v","%v")`, schemaName, prop.Name, propertyTypeStr, prop.Desc), conf)
+	escapeSchemaName := schemaName
+	if !utils.CheckCustomerNonIdName(schemaName) && !strings.HasPrefix(schemaName, "`") && !strings.HasSuffix(schemaName, "`") {
+		escapeSchemaName = fmt.Sprintf("`%v`", schemaName)
+	}
+	resp, err = api.UQL(fmt.Sprintf(`create().edge_property(@%v,"%v","%v","%v")`, escapeSchemaName, prop.Name, propertyTypeStr, prop.Desc), conf)
 
 	return resp, err
 }

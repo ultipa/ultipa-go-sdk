@@ -116,9 +116,10 @@ func TestShowSchema(t *testing.T) {
 }
 
 func TestCreateSchemaWithProperties(t *testing.T) {
+	client, _ := GetClient([]string{"192.168.1.87:61090"}, "miniCircle")
 	// create schema with properties
 	newSchemaWithProperties := &structs.Schema{
-		Name: "text_schema",
+		Name: "special_schema@@",
 		Desc: "A Schema with 2 properties",
 		Properties: []*structs.Property{
 			{
@@ -132,7 +133,10 @@ func TestCreateSchemaWithProperties(t *testing.T) {
 		},
 	}
 
-	resp2, _ := client.CreateSchema(newSchemaWithProperties, true, nil)
+	resp2, err := client.CreateSchema(newSchemaWithProperties, true, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 	log.Println(resp2)
 }
 
