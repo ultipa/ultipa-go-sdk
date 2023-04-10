@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/http"
@@ -133,18 +134,28 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 	var resp *http.UQLResponse
 	var err error
 
+	schemaName := schema.Name
+	if !utils.CheckCustomerNonIdName(schemaName) && !strings.HasPrefix(schemaName, "`") && !strings.HasSuffix(schemaName, "`") {
+		schemaName = fmt.Sprintf("`%v`", schemaName)
+	}
+
+	isEscapedName := utils.CheckIsEscapedName(schemaName)
+
 	api.Logger.Log("Creating Schema : @" + schema.Name)
 
 	if schema.DBType == ultipa.DBType_DBNODE {
-
-		resp, err = api.UQL(fmt.Sprintf(`create().node_schema("%v","%v")`, schema.Name, schema.Desc), conf)
+		uql := fmt.Sprintf(`create().node_schema("%v","%v")`, schemaName, schema.Desc)
+		if isEscapedName {
+			uql = fmt.Sprintf(`create().node_schema(%v,"%v")`, schemaName, schema.Desc)
+		}
+		resp, err = api.UQL(uql, conf)
 		if err != nil {
 			return nil, err
 		}
 
 	} else if schema.DBType == ultipa.DBType_DBEDGE {
 
-		resp, err = api.UQL(fmt.Sprintf(`create().edge_schema("%v","%v")`, schema.Name, schema.Desc), conf)
+		resp, err = api.UQL(fmt.Sprintf(`create().edge_schema("%v","%v")`, schemaName, schema.Desc), conf)
 		if err != nil {
 			return nil, err
 		}
@@ -155,8 +166,7 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 
 	}
 
-
-	api.Logger.Log("Created Schema : @" + schema.Name)
+	api.Logger.Log("Created Schema : @" + schemaName)
 	// create property of schemas
 	if isCreateProperties {
 
@@ -166,7 +176,7 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 				continue
 			}
 
-			resp, err := api.CreateProperty(schema.Name, schema.DBType, prop, conf)
+			resp, err := api.CreateProperty(schemaName, schema.DBType, prop, conf)
 
 			if err != nil {
 				return nil, err
