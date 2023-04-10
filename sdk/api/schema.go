@@ -95,8 +95,11 @@ func (api *UltipaAPI) GetNodeSchema(schemaName string, config *configuration.Req
 	var resp *http.UQLResponse
 	var err error
 	var schemas []*structs.Schema
-
-	resp, err = api.UQL(fmt.Sprintf(`show().node_schema(@%v)`, schemaName), config)
+	escapedSchemaName := schemaName
+	if !utils.CheckCustomerNonIdName(schemaName) && !strings.HasPrefix(schemaName, "`") && !strings.HasSuffix(schemaName, "`") {
+		escapedSchemaName = fmt.Sprintf("`%v`", schemaName)
+	}
+	resp, err = api.UQL(fmt.Sprintf(`show().node_schema(@%v)`, escapedSchemaName), config)
 	if err != nil {
 		return nil, err
 	}
@@ -114,8 +117,11 @@ func (api *UltipaAPI) GetEdgeSchema(schemaName string, config *configuration.Req
 	var resp *http.UQLResponse
 	var err error
 	var schemas []*structs.Schema
-
-	resp, err = api.UQL(fmt.Sprintf(`show().edge_schema(@%v)`, schemaName), config)
+	escapedSchemaName := schemaName
+	if !utils.CheckCustomerNonIdName(schemaName) && !strings.HasPrefix(schemaName, "`") && !strings.HasSuffix(schemaName, "`") {
+		escapedSchemaName = fmt.Sprintf("`%v`", schemaName)
+	}
+	resp, err = api.UQL(fmt.Sprintf(`show().edge_schema(@%v)`, escapedSchemaName), config)
 	if err != nil {
 		return nil, err
 	}
