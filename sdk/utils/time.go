@@ -31,7 +31,8 @@ func NewTime(datetime uint64) *UltipaTime {
 		Datetime: datetime,
 	}
 	if datetime == 0 {
-		unix := time.Unix(0, 0)
+		//use same location UTC as n.Uint64ToTime
+		unix := time.Unix(0, 0).UTC()
 		n.Time = &unix
 	} else {
 		n.Uint64ToTime(datetime)
