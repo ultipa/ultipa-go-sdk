@@ -215,7 +215,7 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 		Statistic: &http.Statistic{},
 	}
 
-	// collect schema and nodes
+	// collect schema and edge index in edges
 	m := map[string]map[int]int{}
 	schemas, err := api.ListSchema(ultipa.DBType_DBEDGE, config.RequestConfig)
 
@@ -227,7 +227,9 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 
 	for index, edge := range edges {
 
-		m[edge.Schema] = map[int]int{}
+		if _, ok := m[edge.Schema]; !ok {
+			m[edge.Schema] = map[int]int{}
+		}
 		// init schema
 		if batches[edge.Schema] == nil {
 
