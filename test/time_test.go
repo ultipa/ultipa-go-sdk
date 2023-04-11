@@ -25,11 +25,10 @@ func TestNewTimeFromString(t *testing.T) {
 }
 
 func TestTimeToUltipaTime(t *testing.T) {
-	ut := utils.TimeToUltipaTime(nil)
+	ut := utils.TimeToUltipaTime(nil, nil)
 	t.Log(ut)
 }
 
-
 func TestTimeZone(t *testing.T) {
- 	t.Log(time.Now().Zone())
+	t.Log(time.Now().Zone())
 }
