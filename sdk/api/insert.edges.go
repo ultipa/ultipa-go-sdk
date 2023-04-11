@@ -227,7 +227,9 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 
 	for index, edge := range edges {
 
-		m[edge.Schema] = map[int]int{}
+		if _, ok := m[edge.Schema]; !ok {
+			m[edge.Schema] = map[int]int{}
+		}
 		// init schema
 		if batches[edge.Schema] == nil {
 

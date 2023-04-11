@@ -220,7 +220,9 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 	batches := map[string]*Batch{}
 
 	for index, node := range nodes {
-		m[node.Schema] = map[int]int{}
+		if _, ok := m[node.Schema]; !ok {
+			m[node.Schema] = map[int]int{}
+		}
 		// init schema
 		if batches[node.Schema] == nil {
 
