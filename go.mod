@@ -10,7 +10,6 @@ require (
 	github.com/lrita/cmap v0.0.0-20200818170753-e987cd3dfa73
 	github.com/pieterclaerhout/go-waitgroup v1.0.7
 	github.com/pterm/pterm v0.12.42
-	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	google.golang.org/grpc v1.45.0
