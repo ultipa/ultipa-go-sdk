@@ -41,7 +41,7 @@ func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType, subTypes []ultipa
 			return nil, nil
 		}
 		value := AsUint64(bs)
-		return NewTime(value), nil
+		return NewDateTime(value), nil
 	case ultipa.PropertyType_TIMESTAMP:
 		if len(bs) == 0 {
 			return nil, nil
@@ -143,7 +143,7 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 		case *UltipaTime:
 			return ConvertInterfaceToBytes(v.Datetime)
 		case string:
-			uTime, err := NewTimeFromString(v)
+			uTime, err := NewDatetimeFromString(v)
 			if err != nil {
 				return nil, err
 			}
@@ -158,7 +158,7 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 		case *UltipaTime:
 			return ConvertInterfaceToBytes(v.GetTimeStamp())
 		case string:
-			uTime, err := NewTimeFromString(v)
+			uTime, err := NewTimestampFromString(v)
 			if err != nil {
 				return nil, err
 			}
@@ -400,15 +400,24 @@ func GetDefaultNilInterface(t ultipa.PropertyType) interface{} {
 
 }
 
-func StringAsInterface(str string, t ultipa.PropertyType) (interface{}, error) {
+func StringAsInterface(source string, t ultipa.PropertyType) (interface{}, error) {
 
-	str = strings.Trim(str, " ")
+	str := strings.Trim(source, " ")
 
-	if str == "" && t != ultipa.PropertyType_STRING && t != ultipa.PropertyType_TEXT {
-		//str = GetDefaultNilString(t)
-		// SDK 4.3 support nil value, won't set default value again
-		return nil, nil
+	if str == "" {
+		if t == ultipa.PropertyType_DATETIME {
+			//for empty string value of DATETIME, server will return 8 bytes 0, which is 1970-01-01 00:00:00, to keep align with that, set str = "1970-01-01"
+			str = "1970-01-01"
+		} else if t != ultipa.PropertyType_STRING && t != ultipa.PropertyType_TEXT {
+			// SDK 4.3 support nil value, won't set default value again
+			return nil, nil
+		}
 	}
+	//if str == "" && t != ultipa.PropertyType_STRING && t != ultipa.PropertyType_TEXT {
+	//str = GetDefaultNilString(t)
+	// SDK 4.3 support nil value, won't set default value again
+	//return nil, nil
+	//}
 
 	switch t {
 	case ultipa.PropertyType_INT32:
@@ -440,13 +449,13 @@ func StringAsInterface(str string, t ultipa.PropertyType) (interface{}, error) {
 		}
 		return float64(v), err
 	case ultipa.PropertyType_DATETIME:
-		v, err := NewTimeFromString(str)
+		v, err := NewDatetimeFromString(str)
 		if err != nil {
 			return nil, err
 		}
 		return v.Datetime, err
 	case ultipa.PropertyType_TIMESTAMP:
-		v, err := NewTimeFromString(str)
+		v, err := NewTimestampFromString(str)
 		if err != nil {
 			return nil, err
 		}
