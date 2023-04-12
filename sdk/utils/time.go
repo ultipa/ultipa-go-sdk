@@ -96,61 +96,223 @@ func NewUltipaTimeFromString(dateString string, location *time.Location) (*Ultip
 	if dateString == "" {
 		return nil, errors.New("unable to convert empty string to UltipaTime")
 	}
-	ultipaTime, err := ParseTimeStampStr(dateString, location)
-	if err == nil && ultipaTime != nil {
+	ultipaTime, err0 := ParseTimeStampStr(dateString, location)
+	if err0 == nil && ultipaTime != nil {
 		return ultipaTime, nil
 	}
-	newDateString, err := compensateYear(strings.Trim(dateString, " "))
-	if err != nil {
-		return nil, err
-	}
+
 	layouts := []string{
-		"2006-1-2",
 		"2006-1-2T15:04:05.000Z0700",
 		"2006-1-2T15:04:05.000Z07:00",
 		"2006-1-2T15:04:05Z0700",
 		"2006-1-2T15:04:05Z07:00",
+
+		"06-1-2T15:04:05.000Z0700",
+		"06-1-2T15:04:05.000Z07:00",
+		"06-1-2T15:04:05Z0700",
+		"06-1-2T15:04:05Z07:00",
+
+		"2006-1-2T15:04:05.000-0700",
+		"2006-1-2T15:04:05.000-07:00",
+		"2006-1-2T15:04:05-0700",
+		"2006-1-2T15:04:05-07:00",
+
+		"06-1-2T15:04:05.000Z0700",
+		"06-1-2T15:04:05.000Z07:00",
+		"06-1-2T15:04:05Z0700",
+		"06-1-2T15:04:05Z07:00",
+
+		"2006-1-2 15:04:05.000Z0700",
+		"2006-1-2 15:04:05.000Z07:00",
+		"2006-1-2 15:04:05Z0700",
+		"2006-1-2 15:04:05Z07:00",
+
+		"06-1-2 15:04:05.000Z0700",
+		"06-1-2 15:04:05.000Z07:00",
+		"06-1-2 15:04:05Z0700",
+		"06-1-2 15:04:05Z07:00",
+
+		"2006-1-2 15:04:05.000-0700",
+		"2006-1-2 15:04:05.000-07:00",
+		"2006-1-2 15:04:05-0700",
+		"2006-1-2 15:04:05-07:00",
+
+		"06-1-2 15:04:05.000-0700",
+		"06-1-2 15:04:05.000-07:00",
+		"06-1-2 15:04:05-0700",
+		"06-1-2 15:04:05-07:00",
+
 		"2006-1-2 15:04:05.000",
 		"2006-1-2 15:04:05",
 		"2006-1-2 15:04",
 		"2006-1-2 15",
-		"2006/1/2",
+		"2006-1-2",
+
+		"06-1-2 15:04:05.000",
+		"06-1-2 15:04:05",
+		"06-1-2 15:04",
+		"06-1-2 15",
+		"06-1-2",
+
 		"2006/1/2T15:04:05.000Z07:00",
 		"2006/1/2T15:04:05.000Z0700",
 		"2006/1/2T15:04:05Z07:00",
 		"2006/1/2T15:04:05Z0700",
+
+		"06/1/2T15:04:05.000Z07:00",
+		"06/1/2T15:04:05.000Z0700",
+		"06/1/2T15:04:05Z07:00",
+		"06/1/2T15:04:05Z0700",
+
+		"2006/1/2T15:04:05.000-07:00",
+		"2006/1/2T15:04:05.000-0700",
+		"2006/1/2T15:04:05-07:00",
+		"2006/1/2T15:04:05-0700",
+
+		"06/1/2T15:04:05.000-07:00",
+		"06/1/2T15:04:05.000-0700",
+		"06/1/2T15:04:05-07:00",
+		"06/1/2T15:04:05-0700",
+
+		"2006/1/2 15:04:05.000Z07:00",
+		"2006/1/2 15:04:05.000Z0700",
+		"2006/1/2 15:04:05Z07:00",
+		"2006/1/2 15:04:05Z0700",
+
+		"06/1/2 15:04:05.000Z07:00",
+		"06/1/2 15:04:05.000Z0700",
+		"06/1/2 15:04:05Z07:00",
+		"06/1/2 15:04:05Z0700",
+
+		"2006/1/2 15:04:05.000-07:00",
+		"2006/1/2 15:04:05.000-0700",
+		"2006/1/2 15:04:05-07:00",
+		"2006/1/2 15:04:05-0700",
+
+		"06/1/2 15:04:05.000-07:00",
+		"06/1/2 15:04:05.000-0700",
+		"06/1/2 15:04:05-07:00",
+		"06/1/2 15:04:05-0700",
+
 		"2006/1/2 15:04:05.000",
 		"2006/1/2 15:04:05",
 		"2006/1/2 15:04",
 		"2006/1/2 15",
-		"2006-01-02",
+		"2006/1/2",
+
+		"06/1/2 15:04:05.000",
+		"06/1/2 15:04:05",
+		"06/1/2 15:04",
+		"06/1/2 15",
+		"06/1/2",
+
 		"2006-01-02T15:04:05.000Z07:00",
 		"2006-01-02T15:04:05.000Z0700",
 		"2006-01-02T15:04:05Z07:00",
 		"2006-01-02T15:04:05Z0700",
+
+		"06-01-02T15:04:05.000Z07:00",
+		"06-01-02T15:04:05.000Z0700",
+		"06-01-02T15:04:05Z07:00",
+		"06-01-02T15:04:05Z0700",
+
+		"2006-01-02T15:04:05.000-07:00",
+		"2006-01-02T15:04:05.000-0700",
+		"2006-01-02T15:04:05-07:00",
+		"2006-01-02T15:04:05-0700",
+
+		"06-01-02T15:04:05.000-07:00",
+		"06-01-02T15:04:05.000-0700",
+		"06-01-02T15:04:05-07:00",
+		"06-01-02T15:04:05-0700",
+
+		"2006-01-02 15:04:05.000Z07:00",
+		"2006-01-02 15:04:05.000Z0700",
+		"2006-01-02 15:04:05Z07:00",
+		"2006-01-02 15:04:05Z0700",
+
+		"06-01-02 15:04:05.000Z07:00",
+		"06-01-02 15:04:05.000Z0700",
+		"06-01-02 15:04:05Z07:00",
+		"06-01-02 15:04:05Z0700",
+
+		"2006-01-02 15:04:05.000-07:00",
+		"2006-01-02 15:04:05.000-0700",
+		"2006-01-02 15:04:05-07:00",
+		"2006-01-02 15:04:05-0700",
+
+		"06-01-02 15:04:05.000-07:00",
+		"06-01-02 15:04:05.000-0700",
+		"06-01-02 15:04:05-07:00",
+		"06-01-02 15:04:05-0700",
+
 		"2006-01-02 15:04:05.000",
 		"2006010215:04:05.000Z0700",
 		"2006010215:04:05.000Z07:00",
 		"2006010215:04:05Z0700",
 		"2006010215:04:05Z07:00",
+
+		"06-01-02 15:04:05.000",
+		"06010215:04:05.000Z0700",
+		"06010215:04:05.000Z07:00",
+		"06010215:04:05Z0700",
+		"06010215:04:05Z07:00",
+
+		"2006010215:04:05.000-0700",
+		"2006010215:04:05.000-07:00",
+		"2006010215:04:05-0700",
+		"2006010215:04:05-07:00",
+
+		"06010215:04:05.000-0700",
+		"06010215:04:05.000-07:00",
+		"06010215:04:05-0700",
+		"06010215:04:05-07:00",
+
 		"2006010215:04:05",
 		"2006-01-02 15:04:05",
 		"2006-01-02 15:04",
 		"2006-01-02 15",
+		"2006-01-02",
+
+		"06010215:04:05",
+		"06-01-02 15:04:05",
+		"06-01-02 15:04",
+		"06-01-02 15",
+		"06-01-02",
 	}
 
 	for _, l := range layouts {
-		t, err := time.Parse(l, newDateString)
+		t, err := time.Parse(l, dateString)
 		if err != nil {
 			continue
 		}
+
+		if strings.HasPrefix(l, "06") {
+			// need to convert two-digit year to 4 digits
+			year := dateString[0:2]
+			yearValue, err := strconv.Atoi(year)
+			if err != nil {
+				return nil, err
+			}
+			if yearValue >= 70 && yearValue < 100 {
+				yearValue += 1900
+			} else if yearValue < 70 {
+				yearValue += 2000
+			}
+			newDateString := fmt.Sprintf("%v%s", yearValue, dateString[2:])
+			t, err = time.Parse("20"+l, newDateString)
+			if err != nil {
+				return nil, err
+			}
+		}
+
 		if location != nil {
 			t = t.In(location)
 		}
 		return TimeToUltipaTime(&t, t.Location()), err
 	}
 
-	return nil, errors.New("parse datetime string failed : " + newDateString)
+	return nil, errors.New("parse datetime string failed : " + dateString)
 }
 
 //NewTimeFromString converts dateString to UltipaTime, supports layouts and timestamp in Second, Millisecond,Microsecond,Nanosecond
@@ -193,56 +355,6 @@ func ParseTimeStampStr(v string, location *time.Location) (*UltipaTime, error) {
 		timeValue = timeValue.In(location)
 	}
 	return TimeToUltipaTime(&timeValue, timeValue.Location()), nil
-}
-
-//compensateYear add padding for dateString, if yearValue > 70 && yearValue < 100 then yearValue+1900;
-//if yearValue < 70 then yearValue+2000;
-func compensateYear(dateString string) (string, error) {
-	if strings.Index(dateString, "-") > -1 {
-		return doCompensateYear(dateString, "-")
-	} else if strings.Index(dateString, "/") > -1 {
-		return doCompensateYear(dateString, "/")
-	} else if strings.Index(dateString, ":") > -1 {
-		idx := strings.Index(dateString, ":")
-		ymdh := dateString[0:idx]
-		ymdhLength := len(ymdh)
-		if ymdhLength > 10 || ymdhLength < 7 {
-			return "", errors.New(fmt.Sprintf("Unable to parse %s as UltipaTime", dateString))
-		} else if ymdhLength == 10 {
-			return dateString, nil
-		} else {
-			year := ymdh[:ymdhLength-6]
-			yearValue, err := strconv.Atoi(year)
-			if err != nil {
-				return "", err
-			}
-			if yearValue > 70 && yearValue < 100 {
-				yearValue += 1900
-			} else if yearValue < 70 {
-				yearValue += 2000
-			}
-			return fmt.Sprintf("%d%s%s", yearValue, ymdh[ymdhLength-6:], dateString[idx:]), nil
-		}
-	}
-	return dateString, nil
-}
-
-func doCompensateYear(dateString string, splitter string) (string, error) {
-	if idx := strings.Index(dateString, splitter); idx > 0 {
-		year := dateString[0:idx]
-		yearValue, err := strconv.Atoi(year)
-		if err != nil {
-			return "", err
-		}
-		if yearValue >= 70 && yearValue < 100 {
-			yearValue += 1900
-		} else if yearValue < 70 {
-			yearValue += 2000
-		}
-		return fmt.Sprintf("%d%s", yearValue, dateString[idx:]), nil
-	} else {
-		return dateString, nil
-	}
 }
 
 // parse Bytes to year, month....
