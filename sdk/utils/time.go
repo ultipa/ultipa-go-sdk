@@ -234,7 +234,7 @@ func doCompensateYear(dateString string, splitter string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		if yearValue > 70 && yearValue < 100 {
+		if yearValue >= 70 && yearValue < 100 {
 			yearValue += 1900
 		} else if yearValue < 70 {
 			yearValue += 2000
