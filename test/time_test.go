@@ -20,6 +20,7 @@ func TestNewTimeFromString(t *testing.T) {
 		"2022122319:06:12+0800",
 		"22122319:06:13+0800",
 		"02122319:06:14+0800",
+		"-1586903608",
 	}
 
 	for i, s := range str {

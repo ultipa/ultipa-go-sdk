@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"unicode"
 )
 
 type UltipaTime struct {
@@ -327,17 +326,18 @@ func ParseTimeStampStr(v string, location *time.Location) (*UltipaTime, error) {
 	if v == "" {
 		return nil, errors.New("unable to convert empty string to UltipaTime")
 	}
-	for _, r := range []rune(v) {
-		if !unicode.IsDigit(r) {
-			return nil, errors.New(fmt.Sprintf("Unable convert value to int for UltipaTime:%s", v))
-		}
-	}
-	length := len(v)
 	timestamp, err := strconv.ParseInt(v, 10, 64)
 	if err != nil {
 		return nil, err
 	}
 	var timeValue time.Time
+
+	source := v
+	if source[0] == '+' || source[0] == '-' {
+		source = v[1:]
+	}
+
+	length := len(source)
 	if length == 13 {
 		//毫秒
 		timeValue = time.Unix(0, timestamp*1e6)
