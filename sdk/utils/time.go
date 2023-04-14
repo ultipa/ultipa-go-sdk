@@ -320,7 +320,7 @@ func NewTimeFromString(dateString string) (*UltipaTime, error) {
 	return NewTimestampFromString(dateString)
 }
 
-// ParseTimeStampStr convert timestamp string value to UltipaTime, if v can be converted to int, then determine time unit by its length, otherwise raise an error.
+// ParseTimeStampStr convert timestamp milliseconds string value to UltipaTime, if v can not be converted to int, then raise an error.
 //location is used when calculating internal Datetime of UltipaTime, if location is null, then will use time.Local by default.
 func ParseTimeStampStr(v string, location *time.Location) (*UltipaTime, error) {
 	if v == "" {
