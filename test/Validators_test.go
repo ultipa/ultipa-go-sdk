@@ -5,17 +5,19 @@ import (
 	"ultipa-go-sdk/sdk/utils"
 )
 
-func TestCheckIsEscapedName(t *testing.T) {
+func TestIsNeedToEscapeName(t *testing.T) {
 	cases := map[string]bool{
-		"`ab@cd`":  true,
+		"`ab@cd`":  false,
 		"abc@d":    false,
 		"`abcd":   false,
 		"abcd`":   false,
-		" `abcd`": false,
+		"`abcd`": false,
+		"哈哈abcd": true,
+		"abcd\"": true,
 	}
 
 	for name, expected := range cases {
-		actual := utils.CheckIsEscapedName(name)
+		actual := utils.IsNeedToEscapeName(name)
 		if actual != expected {
 			t.Errorf("%v expected: %v, actual:%v", name, expected, actual)
 		}

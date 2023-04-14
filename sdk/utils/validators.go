@@ -1,6 +1,9 @@
 package utils
 
-import "regexp"
+import (
+	"regexp"
+	"strings"
+)
 
 //CheckGraphName check the name is validated，for PropertyName, GraphName, SchemaName
 // deprecated since 4.2.28
@@ -33,8 +36,24 @@ func CheckCustomerNonIdName(name string) bool {
 	return matcher.Match([]byte(name))
 }
 
-//CheckIsEscapedName check that  whether name is surrounded by `` or not
-func CheckIsEscapedName(name string) bool {
-	matcher := regexp.MustCompile("^`.+`$")
+//IsNeedToEscapeName check that whether name should be escaped by ``,
+//true - need to escaped, false - no need
+func IsNeedToEscapeName(name string) bool {
+	if strings.Contains(name, "\"") {
+		return true
+	}
+	//name contains multi-byte character
+	matcher := regexp.MustCompile("[^\\x00-\\xff]+")
+	return matcher.Match([]byte(name))
+}
+
+//IsNeedToEscapeSchemaNameForProperty check that whether schema name should be escaped by `` when creating property,
+//true - need to escaped, false - no need
+func IsNeedToEscapeSchemaNameForProperty(name string) bool {
+	return IsNeedToEscapeName(name) || strings.HasPrefix(name, ".") || IsBeginWithDigital(name)
+}
+
+func IsBeginWithDigital(name string) bool {
+	matcher := regexp.MustCompile("^\\d")
 	return matcher.Match([]byte(name))
 }
