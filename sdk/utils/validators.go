@@ -50,7 +50,7 @@ func IsNeedToEscapeName(name string) bool {
 //IsNeedToEscapeSchemaNameForProperty check that whether schema name should be escaped by `` when creating property,
 //true - need to escaped, false - no need
 func IsNeedToEscapeSchemaNameForProperty(name string) bool {
-	return IsNeedToEscapeName(name) || strings.HasPrefix(name, ".") || IsBeginWithDigital(name)
+	return IsNeedToEscapeName(name) || strings.HasPrefix(name, ".") || strings.Contains(name, "-") || IsBeginWithDigital(name)
 }
 
 func IsBeginWithDigital(name string) bool {
