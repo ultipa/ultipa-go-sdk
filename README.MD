@@ -1,7 +1,8 @@
-# Ultipa GO SDK(Driver 4.2)
+# Ultipa GO SDK
 
 ---
 ## Prepare
+Supported server version see ultipa.Version.<br>
 This sdk depends on Protocol Buffer and grpc, so we need to compile the proto file first:<br>
 go install google.golang.org/grpc/cmd/protoc-gen-go@latest<br>
 go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest<br>
