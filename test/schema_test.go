@@ -116,7 +116,7 @@ func TestShowSchema(t *testing.T) {
 }
 
 func TestCreateSchemaWithProperties(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.87:61095"}, "default")
+	client, _ := GetClient([]string{"192.168.1.87:61090"}, "default")
 	// create schema with properties
 	newSchemaWithProperties := &structs.Schema{
 		Name: "12efgacd",
