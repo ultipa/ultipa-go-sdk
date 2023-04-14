@@ -116,18 +116,18 @@ func TestShowSchema(t *testing.T) {
 }
 
 func TestCreateSchemaWithProperties(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.87:61090"}, "miniCircle")
+	client, _ := GetClient([]string{"192.168.1.87:61095"}, "default")
 	// create schema with properties
 	newSchemaWithProperties := &structs.Schema{
-		Name: "special_schema@@",
+		Name: "12efgacd",
 		Desc: "A Schema with 2 properties",
 		Properties: []*structs.Property{
 			{
-				Name: "username",
+				Name: "username用户@",
 				Type: ultipa.PropertyType_STRING,
 			},
 			{
-				Name: "password",
+				Name: "123passwor@d",
 				Type: ultipa.PropertyType_TEXT,
 			},
 		},
