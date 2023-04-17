@@ -79,7 +79,7 @@ func (pool *ConnectionPool) CreateConnections() error {
 	return err
 }
 
-func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds uint32) {
+func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) {
 	pool.muActiveSafely.Lock()
 	defer pool.muActiveSafely.Unlock()
 	if time.Now().Sub(pool.LastActivesTime) <= 5*time.Second && len(pool.Connections) == len(pool.Actives) {
@@ -339,12 +339,12 @@ func (pool *ConnectionPool) Close() error {
 }
 
 // set context with timeout and auth info
-func (pool *ConnectionPool) NewContext(config *configuration.RequestConfig) (context.Context, context.CancelFunc, error) {
+func (pool *ConnectionPool) NewContext(config *configuration.RequestConfig) (ctx context.Context, cancel context.CancelFunc, err error) {
 
 	if config == nil {
 		config = &configuration.RequestConfig{}
 	} else if config.Timezone != "" {
-		_, err := time.LoadLocation(config.Timezone)
+		_, err = time.LoadLocation(config.Timezone)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -360,7 +360,12 @@ func (pool *ConnectionPool) NewContext(config *configuration.RequestConfig) (con
 		timeout = 1
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	if timeout < 0 {
+		parentCtx := context.Background()
+		ctx, cancel = context.WithCancel(parentCtx)
+	} else {
+		ctx, cancel = context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	}
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(pool.Config.ToContextKV(config)...))
 	return ctx, cancel, nil
 }
