@@ -22,7 +22,7 @@ type UltipaConfig struct {
 	Consistency      bool     // if consistency, reading query will send to master
 	CurrentGraph     string   `yaml:"current_graph"`      // the current graph, used when user what get the connection's current graph name
 	CurrentClusterId string   `yaml:"current_cluster_id"` // used for name server only
-	Timeout          uint32   // timeout - seconds
+	Timeout          int32    // timeout - seconds
 	Debug            bool     // debug, print more logs
 	HeartBeat        int      `yaml:"heart_beat"` // frequency:second,  if 0 means no heart beat, to make sure the connection is alive
 }
@@ -51,7 +51,7 @@ func (config *UltipaConfig) FillDefault() {
 	}
 
 	if config.Timeout == 0 {
-		config.Timeout = 1000
+		config.Timeout = 20
 	}
 }
 

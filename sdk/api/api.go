@@ -237,7 +237,7 @@ func (api *UltipaAPI) doExecuteUql(uql string, config *configuration.RequestConf
 func (api *UltipaAPI) buildUqlRequest(uql string, config *configuration.RequestConfig, conf *configuration.UltipaConfig) *ultipa.UqlRequest {
 	uqlRequest := &ultipa.UqlRequest{
 		GraphName: conf.CurrentGraph,
-		Timeout:   conf.Timeout,
+		Timeout:   uint32(conf.Timeout),
 		Uql:       uql,
 	}
 	if config.ThreadNum > 0 {

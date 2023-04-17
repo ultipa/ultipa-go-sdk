@@ -12,7 +12,7 @@ const (
 
 type RequestConfig struct {
 	GraphName      string      // Graphset Name
-	Timeout        uint32      // timeout (Seconds)
+	Timeout        int32      // timeout (Seconds)
 	ClusterId      string      // Name Server Only
 	Host           string      // set for force host test
 	UseMaster      bool        // Use Master( graphSet master )
