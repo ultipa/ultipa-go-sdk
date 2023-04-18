@@ -39,12 +39,13 @@ func CheckCustomerNonIdName(name string) bool {
 //IsNeedToEscapeName check that whether name should be escaped by ``,
 //true - need to escaped, false - no need
 func IsNeedToEscapeName(name string) bool {
-	if strings.Contains(name, "\"") {
-		return true
-	}
-	//name contains multi-byte character
-	matcher := regexp.MustCompile("[^\\x00-\\xff]+")
-	return matcher.Match([]byte(name))
+	//if strings.Contains(name, "\"") {
+	//	return true
+	//}
+	////name contains multi-byte character
+	//matcher := regexp.MustCompile("[^\\x00-\\xff]+")
+	//return matcher.Match([]byte(name))
+	return IsNeedToEscapeSchemaNameForProperty(name)
 }
 
 //IsNeedToEscapeSchemaNameForProperty check that whether schema name should be escaped by `` when creating property,
@@ -57,4 +58,58 @@ func IsNeedToEscapeSchemaNameForProperty(name string) bool {
 func IsBeginWithDigital(name string) bool {
 	matcher := regexp.MustCompile("^\\d")
 	return matcher.Match([]byte(name))
+}
+
+// StartWithTilde check whether start with ~
+func StartWithTilde(name string) bool {
+	return strings.HasPrefix(name, "~")
+}
+
+var InvalidName = map[string]struct{}{
+	"this":          {},
+	"prev_n":        {},
+	"prev_e":        {},
+	"_uuid":         {},
+	"_from_uuid":    {},
+	"_to_uuid":      {},
+	"_id":           {},
+	"_from":         {},
+	"_to":           {},
+	"_graph":        {},
+	"_nodeSchema":   {},
+	"_edgeSchema":   {},
+	"_nodeProperty": {},
+	"_edgeProperty": {},
+	"_nodeIndex":    {},
+	"_edgeIndex":    {},
+	"_nodeFulltext": {},
+	"_edgeFulltext": {},
+	"_statistic":    {},
+	"_top":          {},
+	"_task":         {},
+	"_policy":       {},
+	"_user":         {},
+	"_privilege":    {},
+	"_algoList":     {},
+	"_extaList":     {},
+}
+
+// IsValidName check whether name is valid or not
+func IsValidName(name string) bool {
+	if len(name) < 2 || len(name) > 64 {
+		return false
+	}
+
+	if strings.Contains(name, "`") {
+		return false
+	}
+
+	if StartWithTilde(name) {
+		return false
+	}
+
+	if _, ok := InvalidName[name]; ok {
+		return false
+	}
+	return true
 }

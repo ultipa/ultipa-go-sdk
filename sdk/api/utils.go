@@ -2,6 +2,8 @@ package api
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 	"ultipa-go-sdk/sdk/connection"
 	"ultipa-go-sdk/sdk/utils"
 )
@@ -57,4 +59,23 @@ func (api *UltipaAPI) GetConnByUQL(uql string, graphName string) (uqlType UQLTyp
 
 	return uqlType, leader, followers, global, err
 
+}
+
+func CheckName(name string) error {
+	if len(name) < 2 || len(name) > 64 {
+		return errors.New("name bytes length should be between 2 and 64")
+	}
+
+	if strings.Contains(name, "`") {
+		return errors.New("name can not contain character `")
+	}
+
+	if utils.StartWithTilde(name) {
+		return errors.New("name can not start with character ~")
+	}
+
+	if _, ok := utils.InvalidName[name]; ok {
+		return errors.New(fmt.Sprintf("%s is preserved keyword, can NOT use as name", name))
+	}
+	return nil
 }
