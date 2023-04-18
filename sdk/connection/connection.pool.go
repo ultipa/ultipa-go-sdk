@@ -357,13 +357,16 @@ func (pool *ConnectionPool) NewContext(config *configuration.RequestConfig) (ctx
 	}
 
 	if timeout == 0 {
-		timeout = 1
+		timeout = configuration.DefaultTimeout
 	}
 
 	if timeout < 0 {
 		parentCtx := context.Background()
 		ctx, cancel = context.WithCancel(parentCtx)
 	} else {
+		if timeout < 10 {
+			timeout = 10
+		}
 		ctx, cancel = context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 	}
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(pool.Config.ToContextKV(config)...))
