@@ -28,32 +28,22 @@ func NewTimeStamp(datetime int64) *UltipaTime {
 
 // NewTime convert datetime to UltipaTime for datetime, use NewDateTime instead is clearer
 func NewTime(datetime uint64) *UltipaTime {
-	n := UltipaTime{
-		Datetime: datetime,
-	}
-	if datetime == 0 {
-		//use same location UTC as n.Uint64ToTime
-		unix := time.Unix(0, 0).UTC()
-		n.Time = &unix
-	} else {
-		n.Uint64ToTime(datetime)
-	}
-	return &n
+	return NewDateTime(datetime)
 }
 
 // NewDateTime convert datetime to UltipaTime for datetime, internal Time in UltipaTime use UTC Location
 func NewDateTime(datetime uint64) *UltipaTime {
-	n := UltipaTime{
-		Datetime: datetime,
-	}
 	if datetime == 0 {
 		//use same location UTC as n.Uint64ToTime
 		unix := time.Unix(0, 0).UTC()
-		n.Time = &unix
+		return TimeToUltipaTime(&unix, unix.Location())
 	} else {
+		n := UltipaTime{
+			Datetime: datetime,
+		}
 		n.Uint64ToTime(datetime)
+		return &n
 	}
-	return &n
 }
 
 // StringToTime , layoutISO := "2006-01-02 15:04:05.000"

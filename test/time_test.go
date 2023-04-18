@@ -21,6 +21,7 @@ func TestNewTimeFromString(t *testing.T) {
 		"22122319:06:13+0800",
 		"02122319:06:14+0800",
 		"-1586903608",
+		"1999-11-30 00:00:00Z",
 	}
 
 	for i, s := range str {
@@ -39,4 +40,17 @@ func TestTimeToUltipaTime(t *testing.T) {
 
 func TestTimeZone(t *testing.T) {
 	t.Log(time.Now().Zone())
+	tt:=time.Unix(0, 0).UTC()
+	ut:=utils.TimeToUltipaTime(&tt ,time.UTC)
+	t.Log(ut)
+	t.Log(ut.Datetime)
+}
+
+func TestUint64ToUltipaTime(t *testing.T) {
+	ut:=utils.UltipaTime{
+		Datetime: 1,
+	}
+	t.Log(ut)
+	gt := ut.Uint64ToTime(uint64(1))
+	t.Log(gt)
 }
