@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/http"
@@ -78,8 +77,9 @@ func (api *UltipaAPI) ListSchema(DBType ultipa.DBType, config *configuration.Req
 }
 
 func (api *UltipaAPI) GetSchema(schemaName string, DBType ultipa.DBType, config *configuration.RequestConfig) (*structs.Schema, error) {
-	if strings.Contains(schemaName, "`") {
-		return nil, errors.New("schema name can not contain character `")
+	err := CheckName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
 	}
 	if DBType == ultipa.DBType_DBNODE {
 		return api.GetNodeSchema(schemaName, config)
@@ -94,11 +94,11 @@ func (api *UltipaAPI) GetSchema(schemaName string, DBType ultipa.DBType, config 
 }
 
 func (api *UltipaAPI) GetNodeSchema(schemaName string, config *configuration.RequestConfig) (*structs.Schema, error) {
-	if strings.Contains(schemaName, "`") {
-		return nil, errors.New("schema name can not contain character `")
+	err := CheckName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
 	}
 	var resp *http.UQLResponse
-	var err error
 	var schemas []*structs.Schema
 	escapedSchemaName := schemaName
 	if utils.IsNeedToEscapeName(schemaName) {
@@ -119,11 +119,11 @@ func (api *UltipaAPI) GetNodeSchema(schemaName string, config *configuration.Req
 }
 
 func (api *UltipaAPI) GetEdgeSchema(schemaName string, config *configuration.RequestConfig) (*structs.Schema, error) {
-	if strings.Contains(schemaName, "`") {
-		return nil, errors.New("schema name can not contain character `")
+	err := CheckName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
 	}
 	var resp *http.UQLResponse
-	var err error
 	var schemas []*structs.Schema
 	escapedSchemaName := schemaName
 	if utils.IsNeedToEscapeName(schemaName) {
@@ -144,11 +144,11 @@ func (api *UltipaAPI) GetEdgeSchema(schemaName string, config *configuration.Req
 }
 
 func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bool, conf *configuration.RequestConfig) (*http.UQLResponse, error) {
-	if strings.Contains(schema.Name, "`") {
-		return nil, errors.New("schema name can not contain character `")
+	err := CheckName(schema.Name)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schema.Name))
 	}
 	var resp *http.UQLResponse
-	var err error
 
 	schemaName := schema.Name
 	if utils.IsNeedToEscapeName(schemaName) {
@@ -212,8 +212,9 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 }
 
 func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, config *configuration.RequestConfig) (exist bool, err error) {
-	if strings.Contains(schema.Name, "`") {
-		return false, errors.New("schema name can not contain character `")
+	err = CheckName(schema.Name)
+	if err != nil {
+		return false, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schema.Name))
 	}
 	exist = true
 	s, _ := api.GetSchema(schema.Name, schema.DBType, config)

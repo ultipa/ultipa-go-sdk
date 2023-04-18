@@ -3,7 +3,6 @@ package api
 import (
 	"errors"
 	"fmt"
-	"strings"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/http"
@@ -13,11 +12,14 @@ import (
 
 //CreateProperty create property for schema, schemaName maybe escaped if schemaName contains some special characters.
 func (api *UltipaAPI) CreateProperty(schemaName string, dbType ultipa.DBType, prop *structs.Property, conf *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
-	if strings.Contains(schemaName, "`") {
-		return nil, errors.New("schema name can not contain character `")
+	err = CheckName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
 	}
-	if strings.Contains(prop.Name, "`") {
-		return nil, errors.New("property name can not contain character `")
+
+	err = CheckName(prop.Name)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), prop.Name))
 	}
 	escapedSchemaName := schemaName
 	if utils.IsNeedToEscapeSchemaNameForProperty(schemaName) {
@@ -29,8 +31,13 @@ func (api *UltipaAPI) CreateProperty(schemaName string, dbType ultipa.DBType, pr
 
 func (api *UltipaAPI) doCreateProperty(schemaName string, dbType ultipa.DBType, prop *structs.Property, conf *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	api.Logger.Log("Creating Property : @" + schemaName + "." + prop.Name)
-	if strings.Contains(prop.Name, "`") {
-		return nil, errors.New("property name can not contain character `")
+	err = CheckName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
+	}
+	err = CheckName(prop.Name)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), prop.Name))
 	}
 	switch dbType {
 	case ultipa.DBType_DBNODE:
@@ -49,11 +56,13 @@ func (api *UltipaAPI) doCreateProperty(schemaName string, dbType ultipa.DBType, 
 }
 
 func (api *UltipaAPI) CreatePropertyIfNotExist(schemaName string, dbType ultipa.DBType, prop *structs.Property, config *configuration.RequestConfig) (exist bool, err error) {
-	if strings.Contains(schemaName, "`") {
-		return false, errors.New("schema name can not contain character `")
+	err = CheckName(schemaName)
+	if err != nil {
+		return false, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
 	}
-	if strings.Contains(prop.Name, "`") {
-		return false, errors.New("property name can not contain character `")
+	err = CheckName(prop.Name)
+	if err != nil {
+		return false, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), prop.Name))
 	}
 	property, err := api.GetProperty(schemaName, prop.Name, dbType, config)
 
@@ -74,11 +83,13 @@ func (api *UltipaAPI) CreatePropertyIfNotExist(schemaName string, dbType ultipa.
 }
 
 func (api *UltipaAPI) GetProperty(schemaName string, propertyName string, dbType ultipa.DBType, config *configuration.RequestConfig) (property *structs.Property, err error) {
-	if strings.Contains(schemaName, "`") {
-		return nil, errors.New("schema name can not contain character `")
+	err = CheckName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
 	}
-	if strings.Contains(propertyName, "`") {
-		return nil, errors.New("property name can not contain character `")
+	err = CheckName(propertyName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), propertyName))
 	}
 	schema, err := api.GetSchema(schemaName, dbType, config)
 
@@ -108,11 +119,13 @@ func (api *UltipaAPI) CreateNodeProperty(schemaName string, prop *structs.Proper
 	if prop.Type == structs.PropertyType_IGNORE {
 		return nil, err
 	}
-	if strings.Contains(schemaName, "`") {
-		return nil, errors.New("schema name can not contain character `")
+	err = CheckName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
 	}
-	if strings.Contains(prop.Name, "`") {
-		return nil, errors.New("property name can not contain character `")
+	err = CheckName(prop.Name)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), prop.Name))
 	}
 	escapeSchemaName := schemaName
 	if utils.IsNeedToEscapeSchemaNameForProperty(schemaName) {
@@ -150,11 +163,13 @@ func (api *UltipaAPI) CreateEdgeProperty(schemaName string, prop *structs.Proper
 		return nil, err
 	}
 
-	if strings.Contains(schemaName, "`") {
-		return nil, errors.New("schema name can not contain character `")
+	err = CheckName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
 	}
-	if strings.Contains(prop.Name, "`") {
-		return nil, errors.New("property name can not contain character `")
+	err = CheckName(prop.Name)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), prop.Name))
 	}
 
 	escapeSchemaName := schemaName
