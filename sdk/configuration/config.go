@@ -27,6 +27,8 @@ type UltipaConfig struct {
 	HeartBeat        int      `yaml:"heart_beat"` // frequency:second,  if 0 means no heart beat, to make sure the connection is alive
 }
 
+var DefaultTimeout int32 = 1000
+
 func NewUltipaConfig(config *UltipaConfig) *UltipaConfig {
 	config.FillDefault()
 
@@ -51,7 +53,7 @@ func (config *UltipaConfig) FillDefault() {
 	}
 
 	if config.Timeout == 0 {
-		config.Timeout = 1000
+		config.Timeout = DefaultTimeout
 	}
 }
 
