@@ -31,14 +31,6 @@ func (api *UltipaAPI) CreateProperty(schemaName string, dbType ultipa.DBType, pr
 
 func (api *UltipaAPI) doCreateProperty(schemaName string, dbType ultipa.DBType, prop *structs.Property, conf *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	api.Logger.Log("Creating Property : @" + schemaName + "." + prop.Name)
-	err = CheckName(schemaName)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
-	}
-	err = CheckName(prop.Name)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), prop.Name))
-	}
 	switch dbType {
 	case ultipa.DBType_DBNODE:
 		resp, err = api.doCreateNodeProperty(schemaName, prop, conf)
