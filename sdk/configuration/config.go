@@ -51,7 +51,7 @@ func (config *UltipaConfig) FillDefault() {
 	}
 
 	if config.Timeout == 0 {
-		config.Timeout = 20
+		config.Timeout = 1000
 	}
 }
 
