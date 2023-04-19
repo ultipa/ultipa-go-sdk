@@ -158,10 +158,15 @@ func (pool *ConnectionPool) doRefreshClusterInfo(graphName string) error {
 	activeConns := pool.Actives
 
 	if len(pool.Actives) < 1 {
-		return errors.New("No Actived Connection is found")
+		return errors.New("no active Connection is found")
 	}
 
+	allIsNill := true
 	for _, activeConn := range activeConns {
+		if activeConn == nil {
+			continue
+		}
+		allIsNill = false
 		// 如果该图集暂无初始化时
 		if pool.GraphMgr.GetLeader(graphName) == nil {
 			conn = activeConn
@@ -174,6 +179,9 @@ func (pool *ConnectionPool) doRefreshClusterInfo(graphName string) error {
 		if err == nil {
 			return nil
 		}
+	}
+	if allIsNill {
+		err = errors.New("no active Connection exists")
 	}
 	return err
 }
