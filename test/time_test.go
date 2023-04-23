@@ -34,14 +34,14 @@ func TestNewTimeFromString(t *testing.T) {
 }
 
 func TestTimeToUltipaTime(t *testing.T) {
-	ut := utils.TimeToUltipaTime(nil, nil)
+	ut := utils.TimeToUltipaTime(nil)
 	t.Log(ut)
 }
 
 func TestTimeZone(t *testing.T) {
 	t.Log(time.Now().Zone())
 	tt:=time.Unix(0, 0).UTC()
-	ut:=utils.TimeToUltipaTime(&tt ,time.UTC)
+	ut:=utils.TimeToUltipaTime(&tt)
 	t.Log(ut)
 	t.Log(ut.Datetime)
 }
