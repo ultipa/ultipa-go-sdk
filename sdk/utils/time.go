@@ -271,7 +271,8 @@ func NewUltipaTimeFromString(dateString string) (*UltipaTime, error) {
 	}
 
 	for _, l := range layouts {
-		t, err := time.Parse(l, dateString)
+		//t, err := time.Parse(l, dateString)
+		t, err := time.ParseInLocation(l, dateString, time.Local)
 		if err != nil {
 			continue
 		}
@@ -289,7 +290,7 @@ func NewUltipaTimeFromString(dateString string) (*UltipaTime, error) {
 				yearValue += 2000
 			}
 			newDateString := fmt.Sprintf("%v%s", yearValue, dateString[2:])
-			t, err = time.Parse("20"+l, newDateString)
+			t, err = time.ParseInLocation("20"+l, newDateString, time.Local)
 			if err != nil {
 				return nil, err
 			}
