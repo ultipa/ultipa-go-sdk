@@ -9,7 +9,7 @@ func (err *LeaderNotYetElectedError) Error() string {
 	if err.Message != "" {
 		return err.Message
 	}
-	return "raft leader tot yet elected"
+	return "raft leader not elected yet"
 }
 
 func NewLeaderNotYetElectedError(msg string) *LeaderNotYetElectedError {
