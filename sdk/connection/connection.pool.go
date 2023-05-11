@@ -133,6 +133,9 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) error {
 				printers.PrintWarn(conn.Host + " failed - " + resp.Status.Msg)
 				conn.Active = ultipa.ServerStatus_DEAD
 				return errors.New(resp.Status.Msg)
+			} else {
+				printers.PrintWarn(conn.Host + " failed - " + resp.Status.Msg)
+				conn.Active = ultipa.ServerStatus_DEAD
 			}
 			return nil
 		})
