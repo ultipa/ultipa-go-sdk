@@ -99,43 +99,52 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) error {
 	if seconds <= 0 {
 		seconds = 3
 	}
+	connErrors := map[string]error{}
 	//var wg sync.WaitGroup
 	var eg errgroup.Group
 	for _, conn := range pool.Connections {
 		//wg.Add(1)
+		localConn := conn
 		eg.Go(func() error {
 			//defer wg.Done()
 			ctx, cancel, err := pool.NewContext(&configuration.RequestConfig{
 				Timeout: seconds,
 			})
 			if err != nil {
-				logger.PrintWarn(conn.Host + "failed - " + err.Error())
-				conn.Active = ultipa.ServerStatus_DEAD
+				logger.PrintWarn(localConn.Host + " failed - " + err.Error())
+				localConn.Active = ultipa.ServerStatus_DEAD
+				connErrors[localConn.Host] = err
 				return nil
 			}
 			defer cancel()
 
-			resp, err := conn.GetControlClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
+			resp, err := localConn.GetControlClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
 				Name: "go sdk refresh",
 			})
 
 			if err != nil {
-				logger.PrintWarn(conn.Host + " failed - " + err.Error())
-				conn.Active = ultipa.ServerStatus_DEAD
-				// this connection failed, try next, so return nil here.
+				logger.PrintWarn(localConn.Host + " failed - " + err.Error())
+				localConn.Active = ultipa.ServerStatus_DEAD
+				connErrors[localConn.Host] = err
+				// this connection failed, try next, so return nil here to bypass errgroup.
 				return nil
 			}
 
 			if resp.Status == nil || resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS {
-				conn.Active = ultipa.ServerStatus_ALIVE
-				pool.Actives = append(pool.Actives, conn)
+				localConn.Active = ultipa.ServerStatus_ALIVE
+				pool.Actives = append(pool.Actives, localConn)
+				connErrors[localConn.Host] = nil
 			} else if resp.Status.ErrorCode == ultipa.ErrorCode_PERMISSION_DENIED && strings.Contains(resp.Status.Msg, "username does not exist or password is wrong") {
-				logger.PrintWarn(conn.Host + " failed - " + resp.Status.Msg)
-				conn.Active = ultipa.ServerStatus_DEAD
-				return errors.New(resp.Status.Msg)
+				logger.PrintWarn(localConn.Host + " failed - " + resp.Status.Msg)
+				localConn.Active = ultipa.ServerStatus_DEAD
+				err = errors.New(resp.Status.Msg)
+				connErrors[localConn.Host] = err
+				// username and password mismatch error, not necessary to try next conn, fail via errgroup
+				return err
 			} else {
 				logger.PrintWarn(conn.Host + " failed - " + resp.Status.Msg)
-				conn.Active = ultipa.ServerStatus_DEAD
+				localConn.Active = ultipa.ServerStatus_DEAD
+				connErrors[localConn.Host] = errors.New(resp.Status.Msg)
 			}
 			return nil
 		})
@@ -144,7 +153,23 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) error {
 	if err := eg.Wait(); err != nil {
 		return err
 	}
-	return nil
+	isTcpErr := true
+	for host, connError := range connErrors {
+		if connError == nil {
+			//any connection success, will pass.
+			return nil
+		}
+		//connection error: desc = "transport: Error while dialing dial tcp 192.168.1.80:61095: connectex: No connection could be made because the target machine actively refused it."
+		if !strings.Contains(connError.Error(), "Error while dialing dial tcp") {
+			isTcpErr = false
+			logger.PrintError(fmt.Sprintf("failed to connect to host %s: %v", host, connError))
+		}
+	}
+	if isTcpErr {
+		return errors.New(`transport: Error while dialing dial tcp with all hosts: No connection could be made because the target machine actively refused`)
+	} else {
+		return errors.New(`failed to connect to all hosts`)
+	}
 }
 
 // 更新查看哪些连接还有效
