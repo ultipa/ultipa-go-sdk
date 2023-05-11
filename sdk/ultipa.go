@@ -8,22 +8,24 @@ import (
 )
 
 var (
-	Version  = "v4.2.3" //主版本号
+	Version = "v4.2.3" //主版本号
 )
 
 // New an Ultipa Instance !!!!
-func NewUltipa(config *configuration.UltipaConfig) (*api.UltipaAPI, error){
+func NewUltipa(config *configuration.UltipaConfig) (*api.UltipaAPI, error) {
 
 	config.FillDefault()
 
 	// set connection pool
-	pool , err := connection.NewConnectionPool(config)
-
+	pool, err := connection.NewConnectionPool(config)
+	if err != nil {
+		return nil, err
+	}
 	// set heartbeat for Connection Pool
 	pool.RunHeartBeat()
 
-	if  err != nil {
-		return nil ,err
+	if err != nil {
+		return nil, err
 	}
 
 	return api.NewUltipaAPI(pool), err
