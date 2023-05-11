@@ -102,7 +102,7 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) error {
 	connErrors := map[string]error{}
 	//var wg sync.WaitGroup
 	var eg errgroup.Group
-	for host, conn := range pool.Connections {
+	for _, conn := range pool.Connections {
 		//wg.Add(1)
 		localConn := conn
 		eg.Go(func() error {
@@ -113,7 +113,7 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) error {
 			if err != nil {
 				printers.PrintWarn(localConn.Host + "failed - " + err.Error())
 				localConn.Active = ultipa.ServerStatus_DEAD
-				connErrors[host] = err
+				connErrors[localConn.Host] = err
 				return nil
 			}
 			defer cancel()
@@ -125,7 +125,7 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) error {
 			if err != nil {
 				printers.PrintWarn(localConn.Host + " failed - " + err.Error())
 				localConn.Active = ultipa.ServerStatus_DEAD
-				connErrors[host] = err
+				connErrors[localConn.Host] = err
 				// this connection failed, try next, so return nil here to bypass errgroup.
 				return nil
 			}
@@ -133,18 +133,18 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) error {
 			if resp.Status == nil || resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS {
 				localConn.Active = ultipa.ServerStatus_ALIVE
 				pool.Actives = append(pool.Actives, localConn)
-				connErrors[host] = nil
+				connErrors[localConn.Host] = nil
 			} else if resp.Status.ErrorCode == ultipa.ErrorCode_PERMISSION_DENIED && strings.Contains(resp.Status.Msg, "username does not exist or password is wrong") {
 				printers.PrintWarn(localConn.Host + " failed - " + resp.Status.Msg)
 				localConn.Active = ultipa.ServerStatus_DEAD
 				err = errors.New(resp.Status.Msg)
-				connErrors[host] = err
+				connErrors[localConn.Host] = err
 				// username and password mismatch error, not necessary to try next conn, fail via errgroup
 				return err
 			} else {
 				printers.PrintWarn(conn.Host + " failed - " + resp.Status.Msg)
 				localConn.Active = ultipa.ServerStatus_DEAD
-				connErrors[host] = errors.New(resp.Status.Msg)
+				connErrors[localConn.Host] = errors.New(resp.Status.Msg)
 			}
 			return nil
 		})
