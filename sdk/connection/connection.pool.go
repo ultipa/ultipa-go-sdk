@@ -103,39 +103,40 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) error {
 	var eg errgroup.Group
 	for _, conn := range pool.Connections {
 		//wg.Add(1)
+		localConn := conn
 		eg.Go(func() error {
 			//defer wg.Done()
 			ctx, cancel, err := pool.NewContext(&configuration.RequestConfig{
 				Timeout: seconds,
 			})
 			if err != nil {
-				printers.PrintWarn(conn.Host + "failed - " + err.Error())
-				conn.Active = ultipa.ServerStatus_DEAD
+				printers.PrintWarn(localConn.Host + "failed - " + err.Error())
+				localConn.Active = ultipa.ServerStatus_DEAD
 				return nil
 			}
 			defer cancel()
 
-			resp, err := conn.GetControlClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
+			resp, err := localConn.GetControlClient().SayHello(ctx, &ultipa.HelloUltipaRequest{
 				Name: "go sdk refresh",
 			})
 
 			if err != nil {
-				printers.PrintWarn(conn.Host + " failed - " + err.Error())
-				conn.Active = ultipa.ServerStatus_DEAD
+				printers.PrintWarn(localConn.Host + " failed - " + err.Error())
+				localConn.Active = ultipa.ServerStatus_DEAD
 				// this connection failed, try next, so return nil here.
 				return nil
 			}
 
 			if resp.Status == nil || resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS {
-				conn.Active = ultipa.ServerStatus_ALIVE
-				pool.Actives = append(pool.Actives, conn)
+				localConn.Active = ultipa.ServerStatus_ALIVE
+				pool.Actives = append(pool.Actives, localConn)
 			} else if resp.Status.ErrorCode == ultipa.ErrorCode_PERMISSION_DENIED && strings.Contains(resp.Status.Msg, "username does not exist or password is wrong") {
-				printers.PrintWarn(conn.Host + " failed - " + resp.Status.Msg)
-				conn.Active = ultipa.ServerStatus_DEAD
+				printers.PrintWarn(localConn.Host + " failed - " + resp.Status.Msg)
+				localConn.Active = ultipa.ServerStatus_DEAD
 				return errors.New(resp.Status.Msg)
 			} else {
 				printers.PrintWarn(conn.Host + " failed - " + resp.Status.Msg)
-				conn.Active = ultipa.ServerStatus_DEAD
+				localConn.Active = ultipa.ServerStatus_DEAD
 			}
 			return nil
 		})
