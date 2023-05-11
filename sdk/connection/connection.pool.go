@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/metadata"
 	"log"
 	"reflect"
+	"strings"
 	"sync"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
@@ -52,17 +54,21 @@ func NewConnectionPool(config *configuration.UltipaConfig) (*ConnectionPool, err
 	err := pool.CreateConnections()
 
 	if err != nil {
-		log.Println(err)
+		logger.PrintError(err.Error())
+		return nil, err
 	}
 
 	// Refresh Actives
-	pool.RefreshActives()
-
+	err = pool.RefreshActives()
+	if err != nil {
+		logger.PrintError(err.Error())
+		return nil, err
+	}
 	// Refresh global Cluster info
 	err = pool.RefreshClusterInfo("global")
 
 	if err != nil {
-		log.Println(err)
+		logger.PrintError(err.Error())
 	}
 
 	return pool, err
@@ -79,12 +85,12 @@ func (pool *ConnectionPool) CreateConnections() error {
 	return err
 }
 
-func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) {
+func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) error {
 	pool.muActiveSafely.Lock()
 	defer pool.muActiveSafely.Unlock()
 	if time.Now().Sub(pool.LastActivesTime) <= 5*time.Second && len(pool.Connections) == len(pool.Actives) {
 		// 避免频繁刷新
-		return
+		return nil
 	}
 	defer func() {
 		pool.LastActivesTime = time.Now()
@@ -93,18 +99,19 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) {
 	if seconds <= 0 {
 		seconds = 3
 	}
-	var wg sync.WaitGroup
+	//var wg sync.WaitGroup
+	var eg errgroup.Group
 	for _, conn := range pool.Connections {
-		wg.Add(1)
-		go func(conn *Connection) {
-			defer wg.Done()
+		//wg.Add(1)
+		eg.Go(func() error {
+			//defer wg.Done()
 			ctx, cancel, err := pool.NewContext(&configuration.RequestConfig{
 				Timeout: seconds,
 			})
 			if err != nil {
 				logger.PrintWarn(conn.Host + "failed - " + err.Error())
 				conn.Active = ultipa.ServerStatus_DEAD
-				return
+				return nil
 			}
 			defer cancel()
 
@@ -113,26 +120,36 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) {
 			})
 
 			if err != nil {
-				logger.PrintWarn(conn.Host + "failed - " + err.Error())
+				logger.PrintWarn(conn.Host + " failed - " + err.Error())
 				conn.Active = ultipa.ServerStatus_DEAD
-				return
+				// this connection failed, try next, so return nil here.
+				return nil
 			}
 
 			if resp.Status == nil || resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS {
 				conn.Active = ultipa.ServerStatus_ALIVE
 				pool.Actives = append(pool.Actives, conn)
+			} else if resp.Status.ErrorCode == ultipa.ErrorCode_PERMISSION_DENIED && strings.Contains(resp.Status.Msg, "username does not exist or password is wrong") {
+				logger.PrintWarn(conn.Host + " failed - " + resp.Status.Msg)
+				conn.Active = ultipa.ServerStatus_DEAD
+				return errors.New(resp.Status.Msg)
 			} else {
-				logger.PrintWarn(conn.Host + "failed - " + resp.Status.Msg)
+				logger.PrintWarn(conn.Host + " failed - " + resp.Status.Msg)
 				conn.Active = ultipa.ServerStatus_DEAD
 			}
-		}(conn)
+			return nil
+		})
 	}
-	wg.Wait()
+	//wg.Wait()
+	if err := eg.Wait(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // 更新查看哪些连接还有效
-func (pool *ConnectionPool) RefreshActives() {
-	pool.RefreshActivesWithSeconds(6)
+func (pool *ConnectionPool) RefreshActives() error {
+	return pool.RefreshActivesWithSeconds(6)
 }
 func (pool *ConnectionPool) ForceRefreshClusterInfo(graphName string) error {
 	pool.GraphMgr.DeleteGraph(graphName)
@@ -144,7 +161,10 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 	err := pool.doRefreshClusterInfo(graphName)
 	if err != nil && reflect.TypeOf(err).Elem().String() == "utils.LeaderNotYetElectedError" {
 		//若是leader未选出的错误类型，再重试一次
-		pool.RefreshActives()
+		err = pool.RefreshActives()
+		if err != nil {
+			return err
+		}
 		err = pool.doRefreshClusterInfo(graphName)
 	}
 	return err
@@ -158,7 +178,7 @@ func (pool *ConnectionPool) doRefreshClusterInfo(graphName string) error {
 	activeConns := pool.Actives
 
 	if len(pool.Actives) < 1 {
-		return errors.New("no active Connection is found")
+		return errors.New("no active connection is found")
 	}
 
 	allIsNill := true
@@ -181,7 +201,7 @@ func (pool *ConnectionPool) doRefreshClusterInfo(graphName string) error {
 		}
 	}
 	if allIsNill {
-		err = errors.New("no active Connection exists")
+		err = errors.New("no active connection exists")
 	}
 	return err
 }
@@ -221,7 +241,10 @@ func (pool *ConnectionPool) resolveClusterInfo(graphName string, conn *Connectio
 			pool.Connections[resp.Status.ClusterInfo.Redirect] = c
 		}
 		pool.GraphMgr.SetLeader(graphName, pool.Connections[resp.Status.ClusterInfo.Redirect])
-		pool.RefreshActives()
+		err = pool.RefreshActives()
+		if err != nil {
+			return err
+		}
 		return nil
 	}
 
@@ -251,7 +274,10 @@ func (pool *ConnectionPool) resolveClusterInfo(graphName string, conn *Connectio
 			fconn.SetRoleFromInt32(follower.Role)
 			pool.GraphMgr.AddFollower(graphName, fconn)
 		}
-		pool.RefreshActives()
+		err = pool.RefreshActives()
+		if err != nil {
+			return err
+		}
 		return nil
 	} else {
 		err = errors.New(fmt.Sprintf("falied to refresh cluster of graph %s: %v,%s", graphName, resp.Status.ErrorCode, resp.Status.Msg))
@@ -308,7 +334,7 @@ func (pool *ConnectionPool) GetRandomConn(config *configuration.UltipaConfig) (*
 	pool.muActiveSafely.Lock()
 	defer pool.muActiveSafely.Unlock()
 	if len(pool.Actives) < 1 {
-		return nil, errors.New("No Actived Connection is found")
+		return nil, errors.New("no active connection is found")
 	}
 
 	pool.RandomTick++
