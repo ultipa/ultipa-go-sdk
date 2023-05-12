@@ -161,7 +161,7 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) error {
 		return err
 	}
 	isTcpErr := true
-	for host, connError := range connErrors {
+	for idx, connError := range connErrors {
 		if connError == nil {
 			//any connection success, will pass.
 			return nil
@@ -169,7 +169,7 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) error {
 		//connection error: desc = "transport: Error while dialing dial tcp 192.168.1.80:61095: connectex: No connection could be made because the target machine actively refused it."
 		if !strings.Contains(connError.Error(), "Error while dialing dial tcp") {
 			isTcpErr = false
-			logger.PrintError(fmt.Sprintf("failed to connect to host %s: %v", host, connError))
+			logger.PrintError(fmt.Sprintf("failed to connect to host %s: %v", hosts[idx], connError))
 		}
 	}
 	if isTcpErr {
