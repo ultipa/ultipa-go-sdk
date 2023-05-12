@@ -99,7 +99,6 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) error {
 	if seconds <= 0 {
 		seconds = 3
 	}
-	//connErrors := map[string]error{}
 	var hosts []string
 	connErrors := make([]error, len(pool.Connections))
 	var connections []*Connection
