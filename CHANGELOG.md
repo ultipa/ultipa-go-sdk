@@ -1,4 +1,14 @@
 # CHANGE LOGS
+###4.3.0
+- Support data type LIST and POINT, remove ARRAY data type.
+- AsAttr support LIST data type.
+- Support NULL value.
+- Implement backup interface.
+- Improve error message when failed to create connection pool
+- Differentiate timestamp and datetime when parse from string
+- Support special character when create/show schema and create property
+- 
+
 
 ## Version 4.2.1
 
