@@ -1,6 +1,8 @@
 package test
 
 import (
+	"encoding/binary"
+	"fmt"
 	"testing"
 	"time"
 	"ultipa-go-sdk/sdk/utils"
@@ -53,4 +55,39 @@ func TestUint64ToUltipaTime(t *testing.T) {
 	t.Log(ut)
 	gt := ut.Uint64ToTime(uint64(1))
 	t.Log(gt)
+}
+
+func TestSerializeAndDeserializeDateTime(t *testing.T) {
+
+	value := uint64(0)
+	serializeAndDeserialize(t, value)
+
+	utime, err := utils.NewDatetimeFromString("1999-11-30 00:00:00+0000")
+	if err != nil {
+		t.Fatal(err)
+	}
+	//utime.Datetime is used to serialize for server.
+	dateTimeValue := utime.Datetime
+	serializeAndDeserialize(t, dateTimeValue)
+
+	utime, err = utils.NewDatetimeFromString("0000-00-00 00:00:00+0000")
+	if err != nil {
+		t.Fatal(err)
+	}
+	dateTimeValue = utime.Datetime
+	serializeAndDeserialize(t, dateTimeValue)
+}
+
+func serializeAndDeserialize(t *testing.T, value uint64) {
+	t.Log(fmt.Sprintf("original value=%v", value))
+	bytes := make([]byte, 8)
+	binary.BigEndian.PutUint64(bytes, uint64(value))
+	t.Log(fmt.Sprintf("serialize to bytes =%v", bytes))
+	deValue := utils.AsUint64(bytes)
+	t.Log(fmt.Sprintf("deserialize to uint64=%v", deValue))
+	n := &utils.UltipaTime{
+		Datetime: deValue,
+	}
+	date := n.Uint64ToTime(deValue)
+	t.Log(fmt.Sprintf("deserialize date=%v", date))
 }
