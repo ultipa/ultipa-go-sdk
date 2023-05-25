@@ -210,8 +210,8 @@ func TestCheckPropAndValueAutoData(t *testing.T) {
 	var graph = "grapthInsertTest"
 	hosts := []string{"192.168.1.85:61095", "192.168.1.87:61095", "192.168.1.88:61095"}
 	client, _ := GetClient(hosts, graph)
-	timestamp1, _ := utils.NewTimestampFromString("2018-08-17T09:57:33+08:00")
-	timestamp2, _ := utils.NewTimestampFromString("2018-08-17 09:57:33")
+	timestamp1, _ := utils.NewTimestampFromString("2018-08-17T09:57:33+08:00", nil)
+	timestamp2, _ := utils.NewTimestampFromString("2018-08-17 09:57:33", nil)
 	node1 := structs.Node{
 		Values: &structs.Values{
 			Data: map[string]interface {

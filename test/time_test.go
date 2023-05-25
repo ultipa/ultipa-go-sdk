@@ -36,20 +36,20 @@ func TestNewTimeFromString(t *testing.T) {
 }
 
 func TestTimeToUltipaTime(t *testing.T) {
-	ut := utils.TimeToUltipaTime(nil)
+	ut := utils.TimeToUltipaTime(nil, nil)
 	t.Log(ut)
 }
 
 func TestTimeZone(t *testing.T) {
 	t.Log(time.Now().Zone())
-	tt:=time.Unix(0, 0).UTC()
-	ut:=utils.TimeToUltipaTime(&tt)
+	tt := time.Unix(0, 0).UTC()
+	ut := utils.TimeToUltipaTime(&tt, nil)
 	t.Log(ut)
 	t.Log(ut.Datetime)
 }
 
 func TestUint64ToUltipaTime(t *testing.T) {
-	ut:=utils.UltipaTime{
+	ut := utils.UltipaTime{
 		Datetime: 1,
 	}
 	t.Log(ut)
