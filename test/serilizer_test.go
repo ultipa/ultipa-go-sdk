@@ -15,7 +15,7 @@ func TestStringAsInterface(t *testing.T) {
 }
 
 func TestConvertInterfaceToBytesSafe(t *testing.T) {
-	ultipaTime, err := utils.NewTimestampFromString("2010-12-12 00:00:00.000")
+	ultipaTime, err := utils.NewTimestampFromString("2010-12-12 00:00:00.000", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -31,7 +31,7 @@ func TestConvertInterfaceToBytesSafe(t *testing.T) {
 	}
 	t.Log(datetime)
 
-	ultipaTime, err = utils.NewTimestampFromString("1994-12-12 00:00:00")
+	ultipaTime, err = utils.NewTimestampFromString("1994-12-12 00:00:00", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

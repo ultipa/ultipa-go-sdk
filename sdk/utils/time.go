@@ -23,7 +23,7 @@ type UltipaTime struct {
 // NewTimeStamp convert datetime to UltipaTime for timestamp, internal Time in UltipaTime use local Location
 func NewTimeStamp(datetime int64) *UltipaTime {
 	unixTime := time.Unix(datetime, 0)
-	return TimeToUltipaTime(&unixTime)
+	return TimeToUltipaTime(&unixTime, unixTime.Location())
 }
 
 // NewTime convert datetime to UltipaTime for datetime, use NewDateTime instead is clearer
@@ -36,7 +36,7 @@ func NewDateTime(datetime uint64) *UltipaTime {
 	if datetime == 0 {
 		//use same location UTC as n.Uint64ToTime
 		unix := time.Unix(0, 0).UTC()
-		return TimeToUltipaTime(&unix)
+		return TimeToUltipaTime(&unix, unix.Location())
 	} else {
 		n := UltipaTime{
 			Datetime: datetime,
@@ -64,28 +64,31 @@ func NewTimeFromStringFormat(dateString string, format string) (*UltipaTime, err
 	return &n, err
 }
 
-//NewDatetimeFromString converts dateString to UltipaTime for DateTime, which means that internal Time of UltipaTime use UTC location when calculating internal Datetime.
-//dateString supports layouts or timestamp in Second, Millisecond, Microsecond, Nanosecond
+// NewDatetimeFromString converts dateString to UltipaTime for DateTime, which means that internal Time of UltipaTime use UTC location when calculating internal Datetime.
+// dateString supports layouts or timestamp in Second, Millisecond, Microsecond, Nanosecond
 func NewDatetimeFromString(dateString string) (*UltipaTime, error) {
-	return NewUltipaTimeFromString(dateString)
+	return NewUltipaTimeFromString(dateString, time.UTC)
 }
 
-//NewTimestampFromString converts dateString to UltipaTime for Timestamp, which means that internal Time of UltipaTime use LOCAL location when calculating internal Datetime.
-//dateString supports layouts or timestamp in Second, Millisecond, Microsecond, Nanosecond
-func NewTimestampFromString(dateString string) (*UltipaTime, error) {
+// NewTimestampFromString converts dateString to UltipaTime for Timestamp, which means that internal Time of UltipaTime use LOCAL location when calculating internal Datetime.
+// dateString supports layouts or timestamp in Second, Millisecond, Microsecond, Nanosecond
+func NewTimestampFromString(dateString string, location *time.Location) (*UltipaTime, error) {
 	if dateString == "" {
 		return nil, errors.New("unable to convert empty string to UltipaTime for timestamp")
 	}
-	return NewUltipaTimeFromString(dateString)
+	return NewUltipaTimeFromString(dateString, location)
 }
 
-//NewUltipaTimeFromString converts dateString to UltipaTime, supports layouts and timestamp in Millisecond.
+// NewUltipaTimeFromString converts dateString to UltipaTime, supports layouts and timestamp in Millisecond.
 // location is used when calculating internal Datetime of UltipaTime, if location is null, then will use time.Local by default.
-func NewUltipaTimeFromString(dateString string) (*UltipaTime, error) {
+func NewUltipaTimeFromString(dateString string, location *time.Location) (*UltipaTime, error) {
 	if dateString == "" {
 		return nil, errors.New("unable to convert empty string to UltipaTime")
 	}
-	ultipaTime, err0 := ParseTimeStampStr(dateString)
+	if location == nil {
+		location = time.Local
+	}
+	ultipaTime, err0 := ParseTimeStampStr(dateString, location)
 	if err0 == nil && ultipaTime != nil {
 		return ultipaTime, nil
 	}
@@ -272,7 +275,7 @@ func NewUltipaTimeFromString(dateString string) (*UltipaTime, error) {
 
 	for _, l := range layouts {
 		//t, err := time.Parse(l, dateString)
-		t, err := time.ParseInLocation(l, dateString, time.Local)
+		t, err := time.ParseInLocation(l, dateString, location)
 		if err != nil {
 			continue
 		}
@@ -290,26 +293,30 @@ func NewUltipaTimeFromString(dateString string) (*UltipaTime, error) {
 				yearValue += 2000
 			}
 			newDateString := fmt.Sprintf("%v%s", yearValue, dateString[2:])
-			t, err = time.ParseInLocation("20"+l, newDateString, time.Local)
+			t, err = time.ParseInLocation("20"+l, newDateString, location)
 			if err != nil {
 				return nil, err
 			}
 		}
-		return TimeToUltipaTime(&t), err
+
+		if location != nil {
+			t = t.In(location)
+		}
+		return TimeToUltipaTime(&t, t.Location()), err
 	}
 
 	return nil, errors.New("parse datetime string failed : " + dateString)
 }
 
-//NewTimeFromString converts dateString to UltipaTime, supports layouts and timestamp in Second, Millisecond,Microsecond,Nanosecond
-//Deprecated,keep this method for history reason, please use NewTimestampFromString or NewDatetimeFromString instead.
+// NewTimeFromString converts dateString to UltipaTime, supports layouts and timestamp in Second, Millisecond,Microsecond,Nanosecond
+// Deprecated,keep this method for history reason, please use NewTimestampFromString or NewDatetimeFromString instead.
 func NewTimeFromString(dateString string) (*UltipaTime, error) {
-	return NewTimestampFromString(dateString)
+	return NewTimestampFromString(dateString, nil)
 }
 
 // ParseTimeStampStr convert timestamp milliseconds string value to UltipaTime, if v can not be converted to int, then raise an error.
-//location is used when calculating internal Datetime of UltipaTime, if location is null, then will use time.Local by default.
-func ParseTimeStampStr(v string) (*UltipaTime, error) {
+// location is used when calculating internal Datetime of UltipaTime, if location is null, then will use time.Local by default.
+func ParseTimeStampStr(v string, location *time.Location) (*UltipaTime, error) {
 	if v == "" {
 		return nil, errors.New("unable to convert empty string to UltipaTime")
 	}
@@ -320,7 +327,10 @@ func ParseTimeStampStr(v string) (*UltipaTime, error) {
 	sec := timestamp / 1000
 	nsec := timestamp % 1000 * 1e6
 	timeValue := time.Unix(sec, nsec)
-	return TimeToUltipaTime(&timeValue), nil
+	if location != nil {
+		timeValue = timeValue.In(location)
+	}
+	return TimeToUltipaTime(&timeValue, timeValue.Location()), nil
 }
 
 // parse Bytes to year, month....
@@ -373,14 +383,14 @@ func (t *UltipaTime) Uint64ToTime(datetime uint64) (_t *time.Time) {
 	return t.Time
 }
 
-//uint64_t datetime = 0;
-//uint64_t year_month = year * 13 + month;
-//datetime |= (year_month << 46);
-//datetime |= (day << 41);
-//datetime |= (hour << 36);
-//datetime |= (minute << 30);
-//datetime |= (second << 24);
-//datetime |= macrosec;
+// uint64_t datetime = 0;
+// uint64_t year_month = year * 13 + month;
+// datetime |= (year_month << 46);
+// datetime |= (day << 41);
+// datetime |= (hour << 36);
+// datetime |= (minute << 30);
+// datetime |= (second << 24);
+// datetime |= macrosec;
 func (u *UltipaTime) TimeToUint64(time *time.Time) uint64 {
 
 	u.Datetime = TimeToUint64(*time)
@@ -411,10 +421,13 @@ func TimeToUint64(time time.Time) uint64 {
 	return datetime
 }
 
-func TimeToUltipaTime(t *time.Time) *UltipaTime {
+func TimeToUltipaTime(t *time.Time, location *time.Location) *UltipaTime {
 	toConvertTime := t
 	if t == nil {
 		defaultTime := time.Unix(0, 0)
+		if location != nil {
+			defaultTime = defaultTime.In(location)
+		}
 		toConvertTime = &defaultTime
 	}
 

@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/types"
 )
@@ -72,7 +73,7 @@ func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType, subTypes []ultipa
 	}
 }
 
-//deserializeList deserialize bs to list
+// deserializeList deserialize bs to list
 func deserializeList(bs []byte, subTypes []ultipa.PropertyType) (interface{}, error) {
 	listData := &ultipa.ListData{}
 	if err := proto.Unmarshal(bs, listData); err != nil {
@@ -94,7 +95,7 @@ func deserializeList(bs []byte, subTypes []ultipa.PropertyType) (interface{}, er
 	return list, nil
 }
 
-//ConvertInterfaceToBytesSafe convert value to []byte, if value is nil, will set default value according to PropertyType t
+// ConvertInterfaceToBytesSafe convert value to []byte, if value is nil, will set default value according to PropertyType t
 func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTypes []ultipa.PropertyType) ([]byte, error) {
 	toConvertValue := value
 	if toConvertValue == nil {
@@ -158,7 +159,7 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 		case *UltipaTime:
 			return ConvertInterfaceToBytes(v.GetTimeStamp())
 		case string:
-			uTime, err := NewTimestampFromString(v)
+			uTime, err := NewTimestampFromString(v, nil)
 			if err != nil {
 				return nil, err
 			}
@@ -455,7 +456,7 @@ func StringAsInterface(source string, t ultipa.PropertyType) (interface{}, error
 		}
 		return v.Datetime, err
 	case ultipa.PropertyType_TIMESTAMP:
-		v, err := NewTimestampFromString(str)
+		v, err := NewTimestampFromString(str, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -465,6 +466,21 @@ func StringAsInterface(source string, t ultipa.PropertyType) (interface{}, error
 	}
 
 	return nil, nil
+}
+
+func StringTimestampAsInterface(str string, location *time.Location) (interface{}, error) {
+
+	str = strings.Trim(str, " ")
+
+	if str == "" {
+		str = GetDefaultNilString(ultipa.PropertyType_TIMESTAMP)
+	}
+
+	v, err := NewTimestampFromString(str, location)
+	if err != nil {
+		return nil, err
+	}
+	return v.GetTimeStamp(), err
 }
 
 func StringAsUUID(str string) (types.UUID, error) {
