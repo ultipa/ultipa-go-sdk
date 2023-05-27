@@ -42,6 +42,10 @@ func (api *UltipaAPI) GetConnByUQL(uql string, graphName string) (uqlType UQLTyp
 	}
 
 	leader = api.Pool.GraphMgr.GetLeader(graphName)
+	if leader == nil {
+		return 0, nil, nil, nil, errors.New(fmt.Sprintf("no leader found for graph %s", graphName))
+	}
+
 	followers = api.Pool.GraphMgr.GetGraph(graphName).Followers
 	global, err = api.Pool.GetGlobalMasterConn(nil)
 

@@ -80,3 +80,35 @@ func TestUqlWithSpecialHost(t *testing.T) {
 
 	log.Println(res)
 }
+
+func TestRefreshPool(t *testing.T) {
+	client, _ := GetClient([]string{"192.168.1.85:63540",
+		"192.168.1.87:63540",
+		"192.168.1.88:63540"}, "default")
+	for i := 0; i < 1000; i++ {
+		err := client.Pool.RefreshActivesWithSeconds(1)
+		if err != nil {
+			t.Log(err)
+		}
+		time.Sleep(time.Millisecond * 5500)
+	}
+}
+
+func TestGetConnByUQL(t *testing.T) {
+	graph := "amz"
+	uql := "show().schema()"
+	client, _ := GetClient([]string{"52.83.192.170:61090","161.189.204.0:61090","161.189.19.4:61090"}, graph)
+	_, leader, followers, global, err := client.GetConnByUQL(uql, graph)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if leader == nil {
+		t.Fatal("leader is nill")
+	}
+	if followers == nil {
+		t.Fatal("followers is nill")
+	}
+	if global == nil {
+		t.Fatal("global is nill")
+	}
+}
