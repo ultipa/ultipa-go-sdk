@@ -47,7 +47,7 @@ var GlobalUqlCommandKeys = []string{
 	`alter\(\).graph`,
 	`drop\(\).graph`,
 	`kill\(\)`,
-	`top\(\)`,
+	`^\s*top\(\)`,
 }
 
 var ExtraUqlCommandKeys = map[string]struct{}{
