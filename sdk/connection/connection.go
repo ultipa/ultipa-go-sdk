@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	ultipa "ultipa-go-sdk/rpc"
 	"ultipa-go-sdk/sdk/configuration"
+	"ultipa-go-sdk/sdk/utils"
 )
 
 type Connection struct {
@@ -32,7 +33,16 @@ func NewConnection(host string, config *configuration.UltipaConfig) (*Connection
 		config.MaxRecvSize = 1024 * 1024 * 10
 	}
 
-	if config.Crt == nil {
+	// Try to get a certificate
+	certificate := utils.GetCertificate(host)
+	if config.Crt == nil && certificate != nil {
+		certPool := x509.NewCertPool()
+		certPool.AddCert(certificate)
+		cred := credentials.NewTLS(&tls.Config{
+			RootCAs: certPool,
+		})
+		connection.Conn, err = grpc.Dial(host, grpc.WithTransportCredentials(cred), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(config.MaxRecvSize), grpc.MaxCallSendMsgSize(config.MaxRecvSize)))
+	} else if config.Crt == nil {
 		connection.Conn, err = grpc.Dial(host, grpc.WithInsecure(), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(config.MaxRecvSize), grpc.MaxCallSendMsgSize(config.MaxRecvSize)))
 	} else {
 		certPool := x509.NewCertPool()
@@ -73,4 +83,3 @@ func (conn *Connection) HasRole(role ultipa.FollowerRole) bool {
 func (conn *Connection) Close() error {
 	return conn.Conn.Close()
 }
-
