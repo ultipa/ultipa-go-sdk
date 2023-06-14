@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk"
 	"ultipa-go-sdk/sdk/configuration"
 )
 
@@ -97,7 +98,7 @@ func TestRefreshPool(t *testing.T) {
 func TestGetConnByUQL(t *testing.T) {
 	graph := "amz"
 	uql := "show().schema()"
-	client, _ := GetClient([]string{"52.83.192.170:61090","161.189.204.0:61090","161.189.19.4:61090"}, graph)
+	client, _ := GetClient([]string{"52.83.192.170:61090", "161.189.204.0:61090", "161.189.19.4:61090"}, graph)
 	_, leader, followers, global, err := client.GetConnByUQL(uql, graph)
 	if err != nil {
 		t.Fatal(err)
@@ -111,4 +112,24 @@ func TestGetConnByUQL(t *testing.T) {
 	if global == nil {
 		t.Fatal("global is nill")
 	}
+}
+
+func TestConnectionSSL(t *testing.T) {
+	var err error
+	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
+		Hosts:        []string{"kinqhpwws.us-east-2.uct.ultipa-inc.org:60010"},
+		Username:     "root",
+		Password:     "000000",
+		DefaultGraph: "default",
+		Debug:        true,
+	})
+
+	client, err = sdk.NewUltipa(config)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	uql, err := client.UQL("show().schema()", nil)
+	log.Println(uql)
 }
