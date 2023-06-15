@@ -36,11 +36,7 @@ func NewConnection(host string, config *configuration.UltipaConfig) (*Connection
 	// Try to get a certificate
 	certificate := utils.GetCertificate(host)
 	if config.Crt == nil && certificate != nil {
-		certPool := x509.NewCertPool()
-		certPool.AddCert(certificate)
-		cred := credentials.NewTLS(&tls.Config{
-			RootCAs: certPool,
-		})
+		cred := credentials.NewTLS(nil)
 		connection.Conn, err = grpc.Dial(host, grpc.WithTransportCredentials(cred), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(config.MaxRecvSize), grpc.MaxCallSendMsgSize(config.MaxRecvSize)))
 	} else if config.Crt == nil {
 		connection.Conn, err = grpc.Dial(host, grpc.WithInsecure(), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(config.MaxRecvSize), grpc.MaxCallSendMsgSize(config.MaxRecvSize)))
