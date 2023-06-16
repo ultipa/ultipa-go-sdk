@@ -68,6 +68,7 @@ func NewTimeFromStringFormat(dateString string, format string) (*UltipaTime, err
 // NewDatetimeFromString converts dateString to UltipaTime for DateTime, which means that internal Time of UltipaTime use UTC location when calculating internal Datetime.
 // dateString supports layouts or timestamp in Second, Millisecond, Microsecond, Nanosecond
 func NewDatetimeFromString(dateString string) (*UltipaTime, error) {
+	dateString = RemoveTimezone(dateString)
 	return NewUltipaTimeFromString(dateString, time.UTC)
 }
 
