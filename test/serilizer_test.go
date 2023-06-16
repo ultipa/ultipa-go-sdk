@@ -7,7 +7,7 @@ import (
 )
 
 func TestStringAsInterface(t *testing.T) {
-	datetime, err := utils.StringAsInterface("1970-01-01", ultipa.PropertyType_DATETIME)
+	datetime, err := utils.StringAsInterface("1970-01-01T00:00:00+0100", ultipa.PropertyType_DATETIME, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

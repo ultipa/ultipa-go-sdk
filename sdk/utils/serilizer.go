@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/types"
 )
 
@@ -236,7 +237,7 @@ func GetDefaultNilInterface(t ultipa.PropertyType) interface{} {
 
 }
 
-func StringAsInterface(str string, t ultipa.PropertyType) (interface{}, error) {
+func StringAsInterface(str string, t ultipa.PropertyType, location *time.Location) (interface{}, error) {
 
 	str = strings.Trim(str, " ")
 
@@ -280,7 +281,7 @@ func StringAsInterface(str string, t ultipa.PropertyType) (interface{}, error) {
 		}
 		return v.Datetime, err
 	case ultipa.PropertyType_TIMESTAMP:
-		v, err := NewTimestampFromString(str, nil)
+		v, err := NewTimestampFromString(str, location)
 		if err != nil {
 			return nil, err
 		}
@@ -311,4 +312,41 @@ func StringAsUUID(str string) (types.UUID, error) {
 	str = strings.Trim(str, " ")
 	v, err := strconv.ParseUint(str, 10, 64)
 	return v, err
+}
+
+func GetLocationFromConfig(req *configuration.RequestConfig) *time.Location {
+	if req.TimezoneOffset != 0 {
+		return time.FixedZone("UTC", int(req.TimezoneOffset))
+	} else if req.Timezone != "" {
+		return getLocationFromTimezone(req.Timezone)
+	}
+
+	return nil
+}
+
+func getLocationFromTimezone(timezone string) *time.Location {
+	if IsTimezoneOffsetCandidate(timezone) {
+		offsetStr := timezone
+		if strings.Contains(offsetStr, ":") {
+			offsetStr = strings.ReplaceAll(offsetStr, ":", "")
+		}
+		offset, _ := strconv.ParseInt(offsetStr, 10, 64)
+		if offset != 0 {
+			return time.FixedZone("UTC", int(offset*36))
+		}
+	} else {
+		if timezone != "" {
+			location, err := time.LoadLocation(timezone)
+			if err != nil {
+				return nil
+			}
+			return location
+		}
+	}
+	return nil
+}
+
+// IsTimezoneOffsetCandidate check whether offsetCandidate begin with +/- or not.
+func IsTimezoneOffsetCandidate(offsetCandidate string) bool {
+	return strings.HasPrefix(offsetCandidate, "+") || strings.HasPrefix(offsetCandidate, "-")
 }

@@ -3,6 +3,7 @@ package structs
 import (
 	"fmt"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/types"
 	"ultipa-go-sdk/sdk/utils"
 )
@@ -83,7 +84,10 @@ func NewNodeFromNodeRow(schema *Schema, nodeRow *ultipa.NodeRow) *Node {
 	return newNode
 }
 
-func ConvertStringNodes(schema *Schema, nodes []*Node) {
+func ConvertStringNodes(schema *Schema, nodes []*Node, req *configuration.RequestConfig) {
+	// Obtain the configured time zone information
+	// timezoneOffset > timeZone
+	location := utils.GetLocationFromConfig(req)
 
 	// For by Schema, not nodes value
 	for _, node := range nodes {
@@ -101,7 +105,7 @@ func ConvertStringNodes(schema *Schema, nodes []*Node) {
 				}
 			}
 
-			v, err := utils.StringAsInterface(str, prop.Type)
+			v, err := utils.StringAsInterface(str, prop.Type, location)
 
 			if err != nil {
 				continue

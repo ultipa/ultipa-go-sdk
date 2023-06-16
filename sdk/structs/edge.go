@@ -2,6 +2,7 @@ package structs
 
 import (
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/types"
 	"ultipa-go-sdk/sdk/utils"
 )
@@ -95,7 +96,10 @@ func (edge *Edge) Set(key string, value interface{}) error {
 	return nil
 }
 
-func ConvertStringEdges(schema *Schema, edges []*Edge) {
+func ConvertStringEdges(schema *Schema, edges []*Edge, req *configuration.RequestConfig) {
+	// Obtain the configured time zone information
+	// timezoneOffset > timeZone
+	location := utils.GetLocationFromConfig(req)
 
 	// For by Schema, not nodes value
 	for _, edge := range edges {
@@ -109,7 +113,7 @@ func ConvertStringEdges(schema *Schema, edges []*Edge) {
 				str = stri.(string)
 			}
 
-			v, err := utils.StringAsInterface(str, prop.Type)
+			v, err := utils.StringAsInterface(str, prop.Type, location)
 
 			if err != nil {
 				continue
