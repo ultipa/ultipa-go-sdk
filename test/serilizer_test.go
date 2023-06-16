@@ -19,13 +19,13 @@ func TestConvertInterfaceToBytesSafe(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	datetime, err := utils.ConvertInterfaceToBytesSafe(ultipaTime, ultipa.PropertyType_DATETIME)
+	datetime, err := utils.ConvertInterfaceToBytesSafe(ultipaTime, ultipa.PropertyType_DATETIME, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(datetime)
 
-	datetime, err = utils.ConvertInterfaceToBytesSafe("2010-12-12T00:00:00.000Z", ultipa.PropertyType_DATETIME)
+	datetime, err = utils.ConvertInterfaceToBytesSafe("2010-12-12T00:00:00.000Z", ultipa.PropertyType_DATETIME, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,13 +35,13 @@ func TestConvertInterfaceToBytesSafe(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	datetime, err = utils.ConvertInterfaceToBytesSafe(ultipaTime, ultipa.PropertyType_DATETIME)
+	datetime, err = utils.ConvertInterfaceToBytesSafe(ultipaTime, ultipa.PropertyType_DATETIME, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(datetime)
 
-	datetime, err = utils.ConvertInterfaceToBytesSafe("1994-12-12 00:00:00", ultipa.PropertyType_DATETIME)
+	datetime, err = utils.ConvertInterfaceToBytesSafe("1994-12-12 00:00:00", ultipa.PropertyType_DATETIME, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

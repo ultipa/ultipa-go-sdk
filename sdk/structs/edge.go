@@ -84,9 +84,9 @@ func (edge *Edge) GetBytes(key string) ([]byte, error) {
 }
 
 // GetBytesSafe get []byte value by key, if value is nil, then return default value of PropertyType t
-func (edge *Edge) GetBytesSafe(key string, t ultipa.PropertyType) ([]byte, error) {
+func (edge *Edge) GetBytesSafe(key string, t ultipa.PropertyType, req *configuration.RequestConfig) ([]byte, error) {
 	v := edge.Values.Get(key)
-	return utils.ConvertInterfaceToBytesSafe(v, t)
+	return utils.ConvertInterfaceToBytesSafe(v, t, req)
 }
 
 // set a value by key

@@ -55,7 +55,7 @@ func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType) interface{} {
 }
 
 // ConvertInterfaceToBytesSafe convert value to []byte, if value is nil, will set default value according to PropertyType t
-func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType) ([]byte, error) {
+func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, req *configuration.RequestConfig) ([]byte, error) {
 	toConvertValue := value
 	if toConvertValue == nil {
 		toConvertValue = GetDefaultNilInterface(t)
@@ -68,11 +68,12 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType) ([]by
 		case *UltipaTime:
 			return ConvertInterfaceToBytes(v.Datetime)
 		case string:
-			uTime, err := NewDatetimeFromString(v)
+			datetime, err := StringAsInterface(v, ultipa.PropertyType_DATETIME, GetLocationFromConfig(req))
+
 			if err != nil {
 				return nil, err
 			}
-			return ConvertInterfaceToBytes(uTime.Datetime)
+			return ConvertInterfaceToBytes(datetime)
 		default:
 			return ConvertInterfaceToBytes(toConvertValue)
 		}
@@ -83,11 +84,12 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType) ([]by
 		case *UltipaTime:
 			return ConvertInterfaceToBytes(v.GetTimeStamp())
 		case string:
-			uTime, err := NewTimeFromString(v)
+			timestamp, err := StringAsInterface(v, ultipa.PropertyType_TIMESTAMP, GetLocationFromConfig(req))
+
 			if err != nil {
 				return nil, err
 			}
-			return ConvertInterfaceToBytes(uTime.GetTimeStamp())
+			return ConvertInterfaceToBytes(timestamp)
 		default:
 			return ConvertInterfaceToBytes(toConvertValue)
 		}
@@ -315,6 +317,9 @@ func StringAsUUID(str string) (types.UUID, error) {
 }
 
 func GetLocationFromConfig(req *configuration.RequestConfig) *time.Location {
+	if req == nil {
+		return nil
+	}
 	if req.TimezoneOffset != 0 {
 		return time.FixedZone("UTC", int(req.TimezoneOffset))
 	} else if req.Timezone != "" {

@@ -92,7 +92,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		})
 	}
 
-	err, nodeRows := setPropertiesToNodeRow(schema, rows)
+	err, nodeRows := setPropertiesToNodeRow(schema, rows, config.RequestConfig)
 
 	if err != nil {
 		return nil, err
@@ -118,7 +118,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 	return http.NewNodesInsertResponse(resp)
 }
 
-func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node) (error, []*ultipa.NodeRow) {
+func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node, req *configuration.RequestConfig) (error, []*ultipa.NodeRow) {
 	wg := sync.WaitGroup{}
 	var err error
 	ctx, cancel := context.WithCancel(context.Background())
@@ -134,7 +134,7 @@ func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node) (error
 		go func(index int, row *structs.Node) {
 			defer wg.Done()
 			var newNode *ultipa.NodeRow
-			newNode, err = doConvertSdkNodeRowToUltipaNodeRow(schema, row, index)
+			newNode, err = doConvertSdkNodeRowToUltipaNodeRow(schema, row, index, req)
 			if err != nil {
 				cancel()
 				return
@@ -162,15 +162,15 @@ func checkNodeProperties(schema *structs.Schema, row *structs.Node, index int) e
 	return nil
 }
 
-func convertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Node, index int) (*ultipa.NodeRow, error) {
+func convertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Node, index int, req *configuration.RequestConfig) (*ultipa.NodeRow, error) {
 	err := checkNodeProperties(schema, row, index)
 	if err != nil {
 		return nil, err
 	}
-	return doConvertSdkNodeRowToUltipaNodeRow(schema, row, index)
+	return doConvertSdkNodeRowToUltipaNodeRow(schema, row, index, req)
 }
 
-func doConvertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Node, index int) (*ultipa.NodeRow, error) {
+func doConvertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Node, index int, req *configuration.RequestConfig) (*ultipa.NodeRow, error) {
 	newNode := &ultipa.NodeRow{
 		Id:         row.ID,
 		Uuid:       row.UUID,
@@ -183,7 +183,7 @@ func doConvertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Nod
 		if !row.Values.Contain(prop.Name) {
 			return nil, errors.New(fmt.Sprintf("node row [%d] error: values doesn't contain property [%s]", index, prop.Name))
 		}
-		bs, err := row.GetBytesSafe(prop.Name, prop.Type)
+		bs, err := row.GetBytesSafe(prop.Name, prop.Type, req)
 		if err != nil {
 			printers.PrintError("Get row bytes value failed  " + prop.Name + " " + err.Error())
 			err = errors.New(fmt.Sprintf("node row [%d] error: failed to serialize value of property %s,value=%v", index, prop.Name, row.Values.Get(prop.Name)))
@@ -200,7 +200,7 @@ type Batch struct {
 	Schema *structs.Schema
 }
 
-//InsertNodesBatchAuto Nodes interface values should be string
+// InsertNodesBatchAuto Nodes interface values should be string
 func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *configuration.InsertRequestConfig) (*http.InsertBatchAutoResponse, error) {
 
 	resps := &http.InsertBatchAutoResponse{
@@ -242,7 +242,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 
 		batch := batches[node.Schema]
 		// add nodes
-		row, err := convertSdkNodeRowToUltipaNodeRow(batch.Schema, node, index)
+		row, err := convertSdkNodeRowToUltipaNodeRow(batch.Schema, node, index, config.RequestConfig)
 		if err != nil {
 			return nil, err
 		}

@@ -48,9 +48,9 @@ func (node *Node) GetBytes(key string) ([]byte, error) {
 }
 
 // GetBytesSafe get []byte value by key, if value is nil, then return default value of PropertyType t
-func (node *Node) GetBytesSafe(key string, t ultipa.PropertyType) ([]byte, error) {
+func (node *Node) GetBytesSafe(key string, t ultipa.PropertyType, req *configuration.RequestConfig) ([]byte, error) {
 	v := node.Values.Get(key)
-	return utils.ConvertInterfaceToBytesSafe(v, t)
+	return utils.ConvertInterfaceToBytesSafe(v, t, req)
 }
 
 // set a value by key
