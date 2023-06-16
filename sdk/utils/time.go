@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -476,4 +477,12 @@ func (u *UltipaTime) String() string {
 // Get Timestamp , Second
 func (u *UltipaTime) GetTimeStamp() uint32 {
 	return uint32(u.Time.Unix())
+}
+
+func RemoveTimezone(dateString string) string {
+	// regex
+	timezoneRegex := regexp.MustCompile(`Z\d{4}|Z\d{2}:\d{2}$|[-+][01]\d:\d{2}$|[-+][01]\d{3}$|\s[A-Z]{1,4}$|[-+]\d{4} [A-Z]{3}$`)
+	dateString = timezoneRegex.ReplaceAllString(dateString, "")
+	dateString = strings.Replace(dateString, "T", " ", -1)
+	return dateString
 }
