@@ -3,6 +3,7 @@ package structs
 import (
 	"fmt"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/types"
 	"ultipa-go-sdk/sdk/utils"
 )
@@ -47,9 +48,9 @@ func (node *Node) GetBytes(key string) ([]byte, error) {
 }
 
 // GetBytesSafe get []byte value by key, if value is nil, then return default value of PropertyType t
-func (node *Node) GetBytesSafe(key string, t ultipa.PropertyType, subTypes []ultipa.PropertyType) ([]byte, error) {
+func (node *Node) GetBytesSafe(key string, t ultipa.PropertyType, subTypes []ultipa.PropertyType, req *configuration.RequestConfig) ([]byte, error) {
 	v := node.Values.Get(key)
-	return utils.ConvertInterfaceToBytesSafe(v, t, subTypes)
+	return utils.ConvertInterfaceToBytesSafe(v, t, subTypes, req)
 }
 
 // set a value by key
@@ -86,7 +87,10 @@ func NewNodeFromNodeRow(schema *Schema, nodeRow *ultipa.EntityRow) (*Node, error
 	return newNode, nil
 }
 
-func ConvertStringNodes(schema *Schema, nodes []*Node) {
+func ConvertStringNodes(schema *Schema, nodes []*Node, req *configuration.RequestConfig) {
+	// Obtain the configured time zone information
+	// timezoneOffset > timeZone
+	location := utils.GetLocationFromConfig(req)
 
 	// For by Schema, not nodes value
 	for _, node := range nodes {
@@ -104,7 +108,7 @@ func ConvertStringNodes(schema *Schema, nodes []*Node) {
 				}
 			}
 
-			v, err := utils.StringAsInterface(str, prop.Type)
+			v, err := utils.StringAsInterface(str, prop.Type, location)
 
 			if err != nil {
 				continue

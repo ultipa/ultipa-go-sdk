@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/types"
 )
 
@@ -96,7 +97,7 @@ func deserializeList(bs []byte, subTypes []ultipa.PropertyType) (interface{}, er
 }
 
 // ConvertInterfaceToBytesSafe convert value to []byte, if value is nil, will set default value according to PropertyType t
-func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTypes []ultipa.PropertyType) ([]byte, error) {
+func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTypes []ultipa.PropertyType, req *configuration.RequestConfig) ([]byte, error) {
 	toConvertValue := value
 	if toConvertValue == nil {
 		switch t {
@@ -112,7 +113,7 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 	}
 	switch t {
 	case ultipa.PropertyType_LIST:
-		return SerializeListData(value, subTypes)
+		return SerializeListData(value, subTypes, req)
 	case ultipa.PropertyType_POINT:
 		switch v := value.(type) {
 		case types.Point:
@@ -134,7 +135,7 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 	case ultipa.PropertyType_DECIMAL:
 		return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 	case ultipa.PropertyType_SET:
-		return SerializeSetData(value, subTypes)
+		return SerializeSetData(value, subTypes, req)
 	case ultipa.PropertyType_MAP:
 		return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 	case ultipa.PropertyType_DATETIME:
@@ -144,11 +145,12 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 		case *UltipaTime:
 			return ConvertInterfaceToBytes(v.Datetime)
 		case string:
-			uTime, err := NewDatetimeFromString(v)
+			datetime, err := StringAsInterface(v, ultipa.PropertyType_DATETIME, GetLocationFromConfig(req))
+
 			if err != nil {
 				return nil, err
 			}
-			return ConvertInterfaceToBytes(uTime.Datetime)
+			return ConvertInterfaceToBytes(datetime)
 		default:
 			return ConvertInterfaceToBytes(value)
 		}
@@ -159,11 +161,12 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 		case *UltipaTime:
 			return ConvertInterfaceToBytes(v.GetTimeStamp())
 		case string:
-			uTime, err := NewTimestampFromString(v, nil)
+			timestamp, err := StringAsInterface(v, ultipa.PropertyType_TIMESTAMP, GetLocationFromConfig(req))
+
 			if err != nil {
 				return nil, err
 			}
-			return ConvertInterfaceToBytes(uTime.GetTimeStamp())
+			return ConvertInterfaceToBytes(timestamp)
 		default:
 			return ConvertInterfaceToBytes(value)
 		}
@@ -172,7 +175,7 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 	}
 }
 
-func SerializeListData(list interface{}, subTypes []ultipa.PropertyType) ([]byte, error) {
+func SerializeListData(list interface{}, subTypes []ultipa.PropertyType, req *configuration.RequestConfig) ([]byte, error) {
 	if subTypes == nil {
 		return nil, errors.New("subTypes is nil, unable to serialize list")
 	}
@@ -187,7 +190,7 @@ func SerializeListData(list interface{}, subTypes []ultipa.PropertyType) ([]byte
 	vi := reflect.ValueOf(list)
 	for index := 0; index < vi.Len(); index++ {
 		//TODO if vi.Index(index) is ListValue?
-		bs, err := ConvertInterfaceToBytesSafe(vi.Index(index).Interface(), subTypes[0], nil)
+		bs, err := ConvertInterfaceToBytesSafe(vi.Index(index).Interface(), subTypes[0], nil, req)
 		if err != nil {
 			return nil, err
 		}
@@ -196,7 +199,7 @@ func SerializeListData(list interface{}, subTypes []ultipa.PropertyType) ([]byte
 	return proto.Marshal(listData)
 }
 
-func SerializeSetData(set interface{}, subTypes []ultipa.PropertyType) ([]byte, error) {
+func SerializeSetData(set interface{}, subTypes []ultipa.PropertyType, req *configuration.RequestConfig) ([]byte, error) {
 	if subTypes == nil && len(subTypes) == 0 {
 		return nil, errors.New("subTypes is nil, unable to serialize SetData")
 	}
@@ -212,7 +215,7 @@ func SerializeSetData(set interface{}, subTypes []ultipa.PropertyType) ([]byte, 
 	setData := &ultipa.SetData{}
 	for index := 0; index < vi.Len(); index++ {
 		//TODO if vi.Index(index) is ListValue?
-		bs, err := ConvertInterfaceToBytesSafe(vi.Index(index).Interface(), subTypes[0], nil)
+		bs, err := ConvertInterfaceToBytesSafe(vi.Index(index).Interface(), subTypes[0], nil, req)
 		if err != nil {
 			return nil, err
 		}
@@ -221,7 +224,7 @@ func SerializeSetData(set interface{}, subTypes []ultipa.PropertyType) ([]byte, 
 	return proto.Marshal(setData)
 }
 
-func SerializeMapData(value interface{}, subTypes []ultipa.PropertyType) ([]byte, error) {
+func SerializeMapData(value interface{}, subTypes []ultipa.PropertyType, req *configuration.RequestConfig) ([]byte, error) {
 	if subTypes == nil && len(subTypes) == 0 {
 		return nil, errors.New("subTypes is nil, unable to serialize SetData")
 	}
@@ -239,11 +242,11 @@ func SerializeMapData(value interface{}, subTypes []ultipa.PropertyType) ([]byte
 		toSerializeValue := value.(map[interface{}]interface{})
 		var mapValues []*ultipa.MapValue
 		for k, v := range toSerializeValue {
-			kb, err := ConvertInterfaceToBytesSafe(k, subTypes[0], nil)
+			kb, err := ConvertInterfaceToBytesSafe(k, subTypes[0], nil, req)
 			if err != nil {
 				return nil, err
 			}
-			vb, err := ConvertInterfaceToBytesSafe(v, subTypes[0], nil)
+			vb, err := ConvertInterfaceToBytesSafe(v, subTypes[0], nil, req)
 			if err != nil {
 				return nil, err
 			}
@@ -401,7 +404,7 @@ func GetDefaultNilInterface(t ultipa.PropertyType) interface{} {
 
 }
 
-func StringAsInterface(source string, t ultipa.PropertyType) (interface{}, error) {
+func StringAsInterface(source string, t ultipa.PropertyType, location *time.Location) (interface{}, error) {
 
 	str := strings.Trim(source, " ")
 
@@ -456,7 +459,7 @@ func StringAsInterface(source string, t ultipa.PropertyType) (interface{}, error
 		}
 		return v.Datetime, err
 	case ultipa.PropertyType_TIMESTAMP:
-		v, err := NewTimestampFromString(str, nil)
+		v, err := NewTimestampFromString(str, location)
 		if err != nil {
 			return nil, err
 		}
@@ -487,4 +490,44 @@ func StringAsUUID(str string) (types.UUID, error) {
 	str = strings.Trim(str, " ")
 	v, err := strconv.ParseUint(str, 10, 64)
 	return v, err
+}
+
+func GetLocationFromConfig(req *configuration.RequestConfig) *time.Location {
+	if req == nil {
+		return nil
+	}
+	if req.TimezoneOffset != 0 {
+		return time.FixedZone("UTC", int(req.TimezoneOffset))
+	} else if req.Timezone != "" {
+		return getLocationFromTimezone(req.Timezone)
+	}
+
+	return nil
+}
+
+func getLocationFromTimezone(timezone string) *time.Location {
+	if IsTimezoneOffsetCandidate(timezone) {
+		offsetStr := timezone
+		if strings.Contains(offsetStr, ":") {
+			offsetStr = strings.ReplaceAll(offsetStr, ":", "")
+		}
+		offset, _ := strconv.ParseInt(offsetStr, 10, 64)
+		if offset != 0 {
+			return time.FixedZone("UTC", int(offset*36))
+		}
+	} else {
+		if timezone != "" {
+			location, err := time.LoadLocation(timezone)
+			if err != nil {
+				return nil
+			}
+			return location
+		}
+	}
+	return nil
+}
+
+// IsTimezoneOffsetCandidate check whether offsetCandidate begin with +/- or not.
+func IsTimezoneOffsetCandidate(offsetCandidate string) bool {
+	return strings.HasPrefix(offsetCandidate, "+") || strings.HasPrefix(offsetCandidate, "-")
 }

@@ -2,6 +2,7 @@ package structs
 
 import (
 	ultipa "ultipa-go-sdk/rpc"
+	"ultipa-go-sdk/sdk/configuration"
 	"ultipa-go-sdk/sdk/types"
 	"ultipa-go-sdk/sdk/utils"
 )
@@ -87,9 +88,9 @@ func (edge *Edge) GetBytes(key string) ([]byte, error) {
 }
 
 // GetBytesSafe get []byte value by key, if value is nil, then return default value of PropertyType t
-func (edge *Edge) GetBytesSafe(key string, t ultipa.PropertyType, subTypes []ultipa.PropertyType) ([]byte, error) {
+func (edge *Edge) GetBytesSafe(key string, t ultipa.PropertyType, subTypes []ultipa.PropertyType, req *configuration.RequestConfig) ([]byte, error) {
 	v := edge.Values.Get(key)
-	return utils.ConvertInterfaceToBytesSafe(v, t, subTypes)
+	return utils.ConvertInterfaceToBytesSafe(v, t, subTypes, req)
 }
 
 // set a value by key
@@ -99,7 +100,10 @@ func (edge *Edge) Set(key string, value interface{}) error {
 	return nil
 }
 
-func ConvertStringEdges(schema *Schema, edges []*Edge) {
+func ConvertStringEdges(schema *Schema, edges []*Edge, req *configuration.RequestConfig) {
+	// Obtain the configured time zone information
+	// timezoneOffset > timeZone
+	location := utils.GetLocationFromConfig(req)
 
 	// For by Schema, not nodes value
 	for _, edge := range edges {
@@ -113,7 +117,7 @@ func ConvertStringEdges(schema *Schema, edges []*Edge) {
 				str = stri.(string)
 			}
 
-			v, err := utils.StringAsInterface(str, prop.Type)
+			v, err := utils.StringAsInterface(str, prop.Type, location)
 
 			if err != nil {
 				continue

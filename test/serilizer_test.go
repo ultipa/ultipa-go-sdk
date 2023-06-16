@@ -7,7 +7,7 @@ import (
 )
 
 func TestStringAsInterface(t *testing.T) {
-	datetime, err := utils.StringAsInterface("1970-01-01", ultipa.PropertyType_DATETIME)
+	datetime, err := utils.StringAsInterface("1970-01-01", ultipa.PropertyType_DATETIME, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -19,13 +19,13 @@ func TestConvertInterfaceToBytesSafe(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	datetime, err := utils.ConvertInterfaceToBytesSafe(ultipaTime, ultipa.PropertyType_DATETIME, nil)
+	datetime, err := utils.ConvertInterfaceToBytesSafe(ultipaTime, ultipa.PropertyType_DATETIME, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(datetime)
 
-	datetime, err = utils.ConvertInterfaceToBytesSafe("2010-12-12T00:00:00.000Z", ultipa.PropertyType_DATETIME, nil)
+	datetime, err = utils.ConvertInterfaceToBytesSafe("2010-12-12T00:00:00.000Z", ultipa.PropertyType_DATETIME, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,13 +35,13 @@ func TestConvertInterfaceToBytesSafe(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	datetime, err = utils.ConvertInterfaceToBytesSafe(ultipaTime, ultipa.PropertyType_DATETIME, nil)
+	datetime, err = utils.ConvertInterfaceToBytesSafe(ultipaTime, ultipa.PropertyType_DATETIME, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(datetime)
 
-	datetime, err = utils.ConvertInterfaceToBytesSafe("1994-12-12 00:00:00", ultipa.PropertyType_DATETIME, nil)
+	datetime, err = utils.ConvertInterfaceToBytesSafe("1994-12-12 00:00:00", ultipa.PropertyType_DATETIME, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,7 +49,7 @@ func TestConvertInterfaceToBytesSafe(t *testing.T) {
 }
 
 func TestSerializePoint(t *testing.T) {
-	pointBytes, err := utils.ConvertInterfaceToBytesSafe("Point(1.0 2.0)", ultipa.PropertyType_POINT, nil)
+	pointBytes, err := utils.ConvertInterfaceToBytesSafe("Point(1.0 2.0)", ultipa.PropertyType_POINT, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

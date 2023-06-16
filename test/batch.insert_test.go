@@ -261,3 +261,47 @@ func TestCheckPropAndValueAutoData(t *testing.T) {
 		}
 	}
 }
+
+func TestBatchInsert2(t *testing.T) {
+	var graph = "test"
+	hosts := []string{"10.132.3.136:61510"}
+	client, _ := GetClient(hosts, graph)
+	node1 := structs.Node{
+		Values: &structs.Values{
+			Data: map[string]interface {
+			}{
+				"typeTimestamp": "2038-01-19 03:14:07", "typeString": "haha", "typeDatetime": "2038-01-19 03:14:07"}}, Schema: "insertNode2"}
+	rows1 := []*structs.Node{&node1}
+
+	schema := structs.NewSchema("insertNode2")
+	schema.Properties = append(schema.Properties, &structs.Property{
+		Name: "typeTimestamp",
+		Type: ultipa.PropertyType_TIMESTAMP,
+	}, &structs.Property{
+		Name: "typeString",
+		Type: ultipa.PropertyType_STRING,
+	}, &structs.Property{
+		Name: "typeDatetime",
+		Type: ultipa.PropertyType_DATETIME,
+	})
+
+	cases := []struct {
+		propertiesList []*structs.Property
+		rows           []*structs.Node
+		message        string
+	}{
+		{nil, rows1, "node row [1] error: values size larger than properties size."},
+	}
+	for _, c := range cases {
+		insertRequestConfig := &configuration.InsertRequestConfig{
+			InsertType: ultipa.InsertType_NORMAL,
+		}
+
+		requestConfig := &configuration.RequestConfig{
+			TimezoneOffset: 3600,
+		}
+		insertRequestConfig.RequestConfig = requestConfig
+
+		client.InsertNodesBatchBySchema(schema, c.rows, insertRequestConfig)
+	}
+}

@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -67,6 +68,7 @@ func NewTimeFromStringFormat(dateString string, format string) (*UltipaTime, err
 // NewDatetimeFromString converts dateString to UltipaTime for DateTime, which means that internal Time of UltipaTime use UTC location when calculating internal Datetime.
 // dateString supports layouts or timestamp in Second, Millisecond, Microsecond, Nanosecond
 func NewDatetimeFromString(dateString string) (*UltipaTime, error) {
+	dateString = RemoveTimezone(dateString)
 	return NewUltipaTimeFromString(dateString, time.UTC)
 }
 
@@ -476,4 +478,12 @@ func (u *UltipaTime) String() string {
 // Get Timestamp , Second
 func (u *UltipaTime) GetTimeStamp() uint32 {
 	return uint32(u.Time.Unix())
+}
+
+func RemoveTimezone(dateString string) string {
+	// regex
+	timezoneRegex := regexp.MustCompile(`Z\d{4}|Z\d{2}:\d{2}$|[-+][01]\d:\d{2}$|[-+][01]\d{3}$|\s[A-Z]{1,4}$|[-+]\d{4} [A-Z]{3}$`)
+	dateString = timezoneRegex.ReplaceAllString(dateString, "")
+	dateString = strings.Replace(dateString, "T", " ", -1)
+	return dateString
 }
