@@ -283,7 +283,7 @@ func (di *DataItem) AsAttr() (*structs.Attr, error) {
 	return nil, err
 }
 
-//AsAttrEdges parse DataItem as Attr with Rows that is List<List<Node>>
+// AsAttrEdges parse DataItem as Attr with Rows that is List<List<Node>>
 func (di *DataItem) AsAttrNodes() (*structs.AttrNodes, error) {
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
@@ -303,7 +303,7 @@ func (di *DataItem) AsAttrNodes() (*structs.AttrNodes, error) {
 	return midAttr.ListAttrAsAttrNodes()
 }
 
-//AsAttrEdges parse DataItem as Attr with Rows that is List<List<Edge>>
+// AsAttrEdges parse DataItem as Attr with Rows that is List<List<Edge>>
 func (di *DataItem) AsAttrEdges() (*structs.AttrEdges, error) {
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
@@ -323,7 +323,7 @@ func (di *DataItem) AsAttrEdges() (*structs.AttrEdges, error) {
 	return midAttr.ListAttrAsAttrEdges()
 }
 
-//AsAttrPaths parse DataItem as Attr with Rows that is List<List<Path>>
+// AsAttrPaths parse DataItem as Attr with Rows that is List<List<Path>>
 func (di *DataItem) AsAttrPaths() (*structs.AttrPaths, error) {
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
@@ -497,7 +497,7 @@ func parseAttrMap(oAttr *ultipa.Attr) ([]*structs.AttrMapData, error) {
 	return mapDataRows, nil
 }
 
-//AsGraphs the types will be tables and alias is nodeSchema and edgeSchema
+// AsGraphs the types will be tables and alias is nodeSchema and edgeSchema
 func (di *DataItem) AsGraphs() (graphs []*structs.Graph, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
@@ -531,7 +531,7 @@ func (di *DataItem) AsGraphs() (graphs []*structs.Graph, err error) {
 	return graphs, err
 }
 
-//AsSchemas the types will be tables and alias is nodeSchema and edgeSchema
+// AsSchemas the types will be tables and alias is nodeSchema and edgeSchema
 func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
@@ -561,13 +561,30 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		TotalIndex = 3
 	}
 
+	var NameIndex = 0
+	var DescIndex = 1
+	var PropertyIndex = 2
+	for index, header := range table.Headers {
+		if header.PropertyName == "name" {
+			NameIndex = index
+		} else if header.PropertyName == "description" {
+			DescIndex = index
+		} else if header.PropertyName == "properties" {
+			PropertyIndex = index
+		} else if header.PropertyName == "totalNodes" {
+			TotalIndex = index
+		} else if header.PropertyName == "totalEdges" {
+			TotalIndex = index
+		}
+	}
+
 	for _, row := range table.TableRows {
 		//0:name, 1: description, 2: json(properties),3:totalNodes, 4:totalEdges
 		values := row.GetValues()
-		schema := structs.NewSchema(string(values[0]))
-		schema.Desc = string(values[1])
+		schema := structs.NewSchema(string(values[NameIndex]))
+		schema.Desc = string(values[DescIndex])
 		schema.Type = Type
-		propertyJson := values[2]
+		propertyJson := values[PropertyIndex]
 		schema.Total, _ = strconv.Atoi(utils.AsString(values[TotalIndex]))
 
 		schema.DBType, err = structs.GetDBTypeByString(schema.Type)
@@ -590,9 +607,12 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		}
 
 		for _, prop := range props {
-			lte, err := strconv.ParseBool(prop.Lte)
-			if err != nil {
-				log.Fatalln(err)
+			lte := false
+			if prop.Lte != "" {
+				lte, err = strconv.ParseBool(prop.Lte)
+				if err != nil {
+					log.Fatalln(err)
+				}
 			}
 			p := structs.Property{
 				Name:   prop.Name,
@@ -610,7 +630,7 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 	return schemas, err
 }
 
-//AsProperties the types will be tables and alias is nodeProperty and edgeProperty
+// AsProperties the types will be tables and alias is nodeProperty and edgeProperty
 func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
@@ -649,7 +669,7 @@ func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 	return properties, err
 }
 
-//AsIndexes the types will be tables and alias is nodeIndex and edgeIndex
+// AsIndexes the types will be tables and alias is nodeIndex and edgeIndex
 func (di *DataItem) AsIndexes() (indexes []*structs.Index, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
@@ -683,7 +703,7 @@ func (di *DataItem) AsIndexes() (indexes []*structs.Index, err error) {
 	return indexes, err
 }
 
-//AsFullText the types will be tables and alias is node fulltext Index and edge fulltext Index
+// AsFullText the types will be tables and alias is node fulltext Index and edge fulltext Index
 func (di *DataItem) AsFullText() (fullTextIndexes []*structs.Index, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
