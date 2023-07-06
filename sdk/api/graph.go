@@ -34,16 +34,10 @@ func (api *UltipaAPI) ListGraph(config *configuration.RequestConfig) (*http.Resp
 	values := table.ToKV()
 	for _, v := range values {
 		id, _ := strconv.ParseInt(v.Get("id").(string), 10, 64)
+		totalNodes, _ := strconv.ParseInt(v.Get("totalNodes").(string), 10, 64)
+		totalEdges, _ := strconv.ParseInt(v.Get("totalEdges").(string), 10, 64)
 		status := v.Get("status").(string)
 		description := v.Get("description").(string)
-		var totalNodes int64 = 0
-		if v := v.Get("totalNodes"); v != nil {
-			totalNodes, _ = strconv.ParseInt(v.(string), 10, 64)
-		}
-		var totalEdges int64 = 0
-		if v := v.Get("totalEdges"); v != nil {
-			totalEdges, _ = strconv.ParseInt(v.(string), 10, 64)
-		}
 		clusterId := ""
 		if v := v.Get("clusterId"); v != nil {
 			clusterId = v.(string)

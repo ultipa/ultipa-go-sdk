@@ -561,30 +561,13 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		TotalIndex = 3
 	}
 
-	var NameIndex = 0
-	var DescIndex = 1
-	var PropertyIndex = 2
-	for index, header := range table.Headers {
-		if header.PropertyName == "name" {
-			NameIndex = index
-		} else if header.PropertyName == "description" {
-			DescIndex = index
-		} else if header.PropertyName == "properties" {
-			PropertyIndex = index
-		} else if header.PropertyName == "totalNodes" {
-			TotalIndex = index
-		} else if header.PropertyName == "totalEdges" {
-			TotalIndex = index
-		}
-	}
-
 	for _, row := range table.TableRows {
 		//0:name, 1: description, 2: json(properties),3:totalNodes, 4:totalEdges
 		values := row.GetValues()
-		schema := structs.NewSchema(string(values[NameIndex]))
-		schema.Desc = string(values[DescIndex])
+		schema := structs.NewSchema(string(values[0]))
+		schema.Desc = string(values[1])
 		schema.Type = Type
-		propertyJson := values[PropertyIndex]
+		propertyJson := values[2]
 		schema.Total, _ = strconv.Atoi(utils.AsString(values[TotalIndex]))
 
 		schema.DBType, err = structs.GetDBTypeByString(schema.Type)
@@ -607,12 +590,9 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		}
 
 		for _, prop := range props {
-			lte := false
-			if prop.Lte != "" {
-				lte, err = strconv.ParseBool(prop.Lte)
-				if err != nil {
-					log.Fatalln(err)
-				}
+			lte, err := strconv.ParseBool(prop.Lte)
+			if err != nil {
+				log.Fatalln(err)
 			}
 			p := structs.Property{
 				Name:   prop.Name,
