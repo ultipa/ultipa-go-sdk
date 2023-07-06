@@ -65,8 +65,10 @@ func NewUQLResponse(resp ultipa.UltipaRpcs_UqlClient) (response *UQLResponse, er
 			response.Reply = utils.MergeUQLReply(response.Reply, record)
 		}
 
-		response.Status.Code = record.Status.ErrorCode
-		response.Status.Message = record.Status.Msg
+		if record.Status != nil {
+			response.Status.Code = record.Status.ErrorCode
+			response.Status.Message = record.Status.Msg
+		}
 
 		if response.Status.Code != ultipa.ErrorCode_SUCCESS {
 			return response, nil
