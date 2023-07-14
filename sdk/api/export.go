@@ -62,7 +62,7 @@ func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, conf
 		} else if err != nil {
 			return err
 		}
-		if record != nil && record.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		if record.Status != nil && record.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
 			return errors.New(record.Status.Msg)
 		}
 
