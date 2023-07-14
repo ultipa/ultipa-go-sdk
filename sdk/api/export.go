@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"google.golang.org/grpc"
 	"io"
 	"sync"
@@ -60,6 +61,9 @@ func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, conf
 			break
 		} else if err != nil {
 			return err
+		}
+		if record != nil && record.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+			return errors.New(record.Status.Msg)
 		}
 
 		wg := sync.WaitGroup{}
