@@ -58,7 +58,10 @@ func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType, subTypes []ultipa
 	case ultipa.PropertyType_BLOB:
 		return bs, nil
 	case ultipa.PropertyType_POINT:
-		str := AsString(bs)
+		str, err := AsPointString(bs)
+		if err != nil {
+			return nil, err
+		}
 		return types.PointFromStr(str)
 		//TODO
 	//case ultipa.PropertyType_DECIMAL:
@@ -345,6 +348,18 @@ func AsFloat64(value []byte) float64 {
 
 func AsString(value []byte) string {
 	return string(value)
+}
+
+func AsPointString(value []byte) (string, error) {
+	if len(value) != 16 {
+		return "", errors.New("deserialize point type error: length != 16")
+	}
+	latitudeBytes := value[:8]
+	latitude := AsFloat64(latitudeBytes)
+	longitudeBytes := value[8:]
+	longitude := AsFloat64(longitudeBytes)
+	//POINT(48.500000 22.200000)
+	return fmt.Sprintf("POINT(%f %f)", latitude, longitude), nil
 }
 
 func AsBool(value []byte) bool {
