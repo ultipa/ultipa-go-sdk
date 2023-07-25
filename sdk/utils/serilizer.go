@@ -59,7 +59,7 @@ func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType, subTypes []ultipa
 		return bs, nil
 	case ultipa.PropertyType_POINT:
 		str, err := AsPointString(bs)
-		if err != nil {
+		if str == "" || err != nil {
 			return nil, err
 		}
 		return types.PointFromStr(str)
@@ -358,6 +358,9 @@ func AsPointString(value []byte) (string, error) {
 	latitude := AsFloat64(latitudeBytes)
 	longitudeBytes := value[8:]
 	longitude := AsFloat64(longitudeBytes)
+	if math.IsNaN(latitude) || math.IsNaN(longitude) {
+		return "", nil
+	}
 	//POINT(48.500000 22.200000)
 	return fmt.Sprintf("POINT(%f %f)", latitude, longitude), nil
 }

@@ -441,8 +441,8 @@ func TestUqlPoint(t *testing.T) {
 	//client, _ := GetClient([]string{"10.132.3.136:62061"}, "test")
 	//uql := `find().nodes({@insertNode2}) as nodes return nodes{*} limit 10`
 
-	client, _ := GetClient([]string{"192.168.1.88:63701"}, "test_node_create9148")
-	uql := `find().nodes({@test_schema4}) as nodes return nodes{*} limit 10`
+	client, _ := GetClient([]string{"192.168.1.85:61099"}, "test")
+	uql := `find().nodes({@default}) as nodes return nodes{*} limit 10`
 	resp, err := client.UQL(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
