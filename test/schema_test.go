@@ -12,6 +12,7 @@ import (
 
 func TestListSchema(t *testing.T) {
 	InitCases()
+	client, _ := GetClient([]string{"192.168.1.85:61099"}, "java_sdk_test")
 	res, err := client.ListNodeSchema(nil)
 	if err != nil {
 		log.Panic(err)
@@ -100,6 +101,7 @@ func TestCompareSchema(t *testing.T) {
 }
 
 func TestShowSchema(t *testing.T) {
+	client, _ := GetClient([]string{"192.168.1.85:61099"}, "java_sdk_test")
 	resp, _ := client.UQL("show().schema()", nil)
 
 	nodeSchemas, err := resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
@@ -141,6 +143,7 @@ func TestCreateSchemaWithProperties(t *testing.T) {
 }
 
 func TestCreateSchema(t *testing.T) {
+	client, _ := GetClient([]string{"192.168.1.85:61099"}, "sdk_test")
 	// create schema with properties
 	newSchemaWithoutProperties := &structs.Schema{
 		Name: "People",

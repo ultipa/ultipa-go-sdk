@@ -514,16 +514,30 @@ func (di *DataItem) AsGraphs() (graphs []*structs.Graph, err error) {
 		return nil, errors.New("DataItem " + di.Alias + " is not a Graph list")
 	}
 
-	for _, row := range table.TableRows {
+	structTable, err := di.AsTable()
+	if err != nil {
+		return nil, err
+	}
+	values := structTable.ToKV()
+
+	for _, row := range values {
 		//0:id, 1: name, 2: totalNodes ,3:totalEdges ,4:description ,5:status
-		values := row.GetValues()
 		graph := structs.Graph{}
-		graph.ID = string(values[0])
-		graph.Name = string(values[1])
-		graph.TotalNodes, _ = utils.Str2Uint64(utils.AsString(values[2]))
-		graph.TotalEdges, _ = utils.Str2Uint64(utils.AsString(values[3]))
-		graph.Description = string(values[4])
-		graph.Status = string(values[5])
+		graph.ID = row.Get("id").(string)
+		graph.Name = row.Get("name").(string)
+		var totalNodes uint64 = 0
+		if v := row.Get("totalNodes"); v != nil {
+			totalNodes, _ = strconv.ParseUint(v.(string), 10, 64)
+		}
+		graph.TotalNodes = totalNodes
+
+		var totalEdges uint64 = 0
+		if v := row.Get("totalEdges"); v != nil {
+			totalEdges, _ = strconv.ParseUint(v.(string), 10, 64)
+		}
+		graph.TotalEdges = totalEdges
+		graph.Description = row.Get("description").(string)
+		graph.Status = row.Get("status").(string)
 
 		graphs = append(graphs, &graph)
 	}
@@ -564,6 +578,7 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 	var NameIndex = 0
 	var DescIndex = 1
 	var PropertyIndex = 2
+	var IdIndex = 3
 	for index, header := range table.Headers {
 		if header.PropertyName == "name" {
 			NameIndex = index
@@ -575,6 +590,8 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 			TotalIndex = index
 		} else if header.PropertyName == "totalEdges" {
 			TotalIndex = index
+		} else if header.PropertyName == "id" {
+			IdIndex = index
 		}
 	}
 
@@ -586,7 +603,7 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		schema.Type = Type
 		propertyJson := values[PropertyIndex]
 		schema.Total, _ = strconv.Atoi(utils.AsString(values[TotalIndex]))
-
+		schema.Id = utils.AsUint64(values[IdIndex])
 		schema.DBType, err = structs.GetDBTypeByString(schema.Type)
 
 		if err != nil {

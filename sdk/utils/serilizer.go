@@ -18,6 +18,9 @@ import (
 
 var default_nil_string = string([]byte{0x00})
 
+const SERVER_BOOL_TRUE_VALUE = "1"
+const SERVER_BOOL_FALSE_VALUE = "0"
+
 // Convert Bytes to GoLang Type and return to an interface
 func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType, subTypes []ultipa.PropertyType) (interface{}, error) {
 	if IsNull(t, bs) {
@@ -75,6 +78,12 @@ func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType, subTypes []ultipa
 	//	//TODO
 	//case ultipa.PropertyType_UNSET:
 	//	return nil
+	case ultipa.PropertyType_BOOL:
+		serverValue := AsString(bs)
+		if serverValue == "" {
+			return nil, nil
+		}
+		return strconv.ParseBool(serverValue)
 	default:
 		return nil, nil
 	}
@@ -176,9 +185,29 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 		default:
 			return ConvertInterfaceToBytes(value)
 		}
+	case ultipa.PropertyType_BOOL:
+		switch v := value.(type) {
+		case bool:
+			return doSerializeBool(v)
+		case string:
+			boolValue, err := strconv.ParseBool(v)
+			if err != nil {
+				return nil, err
+			}
+			return doSerializeBool(boolValue)
+		default:
+			return nil, errors.New(fmt.Sprintf("unable to parse the value to bool:%v", value))
+		}
 	default:
 		return ConvertInterfaceToBytes(toConvertValue)
 	}
+}
+
+func doSerializeBool(v bool) ([]byte, error) {
+	if v {
+		return []byte(SERVER_BOOL_TRUE_VALUE), nil
+	}
+	return []byte(SERVER_BOOL_FALSE_VALUE), nil
 }
 
 func SerializeListData(list interface{}, subTypes []ultipa.PropertyType, req *configuration.RequestConfig) ([]byte, error) {

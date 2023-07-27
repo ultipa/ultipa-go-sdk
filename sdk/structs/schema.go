@@ -13,6 +13,7 @@ type Schema struct {
 	Type       string
 	DBType     ultipa.DBType
 	Total      int
+	Id         uint64
 }
 
 func NewSchema(name string) *Schema {

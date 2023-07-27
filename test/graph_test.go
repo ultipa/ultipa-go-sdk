@@ -13,7 +13,7 @@ import (
 
 func TestListGraph(t *testing.T) {
 	InitCases()
-	client, _ := GetClient([]string{"192.168.1.85:61095"}, "miniCircle")
+	client, _ := GetClient([]string{"192.168.1.85:61099"}, "default")
 	res, err := client.ListGraph(nil)
 	if err != nil {
 		log.Panic(err)
@@ -23,9 +23,9 @@ func TestListGraph(t *testing.T) {
 
 func TestCreateGraph(t *testing.T) {
 
-	graphName := "test_creation"
+	graphName := "sdk_test"
 	hosts := []string{
-		"192.168.1.85:61095",
+		"192.168.1.85:61099",
 	}
 	client, err := GetClient(hosts, "default")
 
@@ -42,7 +42,7 @@ func TestCreateGraph(t *testing.T) {
 
 	client.SetCurrentGraph(graphName)
 
-	resp, err := client.UQL("insert().nodes({}).into(@default)", nil)
+	resp, err := client.UQL(`insert().nodes({"_id":1}).into(@default)`, nil)
 
 	if err != nil {
 		logger.PrintError(err.Error())
@@ -59,7 +59,7 @@ func TestDeleteGraph(t *testing.T) {
 }
 
 func TestAsGraph(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	client, _ := GetClient([]string{"192.168.1.85:61099"}, "default")
 	resp, _ := client.UQL("show().graph()", nil)
 	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphs()
 

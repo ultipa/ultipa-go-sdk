@@ -456,3 +456,24 @@ func TestUqlPoint(t *testing.T) {
 	}
 	printers.PrintNodes(nodes, schemas)
 }
+
+
+func TestUqlBool(t *testing.T) {
+	//client, _ := GetClient([]string{"10.132.3.136:62061"}, "test")
+	//uql := `find().nodes({@insertNode2}) as nodes return nodes{*} limit 10`
+
+	client, _ := GetClient([]string{"192.168.1.85:61099"}, "sdk_test")
+	uql := `find().nodes({@People}) as nodes return nodes{*} limit 10`
+	resp, err := client.UQL(uql, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		t.Fatal(resp.Status.Message)
+	}
+	nodes, schemas, err := resp.Alias("nodes").AsNodes()
+	if err != nil {
+		t.Fatal(err)
+	}
+	printers.PrintNodes(nodes, schemas)
+}

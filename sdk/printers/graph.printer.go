@@ -8,10 +8,11 @@ import (
 
 func PrintGraph(graphs []*structs.Graph) {
 	table := simpletable.New()
-	table.Header.Cells = []*simpletable.Cell{&simpletable.Cell{Text: "Name"}, &simpletable.Cell{Text: "Description"}, &simpletable.Cell{Text: "Total Node"}, &simpletable.Cell{Text: "Total Edge"}, &simpletable.Cell{Text: "Status"}}
+	table.Header.Cells = []*simpletable.Cell{&simpletable.Cell{Text: "ID"}, &simpletable.Cell{Text: "Name"}, &simpletable.Cell{Text: "Description"}, &simpletable.Cell{Text: "Total Node"}, &simpletable.Cell{Text: "Total Edge"}, &simpletable.Cell{Text: "Status"}}
 	for _, graph := range graphs {
 
 		table.Body.Cells = append(table.Body.Cells, []*simpletable.Cell{
+			&simpletable.Cell{Text: graph.ID},
 			&simpletable.Cell{Text: graph.Name},
 			&simpletable.Cell{Text: graph.Description},
 			&simpletable.Cell{Text: fmt.Sprint(graph.TotalNodes)},
@@ -19,8 +20,8 @@ func PrintGraph(graphs []*structs.Graph) {
 			&simpletable.Cell{Text: graph.Status},
 		})
 
-		if len(table.Body.Cells) > 0 {
-			table.Println()
-		}
+	}
+	if len(table.Body.Cells) > 0 {
+		table.Println()
 	}
 }

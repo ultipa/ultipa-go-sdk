@@ -11,7 +11,7 @@ import (
 func PrintSchema(schemas []*structs.Schema) {
 
 	for _, schema := range schemas {
-		fmt.Println("Schema Name: ", schema.Name, "(", schema.Total, ")")
+		fmt.Println(fmt.Sprintf("Schema: %v - %v (%d)", schema.Id, schema.Name, schema.Total))
 		fmt.Println("Description: ", schema.Desc)
 		table := simpletable.New()
 		table.Header.Cells = []*simpletable.Cell{&simpletable.Cell{Text: "Name"}, &simpletable.Cell{Text: "Description"}, &simpletable.Cell{Text: "Type"}, &simpletable.Cell{Text: "LTE"}, &simpletable.Cell{Text: "Schema"}}

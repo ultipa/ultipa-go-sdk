@@ -72,10 +72,10 @@ func TestCreatePropertyWithUql(t *testing.T) {
 func TestCreateProperty(t *testing.T) {
 	// Create Node Property
 	newProp := &structs.Property{
-		Name: "gender",
-		Type: ultipa.PropertyType_STRING,
+		Name: "bool_prop",
+		Type: ultipa.PropertyType_BOOL,
 	}
-
+	client, _ := GetClient([]string{"192.168.1.85:61099"}, "sdk_test")
 	resp, err := client.CreateProperty("People", ultipa.DBType_DBNODE, newProp, nil)
 	if err != nil {
 		t.Fatal(err)

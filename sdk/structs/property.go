@@ -48,6 +48,7 @@ var PropertyMap = map[string]ultipa.PropertyType{
 	"point":      ultipa.PropertyType_POINT,
 	"decimal":    ultipa.PropertyType_DECIMAL,
 	"NULL_":      ultipa.PropertyType_NULL_,
+	"bool":       ultipa.PropertyType_BOOL,
 }
 
 var PropertyReverseMap = map[ultipa.PropertyType]string{
@@ -72,6 +73,7 @@ var PropertyReverseMap = map[ultipa.PropertyType]string{
 	ultipa.PropertyType_POINT:     "point",
 	ultipa.PropertyType_DECIMAL:   "decimal",
 	ultipa.PropertyType_NULL_:     "NULL_",
+	ultipa.PropertyType_BOOL:      "bool",
 }
 
 func (p *Property) IsIDType() bool {

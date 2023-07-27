@@ -21,12 +21,12 @@ func (graphs *ResponseGraphs) Find(name string) *ResponseGraph {
 }
 
 type ResponseGraph struct {
-	Id         int64
-	ClusterId  string
-	Name       string
-	TotalNodes int64
-	TotalEdges int64
-	Status     string
+	Id          int64
+	ClusterId   string
+	Name        string
+	TotalNodes  int64
+	TotalEdges  int64
+	Status      string
 	Description string
 }
 
@@ -34,6 +34,7 @@ type ResponseProperty struct {
 }
 
 type ResponseSchema struct {
+	Id          uint64
 	Name        string
 	Description string
 	Properties  []*ResponseProperty

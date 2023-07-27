@@ -208,11 +208,13 @@ message DownloadFileReply {
 //导出数据
 // limit < 0 全量导出
 // limit >= 0 导出limit条
+//limit abandon
 message ExportRequest {
   DBType db_type = 1;
   int32 limit = 2;
   repeated string select_properties = 3;
   string schema = 4;
+  string graph = 5;
 }
 
 message ExportReply {
@@ -302,9 +304,9 @@ message UninstallAlgoReply {
 message UploaderRequest {
   DBType db_type = 1;
   string graph_name = 2;
-  uint64 total_file_counts = 3;
+  uint64 total_file_counts = 3 [jstype = JS_STRING];
   string file_name = 4;
-  uint64 file_size = 5;
+  uint64 file_size = 5 [jstype = JS_STRING];
   bytes chunk = 6;
 }
 
@@ -377,6 +379,7 @@ enum PropertyType {
   SET = 15;
   MAP = 16;
   NULL_ = 17;
+  BOOL = 18;
 }
 
 enum ErrorCode {
@@ -414,6 +417,7 @@ message RaftFollower {
   string address = 1;
   int32 role = 2;
   ServerStatus status = 3;
+  string stream_address = 4;
 }
 
 enum ServerStatus {
@@ -425,6 +429,7 @@ message ClusterInfo {
   string redirect = 1;
   string leader_address = 2;
   repeated RaftFollower followers = 3;
+  string leader_stream_address = 4;
 }
 
 enum DBType {
@@ -463,11 +468,13 @@ message EntityRow {
   string to_id = 7;
   repeated bytes values = 8;
   bool is_null = 9;
+  uint64 schema_id = 10 [jstype = JS_STRING];
 }
 
 message Schema {
   string schema_name = 1;
   repeated Property properties = 2;
+  uint64 schema_id = 3 [jstype = JS_STRING];
 }
 
 message Property {

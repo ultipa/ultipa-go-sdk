@@ -31,10 +31,15 @@ func (api *UltipaAPI) ListNodeSchema(config *configuration.RequestConfig) (*http
 	}
 	values := table.ToKV()
 	for _, v := range values {
-		totalNodes, _ := strconv.ParseInt(v.Get("totalNodes").(string), 10, 64)
+		totalNodes := int64(0)
+		if value := v.Get("totalNodes"); value != nil {
+			totalNodes, _ = strconv.ParseInt(value.(string), 10, 64)
+		}
 		//totalEdges, _ := strconv.ParseInt(v.Get("totalEdges").(string), 10, 64)
 
+		id, _ := strconv.ParseUint(v.Get("id").(string), 10, 64)
 		schemas = append(schemas, &http.ResponseSchema{
+			Id:          id,
 			Name:        v.Get("name").(string),
 			Description: v.Get("description").(string),
 			Properties:  nil,
