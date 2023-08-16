@@ -7,5 +7,5 @@
 .idea/*
 coverage
 vendor
-
+.env
 /.ultipa_cli_history
