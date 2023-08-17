@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	Version = "v4.3.0" //主版本号
+	Version = "v4.3.0"
 )
 
-// New an Ultipa Instance !!!!
+// Create an Ultipa Client
 func NewUltipa(config *configuration.UltipaConfig) (*api.UltipaAPI, error) {
 
 	config.FillDefault()
