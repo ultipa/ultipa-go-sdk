@@ -1,4 +1,4 @@
-module ultipa-go-sdk
+module github.com/ultipa/ultipa-go-sdk
 
 go 1.17
 
