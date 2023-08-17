@@ -10,7 +10,7 @@ func TestUQLStream(t *testing.T) {
 
 	//client, _ := GetClient([]string{"210.13.32.146:40101"}, "default")
 	//client, _ := GetClient([]string{"192.168.1.94:60061"}, "default")
-	client, _ := GetClient([]string{"192.168.1.85:61848"}, "twitter")
+	client, _ := GetClient(hosts, graph)
 
 	uql := `find().nodes({@nodx}) limit 1000000 return nodes{*} `
 

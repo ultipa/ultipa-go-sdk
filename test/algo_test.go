@@ -12,7 +12,7 @@ import (
 func TestListAlgo(t *testing.T) {
 
 	//client, _ := GetClient([]string{"210.13.32.146:60074"}, "default")
-	client, _ := GetClient([]string{"192.168.1.85:61095"}, "default")
+	client, _ := GetClient(hosts, graph)
 
 	algos, err := client.ShowAlgo(nil)
 
@@ -25,7 +25,7 @@ func TestListAlgo(t *testing.T) {
 
 func TestInstallAlgo(t *testing.T) {
 	//client, _ := GetClient([]string{"210.13.32.146:60074"}, "default")
-	client, _ := GetClient([]string{"192.168.1.60:60061"}, "default")
+	client, _ := GetClient(hosts, graph)
 
 	resp, err := client.InstallAlgo("./test_algo_lib/libplugin_lpa.so", "./test_algo_lib/lpa.yml", nil)
 
@@ -44,7 +44,7 @@ func TestInstallAlgo(t *testing.T) {
 func TestUninstallAlgo(t *testing.T) {
 
 	//client, _ := GetClient([]string{"210.13.32.146:60074"}, "default")
-	client, _ := GetClient([]string{"192.168.1.87:60099"}, "default")
+	client, _ := GetClient(hosts, graph)
 
 	resp, err := client.UninstallAlgo("lpa", nil)
 

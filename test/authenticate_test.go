@@ -6,7 +6,7 @@ import (
 )
 
 func TestAuthenticate(t *testing.T) {
-	connection, _ := GetClient([]string{"192.168.2.41:60061"}, "default")
+	connection, _ := GetClient(hosts, graph)
 
 	resp, err := connection.Authenticate(ultipa.AuthenticateType_PERMISSION_TYPE_UQL, "show().graph()", nil)
 

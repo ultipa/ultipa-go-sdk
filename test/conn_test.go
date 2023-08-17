@@ -18,7 +18,7 @@ import (
 func TestNewConn(t *testing.T) {
 
 	//conn, err := grpc.Dial("210.13.32.146:60074", grpc.WithInsecure(), grpc.WithDefaultCallOptions())
-	conn, err := grpc.Dial("210.13.32.146:60075", grpc.WithInsecure(), grpc.WithDefaultCallOptions())
+	conn, err := grpc.Dial(hosts[0], grpc.WithInsecure(), grpc.WithDefaultCallOptions())
 
 	if err != nil {
 		log.Fatalln(err)
@@ -27,10 +27,10 @@ func TestNewConn(t *testing.T) {
 	client := ultipa.NewUltipaRpcsClient(conn)
 
 	h := md5.New()
-	h.Write([]byte("root"))
+	h.Write([]byte(password))
 	pass := hex.EncodeToString(h.Sum(nil))
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*3)
-	ctx = metadata.AppendToOutgoingContext(ctx, "user", "root", "password", strings.ToUpper(pass), "graph_name", "multi_schema_test")
+	ctx = metadata.AppendToOutgoingContext(ctx, "user", username, "password", strings.ToUpper(pass), graph, "multi_schema_test")
 
 	resp, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
 		Name: "hello",
@@ -43,7 +43,7 @@ func TestNewConn(t *testing.T) {
 	log.Println(resp)
 
 	ctx2, _ := context.WithTimeout(context.Background(), time.Second*1000)
-	ctx2 = metadata.AppendToOutgoingContext(ctx2, "user", "root", "password", strings.ToUpper(pass), "graph_name", "multi_schema_test")
+	ctx2 = metadata.AppendToOutgoingContext(ctx2, "user", username, "password", strings.ToUpper(pass), "graph_name", "multi_schema_test")
 	resp2, err := client.Uql(ctx2, &ultipa.UqlRequest{
 		Uql: "n().e().n() as path return path limit 10;",
 	})
@@ -65,7 +65,7 @@ func TestNewConn(t *testing.T) {
 }
 
 func TestUql(t *testing.T) {
-	client, _ := GetClient([]string{"210.13.32.146:60075"}, "default")
+	client, _ := GetClient(hosts, graph)
 	res, _ := client.UQL("n().e().n() as path return path limit 10;", nil)
 	log.Println(res.AliasList, res.Get(0), res.Status.Code, res.Status.Message)
 }
@@ -83,9 +83,7 @@ func TestUqlWithSpecialHost(t *testing.T) {
 }
 
 func TestRefreshPool(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:63540",
-		"192.168.1.87:63540",
-		"192.168.1.88:63540"}, "default")
+	client, _ := GetClient(hosts, graph)
 	for i := 0; i < 1000; i++ {
 		err := client.Pool.RefreshActivesWithSeconds(1)
 		if err != nil {
@@ -96,9 +94,10 @@ func TestRefreshPool(t *testing.T) {
 }
 
 func TestGetConnByUQL(t *testing.T) {
-	graph := "amz"
+
+	client, _ := GetClient(hosts, graph)
+
 	uql := "show().schema()"
-	client, _ := GetClient([]string{"52.83.192.170:61090", "161.189.204.0:61090", "161.189.19.4:61090"}, graph)
 	_, leader, followers, global, err := client.GetConnByUQL(uql, graph)
 	if err != nil {
 		t.Fatal(err)
@@ -115,12 +114,18 @@ func TestGetConnByUQL(t *testing.T) {
 }
 
 func TestConnectionSSL(t *testing.T) {
+
+	if env["ssl_host"] == "" {
+		t.Skip("no ssl host found")
+		return
+	}
+
 	var err error
 	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
-		Hosts:        []string{"kinqhpwws.us-east-2.uct.ultipa-inc.org:60010"},
-		Username:     "root",
-		Password:     "000000",
-		DefaultGraph: "default",
+		Hosts:        []string{env["ssl_host"]},
+		Username:     env["ssl_username"],
+		Password:     env["ssl_password"],
+		DefaultGraph: env["ssl_graph"],
 		Debug:        true,
 	})
 

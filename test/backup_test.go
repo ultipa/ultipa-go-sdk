@@ -7,7 +7,7 @@ import (
 )
 
 func TestBackup(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:61090"}, "default")
+	client, _ := GetClient(hosts, graph)
 
 	//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
 	resp, err := client.Backup("/opt/ultipa-server/exportData/backupTest/", nil)

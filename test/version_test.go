@@ -3,7 +3,7 @@ package test
 import "testing"
 
 func TestGetServerVersion(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.87:61090"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 	version, err := client.GetServerVersion()
 	if err != nil {
 		t.Fatal(err)

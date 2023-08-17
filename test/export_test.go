@@ -18,9 +18,8 @@ func TestExportAsNodesEdges(t *testing.T) {
 	//		{Name: "ssz"}, {Name: "szDec"}, {Name: "annullamentoConRinvio"}, {Name: "annullamentoSenzaRinvio"}, {Name: "rigettato"}, {Name: "inammissibile"}, {Name: "fullDocument"},
 	//	}}
 
-	garphName := "graphInsertTest"
 	schemaName := "nodeSchema"
-	client, _ := GetClient([]string{"192.168.1.88:60903"}, garphName)
+	client, _ := GetClient(hosts, graph)
 
 	schema := &structs.Schema{
 		Name: schemaName,

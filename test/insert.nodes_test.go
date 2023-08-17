@@ -10,7 +10,7 @@ import (
 )
 
 func TestInsertNodeWithListProperty(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.87:50051"}, "default")
+	client, _ := GetClient(hosts, graph)
 
 	schema := structs.NewSchema("default")
 	schema.Properties = append(schema.Properties, &structs.Property{
@@ -42,7 +42,7 @@ func TestInsertNodeWithListProperty(t *testing.T) {
 }
 
 func TestInsertPointProperty(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:61090"}, "listPropertyGraphTest")
+	client, _ := GetClient(hosts, graph)
 	schema := structs.NewSchema("nodeSchemaList")
 	schema.Properties = append(schema.Properties, &structs.Property{
 		Name:     "typePoint",

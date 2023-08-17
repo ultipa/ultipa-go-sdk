@@ -12,11 +12,11 @@ func TestHeartBeat(t *testing.T) {
 
 	var err error
 	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
-		Hosts:    []string{"192.168.1.85:60701"},
-		Username: "root",
-		Password: "root",
+		Hosts:     hosts,
+		Username:  username,
+		Password:  password,
 		HeartBeat: 1,
-		Debug: true,
+		Debug:     true,
 	})
 
 	client, err = sdk.NewUltipa(config)

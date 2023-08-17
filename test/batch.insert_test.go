@@ -19,7 +19,7 @@ func TestBatchInsertNodes(t *testing.T) {
 
 	//client, _ := GetClient([]string{"192.168.1.85:60041"}, "zjstest")
 	//client, _ := GetClient([]string{"192.168.1.71:60061"}, "default")
-	conn, _ := GetClient([]string{"192.168.1.85:64801", "192.168.1.85:64802", "192.168.1.85:64803"}, "default")
+	conn, _ := GetClient(hosts, graph)
 	schema := "text_schema"
 	createSchema(t, schema, conn)
 	batchInsert(schema, conn)
@@ -46,7 +46,7 @@ func batchInsert(schema string, conn *api.UltipaAPI) []*structs.Node {
 
 		node.ID = fmt.Sprint(total)
 		value := rand.Intn(1000)
-		node.Set("username", fmt.Sprintf("用户_%d", value))
+		node.Set("username", fmt.Sprintf("user_%d", value))
 		node.Set("password", RandStr(2000))
 
 		nodes = append(nodes, node)
@@ -130,7 +130,7 @@ func TestBatchInsertEdges(t *testing.T) {
 
 	//client, _ := GetClient([]string{"192.168.1.85:60041"}, "zjstest")
 	//client, _ := GetClient([]string{"192.168.1.71:60061"}, "default")
-	client, _ := GetClient([]string{"192.168.1.85:61115"}, "gongshang")
+	client, _ := GetClient(hosts, graph)
 
 	total := 500
 	finished := 0
@@ -207,8 +207,6 @@ func TestBatchInsertEdges(t *testing.T) {
 }
 
 func TestCheckPropAndValueAutoData(t *testing.T) {
-	var graph = "grapthInsertTest"
-	hosts := []string{"192.168.1.85:61095", "192.168.1.87:61095", "192.168.1.88:61095"}
 	client, _ := GetClient(hosts, graph)
 	timestamp1, _ := utils.NewTimestampFromString("2018-08-17T09:57:33+08:00", nil)
 	timestamp2, _ := utils.NewTimestampFromString("2018-08-17 09:57:33", nil)
@@ -263,8 +261,6 @@ func TestCheckPropAndValueAutoData(t *testing.T) {
 }
 
 func TestBatchInsert2(t *testing.T) {
-	var graph = "test"
-	hosts := []string{"10.132.3.136:61510"}
 	client, _ := GetClient(hosts, graph)
 	node1 := structs.Node{
 		Values: &structs.Values{

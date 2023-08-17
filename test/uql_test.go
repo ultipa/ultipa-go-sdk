@@ -12,7 +12,7 @@ func TestUQL(t *testing.T) {
 
 	//client, _ := GetClient([]string{"210.13.32.146:40101"}, "default")
 	//client, _ := GetClient([]string{"192.168.1.94:60061"}, "default")
-	client, _ := GetClient([]string{"192.168.1.86:60072"}, "default")
+	client, _ := GetClient(hosts, graph)
 
 	InitCases()
 
@@ -49,7 +49,7 @@ func TestUQL1(t *testing.T) {
 	//client, _ := GetClient([]string{"192.168.1.87:62061"}, "maker_test")
 	//client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
 	//client, _ := GetClient([]string{"192.168.1.85:61115"}, "gongshang")
-	client, _ := GetClient([]string{"192.168.1.87:60198"}, "ultipa_www")
+	client, _ := GetClient(hosts, graph)
 
 	//uql := `n({@user && _uuid == 1}).e({@relation.relation_type == 'has'}).n({@projects} as project).re({@relation.relation_type == 'has'}).n({@etl} as etl) group by project skip 0 return table(project._id,project._uuid,count(etl)) as t limit 15 order by project.created_at desc`
 	//uql := `find().edges(2658) as edges return edges{*}`
@@ -89,7 +89,7 @@ func TestUQL2(t *testing.T) {
 	//client, _ := GetClient([]string{"192.168.1.94:60061"}, "default")
 	//client, _ := GetClient([]string{"192.168.1.86:60072"}, "default")
 	//client, _ := GetClient([]string{"192.168.1.87:62061"}, "maker_test")
-	client, _ := GetClient([]string{"192.168.2.142:60062"}, "amz_zjs")
+	client, _ := GetClient(hosts, graph)
 
 	//uql := `n({@user && _uuid == 1}).e({@relation.relation_type == 'has'}).n({@projects} as project).re({@relation.relation_type == 'has'}).n({@etl} as etl) group by project skip 0 return table(project._id,project._uuid,count(etl)) as t limit 15 order by project.created_at desc`
 	uql := `find().nodes() return nodes limit 10`
@@ -112,7 +112,7 @@ func TestUQL2(t *testing.T) {
 
 func TestUQL3(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.85:64801"}, "test_node_create8137")
+	client, _ := GetClient(hosts, graph)
 
 	uql := `find().nodes({@test_schema2}) as n1 order by n1._uuid desc limit 1 return n1.test_timestamp`
 
@@ -135,7 +135,7 @@ func TestUQL3(t *testing.T) {
 
 func TestUQL4(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.87:61095"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 
 	uql := `ab().src({_uuid == 1}).dest({_uuid == 3}).depth(:2) as paths with pnodes(paths) as nodeArray uncollect nodeArray as node return distinct(node)`
 
@@ -152,7 +152,7 @@ func TestUQL4(t *testing.T) {
 
 func TestUQL5(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.87:61095"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 
 	uql := `find().nodes({@account.year==1978 && @account.name=="念敏"}) as nodes return nodes{*} limit 1`
 
@@ -169,7 +169,7 @@ func TestUQL5(t *testing.T) {
 
 func TestUQL6(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.87:61095"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 
 	uql := "find().nodes({@movie}) as nodes return table(nodes.timestamp,nodes.frating) limit 0"
 	resp, err := client.UQL(uql, nil)
@@ -192,7 +192,7 @@ func TestUQL6(t *testing.T) {
 
 func TestUQLAlterGraph(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.85:61095"}, "default")
+	client, _ := GetClient(hosts, graph)
 
 	uql := "alter().graph('alter_graph_1').set({name:'alter_graph'})" //test123
 	resp, err := client.UQL(uql, nil)
@@ -210,7 +210,7 @@ func TestUQLAlterGraph(t *testing.T) {
 
 func TestUQLCompactWithNotExistGraph(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.85:61095"}, "default")
+	client, _ := GetClient(hosts, graph)
 
 	uql := `compact().graph("c1")`
 	//ty, leader, follower, global, err := client.GetConnByUQL(uql, "random_test_js_1672976970614")
@@ -242,7 +242,7 @@ func TestUQLCompactWithNotExistGraph(t *testing.T) {
 
 func TestTopUql(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.87:61090"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 
 	uql := `top()`
 
@@ -258,7 +258,7 @@ func TestTopUql(t *testing.T) {
 }
 func TestUQLFindNodesWithList(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.85:61090"}, "gosdk")
+	client, _ := GetClient(hosts, graph)
 
 	uql := "find().nodes({@People}) as nodes return nodes{*}"
 	resp, err := client.UQL(uql, nil)
@@ -281,7 +281,7 @@ func TestUQLFindNodesWithList(t *testing.T) {
 
 func TestUQLFindNodesWithAttrList(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.87:50051"}, "default")
+	client, _ := GetClient(hosts, graph)
 
 	uql := "find().nodes() as nodes return collect(distinct(nodes)) as arrNode"
 	resp, err := client.UQL(uql, nil)
@@ -304,7 +304,7 @@ func TestUQLFindNodesWithAttrList(t *testing.T) {
 
 func TestUQLFindNodesWithAttrListNullValue(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.85:61090"}, "listPropertyGraphTest")
+	client, _ := GetClient(hosts, graph)
 
 	uql := "find().nodes({@nodeSchemaList}) as n return collect(n.stringList)"
 	resp, err := client.UQL(uql, nil)
@@ -327,7 +327,7 @@ func TestUQLFindNodesWithAttrListNullValue(t *testing.T) {
 
 func TestUQLFindNodesAsAttrList(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.85:61090"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 
 	uql := "find().nodes({_uuid < 10}) return collect(nodes)"
 	resp, err := client.UQL(uql, nil)
@@ -350,7 +350,7 @@ func TestUQLFindNodesAsAttrList(t *testing.T) {
 
 func TestUQLFindPathsWithGroupByAttr(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.85:61090"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 
 	uql := "n({_uuid in [4,5,6]} as n1).e().n(as n2) as paths group by n1 return n1{*}, collect(paths)"
 	resp, err := client.UQL(uql, nil)
@@ -378,7 +378,7 @@ func TestUQLFindPathsWithGroupByAttr(t *testing.T) {
 }
 
 func TestUqlInsertListProperty(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:61090"}, "gosdk")
+	client, _ := GetClient(hosts, graph)
 
 	uql := `insert().nodes({name:["zhangsan","lisi"]}).into(@People)`
 	resp, err := client.UQL(uql, nil)
@@ -391,7 +391,7 @@ func TestUqlInsertListProperty(t *testing.T) {
 }
 
 func TestUQLWithLimit(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.87:61090", "192.168.1.85:61090", "192.168.1.88:61090"}, "gosdk")
+	client, _ := GetClient(hosts, graph)
 	uql := "find().edges({@insertEdge}) as edges return edges{*} limit 40"
 	//uql := "find().nodes({@insertNode}) as n return n{typeListString,typeListInt32,typeListInt64,typeListUint32,typeListUint64,typeListFloat,typeListDouble,typeListDatetime,typeListTimestamp,typeListText}"
 	//uql := "find().nodes({@insertNode}) as nodes return nodes{*}"
@@ -405,7 +405,7 @@ func TestUQLWithLimit(t *testing.T) {
 }
 
 func TestUqlFindPointProperty(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:61090"}, "listPropertyGraphTest")
+	client, _ := GetClient(hosts, graph)
 
 	uql := `find().nodes([11,12]) as nodes return nodes.typePoint`
 	resp, err := client.UQL(uql, nil)
@@ -423,14 +423,14 @@ func TestUqlFindPointProperty(t *testing.T) {
 }
 
 func TestOnePathAsPaths(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.87:61090", "192.168.1.85:61090", "192.168.1.88:61090"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 	var uql = "ab().src(51).dest(103).depth(1) as paths return paths{}"
 	resp, _ := client.UQL(uql, nil)
 	paths, _ := resp.Alias("paths").AsPaths()
 	printers.PrintPaths(paths)
 }
 func TestDateTime(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.87:61090", "192.168.1.85:61090", "192.168.1.88:61090"}, "testCLI")
+	client, _ := GetClient(hosts, graph)
 	var uql = "find().nodes({@`nodeSchema3`}) as nodes return table(nodes.typeListDatetime[0])"
 	resp, _ := client.UQL(uql, nil)
 	table, _ := resp.Alias("table(nodes.typeListDatetime[0])").AsTable()

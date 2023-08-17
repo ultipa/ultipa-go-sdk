@@ -13,7 +13,7 @@ import (
 
 func TestListGraph(t *testing.T) {
 	InitCases()
-	client, _ := GetClient([]string{"192.168.1.85:61095"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 	res, err := client.ListGraph(nil)
 	if err != nil {
 		log.Panic(err)
@@ -23,24 +23,20 @@ func TestListGraph(t *testing.T) {
 
 func TestCreateGraph(t *testing.T) {
 
-	graphName := "test_creation"
-	hosts := []string{
-		"192.168.1.85:61095",
-	}
-	client, err := GetClient(hosts, "default")
+	client, err := GetClient(hosts, graph)
 
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	client.DropGraph(graphName, nil)
+	client.DropGraph(graph, nil)
 
 	client.CreateGraph(&structs.Graph{
-		Name: graphName,
+		Name: graph,
 	}, nil)
 
-	client.SetCurrentGraph(graphName)
+	client.SetCurrentGraph(graph)
 
 	resp, err := client.UQL("insert().nodes({}).into(@default)", nil)
 
@@ -59,7 +55,7 @@ func TestDeleteGraph(t *testing.T) {
 }
 
 func TestAsGraph(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 	resp, _ := client.UQL("show().graph()", nil)
 	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphs()
 
@@ -70,20 +66,17 @@ func TestAsGraph(t *testing.T) {
 }
 
 func TestCreateGraphIfNotExist(t *testing.T) {
-	graphName := "gosdk"
-	hosts := []string{
-		"192.168.1.85:61090",
-	}
-	client, err := GetClient(hosts, "default")
+
+	client, err := GetClient(hosts, graph)
 
 	if err != nil {
 		t.Fatalf("failed to connect to server %v", err)
 	}
 
-	client.DropGraph(graphName, nil)
+	client.DropGraph(graph, nil)
 
 	_, _, err = client.CreateGraphIfNotExit(&structs.Graph{
-		Name: graphName,
+		Name: graph,
 	}, nil)
 	if err != nil {
 		t.Fatalf("failed to create graph %v", err)

@@ -3,7 +3,6 @@ package test
 import (
 	"fmt"
 	"github.com/pterm/pterm"
-	"github.com/pterm/pterm/putils"
 	"log"
 	"testing"
 	"ultipa-go-sdk/sdk/printers"
@@ -12,7 +11,7 @@ import (
 
 func TestExplain(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "default")
+	client, _ := GetClient(hosts, graph)
 
 	//resp, err := client.UQL("explain find().nodes() as nodes limit 1 return nodes limit 10", nil)
 	//	resp, err := client.UQL(`explain n({@account} as buyer).e().n({@card}).re({@transaction} as buy).n()
@@ -63,9 +62,10 @@ func TestExplain1(t *testing.T) {
 	node := buildTreeNode(explainChan)
 
 	traverse(node, 0)
-	tree := putils.TreeFromLeveledList(leveledList)
+	// FIXME:
+	//tree := putils.TreeFromLeveledList(leveledList)
 
-	pterm.DefaultTree.WithIndent(3).WithRoot(tree).Render()
+	//pterm.DefaultTree.WithIndent(3).WithRoot(tree).Render()
 
 }
 

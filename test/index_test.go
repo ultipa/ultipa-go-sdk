@@ -14,7 +14,7 @@ import (
 )
 
 func TestListIndex(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 
 	indexes, err := client.ListIndex(nil)
 	if err != nil {
@@ -24,7 +24,7 @@ func TestListIndex(t *testing.T) {
 }
 
 func TestListNodeIndex(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 
 	indexes, err := client.ListNodeIndex(nil)
 	if err != nil {
@@ -34,7 +34,7 @@ func TestListNodeIndex(t *testing.T) {
 }
 
 func TestListEdgeIndex(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 
 	indexes, err := client.ListEdgeIndex(nil)
 	if err != nil {
@@ -44,7 +44,7 @@ func TestListEdgeIndex(t *testing.T) {
 }
 
 func TestListFullText(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 
 	indexes, err := client.ListFullText(nil)
 	if err != nil {
@@ -54,7 +54,7 @@ func TestListFullText(t *testing.T) {
 }
 
 func TestListNodeFullText(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 
 	indexes, err := client.ListNodeFullText(nil)
 	if err != nil {
@@ -64,7 +64,7 @@ func TestListNodeFullText(t *testing.T) {
 }
 
 func TestListEdgeFullText(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	client, _ := GetClient(hosts, graph)
 
 	indexes, err := client.ListEdgeFullText(nil)
 	if err != nil {

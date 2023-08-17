@@ -1,27 +1,34 @@
 package test
 
 import (
+	"github.com/joho/godotenv"
 	"log"
+	"strings"
 	"testing"
 	"ultipa-go-sdk/sdk"
 	"ultipa-go-sdk/sdk/api"
 	"ultipa-go-sdk/sdk/configuration"
 )
 
+var env map[string]string
 var client *api.UltipaAPI
-
 var hosts []string
+var username string
+var password string
+var graph string
 
 func TestMain(m *testing.M) {
 	var err error
+	env, err = godotenv.Read(".env")
 
-	hosts = []string{
-		//"210.13.32.147:60095",
-		"192.168.1.85:61090",
-		"192.168.1.87:61090",
-		"192.168.1.88:61090",
+	if err != nil {
+		log.Fatalln(err)
 	}
-	client, err = GetClient(hosts, "gosdk")
+
+	hosts = strings.Split(env["hosts"], ",")
+	username, password, graph = env["username"], env["password"], env["graph"]
+
+	client, err = GetClient(hosts, graph)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -31,7 +38,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestPing(t *testing.T) {
-	client, _ = GetClient(hosts, "default")
+	client, _ = GetClient(hosts, graph)
 	client.Test()
 }
 
@@ -39,8 +46,8 @@ func GetClient(hosts []string, graphName string) (*api.UltipaAPI, error) {
 	var err error
 	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
 		Hosts:        hosts,
-		Username:     "root",
-		Password:     "root",
+		Username:     username,
+		Password:     password,
 		DefaultGraph: graphName,
 		Debug:        true,
 	})

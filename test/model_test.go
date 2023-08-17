@@ -11,15 +11,11 @@ import (
 func TestCreateModel(t *testing.T) {
 
 	var err error
-	client, err = GetClient([]string{
-		"192.168.1.86:60072",
-	}, "default")
-
+	client, err = GetClient(hosts, graph)
 
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 
 	log.Println("[Test] Creating Graph Model")
 	model := models.NewGraphModel(&structs.Graph{
@@ -63,9 +59,9 @@ func TestCreateModel(t *testing.T) {
 	})
 
 	model.AddSchema(&structs.Schema{
-		Name: "Privilege",
+		Name:   "Privilege",
 		DBType: ultipa.DBType_DBEDGE,
-		Properties: []*structs.Property {
+		Properties: []*structs.Property{
 			{
 				Name: "type",
 				Desc: "type of privilege: r,w, rw",
@@ -73,7 +69,6 @@ func TestCreateModel(t *testing.T) {
 			},
 		},
 	})
-
 
 	log.Println("[TEST] Initial Model")
 	err = client.InitModel(model, nil)

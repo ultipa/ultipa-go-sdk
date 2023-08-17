@@ -11,12 +11,7 @@ import (
 
 func TestRefreshClusterInfo(t *testing.T) {
 
-	hosts := []string{
-		"192.168.1.86:40101",
-		"192.168.1.85:40101",
-		"192.168.1.90:40101",
-	}
-	client, err := GetClient(hosts, "default")
+	client, err := GetClient(hosts, graph)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -35,9 +30,6 @@ func TestSendNewGraphUQL(t *testing.T) {
 
 func TestClient(t *testing.T) {
 
-	hosts := []string{
-		"192.168.1.85:61095",
-	}
 	client, err := GetClient(hosts, "global")
 
 	if err != nil {
