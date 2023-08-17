@@ -1,8 +1,8 @@
 package test
 
 import (
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"testing"
-	"ultipa-go-sdk/sdk/utils"
 )
 
 func TestIsGlobalUql(t *testing.T) {

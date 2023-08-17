@@ -3,7 +3,7 @@ package structs
 import (
 	"errors"
 	"fmt"
-	ultipa "ultipa-go-sdk/rpc"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 )
 
 //ListAttrAsAttrNodes returns AttrNodes, if PropertyType of attr is LIST and inner result type is Node

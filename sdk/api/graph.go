@@ -3,14 +3,14 @@ package api
 import (
 	"errors"
 	"fmt"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"reflect"
 	"strconv"
 	"time"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/http"
-	"ultipa-go-sdk/sdk/structs"
-	"ultipa-go-sdk/sdk/utils"
 )
 
 func (api *UltipaAPI) ListGraph(config *configuration.RequestConfig) (*http.ResponseGraphs, error) {

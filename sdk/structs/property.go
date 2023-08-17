@@ -3,8 +3,8 @@ package structs
 import (
 	"errors"
 	"fmt"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"strings"
-	ultipa "ultipa-go-sdk/rpc"
 )
 
 type Property struct {

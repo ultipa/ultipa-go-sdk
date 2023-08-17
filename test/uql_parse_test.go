@@ -2,11 +2,11 @@ package test
 
 import (
 	"fmt"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"log"
 	"regexp"
 	"strings"
 	"testing"
-	"ultipa-go-sdk/sdk/utils"
 )
 
 func TestEasyUqlParse(t *testing.T) {
@@ -160,7 +160,6 @@ func TestRegularExpress(t *testing.T) {
 		fmt.Printf("%d:%q\n", idx, matcher.FindStringSubmatch(uql))
 	}
 }
-
 
 func TestRegularExpressWithGroupName(t *testing.T) {
 	uqls := []string{

@@ -1,9 +1,9 @@
 package printers
 
 import (
-"fmt"
-"github.com/alexeyco/simpletable"
-"ultipa-go-sdk/sdk/structs"
+	"fmt"
+	"github.com/alexeyco/simpletable"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 func PrintArray(arr *structs.Array) {

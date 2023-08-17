@@ -1,6 +1,6 @@
 package structs
 
-import ultipa "ultipa-go-sdk/rpc"
+import ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 
 //AttrEdges represents an Attr with Rows that is List<List<Edge>>
 type AttrEdges struct {

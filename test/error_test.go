@@ -1,9 +1,9 @@
 package test
 
 import (
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"reflect"
 	"testing"
-	"ultipa-go-sdk/sdk/utils"
 )
 
 func TestErrorType(t *testing.T) {

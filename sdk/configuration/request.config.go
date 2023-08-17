@@ -1,6 +1,6 @@
 package configuration
 
-import ultipa "ultipa-go-sdk/rpc"
+import ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 
 type RequestType = int32
 
@@ -12,7 +12,7 @@ const (
 
 type RequestConfig struct {
 	GraphName      string      // Graphset Name
-	Timeout        int32      // timeout (Seconds)
+	Timeout        int32       // timeout (Seconds)
 	ClusterId      string      // Name Server Only
 	Host           string      // set for force host test
 	UseMaster      bool        // Use Master( graphSet master )
@@ -22,9 +22,8 @@ type RequestConfig struct {
 	Timezone       string      // name of time zone , e.g. Aisa/Shanghai
 	TimezoneOffset int64       // seconds that elapse from UTC, prior to TimeZone
 	ThreadNum      uint32      // used for uql request
-	MaxPkgSize  int         // max package size in bytes, for both sending and receiving, if not set, default is 10M
+	MaxPkgSize     int         // max package size in bytes, for both sending and receiving, if not set, default is 10M
 }
-
 
 type InsertRequestConfig struct {
 	*RequestConfig

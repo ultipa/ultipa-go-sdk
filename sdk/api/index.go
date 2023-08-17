@@ -9,10 +9,10 @@ package api
 
 import (
 	"fmt"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/http"
-	"ultipa-go-sdk/sdk/structs"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 func (api *UltipaAPI) ListIndex(config *configuration.RequestConfig) ([]*http.ResponseIndex, error) {

@@ -2,10 +2,10 @@ package test
 
 import (
 	"fmt"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"testing"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/utils"
 )
 
 func TestLocation(t *testing.T) {

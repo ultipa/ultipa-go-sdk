@@ -5,15 +5,15 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/types"
 	"google.golang.org/protobuf/proto"
 	"math"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/types"
 )
 
 var default_nil_string = string([]byte{0x00})

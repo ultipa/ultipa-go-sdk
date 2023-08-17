@@ -1,7 +1,7 @@
 package http
 
 import (
-	"ultipa-go-sdk/sdk/structs"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 func (di *DataItem) AsFirstNode() (node *structs.Node, err error) {
@@ -18,7 +18,7 @@ func (di *DataItem) AsFirstEdge() (node *structs.Edge, err error) {
 	edges, _, err := di.AsEdges()
 
 	if len(edges) < 1 {
-		return nil ,err
+		return nil, err
 	}
 
 	return edges[0], err

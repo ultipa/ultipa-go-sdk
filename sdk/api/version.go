@@ -1,7 +1,7 @@
 package api
 
 import (
-	"ultipa-go-sdk/sdk/http"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 )
 
 func (api *UltipaAPI) GetServerVersion() (string, error) {

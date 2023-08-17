@@ -1,12 +1,12 @@
 package api
 
 import (
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"google.golang.org/grpc"
 	"io"
 	"sync"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/structs"
 )
 
 func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, config *configuration.RequestConfig, cb func(nodes []*structs.Node, edges []*structs.Edge) error) error {

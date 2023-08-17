@@ -2,14 +2,14 @@ package api
 
 import (
 	"fmt"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/connection"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 	"strconv"
 	"time"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/connection"
-	"ultipa-go-sdk/sdk/http"
-	"ultipa-go-sdk/sdk/utils"
-	"ultipa-go-sdk/sdk/utils/logger"
 )
 
 // UQL, Insert, Export, Download ... API methods

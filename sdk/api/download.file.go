@@ -1,9 +1,9 @@
 package api
 
 import (
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"io"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
 )
 
 func (api *UltipaAPI) DownloadFileV2(fileName string, taskId string, config *configuration.RequestConfig, receive func(data []byte) error) error {

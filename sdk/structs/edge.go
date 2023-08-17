@@ -1,10 +1,10 @@
 package structs
 
 import (
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/types"
-	"ultipa-go-sdk/sdk/utils"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/types"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
 type Edge struct {

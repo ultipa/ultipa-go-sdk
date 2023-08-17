@@ -1,10 +1,10 @@
 package test
 
 import (
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"log"
 	"reflect"
 	"testing"
-	"ultipa-go-sdk/sdk/utils"
 )
 
 //TODO:
@@ -18,10 +18,9 @@ func TestMergeStruct(t *testing.T) {
 	}
 
 	type Relations struct {
-		Users []*User
+		Users     []*User
 		Companies []*Company
 	}
-
 
 	R1 := &Relations{
 		Users: []*User{

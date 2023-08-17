@@ -1,4 +1,5 @@
 package utils
+
 //
 //import (
 //	"bytes"
@@ -7,8 +8,8 @@ package utils
 //	"fmt"
 //	"math"
 //	"strconv"
-//	ultipa "ultipa-go-sdk/rpc"
-//	"ultipa-go-sdk/types"
+//	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+//	"github.com/ultipa/ultipa-go-sdk/types"
 //)
 //
 //var ultipaTime = UltipaTime{}

@@ -3,10 +3,10 @@ package test
 import (
 	"fmt"
 	"github.com/pterm/pterm"
+	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"log"
 	"testing"
-	"ultipa-go-sdk/sdk/printers"
-	"ultipa-go-sdk/sdk/structs"
 )
 
 func TestExplain(t *testing.T) {

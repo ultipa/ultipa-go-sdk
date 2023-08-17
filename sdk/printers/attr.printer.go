@@ -3,11 +3,11 @@ package printers
 import (
 	"fmt"
 	"github.com/alexeyco/simpletable"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 	"reflect"
 	"strings"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/structs"
-	"ultipa-go-sdk/sdk/utils/logger"
 )
 
 func PrintAttr(attr *structs.Attr) {

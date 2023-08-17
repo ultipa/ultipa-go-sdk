@@ -1,10 +1,10 @@
 package models
 
-import "ultipa-go-sdk/sdk/structs"
+import "github.com/ultipa/ultipa-go-sdk/sdk/structs"
 
 type GraphModel struct {
-	Graph *structs.Graph
-	Schemas   []*structs.Schema
+	Graph   *structs.Graph
+	Schemas []*structs.Schema
 }
 
 func NewGraphModel(graph *structs.Graph) *GraphModel {

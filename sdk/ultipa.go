@@ -2,13 +2,13 @@
 package sdk
 
 import (
-	"ultipa-go-sdk/sdk/api"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/connection"
+	"github.com/ultipa/ultipa-go-sdk/sdk/api"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/connection"
 )
 
 var (
-	Version  = "v4.3.0" //主版本号
+	Version = "v4.3.0" //主版本号
 )
 
 // New an Ultipa Instance !!!!

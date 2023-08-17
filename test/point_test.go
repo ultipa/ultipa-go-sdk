@@ -2,8 +2,8 @@ package test
 
 import (
 	"fmt"
+	"github.com/ultipa/ultipa-go-sdk/sdk/types"
 	"testing"
-	"ultipa-go-sdk/sdk/types"
 )
 
 func TestString(t *testing.T) {

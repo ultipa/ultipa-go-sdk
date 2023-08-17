@@ -1,10 +1,10 @@
 package test
 
 import (
+	"github.com/ultipa/ultipa-go-sdk/utils"
 	"log"
 	"strings"
 	"testing"
-	"ultipa-go-sdk/utils"
 )
 
 //1.86 1.85 1.90

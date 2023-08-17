@@ -1,14 +1,14 @@
 package test
 
 import (
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
+	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
+	"github.com/ultipa/ultipa-go-sdk/utils"
 	"log"
 	"testing"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/http"
-	"ultipa-go-sdk/sdk/printers"
-	"ultipa-go-sdk/sdk/structs"
-	"ultipa-go-sdk/sdk/utils/logger"
-	"ultipa-go-sdk/utils"
 )
 
 func TestListGraph(t *testing.T) {

@@ -10,11 +10,11 @@ package api
 import (
 	"bufio"
 	"github.com/codingsince1985/checksum"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"io"
 	"os"
 	"path"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
 )
 
 func (api *UltipaAPI) InstallExta(extaFilePath string, extaInfoFilePath string, req *configuration.RequestConfig) (*ultipa.InstallExtaReply, error) {

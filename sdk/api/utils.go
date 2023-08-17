@@ -3,9 +3,9 @@ package api
 import (
 	"errors"
 	"fmt"
+	"github.com/ultipa/ultipa-go-sdk/sdk/connection"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"strings"
-	"ultipa-go-sdk/sdk/connection"
-	"ultipa-go-sdk/sdk/utils"
 )
 
 /**

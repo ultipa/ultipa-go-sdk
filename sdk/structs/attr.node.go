@@ -1,6 +1,6 @@
 package structs
 
-import ultipa "ultipa-go-sdk/rpc"
+import ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 
 //AttrNodes represents an Attr with Rows that is List<List<Node>>
 type AttrNodes struct {

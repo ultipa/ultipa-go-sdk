@@ -3,9 +3,9 @@ package printers
 import (
 	"fmt"
 	"github.com/alexeyco/simpletable"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"log"
 	"strconv"
-	"ultipa-go-sdk/sdk/structs"
 )
 
 func PrintSchema(schemas []*structs.Schema) {

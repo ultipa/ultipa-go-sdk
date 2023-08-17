@@ -3,7 +3,7 @@ package printers
 import (
 	"fmt"
 	"github.com/alexeyco/simpletable"
-	"ultipa-go-sdk/sdk/structs"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 func PrintNodes(nodes []*structs.Node, schemas map[string]*structs.Schema) {

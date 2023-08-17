@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"google.golang.org/protobuf/proto"
 	"log"
 	"strconv"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/structs"
-	"ultipa-go-sdk/sdk/utils"
 )
 
 type DataItem struct {

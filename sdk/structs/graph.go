@@ -2,9 +2,9 @@ package structs
 
 import (
 	"errors"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/types"
 	"strings"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/types"
 )
 
 type Graph struct {

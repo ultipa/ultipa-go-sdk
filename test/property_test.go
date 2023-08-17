@@ -8,12 +8,12 @@
 package test
 
 import (
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
+	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"log"
 	"testing"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/http"
-	"ultipa-go-sdk/sdk/printers"
-	"ultipa-go-sdk/sdk/structs"
 )
 
 func TestShowProperty(t *testing.T) {

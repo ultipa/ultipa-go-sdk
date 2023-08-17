@@ -1,6 +1,6 @@
 package structs
 
-import ultipa "ultipa-go-sdk/rpc"
+import ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 
 type List struct {
 	BaseType ultipa.PropertyType

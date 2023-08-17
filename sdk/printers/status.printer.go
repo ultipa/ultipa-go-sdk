@@ -2,7 +2,7 @@ package printers
 
 import (
 	"fmt"
-	"ultipa-go-sdk/sdk/http"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 )
 
 func PrintStatistics(stats *http.Statistic) {
@@ -20,5 +20,5 @@ func PrintStatistics(stats *http.Statistic) {
 		fmt.Printf("Effect Edges: %v \n", ee)
 	}
 
-	fmt.Printf("Total Cost : %vs | Engine Cost : %vs \n", float64(tc) / 1000, float64(ec) / 1000 )
+	fmt.Printf("Total Cost : %vs | Engine Cost : %vs \n", float64(tc)/1000, float64(ec)/1000)
 }

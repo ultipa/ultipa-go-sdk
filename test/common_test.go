@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"log"
 	"math"
 	"strconv"
 	"sync"
 	"testing"
 	"time"
-	ultipa "ultipa-go-sdk/rpc"
 )
 
 func TestSlice(t *testing.T) {

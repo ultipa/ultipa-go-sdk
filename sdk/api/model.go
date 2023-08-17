@@ -1,8 +1,8 @@
 package api
 
 import (
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/models"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/models"
 )
 
 func (api *UltipaAPI) InitModel(model *models.GraphModel, config *configuration.RequestConfig) error {

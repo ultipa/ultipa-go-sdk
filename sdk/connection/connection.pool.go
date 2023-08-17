@@ -4,6 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/metadata"
 	"log"
@@ -11,10 +15,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/utils"
-	"ultipa-go-sdk/sdk/utils/logger"
 )
 
 type GraphClusterInfo struct {

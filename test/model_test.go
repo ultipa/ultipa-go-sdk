@@ -1,11 +1,11 @@
 package test
 
 import (
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/models"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"log"
 	"testing"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/models"
-	"ultipa-go-sdk/sdk/structs"
 )
 
 func TestCreateModel(t *testing.T) {

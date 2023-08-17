@@ -2,9 +2,9 @@ package utils
 
 import (
 	"fmt"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 	"google.golang.org/protobuf/proto"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/utils/logger"
 )
 
 var nullBytes map[ultipa.PropertyType][]byte

@@ -1,7 +1,8 @@
 package utils
+
 //
 //import (
-//	"ultipa-go-sdk/types"
+//	"github.com/ultipa/ultipa-go-sdk/types"
 //)
 //
 //func UqlResponseAppend(uqlReply1 *types.UqlReply, uqlReply2 *types.UqlReply)  {

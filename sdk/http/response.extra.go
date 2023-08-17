@@ -1,8 +1,8 @@
 package http
 
 import (
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/structs"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 type ResponseGraphs struct {
@@ -21,12 +21,12 @@ func (graphs *ResponseGraphs) Find(name string) *ResponseGraph {
 }
 
 type ResponseGraph struct {
-	Id         int64
-	ClusterId  string
-	Name       string
-	TotalNodes int64
-	TotalEdges int64
-	Status     string
+	Id          int64
+	ClusterId   string
+	Name        string
+	TotalNodes  int64
+	TotalEdges  int64
+	Status      string
 	Description string
 }
 

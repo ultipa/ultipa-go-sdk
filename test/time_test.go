@@ -3,9 +3,9 @@ package test
 import (
 	"encoding/binary"
 	"fmt"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"testing"
 	"time"
-	"ultipa-go-sdk/sdk/utils"
 )
 
 func TestNewTimeFromString(t *testing.T) {

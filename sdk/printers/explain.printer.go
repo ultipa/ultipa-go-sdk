@@ -3,8 +3,7 @@ package printers
 import (
 	"fmt"
 	"github.com/pterm/pterm"
-	"github.com/pterm/pterm/putils"
-	"ultipa-go-sdk/sdk/structs"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 type TreeNode struct {
@@ -27,9 +26,9 @@ func PrintExplain(graphs []*structs.Explain) {
 	tree := buildTree(explainChan)
 
 	traverse(tree, 0)
-	root := putils.TreeFromLeveledList(leveledList)
+	//root := putils.TreeFromLeveledList(leveledList)
 
-	pterm.DefaultTree.WithIndent(3).WithRoot(root).Render()
+	//pterm.DefaultTree.WithIndent(3).WithRoot(root).Render()
 }
 
 func buildTree(graphs chan *structs.Explain) *TreeNode {

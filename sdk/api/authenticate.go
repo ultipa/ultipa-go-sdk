@@ -1,8 +1,8 @@
 package api
 
 import (
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 )
 
 func (api *UltipaAPI) Authenticate(authenticateType ultipa.AuthenticateType, uql string, requestConfig *configuration.RequestConfig) (*ultipa.AuthenticateReply, error) {

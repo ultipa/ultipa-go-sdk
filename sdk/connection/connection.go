@@ -3,11 +3,11 @@ package connection
 import (
 	"crypto/tls"
 	"crypto/x509"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/utils"
 )
 
 type Connection struct {

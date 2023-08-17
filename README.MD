@@ -7,9 +7,9 @@
 ```go
 
 import (
-    "ultipa-go-sdk/sdk"
-    "ultipa-go-sdk/sdk/api"
-    "ultipa-go-sdk/sdk/configuration"
+    "github.com/ultipa/ultipa-go-sdk/sdk"
+    "github.com/ultipa/ultipa-go-sdk/sdk/api"
+    "github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 )
 
 config := configuration.NewUltipaConfig(&configuration.UltipaConfig{

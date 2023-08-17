@@ -1,9 +1,9 @@
 package http
 
 import (
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"reflect"
 	"strconv"
-	ultipa "ultipa-go-sdk/rpc"
 )
 
 // 存储返回的统计信息
@@ -12,7 +12,6 @@ type Statistic struct {
 	EdgeAffected int `key:"edge_affected" type:"int"`
 	TotalCost    int `key:"total_time_cost" type:"int"`
 	EngineCost   int `key:"engine_time_cost" type:"int"`
-
 }
 
 func ParseStatistic(table *ultipa.Table) (*Statistic, error) {

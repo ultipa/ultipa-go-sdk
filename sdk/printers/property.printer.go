@@ -2,9 +2,9 @@ package printers
 
 import (
 	"github.com/alexeyco/simpletable"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"log"
 	"strconv"
-	"ultipa-go-sdk/sdk/structs"
 )
 
 func PrintProperty(properties []*structs.Property) {

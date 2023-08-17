@@ -2,12 +2,12 @@ package test
 
 import (
 	"github.com/joho/godotenv"
+	"github.com/ultipa/ultipa-go-sdk/sdk"
+	"github.com/ultipa/ultipa-go-sdk/sdk/api"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"log"
 	"strings"
 	"testing"
-	"ultipa-go-sdk/sdk"
-	"ultipa-go-sdk/sdk/api"
-	"ultipa-go-sdk/sdk/configuration"
 )
 
 var env map[string]string

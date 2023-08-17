@@ -1,14 +1,14 @@
 package api_test
 
 import (
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk"
+	"github.com/ultipa/ultipa-go-sdk/sdk/api"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
+	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"log"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk"
-	"ultipa-go-sdk/sdk/api"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/http"
-	"ultipa-go-sdk/sdk/printers"
-	"ultipa-go-sdk/sdk/structs"
 )
 
 var client *api.UltipaAPI

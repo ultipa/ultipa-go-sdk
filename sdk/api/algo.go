@@ -3,12 +3,12 @@ package api
 import (
 	"bufio"
 	"github.com/codingsince1985/checksum"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"io"
 	"os"
 	"path"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/structs"
 )
 
 func (api *UltipaAPI) ShowAlgo(req *configuration.RequestConfig) ([]*structs.Algo, error) {

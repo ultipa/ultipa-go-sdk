@@ -1,9 +1,9 @@
 package test
 
 import (
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"log"
 	"testing"
-	ultipa "ultipa-go-sdk/rpc"
 )
 
 func TestBackup(t *testing.T) {
