@@ -18,6 +18,10 @@ func SprintInfo(str string) string {
 	return color.GreenString("[INFO] ") + str
 }
 
+func SprintDebug(str string) string {
+	return color.GreenString("[DEBUG] ") + str
+}
+
 func PrintError(str string) {
 	log.Println(SprintError(str))
 }
@@ -28,6 +32,10 @@ func PrintWarn(str string) {
 
 func PrintInfo(str string) {
 	log.Println(SprintInfo(str))
+}
+
+func PrintDebug(str string) {
+	log.Println(SprintDebug(str))
 }
 
 func PrintErrAndExist(str string) {
