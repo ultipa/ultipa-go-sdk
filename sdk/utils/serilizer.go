@@ -293,8 +293,10 @@ func ConvertInterfaceToBytes(value interface{}) ([]byte, error) {
 	case float64:
 		v = make([]byte, 8)
 		binary.BigEndian.PutUint64(v, math.Float64bits(value.(float64)))
+	case []byte:
+		v = value.([]byte)
 	default:
-		return nil, errors.New(fmt.Sprint("not supported ultipa type : ", t))
+		return nil, errors.New(fmt.Sprint("not supported ultipa type for value: ", t))
 	}
 
 	return v, nil

@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	Version = "v4.3.0"
+	Version = "v4.3.1"
 )
 
 // Create an Ultipa Client

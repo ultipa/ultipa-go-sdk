@@ -1,4 +1,7 @@
 # CHANGE LOGS
+###4.3.1
+- Support data type blob.
+
 ###4.3.0
 - Support data type LIST and POINT, remove ARRAY data type.
 - AsAttr support LIST data type.

@@ -57,3 +57,15 @@ func TestSerializePoint(t *testing.T) {
 	t.Log(string(pointBytes))
 
 }
+
+func TestSerializeBlob(t *testing.T) {
+	value := []byte{97, 98, 99}
+
+	bytes, err := utils.ConvertInterfaceToBytesSafe(value, ultipa.PropertyType_BLOB, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(bytes)
+	t.Log(string(bytes))
+
+}
