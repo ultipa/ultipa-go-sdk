@@ -121,14 +121,16 @@ func TestConnectionSSL(t *testing.T) {
 	}
 
 	var err error
-	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
+	config, err := configuration.NewUltipaConfig(&configuration.UltipaConfig{
 		Hosts:        []string{env["ssl_host"]},
 		Username:     env["ssl_username"],
 		Password:     env["ssl_password"],
 		DefaultGraph: env["ssl_graph"],
 		Debug:        true,
 	})
-
+	if err != nil {
+		log.Fatalln(err)
+	}
 	client, err = sdk.NewUltipa(config)
 
 	if err != nil {

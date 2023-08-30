@@ -15,12 +15,14 @@ var client *api.UltipaAPI
 
 func ExampleNewUltipaAPI() {
 
-	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
+	config, err := configuration.NewUltipaConfig(&configuration.UltipaConfig{
 		Hosts:    []string{"10.0.0.1:60061", "10.0.0.2:60061", "10.0.0.3:60061"},
 		Username: "root",
 		Password: "root",
 	})
-
+	if err != nil {
+		log.Fatalln(err)
+	}
 	client, err := sdk.NewUltipa(config)
 
 	if err != nil {

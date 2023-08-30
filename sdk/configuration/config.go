@@ -2,12 +2,10 @@ package configuration
 
 import (
 	"crypto/md5"
-	"encoding/hex"
 	"github.com/jinzhu/copier"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -16,6 +14,7 @@ type UltipaConfig struct {
 	Hosts            []string // hosts with ports
 	Username         string   // ultipa graph username
 	Password         string   // ultipa graph password
+	PasswordEncrypt  string   // method of encrypt password, MD5, LDAP, NOTHING
 	DefaultGraph     string   `yaml:"default_graph"` // default graph when connection established
 	Crt              []byte   // certification file for encrypt messages
 	MaxRecvSize      int      `yaml:"max_recv_size"` // grpc max receive size
@@ -29,14 +28,17 @@ type UltipaConfig struct {
 
 var DefaultTimeout int32 = 1000
 
-func NewUltipaConfig(config *UltipaConfig) *UltipaConfig {
+func NewUltipaConfig(config *UltipaConfig) (*UltipaConfig, error) {
 	config.FillDefault()
 
 	h := md5.New()
 	h.Write([]byte(config.Password))
-	config.Password = strings.ToUpper(hex.EncodeToString(h.Sum(nil)))
-
-	return config
+	encryptedPwd, err := Encrypt(config.PasswordEncrypt, config.Password)
+	if err != nil {
+		return config, err
+	}
+	config.Password = encryptedPwd
+	return config, nil
 }
 
 func (config *UltipaConfig) FillDefault() {
@@ -54,6 +56,9 @@ func (config *UltipaConfig) FillDefault() {
 
 	if config.Timeout == 0 {
 		config.Timeout = DefaultTimeout
+	}
+	if config.PasswordEncrypt == "" {
+		config.PasswordEncrypt = "MD5"
 	}
 }
 
@@ -121,7 +126,9 @@ func LoadConfigFromYAML(file string) (*UltipaConfig, error) {
 		return nil, err
 	}
 
-	config = NewUltipaConfig(config)
-
+	config, err = NewUltipaConfig(config)
+	if err != nil {
+		return nil, err
+	}
 	return config, nil
 }

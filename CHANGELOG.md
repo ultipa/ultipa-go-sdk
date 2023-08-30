@@ -1,6 +1,8 @@
 # CHANGE LOGS
 ###4.3.1
 - Support data type blob.
+- Add passwordEncrypt option for configuration to encrypt password.
+Available values are MD5, LDAP, NOTHING, MD5 is default.
 
 ###4.3.0
 - Support data type LIST and POINT, remove ARRAY data type.
