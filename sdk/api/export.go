@@ -101,13 +101,11 @@ func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, conf
 				var parseErr error
 				go func(index int, row *ultipa.EntityRow) {
 					defer wg.Done()
-					if schema.Name == row.SchemaName {
-						edge, err := structs.NewEdgeFromEdgeRow(edgeSchemaMap[schema.Name], row)
-						if err != nil {
-							parseErr = err
-						}
-						edges[index] = edge
+					edge, err := structs.NewEdgeFromEdgeRow(edgeSchemaMap[row.SchemaName], row)
+					if err != nil {
+						parseErr = err
 					}
+					edges[index] = edge
 				}(index, edgeRow)
 				if parseErr != nil {
 					return parseErr
