@@ -3,6 +3,8 @@
 - Support data type blob.
 - Add passwordEncrypt option for configuration to encrypt password.
 Available values are MD5, LDAP, NOTHING, MD5 is default.
+- Add read and write properties for Ultipa property for server > 4.3.64
+- Send grant().system(),  grant().privilege, grant().node_privilege and grant().edge_privilege to global graph set.
 
 ###4.3.0
 - Support data type LIST and POINT, remove ARRAY data type.

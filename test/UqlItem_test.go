@@ -10,4 +10,25 @@ func TestIsGlobalUql(t *testing.T) {
 	uqlItem := utils.NewUql(uql)
 	isGlobal := uqlItem.IsGlobal()
 	t.Logf("%s is global:%v", uql, isGlobal)
+
+	uql = ` grant().node_privilege(["READ"]).on("",@, *).user("lzq")`
+	uqlItem = utils.NewUql(uql)
+	isGlobal = uqlItem.IsGlobal()
+	t.Logf("%s is global:%v", uql, isGlobal)
+
+	uql = ` grant().edge_privilege(["READ"]).on("",@, *).user("lzq")`
+	uqlItem = utils.NewUql(uql)
+	isGlobal = uqlItem.IsGlobal()
+	t.Logf("%s is global:%v", uql, isGlobal)
+
+
+	uql = ` grant().privilege(["READ"]).on("",@, *).user("lzq")`
+	uqlItem = utils.NewUql(uql)
+	isGlobal = uqlItem.IsGlobal()
+	t.Logf("%s is global:%v", uql, isGlobal)
+
+	uql = ` grant().system().privilege(["STAT"]).user("lzq")`
+	uqlItem = utils.NewUql(uql)
+	isGlobal = uqlItem.IsGlobal()
+	t.Logf("%s is global:%v", uql, isGlobal)
 }

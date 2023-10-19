@@ -631,22 +631,44 @@ func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 		//0:name, 1: type, 2: lte, 3: schema, 4: description
 		values := row.GetValues()
 
-		lte, err := strconv.ParseBool(string(values[2]))
+		rowValues := map[string][]byte{}
+		for idx, header := range table.Headers {
+			rowValues[header.PropertyName] = values[idx]
+		}
+
+		name := getOrDefault("name", "", rowValues)
+		lteStr := getOrDefault("lte", "false", rowValues)
+		typeStr := getOrDefault("type", "", rowValues)
+		read := getOrDefault("read", "0", rowValues)
+		write := getOrDefault("write", "0", rowValues)
+		schema := getOrDefault("schema", "0", rowValues)
+		desc := getOrDefault("description", "", rowValues)
+		lte, err := strconv.ParseBool(lteStr)
 		if err != nil {
 			log.Fatalln(err)
 		}
 		p := structs.Property{
-			Name:   string(values[0]),
-			Desc:   string(values[4]),
+			Name:   name,
+			Desc:   desc,
 			Lte:    lte,
-			Schema: string(values[3]),
+			Read:   "1" == read,
+			Write:  "1" == write,
+			Schema: schema,
 		}
-		p.SetTypeByString(string(values[1]))
+		p.SetTypeByString(typeStr)
 		properties = append(properties, &p)
 
 	}
 
 	return properties, err
+}
+
+func getOrDefault(name string, defaultValue string, container map[string][]byte) string {
+	bytes, ok := container[name]
+	if ok {
+		return string(bytes)
+	}
+	return defaultValue
 }
 
 // AsIndexes the types will be tables and alias is nodeIndex and edgeIndex

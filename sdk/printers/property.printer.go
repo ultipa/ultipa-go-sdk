@@ -10,7 +10,10 @@ import (
 func PrintProperty(properties []*structs.Property) {
 
 	table := simpletable.New()
-	table.Header.Cells = []*simpletable.Cell{&simpletable.Cell{Text: "Name"}, &simpletable.Cell{Text: "Description"}, &simpletable.Cell{Text: "Type"}, &simpletable.Cell{Text: "LTE"}, &simpletable.Cell{Text: "Schema"}}
+	table.Header.Cells = []*simpletable.Cell{&simpletable.Cell{Text: "Name"}, &simpletable.Cell{Text: "Description"},
+		&simpletable.Cell{Text: "Type"}, &simpletable.Cell{Text: "LTE"},
+		{Text: "READ"}, {Text: "WRITE"},
+		&simpletable.Cell{Text: "Schema"}}
 
 	for _, prop := range properties {
 		propertyTypeStr, err := prop.GetStringType()
@@ -23,6 +26,8 @@ func PrintProperty(properties []*structs.Property) {
 			&simpletable.Cell{Text: prop.Desc},
 			&simpletable.Cell{Text: propertyTypeStr},
 			&simpletable.Cell{Text: strconv.FormatBool(prop.Lte)},
+			&simpletable.Cell{Text: strconv.FormatBool(prop.Read)},
+			&simpletable.Cell{Text: strconv.FormatBool(prop.Write)},
 			&simpletable.Cell{Text: prop.Schema},
 		}
 		table.Body.Cells = append(table.Body.Cells, cells)

@@ -1,10 +1,9 @@
 package structs
 
-
 type Table struct {
-	Name string
+	Name    string
 	Headers []*Property
-	Rows []*Row
+	Rows    []*Row
 }
 
 type Row []interface{}
@@ -12,11 +11,11 @@ type Row []interface{}
 func NewTable() *Table {
 	return &Table{
 		Headers: []*Property{},
-		Rows: []*Row{},
+		Rows:    []*Row{},
 	}
 }
 
-func (t *Table) GetHeaders() []*Property{
+func (t *Table) GetHeaders() []*Property {
 	return t.Headers
 }
 
