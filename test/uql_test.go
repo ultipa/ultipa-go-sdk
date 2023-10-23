@@ -436,3 +436,21 @@ func TestDateTime(t *testing.T) {
 	table, _ := resp.Alias("table(nodes.typeListDatetime[0])").AsTable()
 	printers.PrintTable(table)
 }
+
+func TestUqlFindWithDecimalProperty(t *testing.T) {
+	client, _ := GetClient(hosts, graph)
+
+	uql := `find().nodes({@default}) as nodes return nodes{*}`
+	resp, err := client.UQL(uql, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		t.Fatal(resp.Status.Message)
+	}
+	nodes, schemas, err := resp.Alias("nodes").AsNodes()
+	if err != nil {
+		t.Fatal(err)
+	}
+	printers.PrintNodes(nodes, schemas)
+}

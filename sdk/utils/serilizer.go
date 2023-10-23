@@ -61,8 +61,11 @@ func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType, subTypes []ultipa
 		str := AsString(bs)
 		return types.PointFromStr(str)
 		//TODO
-	//case ultipa.PropertyType_DECIMAL:
-	//TODO
+	case ultipa.PropertyType_DECIMAL:
+		if len(bs) == 0 {
+			return nil, nil
+		}
+		return AsString(bs), nil
 	case ultipa.PropertyType_LIST:
 		return deserializeList(bs, subTypes)
 	//	//TODO
@@ -108,8 +111,6 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 		case ultipa.PropertyType_MAP:
 			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
-		case ultipa.PropertyType_DECIMAL:
-			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 		default:
 			return GetNullBytes(t), nil
 		}
@@ -136,7 +137,7 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 		}
 
 	case ultipa.PropertyType_DECIMAL:
-		return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+		return serializeDecimal(value)
 	case ultipa.PropertyType_SET:
 		return SerializeSetData(value, subTypes, req)
 	case ultipa.PropertyType_MAP:
@@ -175,6 +176,38 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 		}
 	default:
 		return ConvertInterfaceToBytes(toConvertValue)
+	}
+}
+
+// serializeDecimal serialize value to bytes for decimal property type.
+func serializeDecimal(value interface{}) ([]byte, error) {
+
+	switch t := value.(type) {
+	case int32:
+		str := strconv.Itoa(value.(int))
+		return []byte(str), nil
+	case int:
+		str := strconv.Itoa(value.(int))
+		return []byte(str), nil
+	case string:
+		return []byte(value.(string)), nil
+	case int64:
+		str := strconv.Itoa(value.(int))
+		return []byte(str), nil
+	case uint32:
+		str := strconv.FormatUint(value.(uint64), 10)
+		return []byte(str), nil
+	case uint64:
+		str := strconv.FormatUint(value.(uint64), 10)
+		return []byte(str), nil
+	case float32:
+		str := strconv.FormatFloat(value.(float64), 'f', -1, 32)
+		return []byte(str), nil
+	case float64:
+		str := strconv.FormatFloat(value.(float64), 'f', -1, 64)
+		return []byte(str), nil
+	default:
+		return nil, errors.New(fmt.Sprint("not supported ultipa type : ", t))
 	}
 }
 

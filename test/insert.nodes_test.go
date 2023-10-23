@@ -133,3 +133,54 @@ func TestInsertBlobProperty(t *testing.T) {
 	nodes, schemas, err := response.Alias("nodes").AsNodes()
 	printers.PrintNodes(nodes, schemas)
 }
+
+func TestInsertDecimalProperty(t *testing.T) {
+	client, _ := GetClient(hosts, graph)
+	schemaName := "default"
+	schema := structs.NewSchema(schemaName)
+	schema.Properties = append(schema.Properties, &structs.Property{
+		Name:     "name",
+		Type:     ultipa.PropertyType_STRING,
+		SubTypes: nil,
+	}, &structs.Property{
+		Name:     "salary",
+		Type:     ultipa.PropertyType_DECIMAL,
+		SubTypes: nil,
+	})
+
+	var nodes []*structs.Node
+	node1 := structs.NewNode()
+	node1.Set("name", "go_sdk")
+	node1.Set("salary", "6.1")
+
+	node2 := structs.NewNode()
+	node2.Set("name", "test")
+	node2.Set("salary", 6.1)
+
+	nodes = append(nodes, node1, node2)
+
+	resp, err := client.InsertNodesBatchBySchema(schema, nodes, &configuration.InsertRequestConfig{
+		InsertType: ultipa.InsertType_OVERWRITE,
+	})
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+	//断言响应码
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		log.Println(resp.Status.Message)
+		t.Log(resp.Status.Message)
+	}
+	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
+
+	uql := fmt.Sprintf("find().nodes({@%s}) as nodes return nodes{*}", schemaName)
+	response, err := client.UQL(uql, nil)
+
+	//断言响应码
+	if response.Status.Code != ultipa.ErrorCode_SUCCESS {
+		log.Println(response.Status.Message)
+		t.Fatal(response.Status.Message)
+	}
+	nodes, schemas, err := response.Alias("nodes").AsNodes()
+	printers.PrintNodes(nodes, schemas)
+}
