@@ -16,6 +16,7 @@ type Property struct {
 	Schema   string
 	Type     ultipa.PropertyType
 	SubTypes []ultipa.PropertyType
+	Extra    string
 }
 
 const (

@@ -644,6 +644,7 @@ func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 		schema := getOrDefault("schema", "0", rowValues)
 		desc := getOrDefault("description", "", rowValues)
 		lte, err := strconv.ParseBool(lteStr)
+		extra := getOrDefault("extra", "", rowValues)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -654,6 +655,7 @@ func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 			Read:   "1" == read,
 			Write:  "1" == write,
 			Schema: schema,
+			Extra:  extra,
 		}
 		p.SetTypeByString(typeStr)
 		properties = append(properties, &p)
