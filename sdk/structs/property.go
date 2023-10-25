@@ -19,7 +19,8 @@ type Property struct {
 	Schema   string
 	Type     ultipa.PropertyType
 	SubTypes []ultipa.PropertyType
-	Extra    string
+	// extra info for property in json format, e.g. DecimalExtra: precision and scale for decimal type.
+	Extra string
 }
 
 const (
