@@ -150,7 +150,7 @@ func (p *Property) GetStringType() (string, error) {
 		var extraData DecimalExtra
 		err := json.Unmarshal([]byte(p.Extra), &extraData)
 		if err != nil {
-			return "", errors.New(fmt.Sprintf("Property [%s] is Decimal but get precision and scale failure", p.Name))
+			return GetStringByPropertyType(p.Type), nil
 		}
 		extraString := fmt.Sprintf("(%d,%d)", extraData.Precision, extraData.Scale)
 		return GetStringByPropertyType(p.Type) + extraString, nil
