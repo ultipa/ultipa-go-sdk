@@ -454,3 +454,21 @@ func TestUqlFindWithDecimalProperty(t *testing.T) {
 	}
 	printers.PrintNodes(nodes, schemas)
 }
+
+func TestUqlFindWithSetProperty(t *testing.T) {
+	client, _ := GetClient(hosts, graph)
+
+	uql := `find().nodes({@default}) as nodes return nodes{*}`
+	resp, err := client.UQL(uql, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		t.Fatal(resp.Status.Message)
+	}
+	nodes, schemas, err := resp.Alias("nodes").AsNodes()
+	if err != nil {
+		t.Fatal(err)
+	}
+	printers.PrintNodes(nodes, schemas)
+}

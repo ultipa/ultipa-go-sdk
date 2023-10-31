@@ -36,12 +36,13 @@ func init() {
 			0xff, 0xff, 0xff, 0xff,
 			0xff, 0xff, 0xff, 0xff,
 		},
-		ultipa.PropertyType_STRING: {0},
-		ultipa.PropertyType_BLOB:   {0},
-		ultipa.PropertyType_TEXT:   {0},
-		ultipa.PropertyType_POINT:  {0x6e, 0x75, 0x6c, 0x6c},
-		ultipa.PropertyType_LIST:   getListNullValue(),
-		ultipa.PropertyType_MAP:    getMapNullValue(),
+		ultipa.PropertyType_STRING:  {0},
+		ultipa.PropertyType_BLOB:    {0},
+		ultipa.PropertyType_TEXT:    {0},
+		ultipa.PropertyType_POINT:   {0x6e, 0x75, 0x6c, 0x6c},
+		ultipa.PropertyType_LIST:    getListNullValue(),
+		ultipa.PropertyType_SET:     getSetNullValue(),
+		ultipa.PropertyType_MAP:     getMapNullValue(),
 		ultipa.PropertyType_DECIMAL: {0},
 	}
 }
@@ -61,6 +62,17 @@ func getListNullValue() []byte {
 	bs, err := proto.Marshal(listData)
 	if err != nil {
 		logger.PrintError(fmt.Sprintf("failed to get bytes of null list, %v", err))
+	}
+	return bs
+}
+
+func getSetNullValue() []byte {
+	setData := &ultipa.SetData{
+		IsNull: true,
+	}
+	bs, err := proto.Marshal(setData)
+	if err != nil {
+		logger.PrintError(fmt.Sprintf("failed to get bytes of null set, %v", err))
 	}
 	return bs
 }

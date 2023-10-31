@@ -1,5 +1,9 @@
 # CHANGE LOGS
 
+### 4.3.3
+
+- Support set data type.
+
 ### 4.3.2
 
 - Support decimal data type.

@@ -68,8 +68,8 @@ func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType, subTypes []ultipa
 		return AsString(bs), nil
 	case ultipa.PropertyType_LIST:
 		return deserializeList(bs, subTypes)
-	//	//TODO
-	//case ultipa.PropertyType_SET:
+	case ultipa.PropertyType_SET:
+		return deserializeSet(bs, subTypes)
 	//	//TODO
 	//case ultipa.PropertyType_MAP:
 	//	//TODO
@@ -92,6 +92,28 @@ func deserializeList(bs []byte, subTypes []ultipa.PropertyType) (interface{}, er
 	}
 	if listData.Values != nil {
 		for _, value := range listData.Values {
+			element, err := ConvertBytesToInterface(value, subTypes[0], nil)
+			if err != nil {
+				return nil, err
+			}
+			list = append(list, element)
+		}
+	}
+	return list, nil
+}
+
+// deserializeSet deserialize bs to set
+func deserializeSet(bs []byte, subTypes []ultipa.PropertyType) (interface{}, error) {
+	setData := &ultipa.SetData{}
+	if err := proto.Unmarshal(bs, setData); err != nil {
+		return nil, err
+	}
+	var list []interface{}
+	if setData.IsNull {
+		return list, nil
+	}
+	if setData.Values != nil {
+		for _, value := range setData.Values {
 			element, err := ConvertBytesToInterface(value, subTypes[0], nil)
 			if err != nil {
 				return nil, err

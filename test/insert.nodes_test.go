@@ -184,3 +184,35 @@ func TestInsertDecimalProperty(t *testing.T) {
 	nodes, schemas, err := response.Alias("nodes").AsNodes()
 	printers.PrintNodes(nodes, schemas)
 }
+
+func TestInsertNodeWithSetProperty(t *testing.T) {
+	client, _ := GetClient(hosts, graph)
+
+	schema := structs.NewSchema("default")
+	schema.Properties = append(schema.Properties, &structs.Property{
+		Name:     "string_set",
+		Type:     ultipa.PropertyType_SET,
+		SubTypes: []ultipa.PropertyType{ultipa.PropertyType_STRING},
+	})
+
+	var nodes []*structs.Node
+	node := structs.NewNode()
+
+	node.Set("string_set", []string{"list", "set", "map"})
+
+	nodes = append(nodes, node)
+
+	resp, err := client.InsertNodesBatchBySchema(schema, nodes, &configuration.InsertRequestConfig{
+		InsertType: ultipa.InsertType_OVERWRITE,
+	})
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+	//断言响应码
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		log.Println(resp.Status.Message)
+		t.Log(resp.Status.Message)
+	}
+	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
+}

@@ -1,4 +1,4 @@
-//Package sdk provide Ultipa functions to drive ultipa servers
+// Package sdk provide Ultipa functions to drive ultipa servers
 package sdk
 
 import (
@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	Version = "v4.3.2"
+	Version = "v4.3.3"
 )
 
 // Create an Ultipa Client
