@@ -22,6 +22,7 @@ var WriteUqlCommandKeys = []string{
 	"clear", "stop", "pause", "resume",
 	"top", "kill",
 	`mount\(\).graph`, `unmount\(\).graph`,
+	`db\.backup`,
 }
 
 var GlobalUqlCommandKeys = []string{
@@ -52,6 +53,7 @@ var GlobalUqlCommandKeys = []string{
 	`drop\(\).graph`,
 	`kill\(\)`,
 	`^\s*top\(\)`,
+	`db\.backup`,
 }
 
 var ExtraUqlCommandKeys = map[string]struct{}{
