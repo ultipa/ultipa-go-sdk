@@ -116,6 +116,13 @@ func (p *Property) SetTypeByString(s string) {
 		p.SubTypes = append(p.SubTypes, GetPropertyTypeByString(strings.TrimSuffix(s, "[]")))
 		return
 	}
+	reg := regexp.MustCompile(`set\(([^)]+)\)`)
+	if reg.MatchString(strings.ReplaceAll(s, " ", "")) {
+		matches := reg.FindStringSubmatch(strings.ReplaceAll(s, " ", ""))
+		p.Type = ultipa.PropertyType_SET
+		p.SubTypes = append(p.SubTypes, GetPropertyTypeByString(matches[1]))
+		return
+	}
 	re := regexp.MustCompile(`^decimal\((\d+),(\d+)\)$`)
 	if re.MatchString(strings.ReplaceAll(s, " ", "")) {
 		p.Type = ultipa.PropertyType_DECIMAL
@@ -145,6 +152,12 @@ func (p *Property) GetStringType() (string, error) {
 			return "", errors.New(fmt.Sprintf("Property [%s] is List but not specified subTypes", p.Name))
 		}
 		return GetStringByPropertyType(p.SubTypes[0]) + "[]", nil
+	}
+	if p.Type == ultipa.PropertyType_SET {
+		if len(p.SubTypes) == 0 {
+			return "", errors.New(fmt.Sprintf("Property [%s] is Set but not specified subTypes", p.Name))
+		}
+		return fmt.Sprintf("set(%s)", GetStringByPropertyType(p.SubTypes[0])), nil
 	}
 	if p.Type == ultipa.PropertyType_DECIMAL {
 		var extraData DecimalExtra

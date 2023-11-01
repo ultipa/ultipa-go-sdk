@@ -129,8 +129,6 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 	toConvertValue := value
 	if toConvertValue == nil {
 		switch t {
-		case ultipa.PropertyType_SET:
-			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 		case ultipa.PropertyType_MAP:
 			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 		default:
