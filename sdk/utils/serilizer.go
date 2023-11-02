@@ -204,7 +204,8 @@ func serializeDecimal(value interface{}) ([]byte, error) {
 
 	switch t := value.(type) {
 	case int32:
-		str := strconv.Itoa(value.(int))
+		v := value.(int32)
+		str := strconv.Itoa(int(v))
 		return []byte(str), nil
 	case int:
 		str := strconv.Itoa(value.(int))
@@ -212,16 +213,19 @@ func serializeDecimal(value interface{}) ([]byte, error) {
 	case string:
 		return []byte(value.(string)), nil
 	case int64:
-		str := strconv.Itoa(value.(int))
+		v := value.(int64)
+		str := strconv.Itoa(int(v))
 		return []byte(str), nil
 	case uint32:
-		str := strconv.FormatUint(value.(uint64), 10)
+		v := value.(uint32)
+		str := strconv.FormatUint(uint64(v), 10)
 		return []byte(str), nil
 	case uint64:
 		str := strconv.FormatUint(value.(uint64), 10)
 		return []byte(str), nil
 	case float32:
-		str := strconv.FormatFloat(value.(float64), 'f', -1, 32)
+		v := value.(float32)
+		str := strconv.FormatFloat(float64(v), 'f', -1, 32)
 		return []byte(str), nil
 	case float64:
 		str := strconv.FormatFloat(value.(float64), 'f', -1, 64)
