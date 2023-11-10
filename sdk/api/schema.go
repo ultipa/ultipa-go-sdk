@@ -18,6 +18,9 @@ func (api *UltipaAPI) ListNodeSchema(config *configuration.RequestConfig) (*http
 	if err != nil {
 		return nil, err
 	}
+	if res.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(res.Status.Message)
+	}
 	table, err := res.GetSingleTable()
 	if err != nil {
 		return nil, err
@@ -58,12 +61,18 @@ func (api *UltipaAPI) ListSchema(DBType ultipa.DBType, config *configuration.Req
 		if err != nil {
 			return nil, err
 		}
+		if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+			return nil, errors.New(resp.Status.Message)
+		}
 
 		schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 	} else if DBType == ultipa.DBType_DBEDGE {
 		resp, err = api.UQL(fmt.Sprintf(`show().edge_schema()`), config)
 		if err != nil {
 			return nil, err
+		}
+		if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+			return nil, errors.New(resp.Status.Message)
 		}
 
 		schemas, err = resp.Alias(http.RESP_EDGE_SCHEMA_KEY).AsSchemas()
@@ -108,6 +117,9 @@ func (api *UltipaAPI) GetNodeSchema(schemaName string, config *configuration.Req
 	if err != nil {
 		return nil, err
 	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
+	}
 
 	schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 
@@ -132,6 +144,9 @@ func (api *UltipaAPI) GetEdgeSchema(schemaName string, config *configuration.Req
 	resp, err = api.UQL(fmt.Sprintf(`show().edge_schema(@%v)`, escapedSchemaName), config)
 	if err != nil {
 		return nil, err
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
 	}
 
 	schemas, err = resp.Alias(http.RESP_EDGE_SCHEMA_KEY).AsSchemas()
