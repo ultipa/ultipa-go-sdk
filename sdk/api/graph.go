@@ -20,6 +20,9 @@ func (api *UltipaAPI) ListGraph(config *configuration.RequestConfig) (*http.Resp
 	if err != nil {
 		return nil, err
 	}
+	if res.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(res.Status.Message)
+	}
 	table, err := res.GetSingleTable()
 	if err != nil {
 		return nil, err
