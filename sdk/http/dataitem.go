@@ -274,7 +274,7 @@ func (di *DataItem) AsAttr() (*structs.Attr, error) {
 		return midAttr.ListAttrAsAttr()
 
 	case ultipa.PropertyType_SET:
-		return nil, errors.New(fmt.Sprintf("DataItem %v is not either Type Attr or LIST Attr, but SET, not supported yet.", di.Alias))
+		return midAttr.ListAttrAsAttr()
 	case ultipa.PropertyType_MAP:
 		return nil, errors.New(fmt.Sprintf("DataItem %v is not either Type Attr or LIST Attr, but MAP, not supported yet.", di.Alias))
 	default:
@@ -392,7 +392,7 @@ func handleAttrValues(oAttr *ultipa.Attr, attr *structs.Attr) error {
 	return nil
 }
 
-// parseAttrList parse the oAttr that PropertyType is ultipa.PropertyType_LIST, set the parsed value to attr.
+// parseAttrList parse the oAttr that PropertyType is ultipa.PropertyType_LIST or ultipa.PropertyType_SET, set the parsed value to attr.
 func parseAttrList(oAttr *ultipa.Attr, attr *structs.Attr) error {
 	var resultType ultipa.ResultType
 	for _, v := range oAttr.Values {

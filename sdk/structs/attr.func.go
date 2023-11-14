@@ -89,11 +89,11 @@ func (attr *Attr) ListAttrAsAttrPaths() (*AttrPaths, error) {
 
 }
 
-//ListAttrAsAttr returns an attr, if PropertyType of attr is LIST and inner result type is Attr.
+//ListAttrAsAttr returns an attr, if PropertyType of attr is LIST/SET and inner result type is Attr.
 //inner result type is attr, then regarded it as basic type, e.g. string,uint64, float64 etc.
 func (attr *Attr) ListAttrAsAttr() (*Attr, error) {
-	if ultipa.PropertyType_LIST != attr.PropertyType {
-		return nil, errors.New(fmt.Sprintf("value of this %v is not a LIST type", attr.Name))
+	if ultipa.PropertyType_LIST != attr.PropertyType && ultipa.PropertyType_SET != attr.PropertyType {
+		return nil, errors.New(fmt.Sprintf("value of this %v is not a LIST or SET type", attr.Name))
 	}
 	result := NewAttr()
 	result.Name = attr.Name

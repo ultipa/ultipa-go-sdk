@@ -16,6 +16,8 @@ func PrintAttr(attr *structs.Attr) {
 		return
 	}
 	switch attr.PropertyType {
+	case ultipa.PropertyType_SET:
+		fallthrough
 	case ultipa.PropertyType_LIST:
 		switch attr.ResultType {
 		case ultipa.ResultType_RESULT_TYPE_NODE:
