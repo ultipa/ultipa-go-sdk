@@ -21,6 +21,7 @@ type Property struct {
 	SubTypes []ultipa.PropertyType
 	// extra info for property in json format, e.g. DecimalExtra: precision and scale for decimal type.
 	Extra string
+	Encrypt string
 }
 
 const (

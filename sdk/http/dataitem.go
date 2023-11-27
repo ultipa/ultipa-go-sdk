@@ -645,17 +645,19 @@ func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 		desc := getOrDefault("description", "", rowValues)
 		lte, err := strconv.ParseBool(lteStr)
 		extra := getOrDefault("extra", "", rowValues)
+		encrypt := getOrDefault("encrypt", "", rowValues)
 		if err != nil {
 			log.Fatalln(err)
 		}
 		p := structs.Property{
-			Name:   name,
-			Desc:   desc,
-			Lte:    lte,
-			Read:   "1" == read,
-			Write:  "1" == write,
-			Schema: schema,
-			Extra:  extra,
+			Name:    name,
+			Desc:    desc,
+			Lte:     lte,
+			Read:    "1" == read,
+			Write:   "1" == write,
+			Schema:  schema,
+			Extra:   extra,
+			Encrypt: encrypt,
 		}
 		p.SetTypeByString(typeStr)
 		properties = append(properties, &p)
