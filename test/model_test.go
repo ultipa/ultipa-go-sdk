@@ -18,7 +18,7 @@ func TestCreateModel(t *testing.T) {
 	}
 
 	log.Println("[Test] Creating Graph Model")
-	model := models.NewGraphModel(&structs.Graph{
+	model := models.NewGraphModel(&structs.GraphInfo{
 		Name: "graph_by_model",
 	})
 

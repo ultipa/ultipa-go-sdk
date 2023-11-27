@@ -54,7 +54,7 @@ func ExampleUltipaAPI_UQL_Nodes_Edges() {
 
 func ExampleUltipaAPI_CreateGraph() {
 
-	graph := &structs.Graph{
+	graph := &structs.GraphInfo{
 		Name:        "new_graph",
 		Description: "my new graph",
 	}
@@ -247,7 +247,7 @@ func ExampleUltipaAPI_UQL5() {
 
 func ExampleUltipaAPI_UQL6() {
 	resp, _ := client.UQL("show().graph()", nil)
-	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphs()
+	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).GraphInfos()
 
 	if err != nil {
 		log.Fatalln(err)

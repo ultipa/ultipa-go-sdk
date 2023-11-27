@@ -3,11 +3,11 @@ package models
 import "github.com/ultipa/ultipa-go-sdk/sdk/structs"
 
 type GraphModel struct {
-	Graph   *structs.Graph
+	Graph   *structs.GraphInfo
 	Schemas []*structs.Schema
 }
 
-func NewGraphModel(graph *structs.Graph) *GraphModel {
+func NewGraphModel(graph *structs.GraphInfo) *GraphModel {
 
 	gm := &GraphModel{
 		Graph: graph,

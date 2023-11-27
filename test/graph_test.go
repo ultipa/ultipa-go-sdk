@@ -32,7 +32,7 @@ func TestCreateGraph(t *testing.T) {
 
 	client.DropGraph(graph, nil)
 
-	client.CreateGraph(&structs.Graph{
+	client.CreateGraph(&structs.GraphInfo{
 		Name: graph,
 	}, nil)
 
@@ -57,7 +57,7 @@ func TestDeleteGraph(t *testing.T) {
 func TestAsGraph(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 	resp, _ := client.UQL("show().graph()", nil)
-	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphs()
+	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).GraphInfos()
 
 	if err != nil {
 		log.Fatalln(err)
@@ -75,7 +75,7 @@ func TestCreateGraphIfNotExist(t *testing.T) {
 
 	client.DropGraph(graph, nil)
 
-	_, _, err = client.CreateGraphIfNotExit(&structs.Graph{
+	_, _, err = client.CreateGraphIfNotExit(&structs.GraphInfo{
 		Name: graph,
 	}, nil)
 	if err != nil {

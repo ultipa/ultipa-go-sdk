@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-type Graph struct {
+type GraphInfo struct {
 	ID          types.ID
 	Name        string
 	Description string

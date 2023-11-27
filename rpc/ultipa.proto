@@ -103,6 +103,7 @@ enum ResultType {
   RESULT_TYPE_EDGE = 3;
   RESULT_TYPE_ATTR = 4;
   RESULT_TYPE_TABLE = 5;
+  RESULT_TYPE_GRAPH = 6;
 }
 
 message ResultAlias {
@@ -120,6 +121,7 @@ message UqlReply {
   repeated NodeAlias nodes = 6;
   repeated EdgeAlias edges = 7;
   repeated AttrAlias attrs = 8;
+  repeated GraphAlias graphs = 9;
   repeated Table tables = 10;
 
   Table statistics = 11;
@@ -144,6 +146,11 @@ message NodeAlias {
 message AttrAlias {
   string alias = 1;
   Attr attr = 2;
+}
+
+message GraphAlias {
+  string alias = 1;
+  Graph graph = 2;
 }
 
 message Attr {
@@ -422,6 +429,11 @@ enum DBType {
 }
 
 message Path {
+  EntityTable node_table = 1;
+  EntityTable edge_table = 2;
+}
+
+message Graph {
   EntityTable node_table = 1;
   EntityTable edge_table = 2;
 }

@@ -497,8 +497,8 @@ func parseAttrMap(oAttr *ultipa.Attr) ([]*structs.AttrMapData, error) {
 	return mapDataRows, nil
 }
 
-// AsGraphs the types will be tables and alias is nodeSchema and edgeSchema
-func (di *DataItem) AsGraphs() (graphs []*structs.Graph, err error) {
+// GraphInfos the types will be tables and alias is nodeSchema and edgeSchema
+func (di *DataItem) GraphInfos() (graphs []*structs.GraphInfo, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return graphs, nil
@@ -517,7 +517,7 @@ func (di *DataItem) AsGraphs() (graphs []*structs.Graph, err error) {
 	for _, row := range table.TableRows {
 		//0:id, 1: name, 2: totalNodes ,3:totalEdges ,4:description ,5:status
 		values := row.GetValues()
-		graph := structs.Graph{}
+		graph := structs.GraphInfo{}
 		graph.ID = string(values[0])
 		graph.Name = string(values[1])
 		graph.TotalNodes, _ = utils.Str2Uint64(utils.AsString(values[2]))
