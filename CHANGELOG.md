@@ -1,7 +1,7 @@
 # CHANGE LOGS
 ### 4.3.4
 - remove backup method
-- 
+- add encrypt attribute for property.
 
 ### 4.3.3
 
