@@ -1,5 +1,12 @@
 # CHANGE LOGS
+
+### 4.4.0
+
+- Add Graph result type, Change original DateItem.asGraphs() method to DateItem.asGraphInfos() and return
+  List<GraphInfo>, new asGraphs() will return List<Graph> for the new Graph result type.
+
 ### 4.3.4
+
 - remove backup method
 - add encrypt attribute for property.
 
