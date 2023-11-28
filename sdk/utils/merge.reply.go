@@ -41,11 +41,14 @@ func FindAliasDataInReply(reply *ultipa.UqlReply, alias string) (data interface{
 		case ultipa.ResultType_RESULT_TYPE_ATTR:
 			data = Find(reply.Attrs, func(index int) bool { return reply.Attrs[index].Alias == alias })
 			t = Alias.ResultType
+		case ultipa.ResultType_RESULT_TYPE_GRAPH:
+			data = Find(reply.Graphs, func(index int) bool { return reply.Graphs[index].Alias == alias })
+			t = Alias.ResultType
 		case ultipa.ResultType_RESULT_TYPE_UNSET:
 			t = Alias.ResultType
 		default:
 			errMsg := fmt.Sprintf("FindAliasDataInReply Not Supported Type %v, it usually caused by unsupported server version.", Alias.ResultType)
-			panic(any(errMsg))
+			panic(errMsg)
 		}
 
 		if data != nil {

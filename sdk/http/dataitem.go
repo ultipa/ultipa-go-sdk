@@ -773,8 +773,8 @@ func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {
 	return algos, nil
 }
 
-// AsGraphs convert graphAlias to structs.Graph for uql syntax toGraph(listUnion(collect(n1), collect(n2)), collect(e)) as graph return graph
-func (di *DataItem) AsGraphs() (graph *structs.Graph, err error) {
+// AsGraph convert graphAlias to structs.Graph for uql syntax toGraph(listUnion(collect(n1), collect(n2)), collect(e)) as graph return graph
+func (di *DataItem) AsGraph() (graph *structs.Graph, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return graph, nil
@@ -823,7 +823,7 @@ func (di *DataItem) AsAny() (interface{}, error) {
 	case ultipa.ResultType_RESULT_TYPE_TABLE:
 		return di.AsTable()
 	case ultipa.ResultType_RESULT_TYPE_GRAPH:
-		return di.AsGraphs()
+		return di.AsGraph()
 	default:
 		return di.Data, nil
 	}

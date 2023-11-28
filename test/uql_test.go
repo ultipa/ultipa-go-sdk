@@ -455,10 +455,10 @@ func TestUqlFindWithDecimalProperty(t *testing.T) {
 	printers.PrintNodes(nodes, schemas)
 }
 
-func TestUqlFindWithSetProperty(t *testing.T) {
+func TestUqlAsGraph(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 
-	uql := `find().nodes({@default}) as nodes return nodes{*}`
+	uql := `n( as n1).re(as e).n(as n2) with toGraph(listUnion(collect(n1), collect(n2)), collect(e)) as graph return graph`
 	resp, err := client.UQL(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
@@ -466,9 +466,9 @@ func TestUqlFindWithSetProperty(t *testing.T) {
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 		t.Fatal(resp.Status.Message)
 	}
-	nodes, schemas, err := resp.Alias("nodes").AsNodes()
+	graph, err := resp.Alias("graph").AsGraph()
 	if err != nil {
 		t.Fatal(err)
 	}
-	printers.PrintNodes(nodes, schemas)
+	printers.PrintGraph(graph)
 }
