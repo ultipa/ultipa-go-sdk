@@ -6,7 +6,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func PrintGraph(graphs []*structs.GraphInfo) {
+func PrintGraphInfo(graphs []*structs.GraphInfo) {
 	table := simpletable.New()
 	table.Header.Cells = []*simpletable.Cell{&simpletable.Cell{Text: "Name"}, &simpletable.Cell{Text: "Description"}, &simpletable.Cell{Text: "Total Node"}, &simpletable.Cell{Text: "Total Edge"}, &simpletable.Cell{Text: "Status"}}
 	for _, graph := range graphs {

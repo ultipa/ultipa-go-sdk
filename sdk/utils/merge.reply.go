@@ -44,7 +44,8 @@ func FindAliasDataInReply(reply *ultipa.UqlReply, alias string) (data interface{
 		case ultipa.ResultType_RESULT_TYPE_UNSET:
 			t = Alias.ResultType
 		default:
-			panic(fmt.Sprintf("FindAliasDataInReply Not Supported Type %v, it usually caused by unsupported server version.", Alias.ResultType))
+			errMsg := fmt.Sprintf("FindAliasDataInReply Not Supported Type %v, it usually caused by unsupported server version.", Alias.ResultType)
+			panic(any(errMsg))
 		}
 
 		if data != nil {
@@ -302,6 +303,57 @@ func MergeUQLReply(reply1 *ultipa.UqlReply, reply2 *ultipa.UqlReply) *ultipa.Uql
 				}
 				attr1.Attr.Values = append(attr1.Attr.Values, attr2.Attr.Values...)
 			}
+		case ultipa.ResultType_RESULT_TYPE_GRAPH:
+			if reply1.Graphs == nil && reply2.Graphs == nil {
+				return reply1
+			}
+			if reply1.Graphs == nil {
+				return reply2
+			}
+			if reply2.Graphs == nil {
+				return reply1
+			}
+			data1 := Find(reply1.Graphs, func(index int) bool { return reply1.Graphs[index].Alias == Alias.Alias })
+			data2 := Find(reply2.Graphs, func(index int) bool { return reply2.Graphs[index].Alias == Alias.Alias })
+
+			if data2 == nil {
+				continue
+			}
+
+			if data1 == nil && data2 != nil {
+				reply1.Graphs = append(reply1.Graphs, data2.(*ultipa.GraphAlias))
+				continue
+			}
+
+			if data2 != nil {
+				graph1 := data1.(*ultipa.GraphAlias)
+				graph2 := data2.(*ultipa.GraphAlias)
+
+				graph1.Graph.NodeTable.EntityRows = append(graph1.Graph.NodeTable.EntityRows, graph2.Graph.NodeTable.EntityRows...)
+				nodeSchemaMap := map[string]*ultipa.Schema{}
+				for _, graph1Schema := range graph1.Graph.NodeTable.Schemas {
+					nodeSchemaMap[graph1Schema.SchemaName] = graph1Schema
+				}
+				for _, graph2Schema := range graph2.Graph.NodeTable.Schemas {
+					if _, ok := nodeSchemaMap[graph2Schema.SchemaName]; !ok {
+						nodeSchemaMap[graph2Schema.SchemaName] = graph2Schema
+						graph1.Graph.NodeTable.Schemas = append(graph1.Graph.NodeTable.Schemas, graph2Schema)
+					}
+				}
+
+				graph1.Graph.EdgeTable.EntityRows = append(graph1.Graph.EdgeTable.EntityRows, graph2.Graph.EdgeTable.EntityRows...)
+				edgeSchemaMap := map[string]*ultipa.Schema{}
+				for _, graph1Schema := range graph1.Graph.EdgeTable.Schemas {
+					edgeSchemaMap[graph1Schema.SchemaName] = graph1Schema
+				}
+				for _, graph2Schema := range graph2.Graph.EdgeTable.Schemas {
+					if _, ok := edgeSchemaMap[graph2Schema.SchemaName]; !ok {
+						edgeSchemaMap[graph2Schema.SchemaName] = graph2Schema
+						graph1.Graph.EdgeTable.Schemas = append(graph1.Graph.EdgeTable.Schemas, graph2Schema)
+					}
+				}
+			}
+
 		}
 	}
 

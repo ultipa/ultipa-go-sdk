@@ -57,12 +57,12 @@ func TestDeleteGraph(t *testing.T) {
 func TestAsGraph(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 	resp, _ := client.UQL("show().graph()", nil)
-	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).GraphInfos()
+	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphInfos()
 
 	if err != nil {
 		log.Fatalln(err)
 	}
-	printers.PrintGraph(graphs)
+	printers.PrintGraphInfo(graphs)
 }
 
 func TestCreateGraphIfNotExist(t *testing.T) {

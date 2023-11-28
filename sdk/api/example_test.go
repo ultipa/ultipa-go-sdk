@@ -247,12 +247,12 @@ func ExampleUltipaAPI_UQL5() {
 
 func ExampleUltipaAPI_UQL6() {
 	resp, _ := client.UQL("show().graph()", nil)
-	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).GraphInfos()
+	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphInfos()
 
 	if err != nil {
 		log.Fatalln(err)
 	}
-	printers.PrintGraph(graphs)
+	printers.PrintGraphInfo(graphs)
 }
 
 func ExampleUltipaAPI_UQL7() {

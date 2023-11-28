@@ -497,8 +497,8 @@ func parseAttrMap(oAttr *ultipa.Attr) ([]*structs.AttrMapData, error) {
 	return mapDataRows, nil
 }
 
-// GraphInfos the types will be tables and alias is nodeSchema and edgeSchema
-func (di *DataItem) GraphInfos() (graphs []*structs.GraphInfo, err error) {
+// AsGraphInfos the types will be tables and alias is nodeSchema and edgeSchema
+func (di *DataItem) AsGraphInfos() (graphs []*structs.GraphInfo, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return graphs, nil
@@ -773,6 +773,40 @@ func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {
 	return algos, nil
 }
 
+// AsGraphs convert graphAlias to structs.Graph for uql syntax toGraph(listUnion(collect(n1), collect(n2)), collect(e)) as graph return graph
+func (di *DataItem) AsGraphs() (graph *structs.Graph, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return graph, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_GRAPH {
+		return nil, errors.New(fmt.Sprintf("dataItem %s is not Graph result type", di.Alias))
+	}
+
+	if di.Data == nil {
+		return nil, nil
+	}
+	graphAlias := di.Data.(*ultipa.GraphAlias)
+
+	return parseGraphs(graphAlias.Graph, graphAlias.Alias)
+}
+
+func parseGraphs(oGraph *ultipa.Graph, name string) (graph *structs.Graph, err error) {
+	graph = structs.NewGraph()
+	graph.Name = name
+	graph.Nodes, graph.NodeSchemas, err = NodeTableToNodes(oGraph.NodeTable, "")
+	if err != nil {
+		return nil, err
+	}
+	graph.Edges, graph.EdgeSchemas, err = EdgeTableToEdges(oGraph.EdgeTable, "")
+	if err != nil {
+		return nil, err
+	}
+
+	return graph, nil
+}
+
 func (di *DataItem) AsAny() (interface{}, error) {
 
 	switch di.Type {
@@ -788,6 +822,8 @@ func (di *DataItem) AsAny() (interface{}, error) {
 		return nodes, err
 	case ultipa.ResultType_RESULT_TYPE_TABLE:
 		return di.AsTable()
+	case ultipa.ResultType_RESULT_TYPE_GRAPH:
+		return di.AsGraphs()
 	default:
 		return di.Data, nil
 	}
