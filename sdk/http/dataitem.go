@@ -37,23 +37,28 @@ func NodeTableToNodes(nt *ultipa.EntityTable, alias string) ([]*structs.Node, ma
 	}
 
 	for _, oNode := range nt.EntityRows {
-		node := &structs.Node{
-			Name:   alias,
-			ID:     oNode.Id,
-			UUID:   oNode.Uuid,
-			Schema: oNode.SchemaName,
-		}
-
-		// set values
-		node.Values = structs.NewValues()
-		schema := schemas[oNode.SchemaName]
-		for index, v := range oNode.Values {
-			prop := schema.Properties[index]
-			value, err := utils.ConvertBytesToInterface(v, prop.Type, prop.SubTypes)
-			if err != nil {
-				return nil, nil, err
+		var node *structs.Node
+		if oNode.IsNull {
+			node = nil
+		} else {
+			node = &structs.Node{
+				Name:   alias,
+				ID:     oNode.Id,
+				UUID:   oNode.Uuid,
+				Schema: oNode.SchemaName,
 			}
-			node.Values.Set(prop.Name, value)
+
+			// set values
+			node.Values = structs.NewValues()
+			schema := schemas[oNode.SchemaName]
+			for index, v := range oNode.Values {
+				prop := schema.Properties[index]
+				value, err := utils.ConvertBytesToInterface(v, prop.Type, prop.SubTypes)
+				if err != nil {
+					return nil, nil, err
+				}
+				node.Values.Set(prop.Name, value)
+			}
 		}
 
 		nodes = append(nodes, node)
@@ -75,30 +80,33 @@ func EdgeTableToEdges(et *ultipa.EntityTable, alias string) ([]*structs.Edge, ma
 			schema.Properties = append(schema.Properties, &structs.Property{Name: header.PropertyName, Type: header.PropertyType, SubTypes: header.SubTypes})
 		}
 	}
-
+	var edge *structs.Edge
 	for _, oEdge := range et.EntityRows {
-		edge := &structs.Edge{
-			Name:     alias,
-			UUID:     oEdge.Uuid,
-			From:     oEdge.FromId,
-			FromUUID: oEdge.FromUuid,
-			To:       oEdge.ToId,
-			ToUUID:   oEdge.ToUuid,
-			Schema:   oEdge.SchemaName,
-		}
-
-		// set values
-		edge.Values = structs.NewValues()
-		schema := schemas[oEdge.SchemaName]
-		for index, v := range oEdge.Values {
-			prop := schema.Properties[index]
-			value, err := utils.ConvertBytesToInterface(v, prop.Type, prop.SubTypes)
-			if err != nil {
-				return nil, nil, err
+		if oEdge.IsNull {
+			edge = nil
+		} else {
+			edge = &structs.Edge{
+				Name:     alias,
+				UUID:     oEdge.Uuid,
+				From:     oEdge.FromId,
+				FromUUID: oEdge.FromUuid,
+				To:       oEdge.ToId,
+				ToUUID:   oEdge.ToUuid,
+				Schema:   oEdge.SchemaName,
 			}
-			edge.Values.Set(prop.Name, value)
-		}
 
+			// set values
+			edge.Values = structs.NewValues()
+			schema := schemas[oEdge.SchemaName]
+			for index, v := range oEdge.Values {
+				prop := schema.Properties[index]
+				value, err := utils.ConvertBytesToInterface(v, prop.Type, prop.SubTypes)
+				if err != nil {
+					return nil, nil, err
+				}
+				edge.Values.Set(prop.Name, value)
+			}
+		}
 		edges = append(edges, edge)
 
 	}

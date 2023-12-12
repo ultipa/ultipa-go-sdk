@@ -31,14 +31,18 @@ func getEdgeTableStringWithoutSchema(edges []*structs.Edge) string {
 }
 
 func getEdgeTableString(edges []*structs.Edge, schemas map[string]*structs.Schema) string {
-	var lastSchema string
+	var lastSchemaName string
 	var table *simpletable.Table
 	switchSchema := false
 	for _, edge := range edges {
-		schema := schemas[edge.Schema]
-		if edge.Schema != lastSchema {
+		schemaName := ""
+		if edge != nil {
+			schemaName = edge.Name
+		}
+		schema := schemas[schemaName]
+		if schemaName != lastSchemaName {
 			switchSchema = true
-			lastSchema = edge.Schema
+			lastSchemaName = edge.Schema
 		} else {
 			switchSchema = false
 		}
@@ -57,28 +61,40 @@ func getEdgeTableString(edges []*structs.Edge, schemas map[string]*structs.Schem
 				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "TO_UUID"},
 				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "TO"},
 				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "SCHEMA"})
-			for _, prop := range schema.Properties {
-				table.Header.Cells = append(table.Header.Cells, &simpletable.Cell{Align: simpletable.AlignCenter, Text: prop.Name})
+			if schema != nil {
+				for _, prop := range schema.Properties {
+					table.Header.Cells = append(table.Header.Cells, &simpletable.Cell{Align: simpletable.AlignCenter, Text: prop.Name})
+				}
 			}
 		}
+		var row []*simpletable.Cell
+		if edge != nil {
+			row = []*simpletable.Cell{
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetUUID())},
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.FromUUID)},
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetFrom())},
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.ToUUID)},
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetTo())},
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetSchema())},
+			}
 
-		r := []*simpletable.Cell{
-			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetUUID())},
-			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.FromUUID)},
-			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetFrom())},
-			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.ToUUID)},
-			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetTo())},
-			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetSchema())},
+			for i := 6; i < len(table.Header.Cells); i++ {
+
+				headerKey := table.Header.Cells[i].Text
+				vv := edge.Values.Get(headerKey)
+				row = append(row, &simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(vv)})
+			}
+		} else {
+			row = []*simpletable.Cell{
+				{Align: simpletable.AlignCenter, Text: "nil"},
+				{Align: simpletable.AlignCenter, Text: "nil"},
+				{Align: simpletable.AlignCenter, Text: "nil"},
+				{Align: simpletable.AlignCenter, Text: "nil"},
+				{Align: simpletable.AlignCenter, Text: "nil"},
+				{Align: simpletable.AlignCenter, Text: "nil"},
+			}
 		}
-
-		for i := 6; i < len(table.Header.Cells); i++ {
-
-			headerKey := table.Header.Cells[i].Text
-			vv := edge.Values.Get(headerKey)
-			r = append(r, &simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(vv)})
-		}
-
-		table.Body.Cells = append(table.Body.Cells, r)
+		table.Body.Cells = append(table.Body.Cells, row)
 	}
 
 	if table != nil {
