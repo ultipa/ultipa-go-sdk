@@ -32,14 +32,18 @@ func getNodeTableStringWithoutSchema(nodes []*structs.Node) string {
 }
 
 func getNodeTableString(nodes []*structs.Node, schemas map[string]*structs.Schema) string {
-	var lastSchema string
+	var lastSchemaName string
 	var table *simpletable.Table
 	switchSchema := false
 	for _, node := range nodes {
-		schema := schemas[node.Schema]
-		if node.Schema != lastSchema {
+		schemaName := ""
+		if node != nil {
+			schemaName = node.Name
+		}
+		schema := schemas[schemaName]
+		if schemaName != lastSchemaName {
 			switchSchema = true
-			lastSchema = node.Schema
+			lastSchemaName = schemaName
 		} else {
 			switchSchema = false
 		}
@@ -51,25 +55,40 @@ func getNodeTableString(nodes []*structs.Node, schemas map[string]*structs.Schem
 		}
 		if table == nil {
 			table = simpletable.New()
-			table.Header.Cells = append(table.Header.Cells, &simpletable.Cell{Align: simpletable.AlignCenter, Text: "ID"}, &simpletable.Cell{Align: simpletable.AlignCenter, Text: "UUID"}, &simpletable.Cell{Align: simpletable.AlignCenter, Text: "Schema"})
-			for _, prop := range schema.Properties {
-				table.Header.Cells = append(table.Header.Cells, &simpletable.Cell{Align: simpletable.AlignCenter, Text: prop.Name})
+			table.Header.Cells = append(table.Header.Cells,
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "ID"},
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "UUID"},
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "Schema"})
+			if schema != nil {
+				for _, prop := range schema.Properties {
+					table.Header.Cells = append(table.Header.Cells, &simpletable.Cell{Align: simpletable.AlignCenter, Text: prop.Name})
+				}
+			}
+
+		}
+		var row []*simpletable.Cell
+		if node != nil {
+			row = []*simpletable.Cell{
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: node.GetID()},
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(node.GetUUID())},
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(node.GetSchema())},
+			}
+
+			for i := 3; i < len(table.Header.Cells); i++ {
+
+				headerKey := table.Header.Cells[i].Text
+				vv := node.Values.Get(headerKey)
+				row = append(row, &simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(vv)})
+			}
+		} else {
+			row = []*simpletable.Cell{
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "nil"},
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "nil"},
+				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "nil"},
 			}
 		}
-		r := []*simpletable.Cell{
-			&simpletable.Cell{Align: simpletable.AlignCenter, Text: node.GetID()},
-			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(node.GetUUID())},
-			&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(node.GetSchema())},
-		}
 
-		for i := 3; i < len(table.Header.Cells); i++ {
-
-			headerKey := table.Header.Cells[i].Text
-			vv := node.Values.Get(headerKey)
-			r = append(r, &simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(vv)})
-		}
-
-		table.Body.Cells = append(table.Body.Cells, r)
+		table.Body.Cells = append(table.Body.Cells, row)
 	}
 
 	if table != nil {

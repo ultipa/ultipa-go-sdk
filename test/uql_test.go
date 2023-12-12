@@ -472,3 +472,53 @@ func TestUqlFindWithSetProperty(t *testing.T) {
 	}
 	printers.PrintNodes(nodes, schemas)
 }
+
+func TestFindNodeWithOptionalUql(t *testing.T) {
+	client, _ := GetClient(hosts, graph)
+	uql := "OPTIONAL find().nodes({@account.year < 1969}) as nodes return nodes{*}"
+	resp, err := client.UQL(uql, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		t.Fatal(resp.Status.Message)
+	}
+	nodes, schemas, err := resp.Alias("nodes").AsNodes()
+	if err != nil {
+		t.Fatal(err)
+	}
+	printers.PrintNodes(nodes, schemas)
+}
+func TestFindEdgeWithOptionalUql(t *testing.T) {
+	client, _ := GetClient(hosts, graph)
+	uql := "OPTIONAL find().edges({@disagree.targetPost <10}) as edges return edges{*}"
+	resp, err := client.UQL(uql, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		t.Fatal(resp.Status.Message)
+	}
+	edges, schemas, err := resp.Alias("edges").AsEdges()
+	if err != nil {
+		t.Fatal(err)
+	}
+	printers.PrintEdges(edges, schemas)
+}
+
+func TestFindPathWithOptionalUql(t *testing.T) {
+	client, _ := GetClient(hosts, graph)
+	uql := "OPTIONAL n(1).e().n(103) as paths RETURN paths{*}"
+	resp, err := client.UQL(uql, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		t.Fatal(resp.Status.Message)
+	}
+	paths, err := resp.Alias("paths").AsPaths()
+	if err != nil {
+		t.Fatal(err)
+	}
+	printers.PrintPaths(paths)
+}
