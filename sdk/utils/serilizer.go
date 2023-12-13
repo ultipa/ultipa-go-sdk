@@ -332,7 +332,7 @@ func ConvertInterfaceToBytes(value interface{}) ([]byte, error) {
 		binary.BigEndian.PutUint32(v, uint32(value.(int32)))
 	case int:
 		v = make([]byte, 4)
-		binary.BigEndian.PutUint32(v, uint32(value.(int32)))
+		binary.BigEndian.PutUint32(v, uint32(value.(int)))
 	case string:
 		v = []byte(value.(string))
 	case int64:
