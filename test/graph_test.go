@@ -13,7 +13,7 @@ import (
 
 func TestListGraph(t *testing.T) {
 	InitCases()
-	client, _ := GetClient([]string{"192.168.1.85:61099"}, "default")
+	client, _ := GetClient([]string{"192.168.1.85:61099"}, "miniCircle")
 	res, err := client.ListGraph(nil)
 	if err != nil {
 		log.Panic(err)
@@ -70,11 +70,11 @@ func TestAsGraph(t *testing.T) {
 }
 
 func TestCreateGraphIfNotExist(t *testing.T) {
-	graphName := "gosdk"
+	graphName := "test111"
 	hosts := []string{
-		"192.168.1.85:61090",
+		"192.168.1.85:61099",
 	}
-	client, err := GetClient(hosts, "default")
+	client, err := GetClient(hosts, "miniCircle")
 
 	if err != nil {
 		t.Fatalf("failed to connect to server %v", err)
@@ -83,7 +83,9 @@ func TestCreateGraphIfNotExist(t *testing.T) {
 	client.DropGraph(graphName, nil)
 
 	_, _, err = client.CreateGraphIfNotExit(&structs.Graph{
-		Name: graphName,
+		Name:        graphName,
+		Shards:      "1,2",
+		PartitionBy: "Crc32",
 	}, nil)
 	if err != nil {
 		t.Fatalf("failed to create graph %v", err)

@@ -28,6 +28,10 @@ type ResponseGraph struct {
 	TotalEdges  int64
 	Status      string
 	Description string
+	Shards      string
+	SlotNum     string
+	ReplicaNum  string
+	PartitionBy string
 }
 
 type ResponseProperty struct {

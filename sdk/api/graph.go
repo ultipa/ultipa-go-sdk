@@ -36,6 +36,10 @@ func (api *UltipaAPI) ListGraph(config *configuration.RequestConfig) (*http.Resp
 		id, _ := strconv.ParseInt(v.Get("id").(string), 10, 64)
 		status := v.Get("status").(string)
 		description := v.Get("description").(string)
+		shards := v.Get("shards").(string)
+		slotNum := v.Get("slot_num").(string)
+		replicaNum := v.Get("replica_num").(string)
+		partitionBy := v.Get("partition_by").(string)
 		var totalNodes int64 = 0
 		if v := v.Get("totalNodes"); v != nil {
 			totalNodes, _ = strconv.ParseInt(v.(string), 10, 64)
@@ -56,6 +60,10 @@ func (api *UltipaAPI) ListGraph(config *configuration.RequestConfig) (*http.Resp
 			TotalEdges:  totalEdges,
 			Status:      status,
 			Description: description,
+			Shards:      shards,
+			SlotNum:     slotNum,
+			ReplicaNum:  replicaNum,
+			PartitionBy: partitionBy,
 		})
 	}
 	return &http.ResponseGraphs{
@@ -77,7 +85,7 @@ func (api *UltipaAPI) CreateGraphIfNotExit(graph *structs.Graph, config *configu
 
 func (api *UltipaAPI) CreateGraph(graph *structs.Graph, config *configuration.RequestConfig) (*http.UQLResponse, error) {
 
-	resp, err := api.UQL(fmt.Sprintf(`create().graph("%v", "%v")`, graph.Name, graph.Description), config)
+	resp, err := api.UQL(fmt.Sprintf(`create().graph("%v", "%v").shards([%v]).partitionByHash('%v',_id)`, graph.Name, graph.Description, graph.Shards, graph.PartitionBy), config)
 
 	if err != nil {
 		return nil, err
