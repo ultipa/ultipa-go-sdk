@@ -37,7 +37,7 @@ func getEdgeTableString(edges []*structs.Edge, schemas map[string]*structs.Schem
 	for _, edge := range edges {
 		schemaName := ""
 		if edge != nil {
-			schemaName = edge.Name
+			schemaName = edge.Schema
 		}
 		schema := schemas[schemaName]
 		if schemaName != lastSchemaName {

@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
@@ -521,4 +522,17 @@ func TestFindPathWithOptionalUql(t *testing.T) {
 		t.Fatal(err)
 	}
 	printers.PrintPaths(paths)
+}
+
+func TestInsertReturnNodes(t *testing.T) {
+	var graphName = "cli_test"
+	client, err := GetClient(hosts, graphName)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	var uql = "insert().into(@`node_schema_a`).nodes([{typeString:'string',name:'name',typeInt32:12,typeInt64:44,typeUint32:0}]) as node return node{*}"
+	res, _ := client.UQL(uql, nil)
+	nodes, schema, _ := res.Alias("node").AsNodes()
+	printers.PrintNodes(nodes, schema)
+	fmt.Println(res)
 }

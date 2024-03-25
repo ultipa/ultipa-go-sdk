@@ -38,7 +38,7 @@ func getNodeTableString(nodes []*structs.Node, schemas map[string]*structs.Schem
 	for _, node := range nodes {
 		schemaName := ""
 		if node != nil {
-			schemaName = node.Name
+			schemaName = node.Schema
 		}
 		schema := schemas[schemaName]
 		if schemaName != lastSchemaName {
