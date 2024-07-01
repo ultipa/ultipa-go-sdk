@@ -6,7 +6,6 @@ import (
 	"fmt"
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -20,7 +19,7 @@ type Property struct {
 	Type     ultipa.PropertyType
 	SubTypes []ultipa.PropertyType
 	// extra info for property in json format, e.g. DecimalExtra: precision and scale for decimal type.
-	Extra string
+	Extra   string
 	Encrypt string
 }
 
@@ -124,24 +123,25 @@ func (p *Property) SetTypeByString(s string) {
 		p.SubTypes = append(p.SubTypes, GetPropertyTypeByString(matches[1]))
 		return
 	}
-	re := regexp.MustCompile(`^decimal\((\d+),(\d+)\)$`)
+	//re := regexp.MustCompile(`^decimal\((\d+),(\d+)\)$`)
+	re := regexp.MustCompile(`^decimal`)
 	if re.MatchString(strings.ReplaceAll(s, " ", "")) {
 		p.Type = ultipa.PropertyType_DECIMAL
-		matches := re.FindStringSubmatch(strings.ReplaceAll(s, " ", ""))
-		precision, err := strconv.Atoi(matches[1])
-		scale, err := strconv.Atoi(matches[2])
-		if err != nil {
-			return
-		}
-		extraData := DecimalExtra{
-			Precision: precision,
-			Scale:     scale,
-		}
-		extraJson, err := json.Marshal(extraData)
-		if err != nil {
-			return
-		}
-		p.Extra = string(extraJson)
+		//matches := re.FindStringSubmatch(strings.ReplaceAll(s, " ", ""))
+		//precision, err := strconv.Atoi(matches[1])
+		//scale, err := strconv.Atoi(matches[2])
+		//if err != nil {
+		//	return
+		//}
+		//extraData := DecimalExtra{
+		//	Precision: precision,
+		//	Scale:     scale,
+		//}
+		//extraJson, err := json.Marshal(extraData)
+		//if err != nil {
+		//	return
+		//}
+		//p.Extra = string(extraJson)
 		return
 	}
 	p.Type = GetPropertyTypeByString(s)
