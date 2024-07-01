@@ -589,6 +589,7 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 			Type        string
 			Description string
 			Lte         string
+			Extra       string
 		}
 
 		err = json.Unmarshal(propertyJson, &props)
@@ -607,6 +608,7 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 				Desc:   prop.Description,
 				Lte:    lte,
 				Schema: schema.Name,
+				Extra:  prop.Extra,
 			}
 			p.SetTypeByString(prop.Type)
 			schema.Properties = append(schema.Properties, &p)
