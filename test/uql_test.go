@@ -21,8 +21,8 @@ func TestUQL(t *testing.T) {
 
 		log.Println("Exec : ", c.UQL)
 
-		//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
-		resp, err := client.UQL(c.UQL, nil)
+		//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+		resp, err := client.Uql(c.UQL, nil)
 
 		if err != nil {
 			log.Fatalln(err)
@@ -62,8 +62,8 @@ n({books || vbook || books2}).e({@docs_role || @docs_tree_role}).n({@role.name i
 return docs_path{*}, role_path{*},books`
 	log.Println("Exec : ", uql)
 
-	//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
-	resp, err := client.UQL(uql, nil)
+	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -98,8 +98,8 @@ func TestUQL2(t *testing.T) {
 
 	log.Println("Exec : ", uql)
 
-	//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
-	resp, err := client.UQL(uql, nil)
+	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -119,8 +119,8 @@ func TestUQL3(t *testing.T) {
 
 	log.Println("Exec : ", uql)
 
-	//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
-	resp, err := client.UQL(uql, nil)
+	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -142,8 +142,8 @@ func TestUQL4(t *testing.T) {
 
 	log.Println("Exec : ", uql)
 
-	//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
-	resp, err := client.UQL(uql, nil)
+	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -159,8 +159,8 @@ func TestUQL5(t *testing.T) {
 
 	log.Println("Exec : ", uql)
 
-	//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
-	resp, err := client.UQL(uql, nil)
+	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -173,7 +173,7 @@ func TestUQL6(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 
 	uql := "find().nodes({@movie}) as nodes return table(nodes.timestamp,nodes.frating) limit 0"
-	resp, err := client.UQL(uql, nil)
+	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -196,7 +196,7 @@ func TestUQLAlterGraph(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 
 	uql := "alter().graph('alter_graph_1').set({name:'alter_graph'})" //test123
-	resp, err := client.UQL(uql, nil)
+	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -229,7 +229,7 @@ func TestUQLCompactWithNotExistGraph(t *testing.T) {
 	//
 	//t.Logf("global leader:%s", global.Host)
 
-	resp, err := client.UQL(uql, &configuration.RequestConfig{
+	resp, err := client.Uql(uql, &configuration.RequestConfig{
 		GraphName: "c1",
 	})
 	if err != nil {
@@ -249,8 +249,8 @@ func TestTopUql(t *testing.T) {
 
 	log.Println("Exec : ", uql)
 
-	//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
-	resp, err := client.UQL(uql, nil)
+	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -262,7 +262,7 @@ func TestUQLFindNodesWithList(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 
 	uql := "find().nodes({@People}) as nodes return nodes{*}"
-	resp, err := client.UQL(uql, nil)
+	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -285,7 +285,7 @@ func TestUQLFindNodesWithAttrList(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 
 	uql := "find().nodes() as nodes return collect(distinct(nodes)) as arrNode"
-	resp, err := client.UQL(uql, nil)
+	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -308,7 +308,7 @@ func TestUQLFindNodesWithAttrListNullValue(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 
 	uql := "find().nodes({@nodeSchemaList}) as n return collect(n.stringList)"
-	resp, err := client.UQL(uql, nil)
+	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -331,7 +331,7 @@ func TestUQLFindNodesAsAttrList(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 
 	uql := "find().nodes({_uuid < 10}) return collect(nodes)"
-	resp, err := client.UQL(uql, nil)
+	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -354,7 +354,7 @@ func TestUQLFindPathsWithGroupByAttr(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 
 	uql := "n({_uuid in [4,5,6]} as n1).e().n(as n2) as paths group by n1 return n1{*}, collect(paths)"
-	resp, err := client.UQL(uql, nil)
+	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -382,7 +382,7 @@ func TestUqlInsertListProperty(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 
 	uql := `insert().nodes({name:["zhangsan","lisi"]}).into(@People)`
-	resp, err := client.UQL(uql, nil)
+	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -396,7 +396,7 @@ func TestUQLWithLimit(t *testing.T) {
 	uql := "find().edges({@insertEdge}) as edges return edges{*} limit 40"
 	//uql := "find().nodes({@insertNode}) as n return n{typeListString,typeListInt32,typeListInt64,typeListUint32,typeListUint64,typeListFloat,typeListDouble,typeListDatetime,typeListTimestamp,typeListText}"
 	//uql := "find().nodes({@insertNode}) as nodes return nodes{*}"
-	resp, _ := client.UQL(uql, nil)
+	resp, _ := client.Uql(uql, nil)
 	edges, e, _ := resp.Alias("edges").AsEdges()
 
 	printers.PrintEdges(edges, e)
@@ -409,7 +409,7 @@ func TestUqlFindPointProperty(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 
 	uql := `find().nodes([11,12]) as nodes return nodes.typePoint`
-	resp, err := client.UQL(uql, nil)
+	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -426,14 +426,14 @@ func TestUqlFindPointProperty(t *testing.T) {
 func TestOnePathAsPaths(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 	var uql = "ab().src(51).dest(103).depth(1) as paths return paths{}"
-	resp, _ := client.UQL(uql, nil)
+	resp, _ := client.Uql(uql, nil)
 	paths, _ := resp.Alias("paths").AsPaths()
 	printers.PrintPaths(paths)
 }
 func TestDateTime(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 	var uql = "find().nodes({@`nodeSchema3`}) as nodes return table(nodes.typeListDatetime[0])"
-	resp, _ := client.UQL(uql, nil)
+	resp, _ := client.Uql(uql, nil)
 	table, _ := resp.Alias("table(nodes.typeListDatetime[0])").AsTable()
 	printers.PrintTable(table)
 }
@@ -442,7 +442,7 @@ func TestUqlFindWithDecimalProperty(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 
 	uql := `find().nodes({@default}) as nodes return nodes{*}`
-	resp, err := client.UQL(uql, nil)
+	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -460,7 +460,7 @@ func TestUqlAsGraph(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 
 	uql := `n( as n1).re(as e).n(as n2) with toGraph(listUnion(collect(n1), collect(n2)), collect(e)) as graph return graph`
-	resp, err := client.UQL(uql, nil)
+	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -477,7 +477,7 @@ func TestUqlAsGraph(t *testing.T) {
 func TestFindNodeWithOptionalUql(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 	uql := "OPTIONAL find().nodes({@account.year < 1969}) as nodes return nodes{*}"
-	resp, err := client.UQL(uql, nil)
+	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -493,7 +493,7 @@ func TestFindNodeWithOptionalUql(t *testing.T) {
 func TestFindEdgeWithOptionalUql(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 	uql := "OPTIONAL find().edges({@disagree.targetPost <10}) as edges return edges{*}"
-	resp, err := client.UQL(uql, nil)
+	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -510,7 +510,7 @@ func TestFindEdgeWithOptionalUql(t *testing.T) {
 func TestFindPathWithOptionalUql(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 	uql := "OPTIONAL n(1).e().n(103) as paths RETURN paths{*}"
-	resp, err := client.UQL(uql, nil)
+	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -531,7 +531,7 @@ func TestInsertReturnNodes(t *testing.T) {
 		log.Fatalln(err)
 	}
 	var uql = "insert().into(@`node_schema_a`).nodes([{typeString:'string',name:'name',typeInt32:12,typeInt64:44,typeUint32:0}]) as node return node{*}"
-	res, _ := client.UQL(uql, nil)
+	res, _ := client.Uql(uql, nil)
 	nodes, schema, _ := res.Alias("node").AsNodes()
 	printers.PrintNodes(nodes, schema)
 	fmt.Println(res)

@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// UQL, Insert, Export, Download ... API methods
+// Uql, Insert, Export, Download ... API methods
 
 type UltipaAPI struct {
 	Pool   *connection.ConnectionPool
@@ -125,10 +125,10 @@ func (api *UltipaAPI) GetControlClientAndConfig(config *configuration.RequestCon
 	return client, conf, nil
 }
 
-// UQL send a uql string to ultipa graph, and return a http UQL Response
-// get Alias from UQL Response and convert to any type you need by asNodes, asEdges, asPaths, asTable, as asArray...
-// Check DataItem to learn more about UQL Response
-func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+// Uql send a uql string to ultipa graph, and return a http Uql Response
+// get Alias from Uql Response and convert to any type you need by asNodes, asEdges, asPaths, asTable, as asArray...
+// Check DataItem to learn more about Uql Response
+func (api *UltipaAPI) Uql(uql string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
 
 	resp, conf, err := api.doExecuteUql(uql, config)
 	if err != nil {
@@ -150,7 +150,7 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 		if err != nil {
 			return nil, err
 		}
-		return api.UQL(uql, config)
+		return api.Uql(uql, config)
 	}
 
 	return uqlResp, nil

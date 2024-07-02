@@ -7,7 +7,7 @@ import (
 )
 
 func (api *UltipaAPI) GetServerVersion() (string, error) {
-	resp, err := api.UQL("stats()", nil)
+	resp, err := api.Uql("stats()", nil)
 	if err != nil {
 		return "", err
 	}

@@ -16,7 +16,7 @@ import (
 func (api *UltipaAPI) ListGraph(config *configuration.RequestConfig) (*http.ResponseGraphs, error) {
 	uql := utils.UQLMAKER{}
 	uql.SetCommand(utils.UQLCommand_listGraph)
-	res, err := api.UQL(uql.ToString(), config)
+	res, err := api.Uql(uql.ToString(), config)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (api *UltipaAPI) CreateGraphIfNotExit(graph *structs.GraphInfo, config *con
 
 func (api *UltipaAPI) CreateGraph(graph *structs.GraphInfo, config *configuration.RequestConfig) (*http.UQLResponse, error) {
 
-	resp, err := api.UQL(fmt.Sprintf(`create().graph("%v", "%v")`, graph.Name, graph.Description), config)
+	resp, err := api.Uql(fmt.Sprintf(`create().graph("%v", "%v")`, graph.Name, graph.Description), config)
 
 	if err != nil {
 		return nil, err
@@ -121,7 +121,7 @@ func (api *UltipaAPI) CreateGraph(graph *structs.GraphInfo, config *configuratio
 
 func (api *UltipaAPI) DropGraph(graphName string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
 
-	resp, err := api.UQL(fmt.Sprintf(`drop().graph("%v")`, graphName), config)
+	resp, err := api.Uql(fmt.Sprintf(`drop().graph("%v")`, graphName), config)
 
 	if err != nil {
 		return nil, err

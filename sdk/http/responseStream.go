@@ -1,5 +1,5 @@
 /**
- * Return a Stream to return UQL results
+ * Return a Stream to return Uql results
  */
 
 package http

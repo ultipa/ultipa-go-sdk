@@ -10,7 +10,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
-//CreateProperty create property for schema, schemaName maybe escaped if schemaName contains some special characters.
+// CreateProperty create property for schema, schemaName maybe escaped if schemaName contains some special characters.
 func (api *UltipaAPI) CreateProperty(schemaName string, dbType ultipa.DBType, prop *structs.Property, conf *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	err = CheckName(schemaName)
 	if err != nil {
@@ -145,7 +145,7 @@ func (api *UltipaAPI) doCreateNodeProperty(schemaName string, prop *structs.Prop
 
 	uql := fmt.Sprintf(`create().node_property(@%v,%s,"%v","%v")`, schemaName, propName, propertyTypeStr, prop.Desc)
 
-	resp, err = api.UQL(uql, conf)
+	resp, err = api.Uql(uql, conf)
 	return resp, err
 }
 
@@ -190,14 +190,14 @@ func (api *UltipaAPI) doCreateEdgeProperty(schemaName string, prop *structs.Prop
 	}
 
 	uql := fmt.Sprintf(`create().edge_property(@%v,%v,"%v","%v")`, schemaName, propName, propertyTypeStr, prop.Desc)
-	resp, err = api.UQL(uql, conf)
+	resp, err = api.Uql(uql, conf)
 	return resp, err
 }
 
 // Usage: AlterNodeProperty("@schemaName.propertyName", dbType *ultipa.DBType, &*structs.Property{Name, Desc}, *RequestConfig)
 func (api *UltipaAPI) AlterNodeProperty(propertyName string, prop *structs.Property, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 
-	resp, err = api.UQL(fmt.Sprintf(`alter().node_property(%v).set({name: "%v", description: "%v"})`, propertyName, prop.Name, prop.Desc), config)
+	resp, err = api.Uql(fmt.Sprintf(`alter().node_property(%v).set({name: "%v", description: "%v"})`, propertyName, prop.Name, prop.Desc), config)
 
 	return resp, err
 }
@@ -205,21 +205,21 @@ func (api *UltipaAPI) AlterNodeProperty(propertyName string, prop *structs.Prope
 // Usage: AlterEdgeProperty("@schemaName.propertyName", dbType *ultipa.DBType, &*structs.Property{Name, Desc}, *RequestConfig)
 func (api *UltipaAPI) AlterEdgeProperty(propertyName string, prop *structs.Property, conf *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 
-	resp, err = api.UQL(fmt.Sprintf(`alter().edge_property(%v).set({name: "%v", description: "%v"})`, propertyName, prop.Name, prop.Desc), conf)
+	resp, err = api.Uql(fmt.Sprintf(`alter().edge_property(%v).set({name: "%v", description: "%v"})`, propertyName, prop.Name, prop.Desc), conf)
 
 	return resp, err
 }
 
 // Usage: DropNodeProperty("@schemaName.propertyName", *RequestConfig)
 func (api *UltipaAPI) DropNodeProperty(propertyName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
-	resp, err = api.UQL(fmt.Sprintf(`drop().node_property(%v)`, propertyName), config)
+	resp, err = api.Uql(fmt.Sprintf(`drop().node_property(%v)`, propertyName), config)
 
 	return resp, err
 }
 
 // Usage: DropEdgeProperty("@schemaName.propertyName", *RequestConfig)
 func (api *UltipaAPI) DropEdgeProperty(propertyName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
-	resp, err = api.UQL(fmt.Sprintf(`drop().edge_property(%v)`, propertyName), config)
+	resp, err = api.Uql(fmt.Sprintf(`drop().edge_property(%v)`, propertyName), config)
 
 	return resp, err
 }

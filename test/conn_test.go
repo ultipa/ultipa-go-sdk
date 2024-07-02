@@ -66,12 +66,12 @@ func TestNewConn(t *testing.T) {
 
 func TestUql(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
-	res, _ := client.UQL("n().e().n() as path return path limit 10;", nil)
+	res, _ := client.Uql("n().e().n() as path return path limit 10;", nil)
 	log.Println(res.AliasList, res.Get(0), res.Status.Code, res.Status.Message)
 }
 
 func TestUqlWithSpecialHost(t *testing.T) {
-	res, err := client.UQL("show().graph()", &configuration.RequestConfig{
+	res, err := client.Uql("show().graph()", &configuration.RequestConfig{
 		Host: "localhost:3000",
 	})
 
@@ -137,6 +137,6 @@ func TestConnectionSSL(t *testing.T) {
 		log.Fatalln(err)
 	}
 
-	uql, err := client.UQL("show().schema()", nil)
+	uql, err := client.Uql("show().schema()", nil)
 	log.Println(uql)
 }

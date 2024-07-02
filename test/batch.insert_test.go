@@ -114,7 +114,7 @@ func createSchema(t *testing.T, schema string, conn *api.UltipaAPI) {
 func checkInsertionResult(t *testing.T, conn *api.UltipaAPI, schema string) {
 	// wait for data saved
 	time.Sleep(time.Duration(2) * time.Second)
-	resp3, err := conn.UQL(fmt.Sprintf("find().nodes({@%s}) as nodes return nodes{*}", schema), nil)
+	resp3, err := conn.Uql(fmt.Sprintf("find().nodes({@%s}) as nodes return nodes{*}", schema), nil)
 	if err != nil {
 		t.Errorf("failed to query insertion result. %v", err)
 	}

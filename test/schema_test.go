@@ -100,7 +100,7 @@ func TestCompareSchema(t *testing.T) {
 }
 
 func TestShowSchema(t *testing.T) {
-	resp, _ := client.UQL("show().schema()", nil)
+	resp, _ := client.Uql("show().schema()", nil)
 
 	nodeSchemas, err := resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 	if err != nil {

@@ -16,7 +16,7 @@ func TestUQLStream(t *testing.T) {
 
 	log.Println("Exec : ", uql)
 
-	//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
 	stream, err := client.UQLStream(uql, nil)
 
 	if err != nil {

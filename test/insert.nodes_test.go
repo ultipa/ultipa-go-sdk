@@ -123,7 +123,7 @@ func TestInsertBlobProperty(t *testing.T) {
 	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
 
 	uql := fmt.Sprintf("find().nodes({@%s}) as nodes return nodes{*}", schemaName)
-	response, err := client.UQL(uql, nil)
+	response, err := client.Uql(uql, nil)
 
 	//断言响应码
 	if response.Status.Code != ultipa.ErrorCode_SUCCESS {
@@ -174,7 +174,7 @@ func TestInsertDecimalProperty(t *testing.T) {
 	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
 
 	uql := fmt.Sprintf("find().nodes({@%s}) as nodes return nodes{*}", schemaName)
-	response, err := client.UQL(uql, nil)
+	response, err := client.Uql(uql, nil)
 
 	//断言响应码
 	if response.Status.Code != ultipa.ErrorCode_SUCCESS {

@@ -39,13 +39,13 @@ func ExampleUltipaAPI_UQL_Nodes_Edges() {
 	rConfig := &configuration.RequestConfig{
 		Timeout: 20,
 	}
-	resp, err := client.UQL("find().nodes() return nodes limit 1", rConfig)
+	resp, err := client.Uql("find().nodes() return nodes limit 1", rConfig)
 
 	nodes, schemas, err := resp.Alias("nodes").AsNodes()
 
 	log.Println(nodes, schemas, err)
 
-	respEdges, err := client.UQL("find().edges() return edges limit 1", nil)
+	respEdges, err := client.Uql("find().edges() return edges limit 1", nil)
 
 	edges, edgeSchemas, err := respEdges.Alias("edges").AsEdges()
 
@@ -193,7 +193,7 @@ func ExampleUltipaAPI_DropEdgeProperty() {
 
 func ExampleUltipaAPI_UQL() {
 
-	resp, _ := client.UQL("find().nodes() as nodes return nodes limit 10", nil)
+	resp, _ := client.Uql("find().nodes() as nodes return nodes limit 10", nil)
 	nodes, schemas, err := resp.Alias("nodes").AsNodes()
 
 	if err != nil {
@@ -204,7 +204,7 @@ func ExampleUltipaAPI_UQL() {
 }
 
 func ExampleUltipaAPI_UQL2() {
-	resp, _ := client.UQL("find().edges() as edges return edges limit 10", nil)
+	resp, _ := client.Uql("find().edges() as edges return edges limit 10", nil)
 	edges, schemas, err := resp.Alias("nodes").AsEdges()
 
 	if err != nil {
@@ -216,7 +216,7 @@ func ExampleUltipaAPI_UQL2() {
 
 func ExampleUltipaAPI_UQL3() {
 
-	resp, _ := client.UQL("n().e()[2].n() as paths return paths{*} limit 1", nil)
+	resp, _ := client.Uql("n().e()[2].n() as paths return paths{*} limit 1", nil)
 	paths, err := resp.Get(0).AsPaths()
 
 	if err != nil {
@@ -226,7 +226,7 @@ func ExampleUltipaAPI_UQL3() {
 }
 
 func ExampleUltipaAPI_UQL4() {
-	resp, _ := client.UQL("n(as start).e()[2].n(as end) return table(start._id, end._id) as pairs limit 10", nil)
+	resp, _ := client.Uql("n(as start).e()[2].n(as end) return table(start._id, end._id) as pairs limit 10", nil)
 	table, err := resp.Get(0).AsTable()
 
 	if err != nil {
@@ -236,7 +236,7 @@ func ExampleUltipaAPI_UQL4() {
 }
 
 func ExampleUltipaAPI_UQL5() {
-	resp, _ := client.UQL(`n({_id == "ULTIPA"}).e().n(as friends) return collect(friends.name) as names`, nil)
+	resp, _ := client.Uql(`n({_id == "ULTIPA"}).e().n(as friends) return collect(friends.name) as names`, nil)
 	names, err := resp.Get(0).AsAttr()
 
 	if err != nil {
@@ -246,7 +246,7 @@ func ExampleUltipaAPI_UQL5() {
 }
 
 func ExampleUltipaAPI_UQL6() {
-	resp, _ := client.UQL("show().graph()", nil)
+	resp, _ := client.Uql("show().graph()", nil)
 	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphInfos()
 
 	if err != nil {
@@ -256,7 +256,7 @@ func ExampleUltipaAPI_UQL6() {
 }
 
 func ExampleUltipaAPI_UQL7() {
-	resp, _ := client.UQL("show().schemas()", nil)
+	resp, _ := client.Uql("show().schemas()", nil)
 
 	nodeSchemas, err := resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 	if err != nil {
@@ -272,7 +272,7 @@ func ExampleUltipaAPI_UQL7() {
 }
 
 func ExampleUltipaAPI_UQL8() {
-	resp, _ := client.UQL("show().algos()", nil)
+	resp, _ := client.Uql("show().algos()", nil)
 
 	algos, err := resp.Alias(http.RESP_ALGOS_KEY).AsAlgos()
 
@@ -284,7 +284,7 @@ func ExampleUltipaAPI_UQL8() {
 
 func ExampleUltipaAPI_UQL9() {
 
-	resp, _ := client.UQL("stats()", nil)
+	resp, _ := client.Uql("stats()", nil)
 
 	dataitem := resp.Alias(http.RESP_STATISTIC_KEY)
 

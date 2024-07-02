@@ -14,7 +14,7 @@ import (
 func (api *UltipaAPI) ListNodeSchema(config *configuration.RequestConfig) (*http.ResponseNodeSchemas, error) {
 	uql := utils.UQLMAKER{}
 	uql.SetCommand(utils.UQLCommand_listNodeSchema)
-	res, err := api.UQL(uql.ToString(), config)
+	res, err := api.Uql(uql.ToString(), config)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (api *UltipaAPI) ListSchema(DBType ultipa.DBType, config *configuration.Req
 	var schemas []*structs.Schema
 
 	if DBType == ultipa.DBType_DBNODE {
-		resp, err = api.UQL(fmt.Sprintf(`show().node_schema()`), config)
+		resp, err = api.Uql(fmt.Sprintf(`show().node_schema()`), config)
 		if err != nil {
 			return nil, err
 		}
@@ -67,7 +67,7 @@ func (api *UltipaAPI) ListSchema(DBType ultipa.DBType, config *configuration.Req
 
 		schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 	} else if DBType == ultipa.DBType_DBEDGE {
-		resp, err = api.UQL(fmt.Sprintf(`show().edge_schema()`), config)
+		resp, err = api.Uql(fmt.Sprintf(`show().edge_schema()`), config)
 		if err != nil {
 			return nil, err
 		}
@@ -113,7 +113,7 @@ func (api *UltipaAPI) GetNodeSchema(schemaName string, config *configuration.Req
 	if utils.IsNeedToEscapeName(schemaName) {
 		escapedSchemaName = fmt.Sprintf("`%v`", schemaName)
 	}
-	resp, err = api.UQL(fmt.Sprintf(`show().node_schema(@%v)`, escapedSchemaName), config)
+	resp, err = api.Uql(fmt.Sprintf(`show().node_schema(@%v)`, escapedSchemaName), config)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ func (api *UltipaAPI) GetEdgeSchema(schemaName string, config *configuration.Req
 	if utils.IsNeedToEscapeName(schemaName) {
 		escapedSchemaName = fmt.Sprintf("`%v`", schemaName)
 	}
-	resp, err = api.UQL(fmt.Sprintf(`show().edge_schema(@%v)`, escapedSchemaName), config)
+	resp, err = api.Uql(fmt.Sprintf(`show().edge_schema(@%v)`, escapedSchemaName), config)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 	if schema.DBType == ultipa.DBType_DBNODE {
 		uql := fmt.Sprintf(`create().node_schema(%v,"%v")`, schemaName, schema.Desc)
 
-		resp, err = api.UQL(uql, conf)
+		resp, err = api.Uql(uql, conf)
 		if err != nil {
 			return nil, err
 		}
@@ -186,7 +186,7 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 
 	} else if schema.DBType == ultipa.DBType_DBEDGE {
 		uql := fmt.Sprintf(`create().edge_schema(%v,"%v")`, schemaName, schema.Desc)
-		resp, err = api.UQL(uql, conf)
+		resp, err = api.Uql(uql, conf)
 		if err != nil {
 			return nil, err
 		}

@@ -17,7 +17,7 @@ import (
 )
 
 func TestShowProperty(t *testing.T) {
-	resp, _ := client.UQL("show().property()", nil)
+	resp, _ := client.Uql("show().property()", nil)
 
 	nodeProperties, err := resp.Alias(http.RESP_NODE_PROPERTY_KEY).AsProperties()
 	if err != nil {
@@ -33,7 +33,7 @@ func TestShowProperty(t *testing.T) {
 }
 
 func TestShowNodeProperty(t *testing.T) {
-	resp, _ := client.UQL("show().node_property()", nil)
+	resp, _ := client.Uql("show().node_property()", nil)
 
 	nodeProperties, err := resp.Alias(http.RESP_NODE_PROPERTY_KEY).AsProperties()
 	if err != nil {
@@ -43,7 +43,7 @@ func TestShowNodeProperty(t *testing.T) {
 }
 
 func TestShowEdgeProperty(t *testing.T) {
-	resp, _ := client.UQL("show().edge_property()", nil)
+	resp, _ := client.Uql("show().edge_property()", nil)
 
 	edgeProperties, err := resp.Alias(http.RESP_EDGE_PROPERTY_KEY).AsProperties()
 	if err != nil {
@@ -53,7 +53,7 @@ func TestShowEdgeProperty(t *testing.T) {
 }
 
 func TestCreatePropertyWithUql(t *testing.T) {
-	resp, err := client.UQL(`create().node_property(@People, "age", "int32[]")`, nil)
+	resp, err := client.Uql(`create().node_property(@People, "age", "int32[]")`, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -61,7 +61,7 @@ func TestCreatePropertyWithUql(t *testing.T) {
 		t.Fatal(resp.Status.Message)
 	}
 
-	resp, _ = client.UQL("show().node_property(@People)", nil)
+	resp, _ = client.Uql("show().node_property(@People)", nil)
 	nodeProperties, err := resp.Alias(http.RESP_NODE_PROPERTY_KEY).AsProperties()
 	if err != nil {
 		log.Fatalln(err)

@@ -20,7 +20,7 @@ func (api *UltipaAPI) ListIndex(config *configuration.RequestConfig) ([]*http.Re
 	var err error
 	var responseIndexes []*http.ResponseIndex
 
-	resp, err = api.UQL(fmt.Sprintf(`show().index()`), config)
+	resp, err = api.Uql(fmt.Sprintf(`show().index()`), config)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (api *UltipaAPI) ListEdgeIndex(config *configuration.RequestConfig) ([]*str
 	var err error
 	var indexes []*structs.Index
 
-	resp, err = api.UQL(fmt.Sprintf(`show().edge_index()`), config)
+	resp, err = api.Uql(fmt.Sprintf(`show().edge_index()`), config)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (api *UltipaAPI) ListNodeIndex(config *configuration.RequestConfig) ([]*str
 	var err error
 	var indexes []*structs.Index
 
-	resp, err = api.UQL(fmt.Sprintf(`show().node_index()`), config)
+	resp, err = api.Uql(fmt.Sprintf(`show().node_index()`), config)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (api *UltipaAPI) ListFullText(config *configuration.RequestConfig) ([]*http
 	var err error
 	var responseIndexes []*http.ResponseIndex
 
-	resp, err = api.UQL(fmt.Sprintf(`show().fulltext()`), config)
+	resp, err = api.Uql(fmt.Sprintf(`show().fulltext()`), config)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (api *UltipaAPI) ListEdgeFullText(config *configuration.RequestConfig) ([]*
 	var err error
 	var indexes []*structs.Index
 
-	resp, err = api.UQL(fmt.Sprintf(`show().edge_fulltext()`), config)
+	resp, err = api.Uql(fmt.Sprintf(`show().edge_fulltext()`), config)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func (api *UltipaAPI) ListNodeFullText(config *configuration.RequestConfig) ([]*
 	var err error
 	var indexes []*structs.Index
 
-	resp, err = api.UQL(fmt.Sprintf(`show().node_fulltext()`), config)
+	resp, err = api.Uql(fmt.Sprintf(`show().node_fulltext()`), config)
 	if err != nil {
 		return nil, err
 	}

@@ -38,7 +38,7 @@ func TestCreateGraph(t *testing.T) {
 
 	client.SetCurrentGraph(graph)
 
-	resp, err := client.UQL("insert().nodes({}).into(@default)", nil)
+	resp, err := client.Uql("insert().nodes({}).into(@default)", nil)
 
 	if err != nil {
 		logger.PrintError(err.Error())
@@ -56,7 +56,7 @@ func TestDeleteGraph(t *testing.T) {
 
 func TestAsGraph(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
-	resp, _ := client.UQL("show().graph()", nil)
+	resp, _ := client.Uql("show().graph()", nil)
 	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphInfos()
 
 	if err != nil {
