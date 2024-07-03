@@ -11,7 +11,7 @@ import (
 	"strconv"
 )
 
-func (api *UltipaAPI) ListNodeSchema(config *configuration.RequestConfig) (*http.ResponseNodeSchemas, error) {
+func (api *UltipaAPI) ShowNodeSchema(config *configuration.RequestConfig) (*http.ResponseNodeSchemas, error) {
 	uql := utils.UQLMAKER{}
 	uql.SetCommand(utils.UQLCommand_listNodeSchema)
 	res, err := api.Uql(uql.ToString(), config)
@@ -51,7 +51,7 @@ func (api *UltipaAPI) ListNodeSchema(config *configuration.RequestConfig) (*http
 	}, nil
 }
 
-func (api *UltipaAPI) ListSchema(DBType ultipa.DBType, config *configuration.RequestConfig) ([]*structs.Schema, error) {
+func (api *UltipaAPI) ShowSchema(DBType ultipa.DBType, config *configuration.RequestConfig) ([]*structs.Schema, error) {
 	var resp *http.UQLResponse
 	var err error
 	var schemas []*structs.Schema
@@ -241,4 +241,64 @@ func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, config *con
 
 	return exist, err
 
+}
+
+func (api *UltipaAPI) DropSchema(schemaName string, dbType ultipa.DBType, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+	err := CheckName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
+	}
+
+	uql := ""
+	switch dbType {
+	case ultipa.DBType_DBNODE:
+		uql = fmt.Sprintf(`drop().node_schema(@%v)`, schemaName)
+	case ultipa.DBType_DBEDGE:
+		uql = fmt.Sprintf(`drop().edge_schema(@%v)`, schemaName)
+	default:
+		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
+	}
+
+	resp, err := api.Uql(uql, config)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
+	}
+
+	return resp, nil
+}
+
+func (api *UltipaAPI) AlterSchema(dbType ultipa.DBType, schemaName, newSchemaName, description string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+	parms := ""
+
+	switch dbType {
+	case ultipa.DBType_DBNODE:
+		parms = "node_schema"
+	case ultipa.DBType_DBEDGE:
+		parms = "edge_schema"
+	default:
+		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
+	}
+
+	uql := fmt.Sprintf(`alter().%v("@%v").set({name: "%v", description: "%v"})`, parms, schemaName, newSchemaName, description)
+
+	// Only modify the description of the schema
+	if newSchemaName == "" {
+		uql = fmt.Sprintf(`alter().%v("@%v").set({description: "%v"})`, parms, schemaName, description)
+	}
+
+	resp, err := api.Uql(uql, config)
+
+	if err != nil {
+		return nil, err
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
+	}
+
+	return resp, nil
 }

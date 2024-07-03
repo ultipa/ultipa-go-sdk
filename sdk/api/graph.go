@@ -172,11 +172,11 @@ func (api *UltipaAPI) GetGraph(graphName string, config *configuration.RequestCo
 	return nil, errors.New("graph not found")
 }
 
-func (api *UltipaAPI) AlterGraph(oldGraphName, newGraphName, description string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
-	uql := fmt.Sprintf(`alter().graph("%v").set({name: "%v", description: "%v"})`, oldGraphName, newGraphName, description)
+func (api *UltipaAPI) AlterGraph(graphName, newGraphName, description string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+	uql := fmt.Sprintf(`alter().graph("%v").set({name: "%v", description: "%v"})`, graphName, newGraphName, description)
 	// Only modify the description of the graphSet
 	if newGraphName == "" {
-		uql = fmt.Sprintf(`alter().graph("%v").set({description: "%v"})`, oldGraphName, description)
+		uql = fmt.Sprintf(`alter().graph("%v").set({description: "%v"})`, graphName, description)
 	}
 
 	resp, err := api.Uql(uql, config)
@@ -188,7 +188,7 @@ func (api *UltipaAPI) AlterGraph(oldGraphName, newGraphName, description string,
 		return nil, errors.New(resp.Status.Message)
 	}
 
-	return resp, err
+	return resp, nil
 }
 
 func (api *UltipaAPI) Truncate(truncate *structs.Truncate, config *configuration.RequestConfig) (*http.UQLResponse, error) {
@@ -215,7 +215,7 @@ func (api *UltipaAPI) Truncate(truncate *structs.Truncate, config *configuration
 		return nil, errors.New(resp.Status.Message)
 	}
 
-	return resp, err
+	return resp, nil
 }
 
 func (api *UltipaAPI) Compact(graphName string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
@@ -245,7 +245,7 @@ func (api *UltipaAPI) MountGraph(graphName string, config *configuration.Request
 		return nil, errors.New(resp.Status.Message)
 	}
 
-	return resp, err
+	return resp, nil
 }
 
 func (api *UltipaAPI) UnmountGraph(graphName string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
@@ -260,5 +260,5 @@ func (api *UltipaAPI) UnmountGraph(graphName string, config *configuration.Reque
 		return nil, errors.New(resp.Status.Message)
 	}
 
-	return resp, err
+	return resp, nil
 }

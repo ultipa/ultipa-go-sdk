@@ -12,7 +12,7 @@ import (
 
 func TestListSchema(t *testing.T) {
 	InitCases()
-	res, err := client.ListNodeSchema(nil)
+	res, err := client.ShowNodeSchema(nil)
 	if err != nil {
 		log.Panic(err)
 	}
