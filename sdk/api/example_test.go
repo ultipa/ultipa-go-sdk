@@ -29,7 +29,7 @@ func ExampleNewUltipaAPI() {
 		log.Fatalln(err)
 	}
 
-	graph, _ := client.ListGraph(nil)
+	graph, _ := client.ShowGraph(nil)
 
 	log.Println(graph.Graphs)
 }

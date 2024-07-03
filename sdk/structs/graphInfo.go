@@ -7,6 +7,12 @@ import (
 	"strings"
 )
 
+type Truncate struct {
+	DbType    ultipa.DBType
+	GraphName string
+	Schema    string
+}
+
 type GraphInfo struct {
 	ID          types.ID
 	Name        string
