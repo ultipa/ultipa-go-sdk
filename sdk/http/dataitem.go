@@ -839,3 +839,68 @@ func (di *DataItem) AsAny() (interface{}, error) {
 	}
 
 }
+
+func (di *DataItem) AsPolicy() (policies []*structs.Policy, err error) {
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, errors.New("RESULT_TYPE_UNSET")
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_POLICY_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a policy list")
+	}
+
+	var policy *structs.Policy
+	for _, row := range table.TableRows {
+		//0:name, 1: properties, 2: schema, 3: status
+		values := row.GetValues()
+		policy, err = bytesToPolicy(values)
+		if err != nil {
+			return nil, errors.New("DataItem ")
+		}
+
+		policies = append(policies, policy)
+	}
+
+	return policies, err
+}
+
+func bytesToPolicy(data [][]byte) (*structs.Policy, error) {
+	if len(data) != 5 {
+		return nil, fmt.Errorf("invalid data length, expected 5 but got %d", len(data))
+	}
+
+	var policy structs.Policy
+
+	// Name
+	if err := json.Unmarshal(data[0], &policy.Name); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal Name: %w", err)
+	}
+
+	// GraphPrivileges
+	if err := json.Unmarshal(data[1], &policy.GraphPrivileges); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal GraphPrivileges: %w", err)
+	}
+
+	// SystemPrivileges
+	if err := json.Unmarshal(data[2], &policy.SystemPrivileges); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal SystemPrivileges: %w", err)
+	}
+
+	// PropertyPrivileges
+	if err := json.Unmarshal(data[3], &policy.PropertyPrivileges); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal PropertyPrivileges: %w", err)
+	}
+
+	// Policies
+	if err := json.Unmarshal(data[4], &policy.Policies); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal Policies: %w", err)
+	}
+
+	return &policy, nil
+}

@@ -244,11 +244,6 @@ func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, config *con
 }
 
 func (api *UltipaAPI) DropSchema(schemaName string, dbType ultipa.DBType, config *configuration.RequestConfig) (*http.UQLResponse, error) {
-	err := CheckName(schemaName)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
-	}
-
 	uql := ""
 	switch dbType {
 	case ultipa.DBType_DBNODE:

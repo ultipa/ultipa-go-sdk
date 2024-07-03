@@ -98,6 +98,16 @@ func (api *UltipaAPI) GetProperty(schemaName string, propertyName string, dbType
 	return nil, nil
 }
 
+func (api *UltipaAPI) ShowProperty(schemaName string, dbType ultipa.DBType, config *configuration.RequestConfig) (property []*structs.Property, err error) {
+	schema, err := api.GetSchema(schemaName, dbType, config)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return schema.Properties, nil
+}
+
 func (api *UltipaAPI) GetNodeProperty(schemaName string, propertyName string, config *configuration.RequestConfig) (property *structs.Property, err error) {
 	return api.GetProperty(schemaName, propertyName, ultipa.DBType_DBNODE, config)
 }
@@ -222,4 +232,59 @@ func (api *UltipaAPI) DropEdgeProperty(propertyName string, config *configuratio
 	resp, err = api.Uql(fmt.Sprintf(`drop().edge_property(%v)`, propertyName), config)
 
 	return resp, err
+}
+
+func (api *UltipaAPI) DropProperty(dbType ultipa.DBType, schemaName, propertyName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+
+	uql := ""
+	switch dbType {
+	case ultipa.DBType_DBNODE:
+		uql = fmt.Sprintf(`drop().node_property(@%v.%v)`, schemaName, propertyName)
+	case ultipa.DBType_DBEDGE:
+		uql = fmt.Sprintf(`drop().edge_property(@%v.%v)`, schemaName, propertyName)
+	default:
+		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
+	}
+
+	resp, err = api.Uql(uql, config)
+
+	if err != nil {
+		return nil, err
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
+	}
+
+	return resp, nil
+}
+
+func (api *UltipaAPI) AlterProperty(dbType ultipa.DBType, schema, property, newProperty, description string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+	parms := ""
+
+	switch dbType {
+	case ultipa.DBType_DBNODE:
+		parms = "node_property"
+	case ultipa.DBType_DBEDGE:
+		parms = "edge_property"
+	default:
+		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
+	}
+
+	uql := fmt.Sprintf(`alter().%v("@%v.%v").set({name: "%v", description: "%v"})`, parms, schema, property, newProperty, description)
+
+	// Only modify the description of the property
+	if newProperty == "" {
+		uql = fmt.Sprintf(`alter().%v("@%v.%v").set({description: "%v"})`, parms, schema, property, description)
+	}
+
+	resp, err := api.Uql(uql, config)
+
+	if err != nil {
+		return nil, err
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
+	}
+
+	return resp, nil
 }

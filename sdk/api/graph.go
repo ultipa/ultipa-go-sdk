@@ -195,6 +195,8 @@ func (api *UltipaAPI) Truncate(truncate *structs.Truncate, config *configuration
 	uql := ""
 	if truncate.Schema != "*" {
 		truncate.Schema = "@" + truncate.Schema
+	} else {
+		truncate.Schema = `"*"`
 	}
 
 	switch truncate.DbType {

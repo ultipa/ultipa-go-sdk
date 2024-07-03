@@ -45,7 +45,13 @@ type ResponseNodeSchemas struct {
 	Status  *Status
 	Schemas []*ResponseSchema
 }
+
 type ResponseIndex struct {
 	Type    ultipa.DBType
 	Indexes []*structs.Index
+}
+
+type ResponsePolicy struct {
+	Status   *Status
+	Policies []*structs.Policy
 }
