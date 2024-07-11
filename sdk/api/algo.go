@@ -12,7 +12,6 @@ import (
 )
 
 func (api *UltipaAPI) ShowAlgo(req *configuration.RequestConfig) ([]*structs.Algo, error) {
-
 	resp, err := api.Uql("show().algo()", req)
 
 	if err != nil {

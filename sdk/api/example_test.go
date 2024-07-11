@@ -31,7 +31,7 @@ func ExampleNewUltipaAPI() {
 
 	graph, _ := client.ShowGraph(nil)
 
-	log.Println(graph.Graphs)
+	log.Println(graph)
 }
 
 func ExampleUltipaAPI_UQL_Nodes_Edges() {
@@ -54,7 +54,7 @@ func ExampleUltipaAPI_UQL_Nodes_Edges() {
 
 func ExampleUltipaAPI_CreateGraph() {
 
-	graph := &structs.GraphInfo{
+	graph := &structs.GraphSet{
 		Name:        "new_graph",
 		Description: "my new graph",
 	}

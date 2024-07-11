@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func (api *UltipaAPI) ShowGraph(config *configuration.RequestConfig) (*http.ResponseGraphs, error) {
+func (api *UltipaAPI) ShowGraph(config *configuration.RequestConfig) (graphSets []*structs.GraphSet, err error) {
 	uql := utils.UQLMAKER{}
 	uql.SetCommand(utils.UQLCommand_listGraph)
 	res, err := api.Uql(uql.ToString(), config)
@@ -27,41 +27,33 @@ func (api *UltipaAPI) ShowGraph(config *configuration.RequestConfig) (*http.Resp
 	if err != nil {
 		return nil, err
 	}
-	var graphs []*http.ResponseGraph
-	if !res.Status.IsSuccess() {
-		return &http.ResponseGraphs{
-			Status: res.Status,
-			Graphs: graphs,
-		}, nil
-	}
+
 	values := table.ToKV()
 	for _, v := range values {
-		id, _ := strconv.ParseInt(v.Get("id").(string), 10, 64)
-		totalNodes, _ := strconv.ParseInt(v.Get("totalNodes").(string), 10, 64)
-		totalEdges, _ := strconv.ParseInt(v.Get("totalEdges").(string), 10, 64)
-		status := v.Get("status").(string)
-		description := v.Get("description").(string)
-		clusterId := ""
-		if v := v.Get("clusterId"); v != nil {
-			clusterId = v.(string)
-		}
-		graphs = append(graphs, &http.ResponseGraph{
-			Id:          id,
-			ClusterId:   clusterId,
+		//id, _ := strconv.ParseInt(v.Get("id").(string), 10, 64)
+		totalNodes, _ := strconv.ParseUint(v.Get("totalNodes").(string), 10, 64)
+		totalEdges, _ := strconv.ParseUint(v.Get("totalEdges").(string), 10, 64)
+		//status := v.Get("status").(string)
+		//description := v.Get("description").(string)
+		//clusterId := ""
+		//if v := v.Get("clusterId"); v != nil {
+		//	clusterId = v.(string)
+		//}
+		graphSets = append(graphSets, &structs.GraphSet{
+			ID: v.Get("id").(string),
+			//ClusterId:   clusterId,
 			Name:        v.Get("name").(string),
 			TotalNodes:  totalNodes,
 			TotalEdges:  totalEdges,
-			Status:      status,
-			Description: description,
+			Status:      v.Get("status").(string),
+			Description: v.Get("description").(string),
 		})
 	}
-	return &http.ResponseGraphs{
-		Status: res.Status,
-		Graphs: graphs,
-	}, nil
+
+	return graphSets, nil
 }
 
-func (api *UltipaAPI) CreateGraphIfNotExit(graph *structs.GraphInfo, config *configuration.RequestConfig) (resp *http.UQLResponse, exist bool, err error) {
+func (api *UltipaAPI) CreateGraphIfNotExit(graph *structs.GraphSet, config *configuration.RequestConfig) (resp *http.UQLResponse, exist bool, err error) {
 	exist, err = api.HasGraph(graph.Name, config)
 
 	if exist {
@@ -72,7 +64,7 @@ func (api *UltipaAPI) CreateGraphIfNotExit(graph *structs.GraphInfo, config *con
 	return resp, exist, err
 }
 
-func (api *UltipaAPI) CreateGraph(graph *structs.GraphInfo, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, config *configuration.RequestConfig) (*http.UQLResponse, error) {
 
 	resp, err := api.Uql(fmt.Sprintf(`create().graph("%v", "%v")`, graph.Name, graph.Description), config)
 
@@ -131,18 +123,13 @@ func (api *UltipaAPI) DropGraph(graphName string, config *configuration.RequestC
 }
 
 func (api *UltipaAPI) HasGraph(graphName string, config *configuration.RequestConfig) (bool, error) {
-	resp, err := api.ShowGraph(config)
+	graphSets, err := api.ShowGraph(config)
 
 	if err != nil {
 		return false, err
 	}
 
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return false, errors.New(resp.Status.Message)
-	}
-
-	for _, graph := range resp.Graphs {
-
+	for _, graph := range graphSets {
 		if graph.Name == graphName {
 			return true, nil
 		}
@@ -151,18 +138,14 @@ func (api *UltipaAPI) HasGraph(graphName string, config *configuration.RequestCo
 	return false, nil
 }
 
-func (api *UltipaAPI) GetGraph(graphName string, config *configuration.RequestConfig) (*http.ResponseGraph, error) {
-	resp, err := api.ShowGraph(config)
+func (api *UltipaAPI) GetGraph(graphName string, config *configuration.RequestConfig) (*structs.GraphSet, error) {
+	grapSets, err := api.ShowGraph(config)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
-
-	for _, graph := range resp.Graphs {
+	for _, graph := range grapSets {
 		if graph.Name == graphName {
 			return graph, nil
 		}

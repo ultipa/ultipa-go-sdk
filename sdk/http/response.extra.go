@@ -5,30 +5,30 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-type ResponseGraphs struct {
-	Status *Status
-	Graphs []*ResponseGraph
-}
+//type ResponseGraphs struct {
+//	Status *Status
+//	Graphs []*ResponseGraph
+//}
 
-func (graphs *ResponseGraphs) Find(name string) *ResponseGraph {
-	for _, g := range graphs.Graphs {
-		if name == g.Name {
-			return g
-		}
-	}
+//func (graphs *ResponseGraphs) Find(name string) *ResponseGraph {
+//	for _, g := range graphs.Graphs {
+//		if name == g.Name {
+//			return g
+//		}
+//	}
+//
+//	return nil
+//}
 
-	return nil
-}
-
-type ResponseGraph struct {
-	Id          int64
-	ClusterId   string
-	Name        string
-	TotalNodes  int64
-	TotalEdges  int64
-	Status      string
-	Description string
-}
+//type ResponseGraph struct {
+//	Id          int64
+//	ClusterId   string
+//	Name        string
+//	TotalNodes  int64
+//	TotalEdges  int64
+//	Status      string
+//	Description string
+//}
 
 type ResponseProperty struct {
 }

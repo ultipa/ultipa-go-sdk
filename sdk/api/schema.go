@@ -94,11 +94,9 @@ func (api *UltipaAPI) GetSchema(schemaName string, DBType ultipa.DBType, config 
 		return api.GetNodeSchema(schemaName, config)
 	} else if DBType == ultipa.DBType_DBEDGE {
 		return api.GetEdgeSchema(schemaName, config)
-	} else {
-		return nil, errors.New("GetSchema() error db_type")
 	}
 
-	return nil, nil
+	return nil, errors.New("GetSchema() error db_type")
 
 }
 

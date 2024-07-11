@@ -13,7 +13,7 @@ type Truncate struct {
 	Schema    string
 }
 
-type GraphInfo struct {
+type GraphSet struct {
 	ID          types.ID
 	Name        string
 	Description string
