@@ -32,9 +32,7 @@ func (api *UltipaAPI) InsertNodesBatch(table *ultipa.EntityTable, config *config
 		GraphName:  conf.CurrentGraph,
 		NodeTable:  table,
 		InsertType: config.InsertType,
-		//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
-		//Silent:     config.Silent,
-		Silent: true,
+		Silent:     config.Silent,
 	})
 
 	if err != nil {
@@ -102,9 +100,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		GraphName:  conf.CurrentGraph,
 		NodeTable:  table,
 		InsertType: config.InsertType,
-		//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
-		//Silent:     config.Silent,
-		Silent: true,
+		Silent:     config.Silent,
 	})
 
 	if err != nil {
@@ -307,9 +303,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 			GraphName:  conf.CurrentGraph,
 			NodeTable:  table,
 			InsertType: config.InsertType,
-			//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
-			//Silent:     config.Silent,
-			Silent: true,
+			Silent:     config.Silent,
 		})
 
 		if err != nil {
@@ -340,76 +334,10 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 }
 
 func (api *UltipaAPI) InsertNodes(schemaName string, rows []*structs.Node, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
-
-	if config == nil {
-		config = &configuration.InsertRequestConfig{}
-	}
-
-	if config.RequestConfig == nil {
-		config.RequestConfig = &configuration.RequestConfig{}
-	}
-
-	config.UseMaster = true
-	client, conf, err := api.GetClient(config.RequestConfig)
-
-	if err != nil {
-		return nil, err
-	}
-
-	ctx, cancel, err := api.Pool.NewContext(config.RequestConfig)
-	if err != nil {
-		return nil, err
-	}
-	defer cancel()
-
 	schema, err := api.GetNodeSchema(schemaName, config.RequestConfig)
 	if err != nil {
 		return nil, fmt.Errorf("get nodeSchema failed, %v", err)
 	}
 
-	table := &ultipa.EntityTable{}
-
-	table.Schemas = []*ultipa.Schema{
-		{
-			SchemaName: schema.Name,
-			Properties: []*ultipa.Property{},
-		},
-	}
-
-	for _, prop := range schema.Properties {
-
-		if prop.IsIDType() || prop.IsIgnore() {
-			continue
-		}
-
-		table.Schemas[0].Properties = append(table.Schemas[0].Properties, &ultipa.Property{
-			PropertyName: prop.Name,
-			PropertyType: prop.Type,
-		})
-	}
-
-	err, nodeRows := setPropertiesToNodeRow(schema, rows, config.RequestConfig)
-
-	if err != nil {
-		return nil, err
-	}
-	table.EntityRows = nodeRows
-	resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
-		GraphName:  conf.CurrentGraph,
-		NodeTable:  table,
-		InsertType: config.InsertType,
-		//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
-		//Silent:     config.Silent,
-		Silent: config.Silent,
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Msg)
-	}
-
-	return http.NewNodesInsertResponse(resp)
+	return api.InsertNodesBatchBySchema(schema, rows, config)
 }
