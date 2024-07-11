@@ -10,6 +10,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"log"
 	"strconv"
+	"time"
 )
 
 type DataItem struct {
@@ -861,7 +862,7 @@ func (di *DataItem) AsPolicy() (policies []*structs.Policy, err error) {
 		values := row.GetValues()
 		policy, err = bytesToPolicy(values)
 		if err != nil {
-			return nil, errors.New("DataItem ")
+			return nil, err
 		}
 
 		policies = append(policies, policy)
@@ -878,9 +879,7 @@ func bytesToPolicy(data [][]byte) (*structs.Policy, error) {
 	var policy structs.Policy
 
 	// Name
-	if err := json.Unmarshal(data[0], &policy.Name); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal Name: %w", err)
-	}
+	policy.Name = string(data[0])
 
 	// GraphPrivileges
 	if err := json.Unmarshal(data[1], &policy.GraphPrivileges); err != nil {
@@ -903,4 +902,157 @@ func bytesToPolicy(data [][]byte) (*structs.Policy, error) {
 	}
 
 	return &policy, nil
+}
+
+func (di *DataItem) AsExta() (extas []*structs.Exta, err error) {
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_EXTAS_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a exta list")
+	}
+
+	for _, row := range table.TableRows {
+		values := row.GetValues()
+
+		i := structs.Exta{
+			Name:    string(values[0]),
+			Author:  string(values[1]),
+			Version: string(values[2]),
+			Detail:  string(values[3]),
+		}
+		extas = append(extas, &i)
+
+	}
+
+	return extas, nil
+}
+
+func (di *DataItem) AsTask() (tasks []*structs.Task, err error) {
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_TASK_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a task list")
+	}
+
+	type TempTask struct {
+		Param    string            `json:"param"`
+		TaskInfo structs.TaskInfo  `json:"task_info"`
+		Result   map[string]string `json:"result"`
+		ErrorMsg string            `json:"error_msg"`
+	}
+
+	for _, row := range table.TableRows {
+		values := row.GetValues()
+
+		var tempTask TempTask
+		err = json.Unmarshal(values[0], &tempTask)
+		if err != nil {
+			return nil, err
+		}
+
+		var param map[string]string
+		err = json.Unmarshal([]byte(tempTask.Param), &param)
+		if err != nil {
+			return nil, err
+		}
+
+		task := structs.Task{
+			Param:    param,
+			TaskInfo: tempTask.TaskInfo,
+			Result:   tempTask.Result,
+			ErrorMsg: tempTask.ErrorMsg,
+		}
+
+		tasks = append(tasks, &task)
+	}
+
+	return tasks, nil
+}
+
+func (di *DataItem) AsTop() (tops []*structs.Top, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return tops, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_TOP_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a top list")
+	}
+
+	for _, row := range table.TableRows {
+		values := row.GetValues()
+
+		i := structs.Top{
+			ProcessId:  string(values[0]),
+			Status:     string(values[1]),
+			ProcessUql: string(values[2]),
+			Duration:   string(values[3]),
+		}
+		tops = append(tops, &i)
+
+	}
+
+	return tops, err
+}
+
+func (di *DataItem) AsStats() (stat *structs.Stat, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, errors.New("ResultType_RESULT_TYPE_UNSET")
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_STATISTIC_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a top list")
+	}
+
+	row := table.TableRows[0]
+	values := row.GetValues()
+
+	dateStr := string(values[2])
+	parsedTime, err := time.Parse("Mon Jan 2 15:04:05 2006", dateStr)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing date: %v", err)
+	}
+	formattedDate := parsedTime.Format("2006-01-02 15:04:05")
+
+	s := &structs.Stat{
+		CPUUsage:    string(values[0]),
+		MemUsage:    string(values[1]),
+		ExpiredDate: formattedDate,
+		CPUCores:    string(values[3]),
+		Company:     string(values[4]),
+		ServerType:  string(values[5]),
+		Version:     string(values[6]),
+	}
+	stat = s
+
+	return stat, err
 }

@@ -345,3 +345,79 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 
 	return resps, nil
 }
+
+func (api *UltipaAPI) InsertEdges(schemaName string, rows []*structs.Edge, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
+
+	if config == nil {
+		config = &configuration.InsertRequestConfig{}
+	}
+
+	if config.RequestConfig == nil {
+		config.RequestConfig = &configuration.RequestConfig{}
+	}
+
+	config.UseMaster = true
+	client, conf, err := api.GetClient(config.RequestConfig)
+
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel, err := api.Pool.NewContext(config.RequestConfig)
+	if err != nil {
+		return nil, err
+	}
+	defer cancel()
+
+	schema, err := api.GetEdgeSchema(schemaName, config.RequestConfig)
+	if err != nil {
+		return nil, fmt.Errorf("get edgeSchema failed, %v", err)
+	}
+
+	table := &ultipa.EntityTable{}
+
+	table.Schemas = []*ultipa.Schema{
+		{
+			SchemaName: schema.Name,
+			Properties: []*ultipa.Property{},
+		},
+	}
+
+	for _, prop := range schema.Properties {
+
+		if prop.IsIDType() || prop.IsIgnore() {
+			continue
+		}
+
+		table.Schemas[0].Properties = append(table.Schemas[0].Properties, &ultipa.Property{
+			PropertyName: prop.Name,
+			PropertyType: prop.Type,
+		})
+	}
+
+	err, edgeRows := setPropertiesToEdgeRow(schema, rows, config.RequestConfig)
+
+	if err != nil {
+		return nil, err
+	}
+	table.EntityRows = edgeRows
+	resp, err := client.InsertEdges(ctx, &ultipa.InsertEdgesRequest{
+		GraphName:            conf.CurrentGraph,
+		EdgeTable:            table,
+		InsertType:           config.InsertType,
+		CreateNodeIfNotExist: config.CreateNodeIfNotExist,
+		//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
+		//Silent:     config.Silent,
+		Silent: config.Silent,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Msg)
+	}
+
+	return http.NewEdgesInsertResponse(resp)
+}

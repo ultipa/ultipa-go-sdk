@@ -24,7 +24,7 @@ func TestCreateModel(t *testing.T) {
 
 	// create user schema
 	model.AddSchema(&structs.Schema{
-		Name:   "User",
+		Name:   "PrivilegeToUser",
 		DBType: ultipa.DBType_DBNODE,
 		Properties: []*structs.Property{
 			{

@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/ultipa/ultipa-go-sdk/sdk"
 	"github.com/ultipa/ultipa-go-sdk/sdk/api"
@@ -39,7 +40,11 @@ func TestMain(m *testing.M) {
 
 func TestPing(t *testing.T) {
 	client, _ = GetClient(hosts, graph)
-	client.Test()
+	resp, err := client.Test()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println(resp.Status.Message)
 }
 
 func GetClient(hosts []string, graphName string) (*api.UltipaAPI, error) {

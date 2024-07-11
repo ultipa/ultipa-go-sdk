@@ -381,7 +381,7 @@ func (x *ultipaControlsExportClient) Recv() (*ExportReply, error) {
 }
 
 func (c *ultipaControlsClient) DownloadFileV2(ctx context.Context, in *DownloadFileRequestV2, opts ...grpc.CallOption) (UltipaControls_DownloadFileV2Client, error) {
-	stream, err := c.cc.NewStream(ctx, &UltipaControls_ServiceDesc.Streams[2], "/ultipa.UltipaControls/DownloadFileV2", opts...)
+	stream, err := c.cc.NewStream(ctx, &UltipaControls_ServiceDesc.Streams[2], "/ultipa.UltipaControls/DownloadAlgoResultFile", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -604,7 +604,7 @@ func (UnimplementedUltipaControlsServer) Export(*ExportRequest, UltipaControls_E
 	return status.Errorf(codes.Unimplemented, "method Export not implemented")
 }
 func (UnimplementedUltipaControlsServer) DownloadFileV2(*DownloadFileRequestV2, UltipaControls_DownloadFileV2Server) error {
-	return status.Errorf(codes.Unimplemented, "method DownloadFileV2 not implemented")
+	return status.Errorf(codes.Unimplemented, "method DownloadAlgoResultFile not implemented")
 }
 func (UnimplementedUltipaControlsServer) InstallAlgo(UltipaControls_InstallAlgoServer) error {
 	return status.Errorf(codes.Unimplemented, "method InstallAlgo not implemented")
@@ -955,7 +955,7 @@ var UltipaControls_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 		{
-			StreamName:    "DownloadFileV2",
+			StreamName:    "DownloadAlgoResultFile",
 			Handler:       _UltipaControls_DownloadFileV2_Handler,
 			ServerStreams: true,
 		},

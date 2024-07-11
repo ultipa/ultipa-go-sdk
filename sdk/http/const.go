@@ -33,4 +33,5 @@ const (
 	RESP_USER_KEY          string = "_user"
 	RESP_PRIVILEGE_KEY     string = "_privilege"
 	RESP_ALGOS_KEY         string = "_algoList"
+	RESP_EXTAS_KEY         string = "_extaList"
 )

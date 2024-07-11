@@ -255,27 +255,36 @@ func (api *UltipaAPI) buildUqlRequest(uql string, config *configuration.RequestC
 }
 
 // test connections
-func (api *UltipaAPI) Test() (bool, error) {
+func (api *UltipaAPI) Test() (resp *http.UQLResponse, err error) {
 	conn, err := api.Pool.GetConn(nil)
 
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	client := conn.GetClient()
 	ctx, cancel, err := api.Pool.NewContext(nil)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	defer cancel()
-	resp, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
+	res, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
 		Name: "Conn Test",
 	})
 
-	if err != nil || resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		return false, err
+	if err != nil || res.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, fmt.Errorf("tset error %v", err)
 	}
 
-	return true, err
+	if res.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, fmt.Errorf("tset error %s", res.Status.Msg)
+	}
+	status := &http.Status{
+		Message: res.Status.Msg,
+		Code:    res.Status.ErrorCode,
+	}
+	resp = &http.UQLResponse{Status: status}
+
+	return resp, nil
 }
 func (api *UltipaAPI) GetActiveClientTest() (bool, *connection.Connection, error) {
 	conn, err := api.Pool.GetConn(nil)

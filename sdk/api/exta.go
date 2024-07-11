@@ -9,9 +9,13 @@ package api
 
 import (
 	"bufio"
+	"errors"
+	"fmt"
 	"github.com/codingsince1985/checksum"
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"io"
 	"os"
 	"path"
@@ -145,4 +149,26 @@ func (api *UltipaAPI) UninstallExta(extaName string, req *configuration.RequestC
 	}
 
 	return reply, nil
+}
+
+func (api *UltipaAPI) ShowExta(config *configuration.RequestConfig) ([]*structs.Exta, error) {
+	var resp *http.UQLResponse
+	var err error
+	var extas []*structs.Exta
+
+	resp, err = api.Uql(fmt.Sprintf(`show().exta()`), config)
+	if err != nil {
+		return nil, err
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
+	}
+
+	extas, err = resp.Alias(http.RESP_EXTAS_KEY).AsExta()
+
+	if len(extas) == 0 {
+		return nil, err
+	}
+
+	return extas, err
 }

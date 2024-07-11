@@ -294,7 +294,7 @@ func ExampleUltipaAPI_UQL9() {
 func ExampleUltipaAPI_InsertNodesBatchBySchema() {
 	// insert 10000 nodes to a schema
 	schema := &structs.Schema{
-		Name: "User",
+		Name: "PrivilegeToUser",
 		Properties: []*structs.Property{
 			{
 				Name: "name",

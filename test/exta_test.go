@@ -10,6 +10,7 @@ package test
 import (
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
+	"log"
 	"os"
 	"testing"
 )
@@ -46,4 +47,14 @@ func TestUninstallExta(t *testing.T) {
 		logger.PrintErrAndExist(err.Error())
 	}
 
+}
+
+func TestShowExta(t *testing.T) {
+	extas, err := client.ShowExta(nil)
+	if err != nil {
+		t.Errorf("ShowExta error:%v", err)
+	}
+	for _, exta := range extas {
+		log.Printf("%#v\n", exta)
+	}
 }

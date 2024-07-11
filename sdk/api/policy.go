@@ -19,7 +19,7 @@ func (api *UltipaAPI) ShowPolicy(config *configuration.RequestConfig) (*http.Res
 	}
 
 	var policies []*structs.Policy
-	policies, err = resp.Alias(http.RESP_NODE_INDEX_KEY).AsPolicy()
+	policies, err = resp.Alias(http.RESP_POLICY_KEY).AsPolicy()
 	if err != nil {
 		return nil, err
 	}
@@ -32,8 +32,65 @@ func (api *UltipaAPI) ShowPolicy(config *configuration.RequestConfig) (*http.Res
 	return r, nil
 }
 
-func (api *UltipaAPI) GetPolicy(policyName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) GetPolicy(policyName string, config *configuration.RequestConfig) (*http.ResponsePolicy, error) {
 	uql := fmt.Sprintf(`show().policy("%s")`, policyName)
+	resp, err := api.Uql(uql, config)
+
+	if err != nil {
+		return nil, err
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
+	}
+
+	var policies []*structs.Policy
+	policies, err = resp.Alias(http.RESP_POLICY_KEY).AsPolicy()
+	if err != nil {
+		return nil, err
+	}
+
+	res := &http.ResponsePolicy{}
+	for _, policy := range policies {
+		if policy.Name == policyName {
+			res.Status = resp.Status
+			res.Policies = []*structs.Policy{policy}
+			return res, nil
+		}
+	}
+
+	return nil, errors.New("policy not found")
+}
+
+func (api *UltipaAPI) CreatePolicy(policy *structs.Policy, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+	uql := policy.ToCreatePolicyUql()
+	resp, err = api.Uql(uql, config)
+
+	if err != nil {
+		return nil, err
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
+	}
+
+	return resp, nil
+}
+
+func (api *UltipaAPI) AlterPolicy(policy *structs.Policy, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+	uql := policy.ToAlterPolicyUql()
+	resp, err = api.Uql(uql, config)
+
+	if err != nil {
+		return nil, err
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
+	}
+
+	return resp, nil
+}
+
+func (api *UltipaAPI) DropPolicy(policyName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+	uql := fmt.Sprintf(`drop().policy("%s")`, policyName)
 	resp, err = api.Uql(uql, config)
 
 	if err != nil {

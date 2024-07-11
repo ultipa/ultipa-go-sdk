@@ -631,7 +631,7 @@ func (UserSettingRequest_OPTION) EnumDescriptor() ([]byte, []int) {
 	return file_ultipa_proto_rawDescGZIP(), []int{13, 0}
 }
 
-//------------------------1.SayHello------------------------------
+// ------------------------1.SayHello------------------------------
 type HelloUltipaRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -734,10 +734,9 @@ func (x *HelloUltipaReply) GetMessage() string {
 	return ""
 }
 
-//
-//uql : ab.src(1).dest(2).depth(1).limit(10).select(*)
-//db_name : default
-//timeout  1s 单位:秒
+// uql : ab.src(1).dest(2).depth(1).limit(10).select(*)
+// db_name : default
+// timeout  1s 单位:秒
 type UqlRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1188,7 +1187,7 @@ func (x *NodeAlias) GetAlias() string {
 	return ""
 }
 
-//key = alias.name, value = ly
+// key = alias.name, value = ly
 type AttrAlias struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1496,7 +1495,7 @@ func (x *AttrMapData) GetValue() *Attr {
 	return nil
 }
 
-//------------------------3.UserSetting------------------------------
+// ------------------------3.UserSetting------------------------------
 type UserSettingRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1625,7 +1624,7 @@ func (x *UserSettingReply) GetData() string {
 	return ""
 }
 
-//下载算法生成文件
+// 下载算法生成文件
 type DownloadFileRequestV2 struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1744,7 +1743,7 @@ func (x *DownloadFileReply) GetChunk() []byte {
 	return nil
 }
 
-//导出数据
+// 导出数据
 // limit < 0 全量导出
 // limit >= 0 导出limit条
 type ExportRequest struct {
@@ -1881,7 +1880,7 @@ func (x *ExportReply) GetEdgeTable() *EntityTable {
 	return nil
 }
 
-//------------------------6.GetLeader------------------------------
+// ------------------------6.GetLeader------------------------------
 type GetLeaderRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1967,7 +1966,7 @@ func (x *GetLeaderReply) GetStatus() *Status {
 	return nil
 }
 
-//------------------------7.InsertNodes------------------------------
+// ------------------------7.InsertNodes------------------------------
 type InsertNodesRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2135,7 +2134,7 @@ func (x *InsertNodesReply) GetIgnoreErrorCode() []uint32 {
 	return nil
 }
 
-//------------------------8.InsertEdges------------------------------
+// ------------------------8.InsertEdges------------------------------
 type InsertEdgesRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2303,7 +2302,7 @@ func (x *InsertEdgesReply) GetIgnoreErrorCode() []uint32 {
 	return nil
 }
 
-//------------------------10.InstallAlgo------------------------------
+// ------------------------10.InstallAlgo------------------------------
 type InstallAlgoRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2414,7 +2413,7 @@ func (x *InstallAlgoReply) GetStatus() *Status {
 	return nil
 }
 
-//------------------------11.UninstallAlgo------------------------------
+// ------------------------11.UninstallAlgo------------------------------
 type UninstallAlgoRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2509,7 +2508,7 @@ func (x *UninstallAlgoReply) GetStatus() *Status {
 	return nil
 }
 
-//------------------------12.RemoteGraphLoader------------------------------
+// ------------------------12.RemoteGraphLoader------------------------------
 type UploaderRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2644,7 +2643,7 @@ func (x *UploaderReply) GetStatus() *Status {
 	return nil
 }
 
-//------------------------13.RemoteGraphLoader------------------------------
+// ------------------------13.RemoteGraphLoader------------------------------
 type CreateGraphByUploaderRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2747,7 +2746,7 @@ func (x *CreateGraphByUploaderReply) GetStatus() *Status {
 	return nil
 }
 
-//------------------------14.InstallExta------------------------------
+// ------------------------14.InstallExta------------------------------
 type InstallExtaRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2858,7 +2857,7 @@ func (x *InstallExtaReply) GetStatus() *Status {
 	return nil
 }
 
-//------------------------15.UninstallExta------------------------------
+// ------------------------15.UninstallExta------------------------------
 type UninstallExtaRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3756,7 +3755,7 @@ func (x *Value) GetValue() string {
 	return ""
 }
 
-//for rpc insert
+// for rpc insert
 type ListData struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -4944,7 +4943,7 @@ var file_ultipa_proto_depIdxs = []int32{
 	29, // 72: ultipa.UltipaControls.GetLeader:input_type -> ultipa.GetLeaderRequest
 	12, // 73: ultipa.UltipaControls.UqlEx:input_type -> ultipa.UqlRequest
 	27, // 74: ultipa.UltipaControls.Export:input_type -> ultipa.ExportRequest
-	25, // 75: ultipa.UltipaControls.DownloadFileV2:input_type -> ultipa.DownloadFileRequestV2
+	25, // 75: ultipa.UltipaControls.DownloadAlgoResultFile:input_type -> ultipa.DownloadFileRequestV2
 	35, // 76: ultipa.UltipaControls.InstallAlgo:input_type -> ultipa.InstallAlgoRequest
 	37, // 77: ultipa.UltipaControls.UninstallAlgo:input_type -> ultipa.UninstallAlgoRequest
 	39, // 78: ultipa.UltipaControls.Uploader:input_type -> ultipa.UploaderRequest
@@ -4961,7 +4960,7 @@ var file_ultipa_proto_depIdxs = []int32{
 	30, // 89: ultipa.UltipaControls.GetLeader:output_type -> ultipa.GetLeaderReply
 	14, // 90: ultipa.UltipaControls.UqlEx:output_type -> ultipa.UqlReply
 	28, // 91: ultipa.UltipaControls.Export:output_type -> ultipa.ExportReply
-	26, // 92: ultipa.UltipaControls.DownloadFileV2:output_type -> ultipa.DownloadFileReply
+	26, // 92: ultipa.UltipaControls.DownloadAlgoResultFile:output_type -> ultipa.DownloadFileReply
 	36, // 93: ultipa.UltipaControls.InstallAlgo:output_type -> ultipa.InstallAlgoReply
 	38, // 94: ultipa.UltipaControls.UninstallAlgo:output_type -> ultipa.UninstallAlgoReply
 	40, // 95: ultipa.UltipaControls.Uploader:output_type -> ultipa.UploaderReply

@@ -55,3 +55,8 @@ type ResponsePolicy struct {
 	Status   *Status
 	Policies []*structs.Policy
 }
+
+type ResponsePrivilege struct {
+	Status     *Status
+	Privileges []*structs.Privilege
+}

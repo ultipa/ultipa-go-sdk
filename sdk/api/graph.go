@@ -151,7 +151,7 @@ func (api *UltipaAPI) HasGraph(graphName string, config *configuration.RequestCo
 	return false, nil
 }
 
-func (api *UltipaAPI) GetGraph(graphName string, config *configuration.RequestConfig) (*http.ResponseGraphs, error) {
+func (api *UltipaAPI) GetGraph(graphName string, config *configuration.RequestConfig) (*http.ResponseGraph, error) {
 	resp, err := api.ShowGraph(config)
 
 	if err != nil {
@@ -164,8 +164,7 @@ func (api *UltipaAPI) GetGraph(graphName string, config *configuration.RequestCo
 
 	for _, graph := range resp.Graphs {
 		if graph.Name == graphName {
-			resp.Graphs = []*http.ResponseGraph{graph}
-			return resp, nil
+			return graph, nil
 		}
 	}
 
