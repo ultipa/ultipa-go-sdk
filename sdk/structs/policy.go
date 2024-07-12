@@ -23,9 +23,9 @@ import (
 // )
 type Policy struct {
 	Name               string             `json:"-"`
-	GraphPrivileges    graphPrivileges    `json:"graph_privileges,omitempty" json:"graph_privileges,omitempty"`
+	GraphPrivileges    GraphPrivileges    `json:"graph_privileges,omitempty" json:"graph_privileges,omitempty"`
 	SystemPrivileges   []string           `json:"system_privileges,omitempty"`
-	PropertyPrivileges propertyPrivileges `json:"property_privileges,omitempty"`
+	PropertyPrivileges PropertyPrivileges `json:"property_privileges,omitempty"`
 	Policies           []string           `json:"policies,omitempty"`
 }
 
@@ -48,15 +48,51 @@ type Policy struct {
 	  }
 	}
 */
-type propertyPrivileges map[string]map[string][][]string
+type PropertyPrivileges map[string]map[string][][]string
 
-type graphPrivileges map[string][]string
+type GraphPrivileges map[string][]string
 
 func (p *Policy) ToCreatePolicyUql() string {
-	return fmt.Sprintf("create().policy(\"%s\",\n%s,\n%s,\n%s,\n%s\n)", p.Name, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.Policies), utils.ToJSONString(p.PropertyPrivileges))
+	uql := fmt.Sprintf("create().policy(\"%s\",\n", p.Name)
+
+	s := ""
+	if p.GraphPrivileges != nil {
+		s = utils.ToJSONString(p.GraphPrivileges) + ",\n"
+	} else {
+		s = "{},\n"
+	}
+	uql += s
+
+	if p.SystemPrivileges != nil {
+		s = utils.ToJSONString(p.SystemPrivileges) + ",\n"
+	} else {
+		s = "[],\n"
+	}
+	uql += s
+
+	if p.Policies != nil {
+		s = utils.ToJSONString(p.Policies) + ",\n"
+		uql += s
+	} else {
+		s = "[],\n"
+	}
+	uql += s
+
+	if p.PropertyPrivileges != nil {
+		s = utils.ToJSONString(p.PropertyPrivileges) + "\n"
+	} else {
+		s = "{}\n"
+	}
+
+	uql += s
+
+	uql += ")"
+
+	return uql
+	//return fmt.Sprintf("create().policy(\"%s\",\n%s,\n%s,\n%s,\n%s\n)", p.Name, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.Policies), utils.ToJSONString(p.PropertyPrivileges))
 }
 
 func (p *Policy) ToAlterPolicyUql() string {
-	return fmt.Sprintf("alter().policy(\"%s\").set({\ngraph_privileges: %s,\nsystem_privileges: %s,\npolicies: %s,\nproperty_privileges: %s\n})", p.Name, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.Policies), utils.ToJSONString(p.PropertyPrivileges))
-	//return fmt.Sprintf("alter().policy(\"%s\").set({\n%s\n})", p.Name, utils.ToJSONString(p))
+	//return fmt.Sprintf("alter().policy(\"%s\").set({\ngraph_privileges: %s,\nsystem_privileges: %s,\npolicies: %s,\nproperty_privileges: %s\n})", p.Name, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.Policies), utils.ToJSONString(p.PropertyPrivileges))
+	return fmt.Sprintf("alter().policy(\"%s\").set(%s)", p.Name, utils.ToJSONString(p))
 }

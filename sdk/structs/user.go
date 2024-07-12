@@ -24,10 +24,10 @@ import (
 type User struct {
 	UserName           string
 	PassWord           string
-	GraphPrivileges    graphPrivileges
+	GraphPrivileges    GraphPrivileges
 	SystemPrivileges   []string
 	Policies           []string
-	PropertyPrivileges propertyPrivileges
+	PropertyPrivileges PropertyPrivileges
 }
 
 func (p *User) ToCreateUserUql() string {
