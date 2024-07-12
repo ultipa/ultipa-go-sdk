@@ -9,7 +9,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) ShowPolicy(config *configuration.RequestConfig) (*http.ResponsePolicy, error) {
+func (api *UltipaAPI) ShowPolicy(config *configuration.RequestConfig) (policies []*structs.Policy, err error) {
 	resp, err := api.Uql("show().policy()", config)
 	if err != nil {
 		return nil, err
@@ -18,21 +18,15 @@ func (api *UltipaAPI) ShowPolicy(config *configuration.RequestConfig) (*http.Res
 		return nil, errors.New(resp.Status.Message)
 	}
 
-	var policies []*structs.Policy
 	policies, err = resp.Alias(http.RESP_POLICY_KEY).AsPolicy()
 	if err != nil {
 		return nil, err
 	}
 
-	r := &http.ResponsePolicy{
-		Status:   resp.Status,
-		Policies: policies,
-	}
-
-	return r, nil
+	return
 }
 
-func (api *UltipaAPI) GetPolicy(policyName string, config *configuration.RequestConfig) (*http.ResponsePolicy, error) {
+func (api *UltipaAPI) GetPolicy(policyName string, config *configuration.RequestConfig) (policy *structs.Policy, err error) {
 	uql := fmt.Sprintf(`show().policy("%s")`, policyName)
 	resp, err := api.Uql(uql, config)
 
@@ -43,22 +37,13 @@ func (api *UltipaAPI) GetPolicy(policyName string, config *configuration.Request
 		return nil, errors.New(resp.Status.Message)
 	}
 
-	var policies []*structs.Policy
-	policies, err = resp.Alias(http.RESP_POLICY_KEY).AsPolicy()
+	policies, err := resp.Alias(http.RESP_POLICY_KEY).AsPolicy()
 	if err != nil {
 		return nil, err
 	}
+	policy = policies[0]
 
-	res := &http.ResponsePolicy{}
-	for _, policy := range policies {
-		if policy.Name == policyName {
-			res.Status = resp.Status
-			res.Policies = []*structs.Policy{policy}
-			return res, nil
-		}
-	}
-
-	return nil, errors.New("policy not found")
+	return
 }
 
 func (api *UltipaAPI) CreatePolicy(policy *structs.Policy, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {

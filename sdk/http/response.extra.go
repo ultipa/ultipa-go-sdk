@@ -1,9 +1,5 @@
 package http
 
-import (
-	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
-)
-
 //type ResponseGraphs struct {
 //	Status *Status
 //	Graphs []*ResponseGraph
@@ -50,12 +46,12 @@ import (
 //	Indexes []*structs.Index
 //}
 
-type ResponsePolicy struct {
-	Status   *Status
-	Policies []*structs.Policy
-}
-
-type ResponsePrivilege struct {
-	Status     *Status
-	Privileges []*structs.Privilege
-}
+//type ResponsePolicy struct {
+//	Status   *Status
+//	Policies []*structs.Policy
+//}
+//
+//type ResponsePrivilege struct {
+//	Status     *Status
+//	Privileges []*structs.Privilege
+//}
