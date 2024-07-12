@@ -75,10 +75,6 @@ func (api *UltipaAPI) ShowEdgeIndex(config *configuration.RequestConfig) ([]*str
 
 	indexes, err = resp.Alias(http.RESP_EDGE_INDEX_KEY).AsIndexes()
 
-	if len(indexes) == 0 {
-		return nil, err
-	}
-
 	return indexes, err
 }
 
@@ -93,10 +89,6 @@ func (api *UltipaAPI) ShowNodeIndex(config *configuration.RequestConfig) ([]*str
 	}
 
 	indexes, err = resp.Alias(http.RESP_NODE_INDEX_KEY).AsIndexes()
-
-	if len(indexes) == 0 {
-		return nil, err
-	}
 
 	return indexes, err
 }
@@ -148,46 +140,29 @@ func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyN
 	return resp, nil
 }
 
-func (api *UltipaAPI) ShowFullText(config *configuration.RequestConfig) ([]*http.ResponseIndex, error) {
+func (api *UltipaAPI) ShowFullText(config *configuration.RequestConfig) ([]*structs.Index, error) {
 	var resp *http.UQLResponse
 	var err error
-	var responseIndexes []*http.ResponseIndex
+	var indexes []*structs.Index
 
 	resp, err = api.Uql(fmt.Sprintf(`show().fulltext()`), config)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, alias := range resp.AliasList {
-		var indexes []*structs.Index
-		var r *http.ResponseIndex
-		if alias == http.RESP_NODE_FULLTEXT_KEY {
-			indexes, err = resp.Alias(http.RESP_NODE_FULLTEXT_KEY).AsFullText()
-			if err != nil {
-				return nil, err
-			}
-			r = &http.ResponseIndex{
-				Type:    ultipa.DBType_DBNODE,
-				Indexes: indexes,
-			}
-
-		}
-
-		if alias == http.RESP_EDGE_FULLTEXT_KEY {
-			indexes, err = resp.Alias(http.RESP_EDGE_FULLTEXT_KEY).AsFullText()
-			if err != nil {
-				return nil, err
-			}
-			r = &http.ResponseIndex{
-				Type:    ultipa.DBType_DBEDGE,
-				Indexes: indexes,
-			}
-		}
-		responseIndexes = append(responseIndexes, r)
-
+	indexes, err = resp.Alias(http.RESP_NODE_FULLTEXT_KEY).AsFullText()
+	if err != nil {
+		return nil, err
 	}
 
-	return responseIndexes, err
+	edgeIndexes, err := resp.Alias(http.RESP_EDGE_FULLTEXT_KEY).AsFullText()
+	if err != nil {
+		return nil, err
+	}
+
+	indexes = append(indexes, edgeIndexes...)
+
+	return indexes, err
 }
 
 func (api *UltipaAPI) ShowEdgeFullText(config *configuration.RequestConfig) ([]*structs.Index, error) {
@@ -201,10 +176,6 @@ func (api *UltipaAPI) ShowEdgeFullText(config *configuration.RequestConfig) ([]*
 	}
 
 	indexes, err = resp.Alias(http.RESP_EDGE_FULLTEXT_KEY).AsFullText()
-
-	if len(indexes) == 0 {
-		return nil, err
-	}
 
 	return indexes, err
 }
@@ -220,10 +191,6 @@ func (api *UltipaAPI) ShowNodeFullText(config *configuration.RequestConfig) ([]*
 	}
 
 	indexes, err = resp.Alias(http.RESP_NODE_FULLTEXT_KEY).AsFullText()
-
-	if len(indexes) == 0 {
-		return nil, err
-	}
 
 	return indexes, err
 }

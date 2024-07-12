@@ -1,7 +1,6 @@
 package http
 
 import (
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
@@ -30,26 +29,26 @@ import (
 //	Description string
 //}
 
-type ResponseProperty struct {
-}
-
-type ResponseSchema struct {
-	Name        string
-	Description string
-	Properties  []*ResponseProperty
-	TotalNodes  int64
-	TotalEdges  int64
-}
-
-type ResponseNodeSchemas struct {
-	Status  *Status
-	Schemas []*ResponseSchema
-}
-
-type ResponseIndex struct {
-	Type    ultipa.DBType
-	Indexes []*structs.Index
-}
+//type ResponseProperty struct {
+//}
+//
+//type ResponseSchema struct {
+//	Name        string
+//	Description string
+//	Properties  []*ResponseProperty
+//	TotalNodes  int64
+//	TotalEdges  int64
+//}
+//
+//type ResponseNodeSchemas struct {
+//	Status  *Status
+//	Schemas []*ResponseSchema
+//}
+//
+//type ResponseIndex struct {
+//	Type    ultipa.DBType
+//	Indexes []*structs.Index
+//}
 
 type ResponsePolicy struct {
 	Status   *Status
