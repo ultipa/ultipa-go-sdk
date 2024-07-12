@@ -506,8 +506,8 @@ func parseAttrMap(oAttr *ultipa.Attr) ([]*structs.AttrMapData, error) {
 	return mapDataRows, nil
 }
 
-// AsGraphInfos the types will be tables and alias is nodeSchema and edgeSchema
-func (di *DataItem) AsGraphInfos() (graphs []*structs.GraphSet, err error) {
+// AsGraphSets the types will be tables and alias is nodeSchema and edgeSchema
+func (di *DataItem) AsGraphSets() (graphs []*structs.GraphSet, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return graphs, nil

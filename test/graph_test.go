@@ -58,12 +58,12 @@ func TestDropGraph(t *testing.T) {
 func TestAsGraph(t *testing.T) {
 	client, _ := GetClient(hosts, graph)
 	resp, _ := client.Uql("show().graph()", nil)
-	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphInfos()
+	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphSets()
 
 	if err != nil {
 		log.Fatalln(err)
 	}
-	printers.PrintGraphInfo(graphs)
+	printers.PrintGraphSet(graphs)
 }
 
 func TestCreateGraphIfNotExist(t *testing.T) {
