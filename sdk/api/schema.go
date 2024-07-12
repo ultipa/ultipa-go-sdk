@@ -8,78 +8,71 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
-	"strconv"
 )
 
-func (api *UltipaAPI) ShowNodeSchema(config *configuration.RequestConfig) (*http.ResponseNodeSchemas, error) {
-	uql := utils.UQLMAKER{}
-	uql.SetCommand(utils.UQLCommand_listNodeSchema)
-	res, err := api.Uql(uql.ToString(), config)
-	if err != nil {
-		return nil, err
-	}
-	if res.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(res.Status.Message)
-	}
-	table, err := res.GetSingleTable()
-	if err != nil {
-		return nil, err
-	}
-	var schemas []*http.ResponseSchema
-	if !res.Status.IsSuccess() {
-		return &http.ResponseNodeSchemas{
-			Status:  res.Status,
-			Schemas: schemas,
-		}, nil
-	}
-	values := table.ToKV()
-	for _, v := range values {
-		totalNodes, _ := strconv.ParseInt(v.Get("totalNodes").(string), 10, 64)
-		//totalEdges, _ := strconv.ParseInt(v.Get("totalEdges").(string), 10, 64)
-
-		schemas = append(schemas, &http.ResponseSchema{
-			Name:        v.Get("name").(string),
-			Description: v.Get("description").(string),
-			Properties:  nil,
-			TotalNodes:  totalNodes,
-			//TotalEdges:  totalEdges,
-		})
-	}
-	return &http.ResponseNodeSchemas{
-		Status:  res.Status,
-		Schemas: schemas,
-	}, nil
-}
-
-func (api *UltipaAPI) ShowSchema(DBType ultipa.DBType, config *configuration.RequestConfig) ([]*structs.Schema, error) {
+func (api *UltipaAPI) ShowSchema(config *configuration.RequestConfig) ([]*structs.Schema, error) {
 	var resp *http.UQLResponse
 	var err error
 	var schemas []*structs.Schema
 
-	if DBType == ultipa.DBType_DBNODE {
-		resp, err = api.Uql(fmt.Sprintf(`show().node_schema()`), config)
-		if err != nil {
-			return nil, err
-		}
-		if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-			return nil, errors.New(resp.Status.Message)
-		}
-
-		schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
-	} else if DBType == ultipa.DBType_DBEDGE {
-		resp, err = api.Uql(fmt.Sprintf(`show().edge_schema()`), config)
-		if err != nil {
-			return nil, err
-		}
-		if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-			return nil, errors.New(resp.Status.Message)
-		}
-
-		schemas, err = resp.Alias(http.RESP_EDGE_SCHEMA_KEY).AsSchemas()
+	resp, err = api.Uql(fmt.Sprintf(`show().schema()`), config)
+	if err != nil {
+		return nil, err
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
 	}
 
+	schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
+	edgesSchemas, err := resp.Alias(http.RESP_EDGE_SCHEMA_KEY).AsSchemas()
+	schemas = append(schemas, edgesSchemas...)
+
 	if len(schemas) == 0 {
+		return nil, fmt.Errorf("no data return")
+	}
+
+	return schemas, err
+}
+
+func (api *UltipaAPI) ShowNodeSchema(config *configuration.RequestConfig) ([]*structs.Schema, error) {
+	var resp *http.UQLResponse
+	var err error
+	var schemas []*structs.Schema
+
+	resp, err = api.Uql(fmt.Sprintf(`show().node_schema()`), config)
+	if err != nil {
 		return nil, err
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
+	}
+
+	schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
+
+	if len(schemas) == 0 {
+		return nil, fmt.Errorf("no data return")
+	}
+
+	return schemas, err
+}
+
+func (api *UltipaAPI) ShowEdgeSchema(config *configuration.RequestConfig) ([]*structs.Schema, error) {
+	var resp *http.UQLResponse
+	var err error
+	var schemas []*structs.Schema
+
+	resp, err = api.Uql(fmt.Sprintf(`show().edge_schema()`), config)
+	if err != nil {
+		return nil, err
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
+	}
+
+	schemas, err = resp.Alias(http.RESP_EDGE_SCHEMA_KEY).AsSchemas()
+
+	if len(schemas) == 0 {
+		return nil, fmt.Errorf("no data return")
 	}
 
 	return schemas, err

@@ -207,7 +207,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 
 	// collect schema and node index in nodes
 	m := map[string]map[int]int{}
-	schemas, err := api.ShowSchema(ultipa.DBType_DBNODE, config.RequestConfig)
+	schemas, err := api.ShowNodeSchema(config.RequestConfig)
 
 	if err != nil {
 		return nil, err
