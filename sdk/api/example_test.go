@@ -76,7 +76,7 @@ func ExampleUltipaAPI_HasGraph() {
 }
 
 func ExampleUltipaAPI_ListSchema() {
-	nodeSchemas, _ := client.ShowSchema(ultipa.DBType_DBNODE, nil)
+	nodeSchemas, _ := client.ShowSchema(nil)
 	log.Println(nodeSchemas)
 
 	// or

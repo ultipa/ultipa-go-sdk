@@ -53,7 +53,7 @@ func (api *UltipaAPI) ShowGraph(config *configuration.RequestConfig) (graphSets 
 	return graphSets, nil
 }
 
-func (api *UltipaAPI) CreateGraphIfNotExit(graph *structs.GraphSet, config *configuration.RequestConfig) (resp *http.UQLResponse, exist bool, err error) {
+func (api *UltipaAPI) CreateGraphIfNotExist(graph *structs.GraphSet, config *configuration.RequestConfig) (resp *http.UQLResponse, exist bool, err error) {
 	exist, err = api.HasGraph(graph.Name, config)
 
 	if exist {

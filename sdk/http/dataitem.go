@@ -698,20 +698,27 @@ func (di *DataItem) AsIndexes() (indexes []*structs.Index, err error) {
 	}
 
 	table := di.Data.(*ultipa.Table)
+	indexType := ""
 
-	if table.TableName != RESP_NODE_INDEX_KEY && table.TableName != RESP_EDGE_INDEX_KEY {
+	if table.TableName == RESP_NODE_INDEX_KEY {
+		indexType = "node"
+	} else if table.TableName == RESP_EDGE_INDEX_KEY {
+		indexType = "edge"
+	} else {
 		return nil, errors.New("DataItem " + di.Alias + " is not a Index list")
 	}
 
 	for _, row := range table.TableRows {
-		//0:name, 1: properties, 2: schema, 3: status
+		//0:name, 1: properties, 2: schema, 3: status 4: size
 		values := row.GetValues()
-
+		size, _ := strconv.Atoi(string(values[4]))
 		i := structs.Index{
 			Name:       string(values[0]),
 			Properties: string(values[1]),
 			Schema:     string(values[2]),
 			Status:     string(values[3]),
+			Size:       size,
+			Type:       indexType,
 		}
 		indexes = append(indexes, &i)
 

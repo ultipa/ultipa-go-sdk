@@ -76,7 +76,7 @@ func TestCreateGraphIfNotExist(t *testing.T) {
 
 	client.DropGraph(graph, nil)
 
-	_, _, err = client.CreateGraphIfNotExit(&structs.GraphSet{
+	_, _, err = client.CreateGraphIfNotExist(&structs.GraphSet{
 		Name: graph,
 	}, nil)
 	if err != nil {

@@ -39,46 +39,28 @@ func (api *UltipaAPI) CreateIndex(dbType ultipa.DBType, schemaName, propertyName
 	return resp, nil
 }
 
-func (api *UltipaAPI) ShowIndex(config *configuration.RequestConfig) ([]*http.ResponseIndex, error) {
+func (api *UltipaAPI) ShowIndex(config *configuration.RequestConfig) ([]*structs.Index, error) {
 	var resp *http.UQLResponse
 	var err error
-	var responseIndexes []*http.ResponseIndex
 
 	resp, err = api.Uql(fmt.Sprintf(`show().index()`), config)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, alias := range resp.AliasList {
-		var indexes []*structs.Index
-		var r *http.ResponseIndex
-		if alias == http.RESP_NODE_INDEX_KEY {
-			indexes, err = resp.Alias(http.RESP_NODE_INDEX_KEY).AsIndexes()
-			if err != nil {
-				return nil, err
-			}
-			r = &http.ResponseIndex{
-				Type:    ultipa.DBType_DBNODE,
-				Indexes: indexes,
-			}
-
-		}
-
-		if alias == http.RESP_EDGE_INDEX_KEY {
-			indexes, err = resp.Alias(http.RESP_EDGE_INDEX_KEY).AsIndexes()
-			if err != nil {
-				return nil, err
-			}
-			r = &http.ResponseIndex{
-				Type:    ultipa.DBType_DBEDGE,
-				Indexes: indexes,
-			}
-		}
-		responseIndexes = append(responseIndexes, r)
-
+	var indexes []*structs.Index
+	indexes, err = resp.Alias(http.RESP_NODE_INDEX_KEY).AsIndexes()
+	if err != nil {
+		return nil, err
+	}
+	EdgeIndexes, err := resp.Alias(http.RESP_EDGE_INDEX_KEY).AsIndexes()
+	if err != nil {
+		return nil, err
 	}
 
-	return responseIndexes, err
+	indexes = append(indexes, EdgeIndexes...)
+
+	return indexes, err
 }
 
 func (api *UltipaAPI) ShowEdgeIndex(config *configuration.RequestConfig) ([]*structs.Index, error) {

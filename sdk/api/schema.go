@@ -24,7 +24,14 @@ func (api *UltipaAPI) ShowSchema(config *configuration.RequestConfig) ([]*struct
 	}
 
 	schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
+	if err != nil {
+		return nil, err
+	}
 	edgesSchemas, err := resp.Alias(http.RESP_EDGE_SCHEMA_KEY).AsSchemas()
+	if err != nil {
+		return nil, err
+	}
+
 	schemas = append(schemas, edgesSchemas...)
 
 	if len(schemas) == 0 {
