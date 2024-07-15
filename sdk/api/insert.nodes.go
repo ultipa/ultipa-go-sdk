@@ -114,7 +114,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 	return http.NewNodesInsertResponse(resp)
 }
 
-func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node, req *configuration.RequestConfig) (error, []*ultipa.EntityRow) {
+func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node, config *configuration.RequestConfig) (error, []*ultipa.EntityRow) {
 	wg := sync.WaitGroup{}
 	var err error
 	ctx, cancel := context.WithCancel(context.Background())
@@ -130,7 +130,7 @@ func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node, req *c
 		go func(index int, row *structs.Node) {
 			defer wg.Done()
 			var newNode *ultipa.EntityRow
-			newNode, err = doConvertSdkNodeRowToUltipaNodeRow(schema, row, index, req)
+			newNode, err = doConvertSdkNodeRowToUltipaNodeRow(schema, row, index, config)
 			if err != nil {
 				cancel()
 				return
@@ -158,15 +158,15 @@ func checkNodeProperties(schema *structs.Schema, row *structs.Node, index int) e
 	return nil
 }
 
-func convertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Node, index int, req *configuration.RequestConfig) (*ultipa.EntityRow, error) {
+func convertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Node, index int, config *configuration.RequestConfig) (*ultipa.EntityRow, error) {
 	err := checkNodeProperties(schema, row, index)
 	if err != nil {
 		return nil, err
 	}
-	return doConvertSdkNodeRowToUltipaNodeRow(schema, row, index, req)
+	return doConvertSdkNodeRowToUltipaNodeRow(schema, row, index, config)
 }
 
-func doConvertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Node, index int, req *configuration.RequestConfig) (*ultipa.EntityRow, error) {
+func doConvertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Node, index int, config *configuration.RequestConfig) (*ultipa.EntityRow, error) {
 	newNode := &ultipa.EntityRow{
 		Id:         row.ID,
 		Uuid:       row.UUID,
@@ -179,7 +179,7 @@ func doConvertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Nod
 		if !row.Values.Contain(prop.Name) {
 			return nil, errors.New(fmt.Sprintf("node row [%d] error: values doesn't contain property [%s]", index, prop.Name))
 		}
-		bs, err := row.GetBytesSafe(prop.Name, prop.Type, prop.SubTypes, req)
+		bs, err := row.GetBytesSafe(prop.Name, prop.Type, prop.SubTypes, config)
 		if err != nil {
 			logger.PrintError("Get row bytes value failed  " + prop.Name + " " + err.Error())
 			err = errors.New(fmt.Sprintf("node row [%d] error: failed to serialize value of property %s,value=%v", index, prop.Name, row.Values.Get(prop.Name)))

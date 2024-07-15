@@ -118,7 +118,7 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 	return http.NewEdgesInsertResponse(resp)
 }
 
-func setPropertiesToEdgeRow(schema *structs.Schema, rows []*structs.Edge, req *configuration.RequestConfig) (error, []*ultipa.EntityRow) {
+func setPropertiesToEdgeRow(schema *structs.Schema, rows []*structs.Edge, config *configuration.RequestConfig) (error, []*ultipa.EntityRow) {
 	wg := sync.WaitGroup{}
 	var err error
 	ctx, cancel := context.WithCancel(context.Background())
@@ -136,7 +136,7 @@ func setPropertiesToEdgeRow(schema *structs.Schema, rows []*structs.Edge, req *c
 		go func(index int, row *structs.Edge) {
 			defer wg.Done()
 			var newEdge *ultipa.EntityRow
-			newEdge, err = doConvertSdkEdgeRowToUltipaEdgeRow(schema, row, index, req)
+			newEdge, err = doConvertSdkEdgeRowToUltipaEdgeRow(schema, row, index, config)
 			if err != nil {
 				cancel()
 				return
@@ -164,15 +164,15 @@ func checkEdgeProperties(schema *structs.Schema, row *structs.Edge, index int) e
 	return nil
 }
 
-func convertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edge, index int, req *configuration.RequestConfig) (*ultipa.EntityRow, error) {
+func convertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edge, index int, config *configuration.RequestConfig) (*ultipa.EntityRow, error) {
 	err := checkEdgeProperties(schema, row, index)
 	if err != nil {
 		return nil, err
 	}
-	return doConvertSdkEdgeRowToUltipaEdgeRow(schema, row, index, req)
+	return doConvertSdkEdgeRowToUltipaEdgeRow(schema, row, index, config)
 }
 
-func doConvertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edge, index int, req *configuration.RequestConfig) (*ultipa.EntityRow, error) {
+func doConvertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edge, index int, config *configuration.RequestConfig) (*ultipa.EntityRow, error) {
 	newEdge := &ultipa.EntityRow{
 		FromId:     row.From,
 		FromUuid:   row.FromUUID,
@@ -191,7 +191,7 @@ func doConvertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edg
 			return nil, errors.New(fmt.Sprintf("edge row [%d] error: values doesn't contain property [%s]", index, prop.Name))
 		}
 
-		bs, err := row.GetBytesSafe(prop.Name, prop.Type, prop.SubTypes, req)
+		bs, err := row.GetBytesSafe(prop.Name, prop.Type, prop.SubTypes, config)
 
 		if err != nil {
 			logger.PrintError("Get row bytes value failed " + prop.Name + " " + err.Error())

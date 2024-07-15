@@ -21,7 +21,7 @@ import (
 	"path"
 )
 
-func (api *UltipaAPI) InstallExta(extaFilePath string, extaInfoFilePath string, req *configuration.RequestConfig) (*ultipa.InstallExtaReply, error) {
+func (api *UltipaAPI) InstallExta(extaFilePath string, extaInfoFilePath string, config *configuration.RequestConfig) (*ultipa.InstallExtaReply, error) {
 
 	chunkSize := 1024 * 1024 * 1 // 2MB
 
@@ -47,13 +47,13 @@ func (api *UltipaAPI) InstallExta(extaFilePath string, extaInfoFilePath string, 
 
 	extaInfoFileMD5, _ := checksum.MD5sum(extaInfoFilePath)
 
-	client, err := api.GetControlClient(req)
+	client, err := api.GetControlClient(config)
 
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(req)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return nil, err
 	}
@@ -126,15 +126,15 @@ func (api *UltipaAPI) InstallExta(extaFilePath string, extaInfoFilePath string, 
 
 }
 
-func (api *UltipaAPI) UninstallExta(extaName string, req *configuration.RequestConfig) (*ultipa.UninstallExtaReply, error) {
+func (api *UltipaAPI) UninstallExta(extaName string, config *configuration.RequestConfig) (*ultipa.UninstallExtaReply, error) {
 
-	client, err := api.GetControlClient(req)
+	client, err := api.GetControlClient(config)
 
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(req)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return nil, err
 	}

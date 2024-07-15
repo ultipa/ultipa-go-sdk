@@ -156,7 +156,7 @@ func (api *UltipaAPI) GetEdgeSchema(schemaName string, config *configuration.Req
 	return schemas[0], err
 }
 
-func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bool, conf *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bool, config *configuration.RequestConfig) (*http.UQLResponse, error) {
 	err := CheckName(schema.Name)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schema.Name))
@@ -174,7 +174,7 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 	if schema.DBType == ultipa.DBType_DBNODE {
 		uql := fmt.Sprintf(`create().node_schema(%v,"%v")`, schemaName, schema.Desc)
 
-		resp, err = api.Uql(uql, conf)
+		resp, err = api.Uql(uql, config)
 		if err != nil {
 			return nil, err
 		}
@@ -184,7 +184,7 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 
 	} else if schema.DBType == ultipa.DBType_DBEDGE {
 		uql := fmt.Sprintf(`create().edge_schema(%v,"%v")`, schemaName, schema.Desc)
-		resp, err = api.Uql(uql, conf)
+		resp, err = api.Uql(uql, config)
 		if err != nil {
 			return nil, err
 		}
@@ -208,7 +208,7 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 				continue
 			}
 
-			resp, err := api.CreateProperty(schema.Name, schema.DBType, prop, conf)
+			resp, err := api.CreateProperty(schema.Name, schema.DBType, prop, config)
 
 			if err != nil {
 				return nil, err

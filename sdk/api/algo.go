@@ -11,8 +11,8 @@ import (
 	"path"
 )
 
-func (api *UltipaAPI) ShowAlgo(req *configuration.RequestConfig) ([]*structs.Algo, error) {
-	resp, err := api.Uql("show().algo()", req)
+func (api *UltipaAPI) ShowAlgo(config *configuration.RequestConfig) ([]*structs.Algo, error) {
+	resp, err := api.Uql("show().algo()", config)
 
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func (api *UltipaAPI) ShowAlgo(req *configuration.RequestConfig) ([]*structs.Alg
 	return algos, nil
 }
 
-func (api *UltipaAPI) InstallAlgo(algoFilePath string, algoInfoFilePath string, req *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
+func (api *UltipaAPI) InstallAlgo(algoFilePath string, algoInfoFilePath string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
 
 	chunkSize := 1024 * 1024 * 1 // 2MB
 
@@ -53,13 +53,13 @@ func (api *UltipaAPI) InstallAlgo(algoFilePath string, algoInfoFilePath string, 
 
 	algoInfoFileMD5, _ := checksum.MD5sum(algoInfoFilePath)
 
-	client, err := api.GetControlClient(req)
+	client, err := api.GetControlClient(config)
 
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(req)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return nil, err
 	}
@@ -132,15 +132,15 @@ func (api *UltipaAPI) InstallAlgo(algoFilePath string, algoInfoFilePath string, 
 
 }
 
-func (api *UltipaAPI) UninstallAlgo(algoName string, req *configuration.RequestConfig) (*ultipa.UninstallAlgoReply, error) {
+func (api *UltipaAPI) UninstallAlgo(algoName string, config *configuration.RequestConfig) (*ultipa.UninstallAlgoReply, error) {
 
-	client, err := api.GetControlClient(req)
+	client, err := api.GetControlClient(config)
 
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(req)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return nil, err
 	}
