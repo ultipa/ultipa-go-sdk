@@ -27,13 +27,13 @@ func (api *UltipaAPI) ShowAlgo(config *configuration.RequestConfig) ([]*structs.
 	return algos, nil
 }
 
-func (api *UltipaAPI) InstallAlgo(algoFilePath string, algoInfoFilePath string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
+func (api *UltipaAPI) InstallAlgo(soFilePath string, infoFilePath string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
 
 	chunkSize := 1024 * 1024 * 1 // 2MB
 
 	// check file status
 
-	algoFile, err := os.OpenFile(algoFilePath, os.O_RDONLY, 0644)
+	algoFile, err := os.OpenFile(soFilePath, os.O_RDONLY, 0644)
 
 	if err != nil {
 		return nil, err
@@ -41,9 +41,9 @@ func (api *UltipaAPI) InstallAlgo(algoFilePath string, algoInfoFilePath string, 
 
 	algoFileReader := bufio.NewReader(algoFile)
 
-	algoFileMD5, _ := checksum.MD5sum(algoFilePath)
+	algoFileMD5, _ := checksum.MD5sum(soFilePath)
 
-	algoInfoFile, err := os.OpenFile(algoInfoFilePath, os.O_RDONLY, 0644)
+	algoInfoFile, err := os.OpenFile(infoFilePath, os.O_RDONLY, 0644)
 
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (api *UltipaAPI) InstallAlgo(algoFilePath string, algoInfoFilePath string, 
 
 	algoInfoFileReader := bufio.NewReader(algoInfoFile)
 
-	algoInfoFileMD5, _ := checksum.MD5sum(algoInfoFilePath)
+	algoInfoFileMD5, _ := checksum.MD5sum(infoFilePath)
 
 	client, err := api.GetControlClient(config)
 

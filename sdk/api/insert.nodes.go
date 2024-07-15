@@ -197,7 +197,7 @@ type Batch struct {
 }
 
 // InsertNodesBatchAuto Nodes interface values should be string
-func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *configuration.InsertRequestConfig) (*http.InsertBatchAutoResponse, error) {
+func (api *UltipaAPI) InsertNodesBatchAuto(rows []*structs.Node, config *configuration.InsertRequestConfig) (*http.InsertBatchAutoResponse, error) {
 
 	resps := &http.InsertBatchAutoResponse{
 		Resps:     map[string]*http.InsertResponse{},
@@ -205,7 +205,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 		Statistic: &http.Statistic{},
 	}
 
-	// collect schema and node index in nodes
+	// collect schema and node index in rows
 	m := map[string]map[int]int{}
 	schemas, err := api.ShowNodeSchema(config.RequestConfig)
 
@@ -215,7 +215,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 
 	batches := map[string]*Batch{}
 
-	for index, node := range nodes {
+	for index, node := range rows {
 		if _, ok := m[node.Schema]; !ok {
 			m[node.Schema] = map[int]int{}
 		}
@@ -237,7 +237,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 		}
 
 		batch := batches[node.Schema]
-		// add nodes
+		// add rows
 		row, err := convertSdkNodeRowToUltipaNodeRow(batch.Schema, node, index, config.RequestConfig)
 		if err != nil {
 			return nil, err
@@ -333,11 +333,11 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 	return resps, nil
 }
 
-func (api *UltipaAPI) InsertNodes(schemaName string, rows []*structs.Node, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
+func (api *UltipaAPI) InsertNodes(schemaName string, nodes []*structs.Node, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
 	schema, err := api.GetNodeSchema(schemaName, config.RequestConfig)
 	if err != nil {
 		return nil, fmt.Errorf("get nodeSchema failed, %v", err)
 	}
 
-	return api.InsertNodesBatchBySchema(schema, rows, config)
+	return api.InsertNodesBatchBySchema(schema, nodes, config)
 }

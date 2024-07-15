@@ -128,9 +128,9 @@ func (api *UltipaAPI) GetControlClientAndConfig(config *configuration.RequestCon
 // Uql send a uql string to ultipa graph, and return a http Uql Response
 // get Alias from Uql Response and convert to any type you need by asNodes, asEdges, asPaths, asTable, as asArray...
 // Check DataItem to learn more about Uql Response
-func (api *UltipaAPI) Uql(uql string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) Uql(uql string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 
-	resp, conf, err := api.doExecuteUql(uql, config)
+	resp, conf, err := api.doExecuteUql(uql, requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ func (api *UltipaAPI) Uql(uql string, config *configuration.RequestConfig) (*htt
 		return nil, err
 	}
 
-	if config != nil && config.Host != "" {
+	if requestConfig != nil && requestConfig.Host != "" {
 		return uqlResp, err
 	}
 
@@ -150,19 +150,19 @@ func (api *UltipaAPI) Uql(uql string, config *configuration.RequestConfig) (*htt
 		if err != nil {
 			return nil, err
 		}
-		return api.Uql(uql, config)
+		return api.Uql(uql, requestConfig)
 	}
 
 	return uqlResp, nil
 }
 
-func (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig) (*http.UQLResponseStream, error) {
-	resp, conf, err := api.doExecuteUql(uql, config)
+func (api *UltipaAPI) UQLStream(uql string, requestConfig *configuration.RequestConfig) (*http.UQLResponseStream, error) {
+	resp, conf, err := api.doExecuteUql(uql, requestConfig)
 	if err != nil {
 		return nil, err
 	}
 	uqlResp, err := http.NewUQLResponseStream(resp)
-	if config != nil && config.Host != "" {
+	if requestConfig != nil && requestConfig.Host != "" {
 		return uqlResp, err
 	}
 	if uqlResp.NeedRedirect() {
@@ -170,7 +170,7 @@ func (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig)
 		if err != nil {
 			return nil, err
 		}
-		return api.UQLStream(uql, config)
+		return api.UQLStream(uql, requestConfig)
 	}
 	return uqlResp, nil
 }

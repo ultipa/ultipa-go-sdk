@@ -205,7 +205,7 @@ func doConvertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edg
 }
 
 // InsertEdgesBatchAuto Nodes interface values should be string
-func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *configuration.InsertRequestConfig) (*http.InsertBatchAutoResponse, error) {
+func (api *UltipaAPI) InsertEdgesBatchAuto(rows []*structs.Edge, config *configuration.InsertRequestConfig) (*http.InsertBatchAutoResponse, error) {
 
 	resps := &http.InsertBatchAutoResponse{
 		Resps:     map[string]*http.InsertResponse{},
@@ -213,7 +213,7 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 		Statistic: &http.Statistic{},
 	}
 
-	// collect schema and edge index in edges
+	// collect schema and edge index in rows
 	m := map[string]map[int]int{}
 	schemas, err := api.ShowEdgeSchema(config.RequestConfig)
 
@@ -223,7 +223,7 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 
 	batches := map[string]*Batch{}
 
-	for index, edge := range edges {
+	for index, edge := range rows {
 
 		if _, ok := m[edge.Schema]; !ok {
 			m[edge.Schema] = map[int]int{}
@@ -246,7 +246,7 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 		}
 
 		batch := batches[edge.Schema]
-		// add edges
+		// add rows
 		row, err := convertSdkEdgeRowToUltipaEdgeRow(batch.Schema, edge, index, config.RequestConfig)
 		if err != nil {
 			return nil, err
@@ -344,11 +344,11 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 	return resps, nil
 }
 
-func (api *UltipaAPI) InsertEdges(schemaName string, rows []*structs.Edge, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
+func (api *UltipaAPI) InsertEdges(schemaName string, edges []*structs.Edge, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
 	schema, err := api.GetEdgeSchema(schemaName, config.RequestConfig)
 	if err != nil {
 		return nil, fmt.Errorf("get edgeSchema failed, %v", err)
 	}
 
-	return api.InsertEdgesBatchBySchema(schema, rows, config)
+	return api.InsertEdgesBatchBySchema(schema, edges, config)
 }

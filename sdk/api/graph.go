@@ -13,10 +13,10 @@ import (
 	"time"
 )
 
-func (api *UltipaAPI) ShowGraph(config *configuration.RequestConfig) (graphSets []*structs.GraphSet, err error) {
+func (api *UltipaAPI) ShowGraph(requestConfig *configuration.RequestConfig) (graphSets []*structs.GraphSet, err error) {
 	uql := utils.UQLMAKER{}
 	uql.SetCommand(utils.UQLCommand_listGraph)
-	res, err := api.Uql(uql.ToString(), config)
+	res, err := api.Uql(uql.ToString(), requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -53,20 +53,20 @@ func (api *UltipaAPI) ShowGraph(config *configuration.RequestConfig) (graphSets 
 	return graphSets, nil
 }
 
-func (api *UltipaAPI) CreateGraphIfNotExist(graph *structs.GraphSet, config *configuration.RequestConfig) (resp *http.UQLResponse, exist bool, err error) {
-	exist, err = api.HasGraph(graph.Name, config)
+func (api *UltipaAPI) CreateGraphIfNotExist(graph *structs.GraphSet, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, exist bool, err error) {
+	exist, err = api.HasGraph(graph.Name, requestConfig)
 
 	if exist {
 		return nil, exist, err
 	}
 
-	resp, err = api.CreateGraph(graph, config)
+	resp, err = api.CreateGraph(graph, requestConfig)
 	return resp, exist, err
 }
 
-func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 
-	resp, err := api.Uql(fmt.Sprintf(`create().graph("%v", "%v")`, graph.Name, graph.Description), config)
+	resp, err := api.Uql(fmt.Sprintf(`create().graph("%v", "%v")`, graph.Name, graph.Description), requestConfig)
 
 	if err != nil {
 		return nil, err
@@ -111,9 +111,9 @@ func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, config *configuration
 	return resp, err
 }
 
-func (api *UltipaAPI) DropGraph(graphName string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) DropGraph(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 
-	resp, err := api.Uql(fmt.Sprintf(`drop().graph("%v")`, graphName), config)
+	resp, err := api.Uql(fmt.Sprintf(`drop().graph("%v")`, graphName), requestConfig)
 
 	if err != nil {
 		return nil, err
@@ -122,8 +122,8 @@ func (api *UltipaAPI) DropGraph(graphName string, config *configuration.RequestC
 	return resp, err
 }
 
-func (api *UltipaAPI) HasGraph(graphName string, config *configuration.RequestConfig) (bool, error) {
-	graphSets, err := api.ShowGraph(config)
+func (api *UltipaAPI) HasGraph(graphName string, requestConfig *configuration.RequestConfig) (bool, error) {
+	graphSets, err := api.ShowGraph(requestConfig)
 
 	if err != nil {
 		return false, err
@@ -138,8 +138,8 @@ func (api *UltipaAPI) HasGraph(graphName string, config *configuration.RequestCo
 	return false, nil
 }
 
-func (api *UltipaAPI) GetGraph(graphName string, config *configuration.RequestConfig) (*structs.GraphSet, error) {
-	grapSets, err := api.ShowGraph(config)
+func (api *UltipaAPI) GetGraph(graphName string, requestConfig *configuration.RequestConfig) (*structs.GraphSet, error) {
+	grapSets, err := api.ShowGraph(requestConfig)
 
 	if err != nil {
 		return nil, err
@@ -154,14 +154,14 @@ func (api *UltipaAPI) GetGraph(graphName string, config *configuration.RequestCo
 	return nil, errors.New("graph not found")
 }
 
-func (api *UltipaAPI) AlterGraph(graphName, newGraphName, description string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
-	uql := fmt.Sprintf(`alter().graph("%v").set({name: "%v", description: "%v"})`, graphName, newGraphName, description)
+func (api *UltipaAPI) AlterGraph(oldGraph, newGraph *structs.GraphSet, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+	uql := fmt.Sprintf(`alter().graph("%s").set({name: "%s", description: "%s"})`, oldGraph.Name, newGraph.Name, newGraph.Description)
 	// Only modify the description of the graphSet
-	if newGraphName == "" {
-		uql = fmt.Sprintf(`alter().graph("%v").set({description: "%v"})`, graphName, description)
+	if newGraph.Name == "" {
+		uql = fmt.Sprintf(`alter().graph("%s").set({description: "%s"})`, oldGraph.Name, newGraph.Description)
 	}
 
-	resp, err := api.Uql(uql, config)
+	resp, err := api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
@@ -173,24 +173,24 @@ func (api *UltipaAPI) AlterGraph(graphName, newGraphName, description string, co
 	return resp, nil
 }
 
-func (api *UltipaAPI) Truncate(truncate *structs.Truncate, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 	uql := ""
-	if truncate.Schema != "*" {
-		truncate.Schema = "@" + truncate.Schema
+	if request.Schema == "*" || request.Schema == "" {
+		request.Schema = `"*"`
 	} else {
-		truncate.Schema = `"*"`
+		request.Schema = "@" + request.Schema
 	}
 
-	switch truncate.DbType {
+	switch request.DbType {
 	case ultipa.DBType_DBNODE:
-		uql = fmt.Sprintf(`truncate().graph("%v").node(%v)`, truncate.GraphName, truncate.Schema)
+		uql = fmt.Sprintf(`truncate().graph("%v").node(%v)`, request.GraphName, request.Schema)
 	case ultipa.DBType_DBEDGE:
-		uql = fmt.Sprintf(`truncate().graph("%v").edge(%v)`, truncate.GraphName, truncate.Schema)
+		uql = fmt.Sprintf(`truncate().graph("%v").edge(%v)`, request.GraphName, request.Schema)
 	case ultipa.DBType_DBGLOBAL:
-		uql = fmt.Sprintf(`truncate().graph("%v")`, truncate.GraphName)
+		uql = fmt.Sprintf(`truncate().graph("%v")`, request.GraphName)
 	}
 
-	resp, err := api.Uql(uql, config)
+	resp, err := api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
@@ -202,10 +202,10 @@ func (api *UltipaAPI) Truncate(truncate *structs.Truncate, config *configuration
 	return resp, nil
 }
 
-func (api *UltipaAPI) Compact(graphName string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) Compact(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 	uql := fmt.Sprintf(`compact().graph("%v")`, graphName)
 
-	resp, err := api.Uql(uql, config)
+	resp, err := api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
@@ -217,10 +217,10 @@ func (api *UltipaAPI) Compact(graphName string, config *configuration.RequestCon
 	return resp, err
 }
 
-func (api *UltipaAPI) MountGraph(graphName string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) MountGraph(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 	uql := fmt.Sprintf(`mount().graph("%v")`, graphName)
 
-	resp, err := api.Uql(uql, config)
+	resp, err := api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
@@ -232,10 +232,10 @@ func (api *UltipaAPI) MountGraph(graphName string, config *configuration.Request
 	return resp, nil
 }
 
-func (api *UltipaAPI) UnmountGraph(graphName string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) UnmountGraph(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 	uql := fmt.Sprintf(`unmount().graph("%v")`, graphName)
 
-	resp, err := api.Uql(uql, config)
+	resp, err := api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
