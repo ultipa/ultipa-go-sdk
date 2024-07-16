@@ -141,7 +141,12 @@ func TestUltipaAPI_AlterGraph(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			rsp, err := client.AlterGraph(tt.args.oldGraphName, tt.args.newGraphName, tt.args.description, tt.args.config)
+			oldGraph := &structs.GraphSet{Name: tt.args.oldGraphName}
+			newGraph := &structs.GraphSet{
+				Name:        tt.args.newGraphName,
+				Description: tt.args.description,
+			}
+			rsp, err := client.AlterGraph(oldGraph, newGraph, tt.args.config)
 			_ = rsp
 			if (tt.wantErr && err == nil) || (!tt.wantErr && err != nil) {
 				t.Errorf("AlterGraph() error = %v, wantErr %v", err, tt.wantErr)

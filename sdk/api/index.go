@@ -16,8 +16,12 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) CreateIndex(dbType ultipa.DBType, schemaName, propertyName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) CreateIndex(dbType ultipa.DBType, schemaName, propertyName string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	uql := ""
+	if schemaName == "" {
+		schemaName = "*"
+	}
+
 	switch dbType {
 	case ultipa.DBType_DBNODE:
 		uql = fmt.Sprintf(`create().node_index(@%v.%v)`, schemaName, propertyName)
@@ -27,7 +31,7 @@ func (api *UltipaAPI) CreateIndex(dbType ultipa.DBType, schemaName, propertyName
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
 
-	resp, err = api.Uql(uql, config)
+	resp, err = api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
@@ -39,11 +43,11 @@ func (api *UltipaAPI) CreateIndex(dbType ultipa.DBType, schemaName, propertyName
 	return resp, nil
 }
 
-func (api *UltipaAPI) ShowIndex(config *configuration.RequestConfig) ([]*structs.Index, error) {
+func (api *UltipaAPI) ShowIndex(requestConfig *configuration.RequestConfig) ([]*structs.Index, error) {
 	var resp *http.UQLResponse
 	var err error
 
-	resp, err = api.Uql(fmt.Sprintf(`show().index()`), config)
+	resp, err = api.Uql(fmt.Sprintf(`show().index()`), requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -63,12 +67,12 @@ func (api *UltipaAPI) ShowIndex(config *configuration.RequestConfig) ([]*structs
 	return indexes, err
 }
 
-func (api *UltipaAPI) ShowEdgeIndex(config *configuration.RequestConfig) ([]*structs.Index, error) {
+func (api *UltipaAPI) ShowEdgeIndex(requestConfig *configuration.RequestConfig) ([]*structs.Index, error) {
 	var resp *http.UQLResponse
 	var err error
 	var indexes []*structs.Index
 
-	resp, err = api.Uql(fmt.Sprintf(`show().edge_index()`), config)
+	resp, err = api.Uql(fmt.Sprintf(`show().edge_index()`), requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -78,12 +82,12 @@ func (api *UltipaAPI) ShowEdgeIndex(config *configuration.RequestConfig) ([]*str
 	return indexes, err
 }
 
-func (api *UltipaAPI) ShowNodeIndex(config *configuration.RequestConfig) ([]*structs.Index, error) {
+func (api *UltipaAPI) ShowNodeIndex(requestConfig *configuration.RequestConfig) ([]*structs.Index, error) {
 	var resp *http.UQLResponse
 	var err error
 	var indexes []*structs.Index
 
-	resp, err = api.Uql(fmt.Sprintf(`show().node_index()`), config)
+	resp, err = api.Uql(fmt.Sprintf(`show().node_index()`), requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -94,8 +98,11 @@ func (api *UltipaAPI) ShowNodeIndex(config *configuration.RequestConfig) ([]*str
 }
 
 func (api *UltipaAPI) DropIndex(dbType ultipa.DBType, schemaName, propertyName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
-
 	uql := ""
+	if schemaName == "" {
+		schemaName = "*"
+	}
+
 	switch dbType {
 	case ultipa.DBType_DBNODE:
 		uql = fmt.Sprintf(`drop().node_index(@%v.%v)`, schemaName, propertyName)
@@ -117,7 +124,7 @@ func (api *UltipaAPI) DropIndex(dbType ultipa.DBType, schemaName, propertyName s
 	return resp, nil
 }
 
-func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyName, fulltextName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyName, fulltextName string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	uql := ""
 	switch dbType {
 	case ultipa.DBType_DBNODE:
@@ -128,7 +135,7 @@ func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyN
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
 
-	resp, err = api.Uql(uql, config)
+	resp, err = api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
@@ -140,12 +147,12 @@ func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyN
 	return resp, nil
 }
 
-func (api *UltipaAPI) ShowFullText(config *configuration.RequestConfig) ([]*structs.Index, error) {
+func (api *UltipaAPI) ShowFullText(requestConfig *configuration.RequestConfig) ([]*structs.Index, error) {
 	var resp *http.UQLResponse
 	var err error
 	var indexes []*structs.Index
 
-	resp, err = api.Uql(fmt.Sprintf(`show().fulltext()`), config)
+	resp, err = api.Uql(fmt.Sprintf(`show().fulltext()`), requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -165,12 +172,12 @@ func (api *UltipaAPI) ShowFullText(config *configuration.RequestConfig) ([]*stru
 	return indexes, err
 }
 
-func (api *UltipaAPI) ShowEdgeFullText(config *configuration.RequestConfig) ([]*structs.Index, error) {
+func (api *UltipaAPI) ShowEdgeFullText(requestConfig *configuration.RequestConfig) ([]*structs.Index, error) {
 	var resp *http.UQLResponse
 	var err error
 	var indexes []*structs.Index
 
-	resp, err = api.Uql(fmt.Sprintf(`show().edge_fulltext()`), config)
+	resp, err = api.Uql(fmt.Sprintf(`show().edge_fulltext()`), requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -180,12 +187,12 @@ func (api *UltipaAPI) ShowEdgeFullText(config *configuration.RequestConfig) ([]*
 	return indexes, err
 }
 
-func (api *UltipaAPI) ShowNodeFullText(config *configuration.RequestConfig) ([]*structs.Index, error) {
+func (api *UltipaAPI) ShowNodeFullText(requestConfig *configuration.RequestConfig) ([]*structs.Index, error) {
 	var resp *http.UQLResponse
 	var err error
 	var indexes []*structs.Index
 
-	resp, err = api.Uql(fmt.Sprintf(`show().node_fulltext()`), config)
+	resp, err = api.Uql(fmt.Sprintf(`show().node_fulltext()`), requestConfig)
 	if err != nil {
 		return nil, err
 	}

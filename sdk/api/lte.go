@@ -8,8 +8,12 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 )
 
-func (api *UltipaAPI) Lte(dbType ultipa.DBType, schemaName, propertyName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) Lte(dbType ultipa.DBType, schemaName, propertyName string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	uql := ""
+	if schemaName == "" {
+		schemaName = "*"
+	}
+
 	switch dbType {
 	case ultipa.DBType_DBNODE:
 		uql = fmt.Sprintf(`LTE().node_property(@%v.%v)`, schemaName, propertyName)
@@ -19,7 +23,7 @@ func (api *UltipaAPI) Lte(dbType ultipa.DBType, schemaName, propertyName string,
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
 
-	resp, err = api.Uql(uql, config)
+	resp, err = api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
@@ -31,8 +35,12 @@ func (api *UltipaAPI) Lte(dbType ultipa.DBType, schemaName, propertyName string,
 	return resp, nil
 }
 
-func (api *UltipaAPI) Ufe(dbType ultipa.DBType, schemaName, propertyName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) Ufe(dbType ultipa.DBType, schemaName, propertyName string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	uql := ""
+	if schemaName == "" {
+		schemaName = "*"
+	}
+
 	switch dbType {
 	case ultipa.DBType_DBNODE:
 		uql = fmt.Sprintf(`UFE().node_property(@%v.%v)`, schemaName, propertyName)
@@ -42,7 +50,7 @@ func (api *UltipaAPI) Ufe(dbType ultipa.DBType, schemaName, propertyName string,
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
 
-	resp, err = api.Uql(uql, config)
+	resp, err = api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err

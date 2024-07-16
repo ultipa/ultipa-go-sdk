@@ -1063,3 +1063,42 @@ func (di *DataItem) AsStats() (stat *structs.Stat, err error) {
 
 	return stat, err
 }
+
+func (di *DataItem) AsPrivilege() (privileges []*structs.Privilege, err error) {
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_PRIVILEGE_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a privilege list")
+	}
+
+	for _, row := range table.TableRows {
+		values := row.GetValues()
+
+		var graphPrivileges, systemPrivileges []string
+		err = json.Unmarshal(values[0], &graphPrivileges)
+		if err != nil {
+			return nil, errors.New("graphPrivileges Unmarshal failed" + err.Error())
+		}
+		err = json.Unmarshal(values[1], &systemPrivileges)
+		if err != nil {
+			return nil, errors.New("systemPrivileges Unmarshal failed" + err.Error())
+		}
+
+		i := structs.Privilege{
+			GraphPrivileges:  graphPrivileges,
+			SystemPrivileges: systemPrivileges,
+		}
+		privileges = append(privileges, &i)
+
+	}
+
+	return privileges, nil
+}

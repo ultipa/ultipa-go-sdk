@@ -2,10 +2,12 @@ package test
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"github.com/ultipa/ultipa-go-sdk/sdk"
 	"github.com/ultipa/ultipa-go-sdk/sdk/api"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"log"
+	"strings"
 	"testing"
 )
 
@@ -16,25 +18,25 @@ var username string
 var password string
 var graph string
 
-//func TestMain(m *testing.M) {
-//	var err error
-//	env, err = godotenv.Read(".env")
-//
-//	if err != nil {
-//		log.Fatalln(err)
-//	}
-//
-//	hosts = strings.Split(env["hosts"], ",")
-//	username, password, graph = env["username"], env["password"], env["graph"]
-//
-//	client, err = GetClient(hosts, graph)
-//
-//	if err != nil {
-//		log.Fatalln(err)
-//	}
-//
-//	m.Run()
-//}
+func TestMain(m *testing.M) {
+	var err error
+	env, err = godotenv.Read(".env")
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	hosts = strings.Split(env["hosts"], ",")
+	username, password, graph = env["username"], env["password"], env["graph"]
+
+	client, err = GetClient(hosts, graph)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	m.Run()
+}
 
 func TestPing(t *testing.T) {
 	client, _ = GetClient(hosts, graph)

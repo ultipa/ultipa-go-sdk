@@ -21,13 +21,13 @@ import (
 	"path"
 )
 
-func (api *UltipaAPI) InstallExta(extaFilePath string, extaInfoFilePath string, config *configuration.RequestConfig) (*ultipa.InstallExtaReply, error) {
+func (api *UltipaAPI) InstallExta(soFilePath string, infoFilePath string, config *configuration.RequestConfig) (*ultipa.InstallExtaReply, error) {
 
 	chunkSize := 1024 * 1024 * 1 // 2MB
 
 	// check file status
 
-	extaFile, err := os.OpenFile(extaFilePath, os.O_RDONLY, 0644)
+	extaFile, err := os.OpenFile(soFilePath, os.O_RDONLY, 0644)
 
 	if err != nil {
 		return nil, err
@@ -35,9 +35,9 @@ func (api *UltipaAPI) InstallExta(extaFilePath string, extaInfoFilePath string, 
 
 	extaFileReader := bufio.NewReader(extaFile)
 
-	extaFileMD5, _ := checksum.MD5sum(extaFilePath)
+	extaFileMD5, _ := checksum.MD5sum(soFilePath)
 
-	extaInfoFile, err := os.OpenFile(extaInfoFilePath, os.O_RDONLY, 0644)
+	extaInfoFile, err := os.OpenFile(infoFilePath, os.O_RDONLY, 0644)
 
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func (api *UltipaAPI) InstallExta(extaFilePath string, extaInfoFilePath string, 
 
 	extaInfoFileReader := bufio.NewReader(extaInfoFile)
 
-	extaInfoFileMD5, _ := checksum.MD5sum(extaInfoFilePath)
+	extaInfoFileMD5, _ := checksum.MD5sum(infoFilePath)
 
 	client, err := api.GetControlClient(config)
 
