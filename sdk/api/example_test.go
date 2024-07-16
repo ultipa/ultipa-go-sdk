@@ -142,7 +142,7 @@ func ExampleUltipaAPI_CreateNodeProperty() {
 		Type: ultipa.PropertyType_STRING,
 	}
 
-	resp, _ := client.CreateProperty("target_schema", ultipa.DBType_DBNODE, newProp, nil)
+	resp, _ := client.CreateProperty(ultipa.DBType_DBNODE, "target_schema", newProp, nil)
 	log.Println(resp.Status.Code)
 
 	// Create Edge Property
@@ -151,33 +151,43 @@ func ExampleUltipaAPI_CreateNodeProperty() {
 		Type: ultipa.PropertyType_STRING,
 	}
 
-	resp2, _ := client.CreateProperty("target_schema", ultipa.DBType_DBEDGE, newEdgeProp, nil)
+	resp2, _ := client.CreateProperty(ultipa.DBType_DBEDGE, "target_schema", newEdgeProp, nil)
 	log.Println(resp2.Status.Code)
 
-	exist, _ := client.CreatePropertyIfNotExist("target_schema", ultipa.DBType_DBEDGE, newEdgeProp, nil)
+	exist, _ := client.CreatePropertyIfNotExist(ultipa.DBType_DBEDGE, "target_schema", newEdgeProp, nil)
 	log.Println(exist)
 }
 
 func ExampleUltipaAPI_GetProperty() {
-	prop, _ := client.GetProperty("user", "name", ultipa.DBType_DBNODE, nil)
+	prop, _ := client.GetProperty(ultipa.DBType_DBNODE, "user", "name", nil)
 	log.Println(prop)
 }
 
 func ExampleUltipaAPI_AlterNodeProperty() {
 	prop := &structs.Property{
-		Name: "username",
-		Desc: "name change to username",
+		Name:   "name",
+		Desc:   "name Desc",
+		Schema: "user",
 	}
-	resp, _ := client.AlterNodeProperty("@user.name", prop, nil)
+	newProp := &structs.Property{
+		Name: "newName",
+		Desc: "name change to newName",
+	}
+	resp, _ := client.AlterNodeProperty(prop, newProp, nil)
 	log.Println(resp)
 }
 
 func ExampleUltipaAPI_AlterEdgeProperty() {
 	prop := &structs.Property{
-		Name: "name",
-		Desc: "change name to type",
+		Name:   "name",
+		Desc:   "name Desc",
+		Schema: "relation",
 	}
-	resp, _ := client.AlterEdgeProperty("@relation.name", prop, nil)
+	newProp := &structs.Property{
+		Name: "newName",
+		Desc: "name change to newName",
+	}
+	resp, _ := client.AlterEdgeProperty(prop, newProp, nil)
 	log.Println(resp)
 }
 

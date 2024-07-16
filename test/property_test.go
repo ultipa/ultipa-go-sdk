@@ -76,7 +76,7 @@ func TestCreateProperty(t *testing.T) {
 		Type: ultipa.PropertyType_STRING,
 	}
 
-	resp, err := client.CreateProperty("People", ultipa.DBType_DBNODE, newProp, nil)
+	resp, err := client.CreateProperty(ultipa.DBType_DBNODE, "People", newProp, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -41,12 +41,12 @@ func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) ([]
 	return schemas, err
 }
 
-func (api *UltipaAPI) ShowNodeSchema(config *configuration.RequestConfig) ([]*structs.Schema, error) {
+func (api *UltipaAPI) ShowNodeSchema(requestConfig *configuration.RequestConfig) ([]*structs.Schema, error) {
 	var resp *http.UQLResponse
 	var err error
 	var schemas []*structs.Schema
 
-	resp, err = api.Uql(fmt.Sprintf(`show().node_schema()`), config)
+	resp, err = api.Uql(fmt.Sprintf(`show().node_schema()`), requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -208,7 +208,7 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 				continue
 			}
 
-			resp, err := api.CreateProperty(schema.Name, schema.DBType, prop, requestConfig)
+			resp, err := api.CreateProperty(schema.DBType, schema.Name, prop, requestConfig)
 
 			if err != nil {
 				return nil, err
@@ -265,7 +265,7 @@ func (api *UltipaAPI) DropSchema(schema *structs.Schema, requestConfig *configur
 	return resp, nil
 }
 
-func (api *UltipaAPI) AlterSchema(schema, newSchema *structs.Schema, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) AlterSchema(schema, newSchema *structs.Schema, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 	parms := ""
 
 	switch schema.DBType {
@@ -284,7 +284,7 @@ func (api *UltipaAPI) AlterSchema(schema, newSchema *structs.Schema, config *con
 		uql = fmt.Sprintf(`alter().%s("@%s").set({description: "%s"})`, parms, schema.Name, newSchema.Desc)
 	}
 
-	resp, err := api.Uql(uql, config)
+	resp, err := api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
