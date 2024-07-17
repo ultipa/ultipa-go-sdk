@@ -344,11 +344,19 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(rows []*structs.Edge, config *configu
 	return resps, nil
 }
 
-func (api *UltipaAPI) InsertEdges(schemaName string, edges []*structs.Edge, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
-	schema, err := api.GetEdgeSchema(schemaName, config.RequestConfig)
+func (api *UltipaAPI) InsertEdges(schemaName string, edges []*structs.Edge, requestConfig *configuration.InsertRequestConfig) (*http.UQLResponse, error) {
+	uql := fmt.Sprintf(`insert().into(@%s).edges([%s])`, schemaName, structs.EdgesToInsertUql(edges))
+	if requestConfig.Silent {
+		uql = uql + " as edges return edges{*}"
+	}
+	resp, err := api.Uql(uql, requestConfig.RequestConfig)
+
 	if err != nil {
-		return nil, fmt.Errorf("get edgeSchema failed, %v", err)
+		return nil, err
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
 	}
 
-	return api.InsertEdgesBatchBySchema(schema, edges, config)
+	return resp, nil
 }
