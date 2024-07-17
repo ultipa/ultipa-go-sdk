@@ -255,14 +255,14 @@ func (api *UltipaAPI) buildUqlRequest(uql string, config *configuration.RequestC
 }
 
 // test connections
-func (api *UltipaAPI) Test() (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) Test(requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	conn, err := api.Pool.GetConn(nil)
 
 	if err != nil {
 		return nil, err
 	}
 	client := conn.GetClient()
-	ctx, cancel, err := api.Pool.NewContext(nil)
+	ctx, cancel, err := api.Pool.NewContext(requestConfig)
 	if err != nil {
 		return nil, err
 	}

@@ -7,7 +7,7 @@ import (
 )
 
 func TestDelete(t *testing.T) {
-	conf := &configuration.DeleteRequestConfig{
+	conf := &configuration.InsertRequestConfig{
 		RequestConfig: &configuration.RequestConfig{GraphName: "amz2"},
 		Silent:        true,
 	}

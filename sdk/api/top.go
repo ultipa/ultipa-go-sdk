@@ -8,8 +8,8 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) Top(config *configuration.RequestConfig) (tops []*structs.Top, err error) {
-	resp, err := api.Uql("top()", config)
+func (api *UltipaAPI) Top(requestConfig *configuration.RequestConfig) (tops []*structs.Top, err error) {
+	resp, err := api.Uql("top()", requestConfig)
 
 	if err != nil {
 		return nil, err

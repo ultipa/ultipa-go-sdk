@@ -8,7 +8,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 )
 
-func (api *UltipaAPI) Kill(processId string, all bool, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) Kill(processId string, all bool, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	uql := "kill()"
 	if all {
 		uql = `kill("*")`
@@ -16,7 +16,7 @@ func (api *UltipaAPI) Kill(processId string, all bool, config *configuration.Req
 		uql = fmt.Sprintf(`kill("%s")`, processId)
 	}
 
-	resp, err = api.Uql(uql, config)
+	resp, err = api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err

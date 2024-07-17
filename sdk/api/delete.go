@@ -8,7 +8,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 )
 
-func (api *UltipaAPI) DeleteNodes(filter string, config *configuration.DeleteRequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) DeleteNodes(filter string, config *configuration.InsertRequestConfig) (*http.UQLResponse, error) {
 	uql := fmt.Sprintf("delete().nodes(%s)", filter)
 	if config.Silent {
 		uql = uql + " as nodes return nodes{*}"
@@ -25,7 +25,7 @@ func (api *UltipaAPI) DeleteNodes(filter string, config *configuration.DeleteReq
 	return resp, nil
 }
 
-func (api *UltipaAPI) DeleteEdges(filter string, config *configuration.DeleteRequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) DeleteEdges(filter string, config *configuration.InsertRequestConfig) (*http.UQLResponse, error) {
 	uql := fmt.Sprintf("delete().edges(%s)", filter)
 	if config.Silent {
 		uql = uql + " as edges return edges{*}"

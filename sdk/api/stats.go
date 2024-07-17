@@ -8,8 +8,8 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) Stats(config *configuration.RequestConfig) (stats *structs.Stat, err error) {
-	resp, err := api.Uql("stats()", config)
+func (api *UltipaAPI) Stats(requestConfig *configuration.RequestConfig) (stats *structs.Stat, err error) {
+	resp, err := api.Uql("stats()", requestConfig)
 
 	if err != nil {
 		return nil, err

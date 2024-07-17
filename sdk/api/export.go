@@ -15,16 +15,16 @@ type Listener interface {
 	//OnError(err error)
 }
 
-func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, config *configuration.RequestConfig, cb func(nodes []*structs.Node, edges []*structs.Edge) error) error {
+func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, requestConfig *configuration.RequestConfig, cb func(nodes []*structs.Node, edges []*structs.Edge) error) error {
 	var err error
 
-	client, err := api.GetControlClient(config)
+	client, err := api.GetControlClient(requestConfig)
 
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(config)
+	ctx, cancel, err := api.Pool.NewContext(requestConfig)
 	if err != nil {
 		return err
 	}
@@ -38,13 +38,13 @@ func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, conf
 
 	var resp ultipa.UltipaControls_ExportClient
 	var respErr error
-	if config != nil && config.MaxPkgSize > 0 {
+	if requestConfig != nil && requestConfig.MaxPkgSize > 0 {
 		resp, respErr = client.Export(ctx, &ultipa.ExportRequest{
 			Schema:           schema.Name,
 			Limit:            int32(limit),
 			SelectProperties: properties,
 			DbType:           schema.DBType,
-		}, grpc.MaxCallRecvMsgSize(config.MaxPkgSize), grpc.MaxCallSendMsgSize(config.MaxPkgSize),
+		}, grpc.MaxCallRecvMsgSize(requestConfig.MaxPkgSize), grpc.MaxCallSendMsgSize(requestConfig.MaxPkgSize),
 		)
 	} else {
 		resp, respErr = client.Export(ctx, &ultipa.ExportRequest{
@@ -126,16 +126,16 @@ func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, conf
 	return err
 }
 
-func (api *UltipaAPI) Export(request *ultipa.ExportRequest, listen Listener, config *configuration.RequestConfig) error {
+func (api *UltipaAPI) Export(request *ultipa.ExportRequest, listen Listener, requestConfig *configuration.RequestConfig) error {
 	var err error
 
-	client, err := api.GetControlClient(config)
+	client, err := api.GetControlClient(requestConfig)
 
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(config)
+	ctx, cancel, err := api.Pool.NewContext(requestConfig)
 	if err != nil {
 		return err
 	}
@@ -143,8 +143,8 @@ func (api *UltipaAPI) Export(request *ultipa.ExportRequest, listen Listener, con
 
 	var resp ultipa.UltipaControls_ExportClient
 	var respErr error
-	if config != nil && config.MaxPkgSize > 0 {
-		resp, respErr = client.Export(ctx, request, grpc.MaxCallRecvMsgSize(config.MaxPkgSize), grpc.MaxCallSendMsgSize(config.MaxPkgSize))
+	if requestConfig != nil && requestConfig.MaxPkgSize > 0 {
+		resp, respErr = client.Export(ctx, request, grpc.MaxCallRecvMsgSize(requestConfig.MaxPkgSize), grpc.MaxCallSendMsgSize(requestConfig.MaxPkgSize))
 	} else {
 		resp, respErr = client.Export(ctx, request)
 	}
