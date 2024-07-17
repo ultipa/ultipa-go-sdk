@@ -181,6 +181,5 @@ func NodesToInsertUql(nodes []*Node) string {
 			nodeStrings = append(nodeStrings, nodeString)
 		}
 	}
-	// insert().into(@user)
-	return fmt.Sprintf(".nodes([%s])", strings.Join(nodeStrings, ", "))
+	return fmt.Sprintf("%s", strings.Join(nodeStrings, ", "))
 }

@@ -188,7 +188,7 @@ func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configu
 
 	} else {
 		if !(*request.DbType == ultipa.DBType_DBGLOBAL || request.DbType == nil) {
-			return nil, fmt.Errorf("to truncate graph, dbType must be DBType_DBNODE or DBType_DBEDGE")
+			return nil, fmt.Errorf("to truncate graph, dbType must be DBType_DBGLOBAL or nil")
 		}
 	}
 

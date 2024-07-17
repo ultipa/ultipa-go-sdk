@@ -333,11 +333,19 @@ func (api *UltipaAPI) InsertNodesBatchAuto(rows []*structs.Node, config *configu
 	return resps, nil
 }
 
-func (api *UltipaAPI) InsertNodes(schemaName string, nodes []*structs.Node, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
-	schema, err := api.GetNodeSchema(schemaName, config.RequestConfig)
+func (api *UltipaAPI) InsertNodes(schemaName string, nodes []*structs.Node, requestConfig *configuration.InsertRequestConfig) (*http.UQLResponse, error) {
+	uql := fmt.Sprintf(`insert().into(@%s).nodes([%s])`, schemaName, structs.NodesToInsertUql(nodes))
+	if requestConfig.Silent {
+		uql = uql + " as nodes return nodes{*}"
+	}
+	resp, err := api.Uql(uql, requestConfig.RequestConfig)
+
 	if err != nil {
-		return nil, fmt.Errorf("get nodeSchema failed, %v", err)
+		return nil, err
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
 	}
 
-	return api.InsertNodesBatchBySchema(schema, nodes, config)
+	return resp, nil
 }

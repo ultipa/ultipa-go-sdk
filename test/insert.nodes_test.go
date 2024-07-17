@@ -217,7 +217,7 @@ func TestInsertNodeWithSetProperty(t *testing.T) {
 	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
 }
 
-func TestNodesToInsertUql(t *testing.T) {
+func TestInsertNodes(t *testing.T) {
 	var nodes []*structs.Node
 	node1 := structs.NewNode()
 	node1.UUID = 1
@@ -229,11 +229,25 @@ func TestNodesToInsertUql(t *testing.T) {
 	node2.Set("salary", 6.1)
 
 	node3 := structs.NewNode()
-	node3.UUID = 1
+	node3.UUID = 2
 	node3.Set("name", "test2")
 
 	nodes = append(nodes, node1, node2, node3)
 
 	uql := structs.NodesToInsertUql(nodes)
 	log.Println(uql)
+
+	requestConfig := &configuration.InsertRequestConfig{
+		RequestConfig: &configuration.RequestConfig{
+			GraphName: "test",
+		},
+		Silent: true,
+	}
+
+	response, err := client.InsertNodes("default", nodes, requestConfig)
+	if err != nil {
+		return
+	}
+
+	log.Println(response.Status.Message)
 }
