@@ -56,6 +56,7 @@ func (p *Policy) ToCreatePolicyUql() string {
 	uql := fmt.Sprintf("create().policy(\"%s\",\n", p.Name)
 
 	s := ""
+
 	if p.GraphPrivileges != nil {
 		s = utils.ToJSONString(p.GraphPrivileges) + ",\n"
 	} else {

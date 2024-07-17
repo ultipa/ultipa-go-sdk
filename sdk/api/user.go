@@ -9,8 +9,8 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) ShowUser(config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
-	resp, err = api.Uql("show().user()", config)
+func (api *UltipaAPI) ShowUser(requestConfig *configuration.RequestConfig) (users []*structs.User, err error) {
+	resp, err := api.Uql("show().user()", requestConfig)
 
 	if err != nil {
 		return nil, err
@@ -19,12 +19,17 @@ func (api *UltipaAPI) ShowUser(config *configuration.RequestConfig) (resp *http.
 		return nil, errors.New(resp.Status.Message)
 	}
 
-	return resp, nil
+	users, err = resp.Alias(http.RESP_USER_KEY).AsUser()
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }
 
-func (api *UltipaAPI) GetUser(name string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) GetUser(name string, config *configuration.RequestConfig) (user *structs.User, err error) {
 	uql := fmt.Sprintf(`show().user("%s")`, name)
-	resp, err = api.Uql(uql, config)
+	resp, err := api.Uql(uql, config)
 
 	if err != nil {
 		return nil, err
@@ -32,8 +37,13 @@ func (api *UltipaAPI) GetUser(name string, config *configuration.RequestConfig) 
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 		return nil, errors.New(resp.Status.Message)
 	}
+	users, err := resp.Alias(http.RESP_USER_KEY).AsUser()
+	if err != nil {
+		return nil, err
+	}
+	user = users[0]
 
-	return resp, nil
+	return user, nil
 }
 
 func (api *UltipaAPI) CreateUser(user *structs.User, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {

@@ -1102,3 +1102,71 @@ func (di *DataItem) AsPrivilege() (privileges []*structs.Privilege, err error) {
 
 	return privileges, nil
 }
+
+func (di *DataItem) AsUser() (users []*structs.User, err error) {
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_USER_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a user list")
+	}
+
+	for _, row := range table.TableRows {
+		values := row.GetValues()
+
+		user, err := bytesToUser(values)
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+
+	}
+
+	return users, nil
+}
+
+func bytesToUser(data [][]byte) (*structs.User, error) {
+	if len(data) != 6 {
+		return nil, fmt.Errorf("invalid data length, expected 6 but got %d", len(data))
+	}
+
+	var user structs.User
+
+	// Name
+	user.UserName = string(data[0])
+
+	// Create
+	timestamp, _ := strconv.ParseInt(string(data[1]), 10, 64)
+	create := time.Unix(timestamp, 0)
+	user.Create = create.Format("2006-01-02 15:04:05")
+
+	// GraphPrivileges
+	if err := json.Unmarshal(data[2], &user.GraphPrivileges); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal GraphPrivileges: %w", err)
+	}
+
+	// SystemPrivileges
+	if err := json.Unmarshal(data[3], &user.SystemPrivileges); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal SystemPrivileges: %w", err)
+	}
+
+	// PropertyPrivileges
+	if err := json.Unmarshal(data[4], &user.PropertyPrivileges); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal PropertyPrivileges: %w", err)
+	}
+
+	// Policies
+	if err := json.Unmarshal(data[5], &user.Policies); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal Policies: %w", err)
+	}
+
+	return &user, nil
+}

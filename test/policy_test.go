@@ -41,10 +41,10 @@ func TestShowPolicy(t *testing.T) {
 }
 
 func TestPolicyUql(t *testing.T) {
-	gp := structs.GraphPrivileges{
-		"default": []string{"UPDATE", "DELETE"},
-		"amz":     []string{"UPDATE"},
-	}
+	//gp := structs.GraphPrivileges{
+	//	"default": []string{"UPDATE", "DELETE"},
+	//	"amz":     []string{"UPDATE"},
+	//}
 	pp := structs.PropertyPrivileges{
 		"node": {
 			"read":  {},
@@ -59,8 +59,8 @@ func TestPolicyUql(t *testing.T) {
 	}
 
 	p := structs.Policy{
-		Name:            "yu",
-		GraphPrivileges: gp,
+		Name: "yu",
+		//GraphPrivileges: gp,
 		//SystemPrivileges: []string{"STAT"},
 		PropertyPrivileges: pp,
 		//Policies:           []string{"yu"},
