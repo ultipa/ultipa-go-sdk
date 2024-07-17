@@ -40,7 +40,7 @@ func TestMain(m *testing.M) {
 
 func TestPing(t *testing.T) {
 	client, _ = GetClient(hosts, graph)
-	resp, err := client.Test()
+	resp, err := client.Test(nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
