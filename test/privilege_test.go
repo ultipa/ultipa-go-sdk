@@ -1,19 +1,20 @@
 package test
 
 import (
+	"fmt"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"log"
 	"testing"
 )
 
 func TestShowShowPrivilege(t *testing.T) {
-	//p, err := client.ShowPrivilege(nil)
-	//if err != nil {
-	//	log.Fatalln(err)
-	//}
-	//for _, privilege := range p {
-	//	fmt.Println(privilege)
-	//}
+	p, err := client.ShowPrivilege(nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	for _, privilege := range p {
+		fmt.Println(privilege)
+	}
 
 	gp := &structs.GraphPrivileges{
 		"default": []string{"UPDATE", "DELETE"},
