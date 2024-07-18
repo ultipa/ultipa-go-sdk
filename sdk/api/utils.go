@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ultipa/ultipa-go-sdk/sdk/connection"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
+	"regexp"
 	"strings"
 )
 
@@ -81,5 +82,43 @@ func CheckName(name string) error {
 	if _, ok := utils.InvalidName[name]; ok {
 		return errors.New(fmt.Sprintf("%s is preserved keyword, can NOT use as name", name))
 	}
+	return nil
+}
+
+// CheckReplaceSchemaPropertyName Check if it contains Chinese characters and add `
+//
+// Used for schemaName and propertyName
+func CheckReplaceSchemaPropertyName(name string) (string, error) {
+	err := CheckName(name)
+	if err != nil {
+		return "", err
+	}
+
+	// Regular expression to match characters that are not letters, digits, or underscores
+	//nonAlphaNumUnderscore := regexp.MustCompile(`[^a-zA-Z0-9_]`)
+	//
+	//if nonAlphaNumUnderscore.MatchString(name) {
+	//	return fmt.Sprintf("`%s`", name), nil
+	//}
+
+	return fmt.Sprintf("`%s`", name), nil
+	//return name, nil
+}
+
+// CheckGraphName Check graph name whether valid
+//
+// Used for GraphName
+func CheckGraphName(name string) error {
+	err := CheckName(name)
+	if err != nil {
+		return err
+	}
+
+	// Regular expression to match names that must start with a letter and can only contain letters, underscores, and digits (A-Z, a-z, _, 0-9)
+	nonAlphaNumUnderscore := regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9_]+$`)
+	if !nonAlphaNumUnderscore.MatchString(name) {
+		return fmt.Errorf("graph name must start with a letter and can only contain letters, underscores, and numbers (A-Z, a-z, _, 0-9)")
+	}
+
 	return nil
 }

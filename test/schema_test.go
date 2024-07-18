@@ -158,3 +158,19 @@ func TestCreateSchema(t *testing.T) {
 	resp2, _ := client.CreateSchema(newSchemaWithoutProperties, false, nil)
 	log.Println(resp2)
 }
+
+func TestAlterSchema(t *testing.T) {
+	// create schema with properties
+	schema := &structs.Schema{
+		DBType: ultipa.DBType_DBNODE,
+		Name:   "People",
+		//Desc:   "People",
+	}
+	newSchema := &structs.Schema{
+		Name: "People2",
+		Desc: "People2",
+	}
+
+	resp2, _ := client.AlterSchema(schema, newSchema, nil)
+	log.Println(resp2)
+}

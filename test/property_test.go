@@ -85,3 +85,101 @@ func TestCreateProperty(t *testing.T) {
 	}
 	log.Println(resp.Status.Code)
 }
+
+func TestProperty(t *testing.T) {
+	schema := &structs.Schema{
+		Name:   "中文Schema",
+		DBType: ultipa.DBType_DBNODE,
+	}
+
+	_, err := client.CreateSchemaIfNotExist(schema, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	schema.DBType = ultipa.DBType_DBEDGE
+	_, err = client.CreateSchemaIfNotExist(schema, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	prop := &structs.Property{
+		Name: "中文Property",
+		Desc: "中文描述",
+		Type: ultipa.PropertyType_STRING,
+	}
+	_, err = client.CreateProperty(ultipa.DBType_DBNODE, schema.Name, prop, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	prop.Name = "中文Property1"
+	_, err = client.CreateNodeProperty(schema.Name, prop, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = client.CreateEdgeProperty(schema.Name, prop, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	pro, err := client.ShowProperty(ultipa.DBType_DBNODE, schema.Name, nil)
+	if err != nil {
+		log.Println(err)
+	}
+	printers.PrintProperty(pro)
+
+	pro1, err := client.ShowNodeProperty(schema.Name, nil)
+	if err != nil {
+		log.Println(err)
+	}
+	printers.PrintProperty(pro1)
+
+	pro2, err := client.ShowEdgeProperty(schema.Name, nil)
+	if err != nil {
+		log.Println(err)
+	}
+	printers.PrintProperty(pro2)
+
+	pro3, err := client.GetProperty(ultipa.DBType_DBNODE, schema.Name, prop.Name, nil)
+	if err != nil {
+		log.Println(err)
+	}
+	printers.PrintProperty([]*structs.Property{pro3})
+
+	pro4, err := client.GetNodeProperty(schema.Name, prop.Name, nil)
+	if err != nil {
+		log.Println(err)
+	}
+	printers.PrintProperty([]*structs.Property{pro4})
+
+	pro5, err := client.GetEdgeProperty(schema.Name, prop.Name, nil)
+	if err != nil {
+		log.Println(err)
+	}
+	printers.PrintProperty([]*structs.Property{pro5})
+
+	prop1 := prop
+	prop1.Name = "中文123"
+	_, err = client.AlterProperty(ultipa.DBType_DBNODE, prop, prop1, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = client.DropProperty(ultipa.DBType_DBNODE, schema.Name, prop1.Name, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = client.DropNodeProperty(schema.Name, "中文Property1", nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = client.DropEdgeProperty(schema.Name, prop.Name, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+}
