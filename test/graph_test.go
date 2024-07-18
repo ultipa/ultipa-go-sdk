@@ -155,3 +155,34 @@ func TestUltipaAPI_AlterGraph(t *testing.T) {
 		})
 	}
 }
+
+func TestTruncate(t *testing.T) {
+	tr := &structs.Truncate{
+		GraphName: "test",
+		DbType:    nil,
+		Schema:    "*",
+	}
+	response, err := client.Truncate(tr, nil)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(response)
+
+	db := ultipa.DBType_DBNODE
+	tr.DbType = &db
+	response, err = client.Truncate(tr, nil)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(response)
+
+	db = ultipa.DBType_DBEDGE
+	tr.DbType = &db
+	tr.Schema = "中文"
+	response, err = client.Truncate(tr, nil)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(response)
+
+}

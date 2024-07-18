@@ -178,6 +178,15 @@ func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configu
 		request.DbType = &t
 	}
 
+	var schemaName string
+	var err error
+	if !(request.Schema == "*" || request.Schema == "") {
+		schemaName, err = CheckReplaceSchemaPropertyName(request.Schema)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("%s, graphName = %s", err.Error(), request.GraphName))
+		}
+	}
+
 	if request.Schema != "" {
 		if !(*request.DbType == ultipa.DBType_DBNODE || *request.DbType == ultipa.DBType_DBEDGE) {
 			return nil, fmt.Errorf("to truncate schema, dbType must be DBType_DBNODE or DBType_DBEDGE")
@@ -186,7 +195,7 @@ func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configu
 		if request.Schema == "*" {
 			request.Schema = `"*"`
 		} else {
-			request.Schema = "@" + request.Schema
+			request.Schema = "@" + schemaName
 		}
 
 	} else {
@@ -197,11 +206,11 @@ func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configu
 
 	switch *request.DbType {
 	case ultipa.DBType_DBNODE:
-		uql = fmt.Sprintf(`truncate().graph("%v").node(%v)`, request.GraphName, request.Schema)
+		uql = fmt.Sprintf(`truncate().graph("%v").nodes(%v)`, request.GraphName, request.Schema)
 	case ultipa.DBType_DBEDGE:
-		uql = fmt.Sprintf(`truncate().graph("%v").edge(%v)`, request.GraphName, request.Schema)
+		uql = fmt.Sprintf(`truncate().graph("%v").edges(%v)`, request.GraphName, request.Schema)
 	default:
-
+		uql = fmt.Sprintf(`truncate().graph("%v")`, request.GraphName)
 	}
 
 	resp, err := api.Uql(uql, requestConfig)
