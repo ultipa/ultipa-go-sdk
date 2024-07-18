@@ -173,6 +173,11 @@ func (api *UltipaAPI) AlterGraph(oldGraph, newGraph *structs.GraphSet, requestCo
 
 func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 	uql := ""
+	if request.DbType == nil {
+		t := ultipa.DBType_DBGLOBAL
+		request.DbType = &t
+	}
+
 	if request.Schema != "" {
 		if !(*request.DbType == ultipa.DBType_DBNODE || *request.DbType == ultipa.DBType_DBEDGE) {
 			return nil, fmt.Errorf("to truncate schema, dbType must be DBType_DBNODE or DBType_DBEDGE")
@@ -185,7 +190,7 @@ func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configu
 		}
 
 	} else {
-		if !(*request.DbType == ultipa.DBType_DBGLOBAL || request.DbType == nil) {
+		if !(*request.DbType == ultipa.DBType_DBGLOBAL) {
 			return nil, fmt.Errorf("to truncate graph, dbType must be DBType_DBGLOBAL or nil")
 		}
 	}
@@ -196,7 +201,7 @@ func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configu
 	case ultipa.DBType_DBEDGE:
 		uql = fmt.Sprintf(`truncate().graph("%v").edge(%v)`, request.GraphName, request.Schema)
 	default:
-		uql = fmt.Sprintf(`truncate().graph("%v")`, request.GraphName)
+
 	}
 
 	resp, err := api.Uql(uql, requestConfig)
