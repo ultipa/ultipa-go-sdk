@@ -65,7 +65,6 @@ func (api *UltipaAPI) CreateGraphIfNotExist(graph *structs.GraphSet, requestConf
 }
 
 func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
-
 	resp, err := api.Uql(fmt.Sprintf(`create().graph("%v", "%v")`, graph.Name, graph.Description), requestConfig)
 
 	if err != nil {
@@ -112,7 +111,6 @@ func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, requestConfig *config
 }
 
 func (api *UltipaAPI) DropGraph(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
-
 	resp, err := api.Uql(fmt.Sprintf(`drop().graph("%v")`, graphName), requestConfig)
 
 	if err != nil {
