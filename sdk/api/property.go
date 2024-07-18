@@ -226,7 +226,7 @@ func (api *UltipaAPI) AlterProperty(dbType ultipa.DBType, property, newProperty 
 		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), property.Name))
 	}
 
-	uql := fmt.Sprintf(`alter().%v("@%v.%v").set({name: "%v", description: "%v"})`, params, schemaName, propertyName, newProperty.Name, newProperty.Desc)
+	uql := fmt.Sprintf(`alter().%v(@%v.%v).set({name: "%v", description: "%v"})`, params, schemaName, propertyName, newProperty.Name, newProperty.Desc)
 
 	// Only modify the description of the property
 	if newProperty.Name == "" {
