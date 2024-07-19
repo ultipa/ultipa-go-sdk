@@ -172,7 +172,7 @@ func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, requestConf
 
 	exist = true
 	if s == nil {
-		_, err = api.CreateSchema(schema, true, requestConfig)
+		_, err = api.CreateSchema(schema, false, requestConfig)
 		exist = false
 	}
 
