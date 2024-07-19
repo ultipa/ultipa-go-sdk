@@ -126,7 +126,7 @@ func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, requ
 	return err
 }
 
-func (api *UltipaAPI) Export(request *ultipa.ExportRequest, listen Listener, requestConfig *configuration.RequestConfig) error {
+func (api *UltipaAPI) Export(request *ultipa.ExportRequest, listener Listener, requestConfig *configuration.RequestConfig) error {
 	var err error
 
 	client, err := api.GetControlClient(requestConfig)
@@ -185,7 +185,7 @@ func (api *UltipaAPI) Export(request *ultipa.ExportRequest, listen Listener, req
 			}
 
 			wg.Wait()
-			err = listen.ProcessNodes(nodes)
+			err = listener.ProcessNodes(nodes)
 		}
 
 		if record.EdgeTable != nil {
@@ -209,7 +209,7 @@ func (api *UltipaAPI) Export(request *ultipa.ExportRequest, listen Listener, req
 			}
 
 			wg.Wait()
-			err = listen.ProcessEdges(edges)
+			err = listener.ProcessEdges(edges)
 		}
 
 		if err != nil {
