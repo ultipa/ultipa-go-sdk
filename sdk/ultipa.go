@@ -7,9 +7,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/connection"
 )
 
-var (
-	Version = "v4.4.0"
-)
+const Version = "v4.5.0"
 
 // Create an Ultipa Client
 func NewUltipa(config *configuration.UltipaConfig) (*api.UltipaAPI, error) {
