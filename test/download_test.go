@@ -45,7 +45,7 @@ func TestDownloadAll(t *testing.T) {
 
 		return nil
 	}
-	err := client.DownloadAllAlgoResultFile2("1", nil, receive)
+	err := client.DownloadAllAlgoResultFile("1", nil, receive)
 	if err != nil {
 		panic(err)
 	}

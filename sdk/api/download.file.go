@@ -48,28 +48,7 @@ func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, taskId string, con
 	return err
 }
 
-func (api *UltipaAPI) DownloadAllAlgoResultFile(taskId string, config *configuration.RequestConfig, receive func(data []byte) error) error {
-	tasks, err := api.ShowTask(taskId, structs.TaskstatusAll, config)
-	if err != nil {
-		return errors.New("get task failed, " + err.Error())
-	}
-
-	files, err := tasks[0].GetTaskFileName()
-	if err != nil {
-		return err
-	}
-
-	for _, file := range files {
-		err = api.DownloadAlgoResultFile(file, taskId, config, receive)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (api *UltipaAPI) DownloadAllAlgoResultFile2(taskId string, config *configuration.RequestConfig, receive func(data []byte, fileName string) error) error {
+func (api *UltipaAPI) DownloadAllAlgoResultFile(taskId string, config *configuration.RequestConfig, receive func(data []byte, fileName string) error) error {
 	var err error
 
 	client, err := api.GetControlClient(config)
