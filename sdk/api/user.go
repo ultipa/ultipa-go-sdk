@@ -27,9 +27,9 @@ func (api *UltipaAPI) ShowUser(requestConfig *configuration.RequestConfig) (user
 	return users, nil
 }
 
-func (api *UltipaAPI) GetUser(name string, config *configuration.RequestConfig) (user *structs.User, err error) {
-	uql := fmt.Sprintf(`show().user("%s")`, name)
-	resp, err := api.Uql(uql, config)
+func (api *UltipaAPI) GetUser(userName string, requestConfig *configuration.RequestConfig) (user *structs.User, err error) {
+	uql := fmt.Sprintf(`show().user("%s")`, userName)
+	resp, err := api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
@@ -46,9 +46,9 @@ func (api *UltipaAPI) GetUser(name string, config *configuration.RequestConfig) 
 	return user, nil
 }
 
-func (api *UltipaAPI) CreateUser(user *structs.User, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
-	uql := user.ToCreateUserUql()
-	resp, err = api.Uql(uql, config)
+func (api *UltipaAPI) CreateUser(request *structs.CreateUser, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+	uql := request.ToCreateUserUql()
+	resp, err = api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
@@ -60,9 +60,9 @@ func (api *UltipaAPI) CreateUser(user *structs.User, config *configuration.Reque
 	return resp, nil
 }
 
-func (api *UltipaAPI) AlterUser(user *structs.User, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
-	uql := user.ToAlterUserUql()
-	resp, err = api.Uql(uql, config)
+func (api *UltipaAPI) AlterUser(request *structs.AlterUser, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+	uql := request.ToAlterUserUql()
+	resp, err = api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
@@ -74,9 +74,9 @@ func (api *UltipaAPI) AlterUser(user *structs.User, config *configuration.Reques
 	return resp, nil
 }
 
-func (api *UltipaAPI) DropUser(userName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) DropUser(userName string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	uql := fmt.Sprintf(`drop().user("%s")`, userName)
-	resp, err = api.Uql(uql, config)
+	resp, err = api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err

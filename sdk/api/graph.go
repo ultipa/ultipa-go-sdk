@@ -178,13 +178,9 @@ func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configu
 		request.DbType = &t
 	}
 
-	var schemaName string
-	var err error
-	if !(request.Schema == "*" || request.Schema == "") {
-		schemaName, err = CheckReplaceSchemaPropertyName(request.Schema)
-		if err != nil {
-			return nil, errors.New(fmt.Sprintf("%s, graphName = %s", err.Error(), request.GraphName))
-		}
+	schemaName, err := CheckReplaceSchemaPropertyName(request.Schema)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, graphName = %s", err.Error(), request.GraphName))
 	}
 
 	if request.Schema != "" {

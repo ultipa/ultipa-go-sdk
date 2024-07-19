@@ -89,6 +89,10 @@ func CheckName(name string) error {
 //
 // Used for schemaName and propertyName
 func CheckReplaceSchemaPropertyName(name string) (string, error) {
+	if name == "" || name == "*" {
+		return name, nil
+	}
+
 	err := CheckName(name)
 	if err != nil {
 		return "", err

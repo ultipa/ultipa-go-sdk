@@ -10,17 +10,17 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
-func (api *UltipaAPI) ShowTask(algoNameOrId string, TaskStatus structs.TaskStatus, config *configuration.RequestConfig) (tasks []*structs.Task, err error) {
+func (api *UltipaAPI) ShowTask(algoNameOrId string, status structs.TaskStatus, requestConfig *configuration.RequestConfig) (tasks []*structs.Task, err error) {
 	uql := ""
 	if len(algoNameOrId) == 0 {
 		uql = "show().task()"
 	} else if utils.IsAllDigits(algoNameOrId) {
 		uql = fmt.Sprintf("show().task(%v)", algoNameOrId)
 	} else {
-		uql = fmt.Sprintf(`show().task("%v","%v")`, algoNameOrId, TaskStatus.String())
+		uql = fmt.Sprintf(`show().task("%v","%v")`, algoNameOrId, status.String())
 	}
 
-	resp, err := api.Uql(uql, config)
+	resp, err := api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
@@ -34,14 +34,14 @@ func (api *UltipaAPI) ShowTask(algoNameOrId string, TaskStatus structs.TaskStatu
 	return tasks, err
 }
 
-func (api *UltipaAPI) ClearTask(algoNameOrId string, TaskStatus structs.TaskStatus, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) ClearTask(algoNameOrId string, status structs.TaskStatus, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	uql := ""
 	if len(algoNameOrId) == 0 {
 		uql = `clear().task("*")`
 	} else if utils.IsAllDigits(algoNameOrId) {
 		uql = fmt.Sprintf("clear().task(%v)", algoNameOrId)
 	} else {
-		uql = fmt.Sprintf(`clear().task("%v","%v")`, algoNameOrId, TaskStatus.String())
+		uql = fmt.Sprintf(`clear().task("%v","%v")`, algoNameOrId, status.String())
 	}
 
 	resp, err = api.Uql(uql, config)

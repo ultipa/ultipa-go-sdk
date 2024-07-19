@@ -185,4 +185,12 @@ func TestTruncate(t *testing.T) {
 	}
 	log.Println(response)
 
+	tr.DbType = nil
+	tr.Schema = ""
+	response, err = client.Truncate(tr, nil)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(response)
+
 }

@@ -183,3 +183,15 @@ func TestProperty(t *testing.T) {
 	}
 
 }
+
+func TestProperty2(t *testing.T) {
+	prop := &structs.Property{
+		Name: "中文Property2",
+		Desc: "中文描述",
+		Type: ultipa.PropertyType_STRING,
+	}
+	_, err := client.CreatePropertyIfNotExist(ultipa.DBType_DBNODE, "default", prop, nil)
+	if err != nil {
+		log.Println(err)
+	}
+}

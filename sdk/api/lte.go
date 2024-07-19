@@ -10,8 +10,19 @@ import (
 
 func (api *UltipaAPI) Lte(dbType ultipa.DBType, schemaName, propertyName string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	uql := ""
+
 	if schemaName == "" {
 		schemaName = "*"
+	}
+
+	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
+	}
+
+	propertyName, err = CheckReplaceSchemaPropertyName(propertyName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), propertyName))
 	}
 
 	switch dbType {
@@ -39,6 +50,16 @@ func (api *UltipaAPI) Ufe(dbType ultipa.DBType, schemaName, propertyName string,
 	uql := ""
 	if schemaName == "" {
 		schemaName = "*"
+	}
+
+	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
+	}
+
+	propertyName, err = CheckReplaceSchemaPropertyName(propertyName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), propertyName))
 	}
 
 	switch dbType {

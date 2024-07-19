@@ -22,6 +22,16 @@ func (api *UltipaAPI) CreateIndex(dbType ultipa.DBType, schemaName, propertyName
 		schemaName = "*"
 	}
 
+	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
+	}
+
+	propertyName, err = CheckReplaceSchemaPropertyName(propertyName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), propertyName))
+	}
+
 	switch dbType {
 	case ultipa.DBType_DBNODE:
 		uql = fmt.Sprintf(`create().node_index(@%v.%v)`, schemaName, propertyName)
@@ -103,6 +113,16 @@ func (api *UltipaAPI) DropIndex(dbType ultipa.DBType, schemaName, propertyName s
 		schemaName = "*"
 	}
 
+	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
+	}
+
+	propertyName, err = CheckReplaceSchemaPropertyName(propertyName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), propertyName))
+	}
+
 	switch dbType {
 	case ultipa.DBType_DBNODE:
 		uql = fmt.Sprintf(`drop().node_index(@%v.%v)`, schemaName, propertyName)
@@ -126,6 +146,17 @@ func (api *UltipaAPI) DropIndex(dbType ultipa.DBType, schemaName, propertyName s
 
 func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyName, fulltextName string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	uql := ""
+
+	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
+	}
+
+	propertyName, err = CheckReplaceSchemaPropertyName(propertyName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), propertyName))
+	}
+
 	switch dbType {
 	case ultipa.DBType_DBNODE:
 		uql = fmt.Sprintf(`create().node_fulltext(@%v.%v, "%v")`, schemaName, propertyName, fulltextName)
@@ -200,4 +231,24 @@ func (api *UltipaAPI) ShowNodeFullText(requestConfig *configuration.RequestConfi
 	indexes, err = resp.Alias(http.RESP_NODE_FULLTEXT_KEY).AsFullText()
 
 	return indexes, err
+}
+
+func (api *UltipaAPI) DropFullText(fullTextName string, dbType ultipa.DBType, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+
+	uql := ""
+	switch dbType {
+	case ultipa.DBType_DBNODE:
+		uql = fmt.Sprintf(`drop().node_fulltext("%v")`, fullTextName)
+	case ultipa.DBType_DBEDGE:
+		uql = fmt.Sprintf(`drop().edge_fulltext("%v")`, fullTextName)
+	default:
+		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
+	}
+
+	resp, err = api.Uql(uql, requestConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, err
 }
