@@ -8,16 +8,16 @@ import (
 	"io"
 )
 
-func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, taskId string, config *configuration.RequestConfig, receive func(data []byte) error) error {
+func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, taskId string, requestConfig *configuration.RequestConfig, receive func(data []byte) error) error {
 	var err error
 
-	client, err := api.GetControlClient(config)
+	client, err := api.GetControlClient(requestConfig)
 
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(config)
+	ctx, cancel, err := api.Pool.NewContext(requestConfig)
 	if err != nil {
 		return err
 	}
@@ -48,22 +48,22 @@ func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, taskId string, con
 	return err
 }
 
-func (api *UltipaAPI) DownloadAllAlgoResultFile(taskId string, config *configuration.RequestConfig, receive func(data []byte, fileName string) error) error {
+func (api *UltipaAPI) DownloadAllAlgoResultFile(taskId string, requestConfig *configuration.RequestConfig, receive func(data []byte, fileName string) error) error {
 	var err error
 
-	client, err := api.GetControlClient(config)
+	client, err := api.GetControlClient(requestConfig)
 
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(config)
+	ctx, cancel, err := api.Pool.NewContext(requestConfig)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	tasks, err := api.ShowTask(taskId, structs.TaskstatusAll, config)
+	tasks, err := api.ShowTask(taskId, structs.TaskstatusAll, requestConfig)
 	if err != nil {
 		return errors.New("get task failed, " + err.Error())
 	}
