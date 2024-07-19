@@ -4943,7 +4943,7 @@ var file_ultipa_proto_depIdxs = []int32{
 	29, // 72: ultipa.UltipaControls.GetLeader:input_type -> ultipa.GetLeaderRequest
 	12, // 73: ultipa.UltipaControls.UqlEx:input_type -> ultipa.UqlRequest
 	27, // 74: ultipa.UltipaControls.Export:input_type -> ultipa.ExportRequest
-	25, // 75: ultipa.UltipaControls.DownloadAlgoResultFile:input_type -> ultipa.DownloadFileRequestV2
+	25, // 75: ultipa.UltipaControls.DownloadFileV2:input_type -> ultipa.DownloadFileRequestV2
 	35, // 76: ultipa.UltipaControls.InstallAlgo:input_type -> ultipa.InstallAlgoRequest
 	37, // 77: ultipa.UltipaControls.UninstallAlgo:input_type -> ultipa.UninstallAlgoRequest
 	39, // 78: ultipa.UltipaControls.Uploader:input_type -> ultipa.UploaderRequest
@@ -4960,7 +4960,7 @@ var file_ultipa_proto_depIdxs = []int32{
 	30, // 89: ultipa.UltipaControls.GetLeader:output_type -> ultipa.GetLeaderReply
 	14, // 90: ultipa.UltipaControls.UqlEx:output_type -> ultipa.UqlReply
 	28, // 91: ultipa.UltipaControls.Export:output_type -> ultipa.ExportReply
-	26, // 92: ultipa.UltipaControls.DownloadAlgoResultFile:output_type -> ultipa.DownloadFileReply
+	26, // 92: ultipa.UltipaControls.DownloadFileV2:output_type -> ultipa.DownloadFileReply
 	36, // 93: ultipa.UltipaControls.InstallAlgo:output_type -> ultipa.InstallAlgoReply
 	38, // 94: ultipa.UltipaControls.UninstallAlgo:output_type -> ultipa.UninstallAlgoReply
 	40, // 95: ultipa.UltipaControls.Uploader:output_type -> ultipa.UploaderReply
