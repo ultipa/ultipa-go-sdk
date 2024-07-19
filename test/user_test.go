@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"log"
 	"testing"
 )
 
@@ -41,15 +42,38 @@ func TestUserUql(t *testing.T) {
 		},
 	}
 
-	p := structs.User{
-		UserName: "yu1112",
-		PassWord: "1112",
-		//GraphPrivileges: gp,
-		//SystemPrivileges: []string{"STAT"},
+	p := structs.CreateUser{
+		UserName:           "yu2345",
+		PassWord:           "111asdad2",
+		GraphPrivileges:    structs.GraphPrivileges{},
+		SystemPrivileges:   []string{},
 		PropertyPrivileges: pp,
 		//Policies:           []string{"yu"},
+		Policies: []string{"yu"},
 	}
 
 	fmt.Println(p.ToCreateUserUql())
-	fmt.Println(p.ToAlterUserUql())
+	p1 := structs.AlterUser(p)
+	fmt.Println(p1.ToAlterUserUql())
+
+	_, err := client.DropUser(p.UserName, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = client.CreateUser(&p, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	p1.PassWord = ""
+	p1.Policies = []string{}
+	p1.SystemPrivileges = nil
+	fmt.Println(p1.ToAlterUserUql())
+
+	_, err = client.AlterUser(&p1, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
 }

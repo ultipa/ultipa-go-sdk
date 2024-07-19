@@ -7,7 +7,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) SetUserSetting(setUserSetting *structs.SetUserSetting, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) SetUserSetting(request *structs.SetUserSetting, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 	var err error
 
 	client, err := api.GetControlClient(requestConfig)
@@ -23,10 +23,10 @@ func (api *UltipaAPI) SetUserSetting(setUserSetting *structs.SetUserSetting, req
 	defer cancel()
 
 	res, err := client.UserSetting(ctx, &ultipa.UserSettingRequest{
-		UserName: setUserSetting.UserName,
+		UserName: request.UserName,
 		Opt:      ultipa.UserSettingRequest_OPT_SET,
-		Type:     setUserSetting.Type,
-		Data:     setUserSetting.Data,
+		Type:     request.Type,
+		Data:     request.Data,
 	})
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (api *UltipaAPI) SetUserSetting(setUserSetting *structs.SetUserSetting, req
 	return resp, err
 }
 
-func (api *UltipaAPI) GetUserSetting(getUserSetting *structs.GetUserSetting, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) GetUserSetting(request *structs.GetUserSetting, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 	var err error
 
 	client, err := api.GetControlClient(requestConfig)
@@ -67,9 +67,9 @@ func (api *UltipaAPI) GetUserSetting(getUserSetting *structs.GetUserSetting, req
 	defer cancel()
 
 	res, err := client.UserSetting(ctx, &ultipa.UserSettingRequest{
-		UserName: getUserSetting.UserName,
+		UserName: request.UserName,
 		Opt:      ultipa.UserSettingRequest_OPT_GET,
-		Type:     getUserSetting.Type,
+		Type:     request.Type,
 	})
 	if err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func (api *UltipaAPI) GetUserSetting(getUserSetting *structs.GetUserSetting, req
 		DataItemMap: map[string]struct {
 			DataItem *http.DataItem
 			Index    int
-		}{getUserSetting.UserName: {DataItem: data}},
+		}{request.UserName: {DataItem: data}},
 	}
 
 	return resp, err

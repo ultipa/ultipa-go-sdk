@@ -97,7 +97,55 @@ func (u *CreateUser) ToCreateUserUql() string {
 	//return fmt.Sprintf("create().user(\"%s\",\n%s,\n%s,\n%s,\n%s\n)", u.Name, utils.ToJSONString(u.GraphPrivileges), utils.ToJSONString(u.SystemPrivileges), utils.ToJSONString(u.Policies), utils.ToJSONString(u.PropertyPrivileges))
 }
 
+//func (u *AlterUser) ToAlterUserUql() string {
+//	//return fmt.Sprintf("alter().policy(\"%s\").set({\ngraph_privileges: %s,\nsystem_privileges: %s,\npolicies: %s,\nproperty_privileges: %s\n})", p.Name, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.Policies), utils.ToJSONString(p.PropertyPrivileges))
+//	return fmt.Sprintf("alter().user(\"%s\").set(%s)", u.UserName, utils.ToJSONString(u))
+//}
+
 func (u *AlterUser) ToAlterUserUql() string {
-	//return fmt.Sprintf("alter().policy(\"%s\").set({\ngraph_privileges: %s,\nsystem_privileges: %s,\npolicies: %s,\nproperty_privileges: %s\n})", p.Name, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.Policies), utils.ToJSONString(p.PropertyPrivileges))
-	return fmt.Sprintf("alter().user(\"%s\").set(%s)", u.UserName, utils.ToJSONString(u))
+	uql := fmt.Sprintf("alter().user(\"%s\").set({\n", u.UserName)
+
+	s := ""
+
+	if u.PassWord != "" {
+		s = fmt.Sprintf("password: \"%s\"", u.PassWord)
+		uql += s
+	}
+
+	if u.GraphPrivileges != nil {
+		if s != "" {
+			s = ",\n"
+		}
+		s += "graph_privileges:" + utils.ToJSONString(u.GraphPrivileges)
+		uql += s
+	}
+
+	if u.SystemPrivileges != nil {
+		if s != "" {
+			s = ",\n"
+		}
+		s += "system_privileges:" + utils.ToJSONString(u.SystemPrivileges)
+		uql += s
+	}
+
+	if u.Policies != nil {
+		if s != "" {
+			s = ",\n"
+		}
+		s += "policies:" + utils.ToJSONString(u.Policies)
+		uql += s
+	}
+
+	if u.PropertyPrivileges != nil {
+		if s != "" {
+			s = ",\n"
+		}
+		s += "property_privileges:" + utils.ToJSONString(u.PropertyPrivileges)
+		uql += s
+	}
+
+	uql += "\n})"
+
+	return uql
+	//return fmt.Sprintf("create().user(\"%s\",\n%s,\n%s,\n%s,\n%s\n)", u.Name, utils.ToJSONString(u.GraphPrivileges), utils.ToJSONString(u.SystemPrivileges), utils.ToJSONString(u.Policies), utils.ToJSONString(u.PropertyPrivileges))
 }
