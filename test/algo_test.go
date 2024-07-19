@@ -10,9 +10,7 @@ import (
 )
 
 func TestListAlgo(t *testing.T) {
-
-	//client, _ := GetClient([]string{"210.13.32.146:60074"}, "default")
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
 	algos, err := client.ShowAlgo(nil)
 
@@ -24,10 +22,9 @@ func TestListAlgo(t *testing.T) {
 }
 
 func TestInstallAlgo(t *testing.T) {
-	//client, _ := GetClient([]string{"210.13.32.146:60074"}, "default")
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
-	resp, err := client.InstallAlgo("./test_algo_lib/libplugin_lpa.so", "./test_algo_lib/lpa.yml", nil)
+	resp, err := client.InstallAlgo("./data/installAlgo/libplugin_lpa.so", "./data/installAlgo/lpa.yml", nil)
 
 	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
 		logger.PrintError(resp.Status.Msg)
@@ -42,9 +39,7 @@ func TestInstallAlgo(t *testing.T) {
 }
 
 func TestUninstallAlgo(t *testing.T) {
-
-	//client, _ := GetClient([]string{"210.13.32.146:60074"}, "default")
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
 	resp, err := client.UninstallAlgo("lpa", nil)
 

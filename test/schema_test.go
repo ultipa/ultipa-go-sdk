@@ -124,7 +124,7 @@ func TestShowSchema(t *testing.T) {
 }
 
 func TestCreateSchemaWithProperties(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 	// create schema with properties
 	newSchemaWithProperties := &structs.Schema{
 		Name: "_abc _acd",

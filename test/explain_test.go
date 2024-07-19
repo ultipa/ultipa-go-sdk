@@ -11,7 +11,7 @@ import (
 
 func TestExplain(t *testing.T) {
 
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
 	//resp, err := client.Uql("explain find().nodes() as nodes limit 1 return nodes limit 10", nil)
 	//	resp, err := client.Uql(`explain n({@account} as buyer).e().n({@card}).re({@transaction} as buy).n()

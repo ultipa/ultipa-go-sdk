@@ -14,7 +14,7 @@ import (
 
 func TestShowGraph(t *testing.T) {
 	InitCases()
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 	res, err := client.ShowGraph(nil)
 	if err != nil {
 		log.Panic(err)
@@ -56,7 +56,7 @@ func TestDropGraph(t *testing.T) {
 }
 
 func TestAsGraph(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 	resp, _ := client.Uql("show().graph()", nil)
 	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphSets()
 

@@ -130,7 +130,7 @@ func TestBatchInsertEdges(t *testing.T) {
 
 	//client, _ := GetClient([]string{"192.168.1.85:60041"}, "zjstest")
 	//client, _ := GetClient([]string{"192.168.1.71:60061"}, "default")
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
 	total := 500
 	finished := 0
@@ -207,7 +207,7 @@ func TestBatchInsertEdges(t *testing.T) {
 }
 
 func TestCheckPropAndValueAutoData(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 	timestamp1, _ := utils.NewTimestampFromString("2018-08-17T09:57:33+08:00", nil)
 	timestamp2, _ := utils.NewTimestampFromString("2018-08-17 09:57:33", nil)
 	node1 := structs.Node{
@@ -261,7 +261,7 @@ func TestCheckPropAndValueAutoData(t *testing.T) {
 }
 
 func TestBatchInsert2(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 	node1 := structs.Node{
 		Values: &structs.Values{
 			Data: map[string]interface {

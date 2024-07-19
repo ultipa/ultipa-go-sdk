@@ -12,7 +12,7 @@ import (
 )
 
 func TestInsertNodeWithListProperty(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
 	schema := structs.NewSchema("default")
 	schema.Properties = append(schema.Properties, &structs.Property{
@@ -44,7 +44,7 @@ func TestInsertNodeWithListProperty(t *testing.T) {
 }
 
 func TestInsertPointProperty(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 	schema := structs.NewSchema("nodeSchemaList")
 	schema.Properties = append(schema.Properties, &structs.Property{
 		Name:     "typePoint",
@@ -84,7 +84,7 @@ func TestInsertPointProperty(t *testing.T) {
 }
 
 func TestInsertBlobProperty(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 	schemaName := "node_schema"
 	schema := structs.NewSchema(schemaName)
 	schema.Properties = append(schema.Properties, &structs.Property{
@@ -135,7 +135,7 @@ func TestInsertBlobProperty(t *testing.T) {
 }
 
 func TestInsertDecimalProperty(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 	schemaName := "default"
 	schema := structs.NewSchema(schemaName)
 	schema.Properties = append(schema.Properties, &structs.Property{
@@ -186,7 +186,7 @@ func TestInsertDecimalProperty(t *testing.T) {
 }
 
 func TestInsertNodeWithSetProperty(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
 	schema := structs.NewSchema("default")
 	schema.Properties = append(schema.Properties, &structs.Property{

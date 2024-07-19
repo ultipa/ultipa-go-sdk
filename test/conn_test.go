@@ -65,7 +65,7 @@ func TestNewConn(t *testing.T) {
 }
 
 func TestUql(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 	res, _ := client.Uql("n().e().n() as path return path limit 10;", nil)
 	log.Println(res.AliasList, res.Get(0), res.Status.Code, res.Status.Message)
 }
@@ -83,7 +83,7 @@ func TestUqlWithSpecialHost(t *testing.T) {
 }
 
 func TestRefreshPool(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 	for i := 0; i < 1000; i++ {
 		err := client.Pool.RefreshActivesWithSeconds(1)
 		if err != nil {
@@ -95,7 +95,7 @@ func TestRefreshPool(t *testing.T) {
 
 func TestGetConnByUQL(t *testing.T) {
 
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
 	uql := "show().schema()"
 	_, leader, followers, global, err := client.GetConnByUQL(uql, graph)

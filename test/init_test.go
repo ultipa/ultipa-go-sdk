@@ -19,23 +19,11 @@ var password string
 var graph string
 
 func TestMain(m *testing.M) {
-	var err error
-	env, err = godotenv.Read(".env")
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	hosts = strings.Split(env["hosts"], ",")
-	username, password, graph = env["username"], env["password"], env["graph"]
-
-	client, err = GetClient(hosts, graph)
-
-	if err != nil {
-		log.Fatalln(err)
-	}
+	setup()
 
 	m.Run()
+
+	teardown()
 }
 
 func TestPing(t *testing.T) {
@@ -66,4 +54,27 @@ func GetClient(hosts []string, graphName string) (*api.UltipaAPI, error) {
 	}
 
 	return client, err
+}
+
+func setup() {
+	fmt.Println("Setting up the test environment")
+	var err error
+	env, err = godotenv.Read(".env")
+
+	if err != nil {
+		log.Fatalln("Get env error, ", err)
+	}
+
+	hosts = strings.Split(env["hosts"], ",")
+	username, password, graph = env["username"], env["password"], env["graph"]
+
+	client, err = GetClient(hosts, graph)
+
+	if err != nil {
+		log.Fatalln("GetClient error, ", err)
+	}
+}
+
+func teardown() {
+	log.Println("Tearing down the test environment")
 }
