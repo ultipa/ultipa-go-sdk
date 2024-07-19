@@ -78,7 +78,6 @@ func (u *CreateUser) ToCreateUserUql() string {
 
 	if u.Policies != nil {
 		s = utils.ToJSONString(u.Policies) + ",\n"
-		uql += s
 	} else {
 		s = "[],\n"
 	}
