@@ -42,6 +42,7 @@ type CreateUser struct {
 
 type AlterUser struct {
 	UserName           string             `json:"-"`
+	PassWord           string             `json:"password,omitempty"`
 	GraphPrivileges    GraphPrivileges    `json:"graph_privileges,omitempty"`
 	SystemPrivileges   []string           `json:"system_privileges,omitempty"`
 	Policies           []string           `json:"policies,omitempty"`
