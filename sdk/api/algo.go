@@ -2,9 +2,12 @@ package api
 
 import (
 	"bufio"
+	"errors"
+	"fmt"
 	"github.com/codingsince1985/checksum"
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"io"
 	"os"
@@ -18,7 +21,11 @@ func (api *UltipaAPI) ShowAlgo(config *configuration.RequestConfig) ([]*structs.
 		return nil, err
 	}
 
-	algos, err := resp.Get(0).AsAlgos()
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
+	}
+
+	algos, err := resp.Alias(http.RESP_ALGOS_KEY).AsAlgos()
 
 	if err != nil {
 		return nil, err
@@ -128,6 +135,10 @@ func (api *UltipaAPI) InstallAlgo(soFilePath string, infoFilePath string, config
 		return nil, err
 	}
 
+	if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(reply.Status.Msg)
+	}
+
 	return reply, nil
 
 }
@@ -154,5 +165,23 @@ func (api *UltipaAPI) UninstallAlgo(algoName string, config *configuration.Reque
 		return nil, err
 	}
 
+	if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(reply.Status.Msg)
+	}
+
 	return reply, nil
+}
+
+func (api *UltipaAPI) GetAlgo(algoName string, config *configuration.RequestConfig) (*structs.Algo, error) {
+	algos, err := api.ShowAlgo(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, algo := range algos {
+		if algo.Name == algoName {
+			return algo, nil
+		}
+	}
+	return nil, fmt.Errorf("algo %v not found", algoName)
 }

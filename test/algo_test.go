@@ -1,15 +1,12 @@
 package test
 
 import (
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
-	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 	"log"
-	"os"
 	"testing"
 )
 
-func TestListAlgo(t *testing.T) {
+func TestShowAlgo(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
 
 	algos, err := client.ShowAlgo(nil)
@@ -21,37 +18,35 @@ func TestListAlgo(t *testing.T) {
 	printers.PrintAlgoList(algos)
 }
 
-func TestInstallAlgo(t *testing.T) {
+func TestAlgo(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
 
-	resp, err := client.InstallAlgo("./data/installAlgo/libplugin_lpa.so", "./data/installAlgo/lpa.yml", nil)
+	algoName := "lpa"
+	_, err := client.GetAlgo(algoName, nil)
 
-	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		logger.PrintError(resp.Status.Msg)
-		os.Exit(1)
+	if err == nil {
+		// if algo exist UninstallAlgo
+		_, err := client.UninstallAlgo("lpa", nil)
+		if err != nil {
+			t.Errorf("UninstallAlgo error, %v", err)
+		}
 	}
+
+	// InstallAlgo
+	_, err = client.InstallAlgo("./data/installAlgo/libplugin_lpa.so", "./data/installAlgo/lpa.yml", nil)
 
 	if err != nil {
-		logger.PrintErrAndExist(err.Error())
+		t.Errorf("InstallAlgo error, %v", err)
 	}
 
-	TestListAlgo(t)
-}
-
-func TestUninstallAlgo(t *testing.T) {
-	//client, _ := GetClient(hosts, graph)
-
-	resp, err := client.UninstallAlgo("lpa", nil)
-
-	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		logger.PrintError(resp.Status.Msg)
-		os.Exit(1)
+	algo, _ := client.GetAlgo(algoName, nil)
+	if algo == nil {
+		t.Errorf("No installed algorithm found")
 	}
 
+	// UninstallAlgo
+	_, err = client.UninstallAlgo("lpa", nil)
 	if err != nil {
-		logger.PrintErrAndExist(err.Error())
+		t.Errorf("UninstallAlgo error, %v", err)
 	}
-
-	TestListAlgo(t)
-
 }
