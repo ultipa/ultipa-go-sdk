@@ -185,7 +185,8 @@ func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configu
 
 	if request.Schema != "" {
 		if !(*request.DbType == ultipa.DBType_DBNODE || *request.DbType == ultipa.DBType_DBEDGE) {
-			return nil, fmt.Errorf("to truncate schema, dbType must be DBType_DBNODE or DBType_DBEDGE")
+			//return nil, fmt.Errorf("to truncate schema, dbType must be DBType_DBNODE or DBType_DBEDGE")
+			return nil, fmt.Errorf("to truncate schema, DbType is required in the parameters")
 		}
 
 		if request.Schema == "*" {
