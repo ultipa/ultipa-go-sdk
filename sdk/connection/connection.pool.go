@@ -40,7 +40,7 @@ type ConnectionPool struct {
 func NewConnectionPool(config *configuration.UltipaConfig) (*ConnectionPool, error) {
 
 	if len(config.Hosts) < 1 {
-		return nil, errors.New("Error Hosts can not by empty")
+		return nil, errors.New("error Hosts can not by empty")
 	}
 
 	pool := &ConnectionPool{
@@ -240,7 +240,7 @@ func (pool *ConnectionPool) doRefreshClusterInfo(graphName string) error {
 	return err
 }
 
-//resolveClusterInfo resolve graphName cluster info with connection conn
+// resolveClusterInfo resolve graphName cluster info with connection conn
 func (pool *ConnectionPool) resolveClusterInfo(graphName string, conn *Connection) error {
 
 	ctx, cancel, err := pool.NewContext(&configuration.RequestConfig{GraphName: graphName})
@@ -358,7 +358,7 @@ func (pool *ConnectionPool) GetMasterConn(config *configuration.UltipaConfig) (*
 
 }
 
-//SetMasterConn (graphName , *conn) Set master client
+// SetMasterConn (graphName , *conn) Set master client
 func (pool *ConnectionPool) SetMasterConn(graphName string, conn *Connection) {
 	pool.GraphMgr.SetLeader(graphName, conn)
 }

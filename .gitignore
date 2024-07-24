@@ -4,7 +4,6 @@
 .idea/*
 .vscode
 .vscode/*
-.idea/*
 coverage
 vendor
 .env

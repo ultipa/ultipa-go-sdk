@@ -254,7 +254,7 @@ func (api *UltipaAPI) buildUqlRequest(uql string, config *configuration.RequestC
 	return uqlRequest
 }
 
-// test connections
+// Test connection test
 func (api *UltipaAPI) Test(requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	conn, err := api.Pool.GetConn(nil)
 
@@ -286,6 +286,7 @@ func (api *UltipaAPI) Test(requestConfig *configuration.RequestConfig) (resp *ht
 
 	return resp, nil
 }
+
 func (api *UltipaAPI) GetActiveClientTest() (bool, *connection.Connection, error) {
 	conn, err := api.Pool.GetConn(nil)
 

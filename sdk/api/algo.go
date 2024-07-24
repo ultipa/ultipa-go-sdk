@@ -14,6 +14,7 @@ import (
 	"path"
 )
 
+// ShowAlgo get all algo
 func (api *UltipaAPI) ShowAlgo(config *configuration.RequestConfig) ([]*structs.Algo, error) {
 	resp, err := api.Uql("show().algo()", config)
 
@@ -34,6 +35,7 @@ func (api *UltipaAPI) ShowAlgo(config *configuration.RequestConfig) ([]*structs.
 	return algos, nil
 }
 
+// InstallAlgo install algo
 func (api *UltipaAPI) InstallAlgo(soFilePath string, infoFilePath string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
 
 	chunkSize := 1024 * 1024 * 1 // 2MB
@@ -143,6 +145,7 @@ func (api *UltipaAPI) InstallAlgo(soFilePath string, infoFilePath string, config
 
 }
 
+// UninstallAlgo uninstall algo
 func (api *UltipaAPI) UninstallAlgo(algoName string, config *configuration.RequestConfig) (*ultipa.UninstallAlgoReply, error) {
 
 	client, err := api.GetControlClient(config)
@@ -172,8 +175,9 @@ func (api *UltipaAPI) UninstallAlgo(algoName string, config *configuration.Reque
 	return reply, nil
 }
 
+// GetAlgo get a specific algorithm by name
 func (api *UltipaAPI) GetAlgo(algoName string, config *configuration.RequestConfig) (*structs.Algo, error) {
-	algos, err := api.ShowAlgo(nil)
+	algos, err := api.ShowAlgo(config)
 	if err != nil {
 		return nil, err
 	}

@@ -7,9 +7,10 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/connection"
 )
 
+// Version represents the current version of the SDK.
 const Version = "v4.5.0"
 
-// Create an Ultipa Client
+// NewUltipa Create an Ultipa Client
 func NewUltipa(config *configuration.UltipaConfig) (*api.UltipaAPI, error) {
 
 	config.FillDefault()
