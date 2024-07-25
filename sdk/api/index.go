@@ -10,6 +10,7 @@ package api
 import (
 	"errors"
 	"fmt"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
@@ -188,12 +189,12 @@ func (api *UltipaAPI) ShowFullText(requestConfig *configuration.RequestConfig) (
 		return nil, err
 	}
 
-	indexes, err = resp.Alias(http.RESP_NODE_FULLTEXT_KEY).AsFullText()
+	indexes, err = resp.Alias(http.RESP_NODE_FULLTEXT_KEY).AsFullTexts()
 	if err != nil {
 		return nil, err
 	}
 
-	edgeIndexes, err := resp.Alias(http.RESP_EDGE_FULLTEXT_KEY).AsFullText()
+	edgeIndexes, err := resp.Alias(http.RESP_EDGE_FULLTEXT_KEY).AsFullTexts()
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +214,7 @@ func (api *UltipaAPI) ShowEdgeFullText(requestConfig *configuration.RequestConfi
 		return nil, err
 	}
 
-	indexes, err = resp.Alias(http.RESP_EDGE_FULLTEXT_KEY).AsFullText()
+	indexes, err = resp.Alias(http.RESP_EDGE_FULLTEXT_KEY).AsFullTexts()
 
 	return indexes, err
 }
@@ -228,7 +229,7 @@ func (api *UltipaAPI) ShowNodeFullText(requestConfig *configuration.RequestConfi
 		return nil, err
 	}
 
-	indexes, err = resp.Alias(http.RESP_NODE_FULLTEXT_KEY).AsFullText()
+	indexes, err = resp.Alias(http.RESP_NODE_FULLTEXT_KEY).AsFullTexts()
 
 	return indexes, err
 }

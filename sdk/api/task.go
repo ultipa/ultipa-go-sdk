@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"fmt"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
@@ -29,7 +30,7 @@ func (api *UltipaAPI) ShowTask(algoNameOrId string, status structs.TaskStatus, r
 		return nil, errors.New(resp.Status.Message)
 	}
 
-	tasks, err = resp.Alias(http.RESP_TASK_KEY).AsTask()
+	tasks, err = resp.Alias(http.RESP_TASK_KEY).AsTasks()
 
 	return tasks, err
 }

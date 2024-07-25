@@ -3,6 +3,7 @@ package connection
 import (
 	"crypto/tls"
 	"crypto/x509"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"

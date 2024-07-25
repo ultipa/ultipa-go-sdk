@@ -2,10 +2,11 @@ package api
 
 import (
 	"errors"
+	"io"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
-	"io"
 )
 
 func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, taskId string, requestConfig *configuration.RequestConfig, receive func(data []byte) error) error {

@@ -4,8 +4,6 @@ import (
 	"time"
 )
 
-
-
 type UltipaTime struct {
 	Datetime uint64
 	Year     uint64
@@ -15,10 +13,10 @@ type UltipaTime struct {
 	Minute   uint64
 	Second   uint64
 	Macrosec uint64
-	Time *time.Time
+	Time     *time.Time
 }
 
-func (t *UltipaTime) New(datetime uint64) *UltipaTime{
+func (t *UltipaTime) New(datetime uint64) *UltipaTime {
 	n := UltipaTime{
 		Datetime: datetime,
 	}
@@ -29,10 +27,10 @@ func (t *UltipaTime) New(datetime uint64) *UltipaTime{
 // StringToTime , layoutISO := "2006-01-02 15:04:05.000"
 // StringToTime , layoutISO := "2006-01-02 15:04:05"
 // StringToTime , layoutISO := "2006-01-02"
-func (u *UltipaTime) NewFromString(dateString string) (*UltipaTime, error){
+func (u *UltipaTime) NewFromString(dateString string) (*UltipaTime, error) {
 	var err error
 	n := UltipaTime{}
-	layouts := []string {
+	layouts := []string{
 		"2006-1-2T15:04:05.000Z07:00",
 		"2006-1-2T15:04:05.000Z0700",
 		"2006-1-2T15:04:05Z07:00",
@@ -64,21 +62,20 @@ func (u *UltipaTime) NewFromString(dateString string) (*UltipaTime, error){
 //int second = ((datetime >> 24) & 0x3F);
 //int microsec = (datetime & 0xFFFFFF);
 
-//uint64_t year = 0;
-//uint64_t month = 0;
-//uint64_t day = 0;
-//uint64_t hour = 0;
-//uint64_t minute = 0;
-//uint64_t second = 0;
-//uint64_t macrosec = 0;
+// uint64_t year = 0;
+// uint64_t month = 0;
+// uint64_t day = 0;
+// uint64_t hour = 0;
+// uint64_t minute = 0;
+// uint64_t second = 0;
+// uint64_t macrosec = 0;
 //
-//if (year > 70 && year < 100) {
-//year += 1900;
-//} else if (year < 70) {
-//year += 2000;
-//}
-//
-func  (t *UltipaTime) Uint64ToTime(datetime uint64)  (_t *time.Time) {
+// if (year > 70 && year < 100) {
+// year += 1900;
+// } else if (year < 70) {
+// year += 2000;
+// }
+func (t *UltipaTime) Uint64ToTime(datetime uint64) (_t *time.Time) {
 	year_month := (datetime >> 46) & 0x1FFFF
 
 	t.Year = year_month / 13
@@ -97,23 +94,23 @@ func  (t *UltipaTime) Uint64ToTime(datetime uint64)  (_t *time.Time) {
 	t.Second = (datetime >> 24) & 0x3F
 	t.Macrosec = datetime & 0xFFFFFF
 
-	date := time.Date(int(t.Year),time.Month(t.Month),int(t.Day),int(t.Hour),int(t.Minute),int(t.Second),int(t.Macrosec * 1000), time.UTC)
+	date := time.Date(int(t.Year), time.Month(t.Month), int(t.Day), int(t.Hour), int(t.Minute), int(t.Second), int(t.Macrosec*1000), time.UTC)
 	t.Time = &date
 
 	return t.Time
 }
 
-//uint64_t datetime = 0;
-//uint64_t year_month = year * 13 + month;
-//datetime |= (year_month << 46);
-//datetime |= (day << 41);
-//datetime |= (hour << 36);
-//datetime |= (minute << 30);
-//datetime |= (second << 24);
-//datetime |= macrosec;
+// uint64_t datetime = 0;
+// uint64_t year_month = year * 13 + month;
+// datetime |= (year_month << 46);
+// datetime |= (day << 41);
+// datetime |= (hour << 36);
+// datetime |= (minute << 30);
+// datetime |= (second << 24);
+// datetime |= macrosec;
 func (u *UltipaTime) TimeToUint64(time *time.Time) uint64 {
 
-	datetime :=  uint64(0)
+	datetime := uint64(0)
 
 	u.Year = uint64(time.Year())
 	u.Month = uint64(time.Month())
@@ -123,7 +120,7 @@ func (u *UltipaTime) TimeToUint64(time *time.Time) uint64 {
 	u.Second = uint64(time.Second())
 	u.Macrosec = uint64(time.Nanosecond() / 1000)
 
-	yearMonth := u.Year * 13 + u.Month
+	yearMonth := u.Year*13 + u.Month
 	datetime = yearMonth << 46
 	datetime = datetime | (u.Day << 41)
 	datetime = datetime | (u.Hour << 36)
@@ -135,8 +132,6 @@ func (u *UltipaTime) TimeToUint64(time *time.Time) uint64 {
 
 	return datetime
 }
-
-
 
 func (u *UltipaTime) ToString() string {
 	return u.Time.Format("2006-01-02T15:04:05.000Z07:00")

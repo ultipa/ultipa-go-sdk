@@ -1,9 +1,10 @@
 package test
 
 import (
-	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"log"
 	"testing"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 )
 
 func TestDelete(t *testing.T) {

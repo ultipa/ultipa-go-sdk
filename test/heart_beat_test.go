@@ -1,11 +1,12 @@
 package test
 
 import (
-	"github.com/ultipa/ultipa-go-sdk/sdk"
-	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"log"
 	"testing"
 	"time"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 )
 
 func TestHeartBeat(t *testing.T) {

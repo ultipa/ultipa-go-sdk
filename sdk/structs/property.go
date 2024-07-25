@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"regexp"
 	"strings"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 )
 
 type Property struct {

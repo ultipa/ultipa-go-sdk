@@ -2,14 +2,14 @@ package configuration
 
 import (
 	"crypto/md5"
-	"github.com/jinzhu/copier"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"strconv"
 	"time"
+
+	"github.com/jinzhu/copier"
+	"gopkg.in/yaml.v3"
 )
 
-//
 type UltipaConfig struct {
 	Hosts            []string // hosts with ports
 	Username         string   // ultipa graph username

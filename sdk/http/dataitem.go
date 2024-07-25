@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
+	"strconv"
+	"time"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"google.golang.org/protobuf/proto"
-	"log"
-	"strconv"
-	"time"
 )
 
 type DataItem struct {
@@ -727,8 +728,8 @@ func (di *DataItem) AsIndexes() (indexes []*structs.Index, err error) {
 	return indexes, err
 }
 
-// AsFullText the types will be tables and alias is node fulltext Index and edge fulltext Index
-func (di *DataItem) AsFullText() (fullTextIndexes []*structs.Index, err error) {
+// AsFullTexts the types will be tables and alias is node fulltext Index and edge fulltext Index
+func (di *DataItem) AsFullTexts() (fullTextIndexes []*structs.Index, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return fullTextIndexes, nil
@@ -848,7 +849,7 @@ func (di *DataItem) AsAny() (interface{}, error) {
 
 }
 
-func (di *DataItem) AsPolicy() (policies []*structs.Policy, err error) {
+func (di *DataItem) AsPolicies() (policies []*structs.Policy, err error) {
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, errors.New("RESULT_TYPE_UNSET")
 	}
@@ -903,15 +904,15 @@ func bytesToPolicy(data [][]byte) (*structs.Policy, error) {
 		return nil, fmt.Errorf("failed to unmarshal PropertyPrivileges: %w", err)
 	}
 
-	// Policies
+	// AsPolicies
 	if err := json.Unmarshal(data[4], &policy.Policies); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal Policies: %w", err)
+		return nil, fmt.Errorf("failed to unmarshal AsPolicies: %w", err)
 	}
 
 	return &policy, nil
 }
 
-func (di *DataItem) AsExta() (extas []*structs.Exta, err error) {
+func (di *DataItem) AsExtas() (extas []*structs.Exta, err error) {
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
 	}
@@ -942,7 +943,7 @@ func (di *DataItem) AsExta() (extas []*structs.Exta, err error) {
 	return extas, nil
 }
 
-func (di *DataItem) AsTask() (tasks []*structs.Task, err error) {
+func (di *DataItem) AsTasks() (tasks []*structs.Task, err error) {
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
 	}
@@ -992,7 +993,7 @@ func (di *DataItem) AsTask() (tasks []*structs.Task, err error) {
 	return tasks, nil
 }
 
-func (di *DataItem) AsTop() (tops []*structs.Top, err error) {
+func (di *DataItem) AsTops() (tops []*structs.Top, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return tops, nil
@@ -1064,7 +1065,7 @@ func (di *DataItem) AsStats() (stat *structs.Stat, err error) {
 	return stat, err
 }
 
-func (di *DataItem) AsPrivilege() (privileges []*structs.Privilege, err error) {
+func (di *DataItem) AsPrivileges() (privileges []*structs.Privilege, err error) {
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
 	}
@@ -1103,7 +1104,7 @@ func (di *DataItem) AsPrivilege() (privileges []*structs.Privilege, err error) {
 	return privileges, nil
 }
 
-func (di *DataItem) AsUser() (users []*structs.User, err error) {
+func (di *DataItem) AsUsers() (users []*structs.User, err error) {
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
 	}
@@ -1163,9 +1164,9 @@ func bytesToUser(data [][]byte) (*structs.User, error) {
 		return nil, fmt.Errorf("failed to unmarshal PropertyPrivileges: %w", err)
 	}
 
-	// Policies
+	// AsPolicies
 	if err := json.Unmarshal(data[5], &user.Policies); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal Policies: %w", err)
+		return nil, fmt.Errorf("failed to unmarshal AsPolicies: %w", err)
 	}
 
 	return &user, nil

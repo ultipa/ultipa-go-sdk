@@ -1,8 +1,9 @@
 package test
 
 import (
-	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"testing"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
 func TestIsGlobalUql(t *testing.T) {
@@ -20,7 +21,6 @@ func TestIsGlobalUql(t *testing.T) {
 	uqlItem = utils.NewUql(uql)
 	isGlobal = uqlItem.IsGlobal()
 	t.Logf("%s is global:%v", uql, isGlobal)
-
 
 	uql = ` grant().privilege(["READ"]).on("",@, *).user("lzq")`
 	uqlItem = utils.NewUql(uql)

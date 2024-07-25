@@ -1,6 +1,8 @@
 package api_test
 
 import (
+	"log"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk"
 	"github.com/ultipa/ultipa-go-sdk/sdk/api"
@@ -8,7 +10,6 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
-	"log"
 )
 
 var client *api.UltipaAPI

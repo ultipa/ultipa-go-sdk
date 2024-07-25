@@ -2,12 +2,13 @@ package printers
 
 import (
 	"fmt"
+	"reflect"
+	"strings"
+
 	"github.com/alexeyco/simpletable"
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
-	"reflect"
-	"strings"
 )
 
 func PrintAttr(attr *structs.Attr) {
@@ -57,7 +58,7 @@ func PrintAttr(attr *structs.Attr) {
 	}
 }
 
-//PrintAttrNodes print Attr with values as List<List<Node>>
+// PrintAttrNodes print Attr with values as List<List<Node>>
 func PrintAttrNodes(attrNodes *structs.AttrNodes) {
 	if attrNodes.NodesList == nil {
 		logger.PrintInfo(fmt.Sprintf("Alias:%s, Type:%s, resultType:%s, nodes is null.\r\n", attrNodes.Name, ultipa.PropertyType_LIST, attrNodes.ResultType))
@@ -69,7 +70,7 @@ func PrintAttrNodes(attrNodes *structs.AttrNodes) {
 	}
 }
 
-//PrintAttrEdges print Attr with values as List<List<Edge>>
+// PrintAttrEdges print Attr with values as List<List<Edge>>
 func PrintAttrEdges(attrEdges *structs.AttrEdges) {
 	if attrEdges.EdgesList == nil {
 		logger.PrintInfo(fmt.Sprintf("Alias:%s, Type:%s, resultType:%s, edges is null.\r\n", attrEdges.Name, ultipa.PropertyType_LIST, attrEdges.ResultType))
@@ -81,7 +82,7 @@ func PrintAttrEdges(attrEdges *structs.AttrEdges) {
 	}
 }
 
-//PrintAttrPaths print Attr with values as List<List<Path>>
+// PrintAttrPaths print Attr with values as List<List<Path>>
 func PrintAttrPaths(attrPaths *structs.AttrPaths) {
 	if attrPaths.PathsList == nil {
 		logger.PrintInfo(fmt.Sprintf("Alias:%s, Type:%s, resultType:%s, paths is null.\r\n", attrPaths.Name, ultipa.PropertyType_LIST, attrPaths.ResultType))

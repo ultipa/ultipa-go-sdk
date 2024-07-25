@@ -1,6 +1,6 @@
 package utils
 
-//LeaderNotYetElectedError leader not yet elected error for cluster
+// LeaderNotYetElectedError leader not yet elected error for cluster
 type LeaderNotYetElectedError struct {
 	Message string
 }

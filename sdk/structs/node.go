@@ -3,11 +3,12 @@ package structs
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/types"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
-	"strings"
 )
 
 type Node struct {
@@ -127,7 +128,7 @@ func GetSchemasOfNodeList(nodes []*Node) map[string]*Schema {
 		if !ok {
 			schemaPropertiesMap[node.Schema] = []string{}
 		}
-		for property, _ := range node.Values.Data {
+		for property := range node.Values.Data {
 			if !utils.Contains(propertyList, property) {
 				propertyList = append(propertyList, property)
 				schemaPropertiesMap[node.Schema] = propertyList

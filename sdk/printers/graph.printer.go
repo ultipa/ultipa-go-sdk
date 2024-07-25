@@ -2,10 +2,11 @@ package printers
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/alexeyco/simpletable"
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
-	"strconv"
 )
 
 func PrintGraph(graph *structs.Graph) {

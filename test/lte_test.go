@@ -1,9 +1,10 @@
 package test
 
 import (
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"log"
 	"testing"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 )
 
 func TestLte(t *testing.T) {

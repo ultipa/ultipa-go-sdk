@@ -1,9 +1,10 @@
 package logger
 
 import (
-	"github.com/fatih/color"
 	"log"
 	"os"
+
+	"github.com/fatih/color"
 )
 
 func SprintError(str string) string {

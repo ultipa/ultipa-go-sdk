@@ -1,9 +1,10 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
-	"testing"
 )
 
 func TestExportAsNodesEdges(t *testing.T) {

@@ -2,6 +2,7 @@ package structs
 
 import (
 	"fmt"
+
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
@@ -90,10 +91,10 @@ func (p *Policy) ToCreatePolicyUql() string {
 	uql += ")"
 
 	return uql
-	//return fmt.Sprintf("create().policy(\"%s\",\n%s,\n%s,\n%s,\n%s\n)", p.Name, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.Policies), utils.ToJSONString(p.PropertyPrivileges))
+	//return fmt.Sprintf("create().policy(\"%s\",\n%s,\n%s,\n%s,\n%s\n)", p.Name, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.AsPolicies), utils.ToJSONString(p.PropertyPrivileges))
 }
 
 func (p *Policy) ToAlterPolicyUql() string {
-	//return fmt.Sprintf("alter().policy(\"%s\").set({\ngraph_privileges: %s,\nsystem_privileges: %s,\npolicies: %s,\nproperty_privileges: %s\n})", p.Name, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.Policies), utils.ToJSONString(p.PropertyPrivileges))
+	//return fmt.Sprintf("alter().policy(\"%s\").set({\ngraph_privileges: %s,\nsystem_privileges: %s,\npolicies: %s,\nproperty_privileges: %s\n})", p.Name, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.AsPolicies), utils.ToJSONString(p.PropertyPrivileges))
 	return fmt.Sprintf("alter().policy(\"%s\").set(%s)", p.Name, utils.ToJSONString(p))
 }

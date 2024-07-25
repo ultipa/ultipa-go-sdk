@@ -1,6 +1,5 @@
 package structs
 
-
 type Array struct {
 	Name string
 	Rows []*Row

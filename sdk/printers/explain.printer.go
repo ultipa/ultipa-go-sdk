@@ -2,6 +2,7 @@ package printers
 
 import (
 	"fmt"
+
 	"github.com/pterm/pterm"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )

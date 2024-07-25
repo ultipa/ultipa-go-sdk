@@ -1,12 +1,13 @@
 package api
 
 import (
+	"io"
+	"sync"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"google.golang.org/grpc"
-	"io"
-	"sync"
 )
 
 type Listener interface {

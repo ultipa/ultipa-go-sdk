@@ -10,6 +10,7 @@ package api
 import (
 	"errors"
 	"fmt"
+
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 

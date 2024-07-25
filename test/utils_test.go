@@ -1,8 +1,9 @@
 package test
 
 import (
-	"github.com/ultipa/ultipa-go-sdk/sdk/api"
 	"testing"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/api"
 )
 
 func TestCheckGraphName(t *testing.T) {

@@ -4,17 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"reflect"
+	"strings"
+	"sync"
+	"time"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/metadata"
-	"log"
-	"reflect"
-	"strings"
-	"sync"
-	"time"
 )
 
 type GraphClusterInfo struct {
@@ -464,7 +465,7 @@ func (pool *ConnectionPool) RunHeartBeat() {
 					})
 
 					if err != nil || (resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS) {
-						log.Printf("heart beat failed : ", conn.Host)
+						log.Printf("heart beat failed : %v\n", conn.Host)
 						continue
 					}
 				}

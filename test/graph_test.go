@@ -1,6 +1,9 @@
 package test
 
 import (
+	"log"
+	"testing"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
@@ -8,8 +11,6 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 	"github.com/ultipa/ultipa-go-sdk/utils"
-	"log"
-	"testing"
 )
 
 func TestShowGraph(t *testing.T) {

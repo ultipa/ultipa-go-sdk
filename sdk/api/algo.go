@@ -4,14 +4,15 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
+	"os"
+	"path"
+
 	"github.com/codingsince1985/checksum"
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
-	"io"
-	"os"
-	"path"
 )
 
 // ShowAlgo get all algo

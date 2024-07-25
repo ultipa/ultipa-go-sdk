@@ -2,10 +2,11 @@ package printers
 
 import (
 	"fmt"
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
-	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"log"
 	"strings"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	//"github.com/ultipa/ultipa-go-sdk/sdk/http"
 )
 

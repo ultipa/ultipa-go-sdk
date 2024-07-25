@@ -2,11 +2,12 @@ package test
 
 import (
 	"fmt"
+	"log"
+	"testing"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"github.com/ultipa/ultipa-go-sdk/utils"
-	"log"
-	"testing"
 )
 
 func TestShowPolicy(t *testing.T) {
@@ -63,7 +64,7 @@ func TestPolicyUql(t *testing.T) {
 		//GraphPrivileges: gp,
 		//SystemPrivileges: []string{"STAT"},
 		PropertyPrivileges: pp,
-		//Policies:           []string{"yu"},
+		//AsPolicies:           []string{"yu"},
 	}
 
 	log.Println(p.ToCreatePolicyUql())

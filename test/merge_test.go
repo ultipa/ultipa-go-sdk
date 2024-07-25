@@ -1,13 +1,14 @@
 package test
 
 import (
-	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"log"
 	"reflect"
 	"testing"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
-//TODO:
+// TODO:
 func TestMergeStruct(t *testing.T) {
 	type Company struct {
 		Name string

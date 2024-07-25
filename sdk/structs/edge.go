@@ -3,11 +3,12 @@ package structs
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/types"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
-	"strings"
 )
 
 type Edge struct {
@@ -137,7 +138,7 @@ func GetSchemasOfEdgeList(edges []*Edge) map[string]*Schema {
 		if !ok {
 			schemaPropertiesMap[edge.Schema] = []string{}
 		}
-		for property, _ := range edge.Values.Data {
+		for property := range edge.Values.Data {
 			if !utils.Contains(propertyList, property) {
 				propertyList = append(propertyList, property)
 				schemaPropertiesMap[edge.Schema] = propertyList

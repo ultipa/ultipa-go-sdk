@@ -2,9 +2,10 @@ package utils
 
 import (
 	"fmt"
-	"github.com/ultipa/ultipa-go-sdk/utils"
 	"regexp"
 	"strings"
+
+	"github.com/ultipa/ultipa-go-sdk/utils"
 )
 
 type UQLMAKER struct {

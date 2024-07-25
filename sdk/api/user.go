@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"fmt"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
@@ -19,7 +20,7 @@ func (api *UltipaAPI) ShowUser(requestConfig *configuration.RequestConfig) (user
 		return nil, errors.New(resp.Status.Message)
 	}
 
-	users, err = resp.Alias(http.RESP_USER_KEY).AsUser()
+	users, err = resp.Alias(http.RESP_USER_KEY).AsUsers()
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +38,7 @@ func (api *UltipaAPI) GetUser(userName string, requestConfig *configuration.Requ
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 		return nil, errors.New(resp.Status.Message)
 	}
-	users, err := resp.Alias(http.RESP_USER_KEY).AsUser()
+	users, err := resp.Alias(http.RESP_USER_KEY).AsUsers()
 	if err != nil {
 		return nil, err
 	}

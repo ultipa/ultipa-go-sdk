@@ -48,7 +48,7 @@ package http
 
 //type ResponsePolicy struct {
 //	Status   *Status
-//	Policies []*structs.Policy
+//	AsPolicies []*structs.Policy
 //}
 //
 //type ResponsePrivilege struct {

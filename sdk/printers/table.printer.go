@@ -2,6 +2,7 @@ package printers
 
 import (
 	"fmt"
+
 	"github.com/alexeyco/simpletable"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )

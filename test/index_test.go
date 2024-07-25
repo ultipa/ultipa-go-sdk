@@ -8,9 +8,10 @@
 package test
 
 import (
-	"github.com/ultipa/ultipa-go-sdk/utils"
 	"log"
 	"testing"
+
+	"github.com/ultipa/ultipa-go-sdk/utils"
 )
 
 func TestListIndex(t *testing.T) {

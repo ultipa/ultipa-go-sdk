@@ -5,10 +5,11 @@
 package http
 
 import (
+	"io"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
-	"io"
 )
 
 type UQLResponse struct {

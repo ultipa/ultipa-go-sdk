@@ -3,10 +3,11 @@ package api
 import (
 	"errors"
 	"fmt"
-	"github.com/ultipa/ultipa-go-sdk/sdk/connection"
-	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"regexp"
 	"strings"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/connection"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
 /**

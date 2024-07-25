@@ -1,9 +1,10 @@
 package test
 
 import (
-	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
 	"log"
 	"testing"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
 )
 
 func TestUQLStream(t *testing.T) {

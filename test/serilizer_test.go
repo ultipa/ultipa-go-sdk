@@ -1,9 +1,10 @@
 package test
 
 import (
+	"testing"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
-	"testing"
 )
 
 func TestStringAsInterface(t *testing.T) {

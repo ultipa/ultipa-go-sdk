@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"fmt"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
@@ -18,7 +19,7 @@ func (api *UltipaAPI) ShowPolicy(requestConfig *configuration.RequestConfig) (po
 		return nil, errors.New(resp.Status.Message)
 	}
 
-	policies, err = resp.Alias(http.RESP_POLICY_KEY).AsPolicy()
+	policies, err = resp.Alias(http.RESP_POLICY_KEY).AsPolicies()
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +38,7 @@ func (api *UltipaAPI) GetPolicy(policyName string, requestConfig *configuration.
 		return nil, errors.New(resp.Status.Message)
 	}
 
-	policies, err := resp.Alias(http.RESP_POLICY_KEY).AsPolicy()
+	policies, err := resp.Alias(http.RESP_POLICY_KEY).AsPolicies()
 	if err != nil {
 		return nil, err
 	}

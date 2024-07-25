@@ -1,11 +1,12 @@
 package test
 
 import (
+	"log"
+	"testing"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/utils"
-	"log"
-	"testing"
 )
 
 func TestParseStatistic(t *testing.T) {

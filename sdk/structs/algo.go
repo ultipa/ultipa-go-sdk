@@ -6,10 +6,10 @@ import (
 )
 
 type AlgoJsonStruct struct {
-	Name string
-	Version string
+	Name        string
+	Version     string
 	Description string
-	Parameters map[string]string
+	Parameters  map[string]string
 }
 
 type AlgoParam struct {
@@ -18,10 +18,10 @@ type AlgoParam struct {
 }
 
 type Algo struct {
-	Name   string
-	Desc string
+	Name    string
+	Desc    string
 	Version string
-	Params map[string]*AlgoParam
+	Params  map[string]*AlgoParam
 }
 
 func NewAlgo(name string, paramString string) (*Algo, error) {
@@ -40,7 +40,7 @@ func NewAlgo(name string, paramString string) (*Algo, error) {
 		return nil, err
 	}
 
-	for k,v := range algoJsonStruct.Parameters {
+	for k, v := range algoJsonStruct.Parameters {
 		algo.Params[k] = &AlgoParam{
 			Name: k,
 			Desc: v,
@@ -55,7 +55,7 @@ func NewAlgo(name string, paramString string) (*Algo, error) {
 
 func (algo *Algo) ParamsToString() string {
 	str := ""
-	for k,v := range algo.Params {
+	for k, v := range algo.Params {
 		str += fmt.Sprintf("%v : %v\n", k, v.Desc)
 	}
 	return str

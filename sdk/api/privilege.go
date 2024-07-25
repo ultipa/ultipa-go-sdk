@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"fmt"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
@@ -20,7 +21,7 @@ func (api *UltipaAPI) ShowPrivilege(config *configuration.RequestConfig) (privil
 		return nil, errors.New(resp.Status.Message)
 	}
 
-	privileges, err = resp.Alias(http.RESP_PRIVILEGE_KEY).AsPrivilege()
+	privileges, err = resp.Alias(http.RESP_PRIVILEGE_KEY).AsPrivileges()
 	if err != nil {
 		return nil, err
 	}

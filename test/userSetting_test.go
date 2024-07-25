@@ -2,8 +2,9 @@ package test
 
 import (
 	"fmt"
-	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"testing"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 func TestUserSetting(t *testing.T) {

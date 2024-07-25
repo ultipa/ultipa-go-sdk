@@ -2,11 +2,12 @@ package test
 
 import (
 	"fmt"
+	"log"
+	"testing"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
-	"log"
-	"testing"
 )
 
 func TestUQL(t *testing.T) {

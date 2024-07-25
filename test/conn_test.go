@@ -4,15 +4,16 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"log"
+	"strings"
+	"testing"
+	"time"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-	"log"
-	"strings"
-	"testing"
-	"time"
 )
 
 func TestNewConn(t *testing.T) {

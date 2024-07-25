@@ -2,6 +2,7 @@ package printers
 
 import (
 	"fmt"
+
 	"github.com/alexeyco/simpletable"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
@@ -69,9 +70,9 @@ func getNodeTableString(nodes []*structs.Node, schemas map[string]*structs.Schem
 		var row []*simpletable.Cell
 		if node != nil {
 			row = []*simpletable.Cell{
-				&simpletable.Cell{Align: simpletable.AlignCenter, Text: node.GetID()},
-				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(node.GetUUID())},
-				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(node.GetSchema())},
+				{Align: simpletable.AlignCenter, Text: node.GetID()},
+				{Align: simpletable.AlignCenter, Text: fmt.Sprint(node.GetUUID())},
+				{Align: simpletable.AlignCenter, Text: fmt.Sprint(node.GetSchema())},
 			}
 
 			for i := 3; i < len(table.Header.Cells); i++ {
@@ -82,9 +83,9 @@ func getNodeTableString(nodes []*structs.Node, schemas map[string]*structs.Schem
 			}
 		} else {
 			row = []*simpletable.Cell{
-				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "nil"},
-				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "nil"},
-				&simpletable.Cell{Align: simpletable.AlignCenter, Text: "nil"},
+				{Align: simpletable.AlignCenter, Text: "nil"},
+				{Align: simpletable.AlignCenter, Text: "nil"},
+				{Align: simpletable.AlignCenter, Text: "nil"},
 			}
 		}
 

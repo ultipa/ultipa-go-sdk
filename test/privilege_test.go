@@ -2,9 +2,10 @@ package test
 
 import (
 	"fmt"
-	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"log"
 	"testing"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 func TestShowShowPrivilege(t *testing.T) {

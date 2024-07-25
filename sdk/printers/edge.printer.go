@@ -2,6 +2,7 @@ package printers
 
 import (
 	"fmt"
+
 	"github.com/alexeyco/simpletable"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
@@ -70,12 +71,12 @@ func getEdgeTableString(edges []*structs.Edge, schemas map[string]*structs.Schem
 		var row []*simpletable.Cell
 		if edge != nil {
 			row = []*simpletable.Cell{
-				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetUUID())},
-				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.FromUUID)},
-				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetFrom())},
-				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.ToUUID)},
-				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetTo())},
-				&simpletable.Cell{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetSchema())},
+				{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetUUID())},
+				{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.FromUUID)},
+				{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetFrom())},
+				{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.ToUUID)},
+				{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetTo())},
+				{Align: simpletable.AlignCenter, Text: fmt.Sprint(edge.GetSchema())},
 			}
 
 			for i := 6; i < len(table.Header.Cells); i++ {

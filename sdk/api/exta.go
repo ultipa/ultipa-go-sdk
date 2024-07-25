@@ -11,14 +11,15 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
+	"os"
+	"path"
+
 	"github.com/codingsince1985/checksum"
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
-	"io"
-	"os"
-	"path"
 )
 
 func (api *UltipaAPI) InstallExta(soFilePath string, infoFilePath string, requestConfig *configuration.RequestConfig) (*ultipa.InstallExtaReply, error) {
@@ -122,6 +123,10 @@ func (api *UltipaAPI) InstallExta(soFilePath string, infoFilePath string, reques
 		return nil, err
 	}
 
+	if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(reply.Status.Msg)
+	}
+
 	return reply, nil
 
 }
@@ -148,6 +153,10 @@ func (api *UltipaAPI) UninstallExta(extaName string, requestConfig *configuratio
 		return nil, err
 	}
 
+	if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(reply.Status.Msg)
+	}
+
 	return reply, nil
 }
 
@@ -164,7 +173,7 @@ func (api *UltipaAPI) ShowExta(config *configuration.RequestConfig) ([]*structs.
 		return nil, errors.New(resp.Status.Message)
 	}
 
-	extas, err = resp.Alias(http.RESP_EXTAS_KEY).AsExta()
+	extas, err = resp.Alias(http.RESP_EXTAS_KEY).AsExtas()
 
 	if len(extas) == 0 {
 		return nil, err

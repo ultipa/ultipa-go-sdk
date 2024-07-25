@@ -2,9 +2,10 @@ package test
 
 import (
 	"fmt"
-	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"log"
 	"testing"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 func TestUser(t *testing.T) {
@@ -48,7 +49,7 @@ func TestUserUql(t *testing.T) {
 		GraphPrivileges:    structs.GraphPrivileges{},
 		SystemPrivileges:   []string{},
 		PropertyPrivileges: pp,
-		//Policies:           []string{"yu"},
+		//AsPolicies:           []string{"yu"},
 		Policies: []string{"yu"},
 	}
 

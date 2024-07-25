@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 	"google.golang.org/protobuf/proto"

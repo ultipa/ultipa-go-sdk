@@ -2,8 +2,9 @@ package test
 
 import (
 	"fmt"
-	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"testing"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
 func TestGetCertificate(t *testing.T) {

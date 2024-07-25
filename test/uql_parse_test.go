@@ -2,11 +2,12 @@ package test
 
 import (
 	"fmt"
-	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"log"
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
 func TestEasyUqlParse(t *testing.T) {
@@ -59,7 +60,7 @@ func TestParseGraph(t *testing.T) {
 func TestIsExtra(t *testing.T) {
 
 	uqls := map[string]bool{}
-	for uql, _ := range utils.ExtraUqlCommandKeys {
+	for uql := range utils.ExtraUqlCommandKeys {
 		uqls[uql] = true
 	}
 	uqls[`kill("*")`] = true

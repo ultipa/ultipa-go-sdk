@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
-	"sync"
 )
 
 func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EntityTable, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {

@@ -11,7 +11,7 @@ go mod tidy
 
 ## Document
 
-Read Ultipa Go SDK document  [ultipa.com](https://www.ultipa.com/document/ultipa-drivers/go-installation/v4.3)
+Read Ultipa Go SDK document  [ultipa.com](https://www.ultipa.com/document/ultipa-drivers/go-installation/v4.5)
 
 ## Create Client
 
@@ -54,16 +54,24 @@ nodes := resp.alias("nodes").asNodes()
 - asTable() : (table *structs.Table, err error)
 - asArray() : (arr *structs.Array, err error)
 - asAttr()  : (arr *structs.Array, err error)
-- asGraphs() : (graphs []*structs.Graph, err error)
+- AsGraphSets() (graphs []*structs.GraphSet, err error)
 - asSchemas() : (schemas []*structs.Schema, err error)
+- AsProperties() (properties []*structs.Property, err error)
+- AsIndexes() (indexes []*structs.Index, err error)
+- AsFullTexts() (fullTextIndexes []*structs.Index, err error)
 - asAlgos() : ([]*structs.Algo, error)
+- AsGraph() (graph *structs.Graph, err error)
 - asAny() : (interface{}, error)
+- AsPolicies() (policies []*structs.Policy, err error)
+- AsExtas() (extas []*structs.Exta, err error)
+- AsTasks() (tasks []*structs.Task, err error)
+- AsTops() (tops []*structs.Top, err error)
+- AsStats() (stat *structs.Stat, err error)
+- AsPrivileges() (privileges []*structs.Privilege, err error)
+- AsUsers() (users []*structs.User, err error)
 
 ## Batch Insert
 
 Check Go Transporter For Details
 
 ---
-
-
-

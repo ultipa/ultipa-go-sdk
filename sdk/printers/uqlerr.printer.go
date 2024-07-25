@@ -1,12 +1,13 @@
 package printers
 
 import (
-	"github.com/fatih/color"
-	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 	"log"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/fatih/color"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 )
 
 func PrintUqlErr(errmsg string) {

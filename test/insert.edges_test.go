@@ -1,10 +1,11 @@
 package test
 
 import (
-	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
-	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"log"
 	"testing"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 func TestInsertEdge(t *testing.T) {

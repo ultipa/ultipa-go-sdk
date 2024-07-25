@@ -2,13 +2,14 @@ package test
 
 import (
 	"fmt"
+	"log"
+	"testing"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"github.com/ultipa/ultipa-go-sdk/sdk/types"
-	"log"
-	"testing"
 )
 
 func TestInsertNodeWithListProperty(t *testing.T) {

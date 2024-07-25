@@ -2,6 +2,7 @@ package structs
 
 import (
 	"fmt"
+
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
@@ -50,11 +51,11 @@ type AlterUser struct {
 }
 
 //func (p *User) ToCreateUserUql() string {
-//	return fmt.Sprintf("create().user(\"%s\",\"%s\",\n%s,\n%s,\n%s,\n%s\n)", p.UserName, p.PassWord, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.Policies), utils.ToJSONString(p.PropertyPrivileges))
+//	return fmt.Sprintf("create().user(\"%s\",\"%s\",\n%s,\n%s,\n%s,\n%s\n)", p.UserName, p.PassWord, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.AsPolicies), utils.ToJSONString(p.PropertyPrivileges))
 //}
 //
 //func (p *User) ToAlterUserUql() string {
-//	return fmt.Sprintf("alter().user(\"%s\").set({\npassword: \"%s\",\ngraph_privileges: %s,\nsystem_privileges: %s,\npolicies: %s,\nproperty_privileges: %s\n})", p.UserName, p.PassWord, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.Policies), utils.ToJSONString(p.PropertyPrivileges))
+//	return fmt.Sprintf("alter().user(\"%s\").set({\npassword: \"%s\",\ngraph_privileges: %s,\nsystem_privileges: %s,\npolicies: %s,\nproperty_privileges: %s\n})", p.UserName, p.PassWord, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.AsPolicies), utils.ToJSONString(p.PropertyPrivileges))
 //}
 
 func (u *CreateUser) ToCreateUserUql() string {
@@ -94,11 +95,11 @@ func (u *CreateUser) ToCreateUserUql() string {
 	uql += ")"
 
 	return uql
-	//return fmt.Sprintf("create().user(\"%s\",\n%s,\n%s,\n%s,\n%s\n)", u.Name, utils.ToJSONString(u.GraphPrivileges), utils.ToJSONString(u.SystemPrivileges), utils.ToJSONString(u.Policies), utils.ToJSONString(u.PropertyPrivileges))
+	//return fmt.Sprintf("create().user(\"%s\",\n%s,\n%s,\n%s,\n%s\n)", u.Name, utils.ToJSONString(u.GraphPrivileges), utils.ToJSONString(u.SystemPrivileges), utils.ToJSONString(u.AsPolicies), utils.ToJSONString(u.PropertyPrivileges))
 }
 
 //func (u *AlterUser) ToAlterUserUql() string {
-//	//return fmt.Sprintf("alter().policy(\"%s\").set({\ngraph_privileges: %s,\nsystem_privileges: %s,\npolicies: %s,\nproperty_privileges: %s\n})", p.Name, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.Policies), utils.ToJSONString(p.PropertyPrivileges))
+//	//return fmt.Sprintf("alter().policy(\"%s\").set({\ngraph_privileges: %s,\nsystem_privileges: %s,\npolicies: %s,\nproperty_privileges: %s\n})", p.Name, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.AsPolicies), utils.ToJSONString(p.PropertyPrivileges))
 //	return fmt.Sprintf("alter().user(\"%s\").set(%s)", u.UserName, utils.ToJSONString(u))
 //}
 
@@ -147,5 +148,5 @@ func (u *AlterUser) ToAlterUserUql() string {
 	uql += "\n})"
 
 	return uql
-	//return fmt.Sprintf("create().user(\"%s\",\n%s,\n%s,\n%s,\n%s\n)", u.Name, utils.ToJSONString(u.GraphPrivileges), utils.ToJSONString(u.SystemPrivileges), utils.ToJSONString(u.Policies), utils.ToJSONString(u.PropertyPrivileges))
+	//return fmt.Sprintf("create().user(\"%s\",\n%s,\n%s,\n%s,\n%s\n)", u.Name, utils.ToJSONString(u.GraphPrivileges), utils.ToJSONString(u.SystemPrivileges), utils.ToJSONString(u.AsPolicies), utils.ToJSONString(u.PropertyPrivileges))
 }

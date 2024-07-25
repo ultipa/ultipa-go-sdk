@@ -2,6 +2,11 @@ package test
 
 import (
 	"fmt"
+	"log"
+	"math/rand"
+	"testing"
+	"time"
+
 	"github.com/pieterclaerhout/go-waitgroup"
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/api"
@@ -9,10 +14,6 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
-	"log"
-	"math/rand"
-	"testing"
-	"time"
 )
 
 func TestBatchInsertNodes(t *testing.T) {

@@ -2,13 +2,14 @@ package test
 
 import (
 	"fmt"
+	"log"
+	"strings"
+	"testing"
+
 	"github.com/joho/godotenv"
 	"github.com/ultipa/ultipa-go-sdk/sdk"
 	"github.com/ultipa/ultipa-go-sdk/sdk/api"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
-	"log"
-	"strings"
-	"testing"
 )
 
 var env map[string]string
@@ -57,12 +58,12 @@ func GetClient(hosts []string, graphName string) (*api.UltipaAPI, error) {
 }
 
 func setup() {
-	fmt.Println("Setting up the test environment")
+	log.Println("Setting up the test environment")
 	var err error
 	env, err = godotenv.Read(".env")
 
 	if err != nil {
-		log.Fatalln("Get env error, ", err)
+		panic("Get env error, " + err.Error())
 	}
 
 	hosts = strings.Split(env["hosts"], ",")
@@ -71,7 +72,7 @@ func setup() {
 	client, err = GetClient(hosts, graph)
 
 	if err != nil {
-		log.Fatalln("GetClient error, ", err)
+		panic("GetClient error, " + err.Error())
 	}
 }
 
