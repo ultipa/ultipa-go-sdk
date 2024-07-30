@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"log"
 	"testing"
 
@@ -11,11 +10,6 @@ import (
 )
 
 func TestUQL(t *testing.T) {
-
-	//client, _ := GetClient([]string{"210.13.32.146:40101"}, "default")
-	//client, _ := GetClient([]string{"192.168.1.94:60061"}, "default")
-	//client, _ := GetClient(hosts, graph)
-
 	InitCases()
 
 	for _, c := range cases {
@@ -26,7 +20,7 @@ func TestUQL(t *testing.T) {
 		resp, err := client.Uql(c.UQL, nil)
 
 		if err != nil {
-			log.Fatalln(err)
+			t.Fatal(err)
 		}
 
 		if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
@@ -44,15 +38,6 @@ func TestUQL(t *testing.T) {
 }
 
 func TestUQL1(t *testing.T) {
-
-	//client, _ := GetClient([]string{"210.13.32.146:40101"}, "default")
-	//client, _ := GetClient([]string{"192.168.1.94:60061"}, "default")
-	//client, _ := GetClient([]string{"192.168.1.86:60072"}, "default")
-	//client, _ := GetClient([]string{"192.168.1.87:62061"}, "maker_test")
-	//client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
-	//client, _ := GetClient([]string{"192.168.1.85:61115"}, "gongshang")
-	//client, _ := GetClient(hosts, graph)
-
 	//uql := `n({@user && _uuid == 1}).e({@relation.relation_type == 'has'}).n({@projects} as project).re({@relation.relation_type == 'has'}).n({@etl} as etl) group by project skip 0 return table(project._id,project._uuid,count(etl)) as t limit 15 order by project.created_at desc`
 	//uql := `find().edges(2658) as edges return edges{*}`
 	//uql := `find().nodes() as nodes return nodes{*} limit 10`
@@ -67,11 +52,7 @@ return docs_path{*}, role_path{*},books`
 	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
-		log.Fatalln(err)
-	}
-
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		log.Println(resp.Status.Message)
+		t.Fatal(err)
 	}
 
 	log.Println(resp.Statistic.TotalCost)
@@ -86,11 +67,6 @@ return docs_path{*}, role_path{*},books`
 }
 
 func TestUQL2(t *testing.T) {
-
-	//client, _ := GetClient([]string{"210.13.32.146:40101"}, "default")
-	//client, _ := GetClient([]string{"192.168.1.94:60061"}, "default")
-	//client, _ := GetClient([]string{"192.168.1.86:60072"}, "default")
-	//client, _ := GetClient([]string{"192.168.1.87:62061"}, "maker_test")
 	//client, _ := GetClient(hosts, graph)
 
 	//uql := `n({@user && _uuid == 1}).e({@relation.relation_type == 'has'}).n({@projects} as project).re({@relation.relation_type == 'has'}).n({@etl} as etl) group by project skip 0 return table(project._id,project._uuid,count(etl)) as t limit 15 order by project.created_at desc`
@@ -103,7 +79,7 @@ func TestUQL2(t *testing.T) {
 	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	printers.PrintAny(resp.Get(0))
 	nodes, _, _ := resp.Get(0).AsNodes()
@@ -124,7 +100,7 @@ func TestUQL3(t *testing.T) {
 	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 
 	attrs, _ := resp.Get(0).AsAttr()
@@ -147,7 +123,7 @@ func TestUQL4(t *testing.T) {
 	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	printers.PrintAny(resp.Get(0))
 }
@@ -164,7 +140,7 @@ func TestUQL5(t *testing.T) {
 	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	printers.PrintAny(resp.Get(0))
 }
@@ -176,15 +152,15 @@ func TestUQL6(t *testing.T) {
 	uql := "find().nodes({@movie}) as nodes return table(nodes.timestamp,nodes.frating) limit 0"
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	//断言响应码
+
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 		log.Println(resp.Status.Message)
 		t.Log(resp.Status.Message)
 	}
 	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
-	//断言返回数据
+
 	table, err := resp.Alias("table(nodes.timestamp,nodes.frating)").AsTable()
 	if err != nil {
 		return
@@ -199,15 +175,10 @@ func TestUQLAlterGraph(t *testing.T) {
 	uql := "alter().graph('alter_graph_1').set({name:'alter_graph'})" //test123
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	//断言响应码
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		log.Println(resp.Status.Message)
-		t.Log(resp.Status.Message)
-	}
+
 	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
-	//断言返回数据
 }
 
 func TestUQLCompactWithNotExistGraph(t *testing.T) {
@@ -217,7 +188,7 @@ func TestUQLCompactWithNotExistGraph(t *testing.T) {
 	uql := `compact().graph("c1")`
 	//ty, leader, follower, global, err := client.GetConnByUQL(uql, "random_test_js_1672976970614")
 	//if err != nil {
-	//	log.Fatalln(err)
+	//	t.Fatal(err)
 	//}
 	//t.Logf("uql type:%v", ty)
 	//t.Logf("leader:%s", leader.Host)
@@ -230,15 +201,11 @@ func TestUQLCompactWithNotExistGraph(t *testing.T) {
 	//
 	//t.Logf("global leader:%s", global.Host)
 
-	resp, err := client.Uql(uql, &configuration.RequestConfig{
+	_, err := client.Uql(uql, &configuration.RequestConfig{
 		GraphName: "c1",
 	})
 	if err != nil {
 		t.Fatalf("fail to compact:%v", err)
-	}
-
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		log.Fatalf(resp.Status.Message)
 	}
 }
 
@@ -254,7 +221,7 @@ func TestTopUql(t *testing.T) {
 	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	printers.PrintAny(resp.Get(0))
 }
@@ -265,15 +232,11 @@ func TestUQLFindNodesWithList(t *testing.T) {
 	uql := "find().nodes({@People}) as nodes return nodes{*}"
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	//断言响应码
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		log.Println(resp.Status.Message)
-		t.Log(resp.Status.Message)
-	}
+
 	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
-	//断言返回数据
+
 	nodes, schemas, err := resp.Alias("nodes").AsNodes()
 	if err != nil {
 		t.Fatal(err)
@@ -288,15 +251,11 @@ func TestUQLFindNodesWithAttrList(t *testing.T) {
 	uql := "find().nodes() as nodes return collect(distinct(nodes)) as arrNode"
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	//断言响应码
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		log.Println(resp.Status.Message)
-		t.Log(resp.Status.Message)
-	}
+
 	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
-	//断言返回数据
+
 	attrs, err := resp.Alias("arrNode").AsAttr()
 	if err != nil {
 		t.Fatal(err)
@@ -311,15 +270,11 @@ func TestUQLFindNodesWithAttrListNullValue(t *testing.T) {
 	uql := "find().nodes({@nodeSchemaList}) as n return collect(n.stringList)"
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	//断言响应码
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		log.Println(resp.Status.Message)
-		t.Log(resp.Status.Message)
-	}
+
 	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
-	//断言返回数据
+
 	attrs, err := resp.Alias("collect(n.stringList)").AsAttr()
 	if err != nil {
 		t.Fatal(err)
@@ -334,15 +289,11 @@ func TestUQLFindNodesAsAttrList(t *testing.T) {
 	uql := "find().nodes({_uuid < 10}) return collect(nodes)"
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	//断言响应码
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		log.Println(resp.Status.Message)
-		t.Log(resp.Status.Message)
-	}
+
 	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
-	//断言返回数据
+
 	attr, err := resp.Alias("collect(nodes)").AsAttr()
 	if err != nil {
 		t.Fatal(err)
@@ -357,15 +308,11 @@ func TestUQLFindPathsWithGroupByAttr(t *testing.T) {
 	uql := "n({_uuid in [4,5,6]} as n1).e().n(as n2) as paths group by n1 return n1{*}, collect(paths)"
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	//断言响应码
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		log.Println(resp.Status.Message)
-		t.Log(resp.Status.Message)
-	}
+
 	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
-	//断言返回数据
+
 	node, schemas, err := resp.Alias("n1").AsNodes()
 	if err != nil {
 		t.Fatal(err)
@@ -385,11 +332,9 @@ func TestUqlInsertListProperty(t *testing.T) {
 	uql := `insert().nodes({name:["zhangsan","lisi"]}).into(@People)`
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		t.Fatal(resp.Status.Message)
-	}
+	t.Logf("insert nodes count : %d", resp.Statistic.TotalCost)
 }
 
 func TestUQLWithLimit(t *testing.T) {
@@ -412,11 +357,9 @@ func TestUqlFindPointProperty(t *testing.T) {
 	uql := `find().nodes([11,12]) as nodes return nodes.typePoint`
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		t.Fatal(resp.Status.Message)
-	}
+
 	attr, err := resp.Alias("nodes.typePoint").AsAttr()
 	if err != nil {
 		t.Fatal(err)
@@ -445,11 +388,9 @@ func TestUqlFindWithDecimalProperty(t *testing.T) {
 	uql := `find().nodes({@default}) as nodes return nodes{*}`
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		t.Fatal(resp.Status.Message)
-	}
+
 	nodes, schemas, err := resp.Alias("nodes").AsNodes()
 	if err != nil {
 		t.Fatal(err)
@@ -463,11 +404,9 @@ func TestUqlAsGraph(t *testing.T) {
 	uql := `n( as n1).re(as e).n(as n2) with toGraph(listUnion(collect(n1), collect(n2)), collect(e)) as graph return graph`
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		t.Fatal(resp.Status.Message)
-	}
+
 	graph, err := resp.Alias("graph").AsGraph()
 	if err != nil {
 		t.Fatal(err)
@@ -480,11 +419,9 @@ func TestFindNodeWithOptionalUql(t *testing.T) {
 	uql := "OPTIONAL find().nodes({@account.year < 1969}) as nodes return nodes{*}"
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		t.Fatal(resp.Status.Message)
-	}
+
 	nodes, schemas, err := resp.Alias("nodes").AsNodes()
 	if err != nil {
 		t.Fatal(err)
@@ -496,11 +433,9 @@ func TestFindEdgeWithOptionalUql(t *testing.T) {
 	uql := "OPTIONAL find().edges({@disagree.targetPost <10}) as edges return edges{*}"
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		t.Fatal(resp.Status.Message)
-	}
+
 	edges, schemas, err := resp.Alias("edges").AsEdges()
 	if err != nil {
 		t.Fatal(err)
@@ -513,11 +448,9 @@ func TestFindPathWithOptionalUql(t *testing.T) {
 	uql := "OPTIONAL n(1).e().n(103) as paths RETURN paths{*}"
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		t.Fatal(resp.Status.Message)
-	}
+
 	paths, err := resp.Alias("paths").AsPaths()
 	if err != nil {
 		t.Fatal(err)
@@ -527,13 +460,16 @@ func TestFindPathWithOptionalUql(t *testing.T) {
 
 func TestInsertReturnNodes(t *testing.T) {
 	var graphName = "cli_test"
-	client, err := GetClient(hosts, graphName)
-	if err != nil {
-		log.Fatalln(err)
-	}
+
 	var uql = "insert().into(@`node_schema_a`).nodes([{typeString:'string',name:'name',typeInt32:12,typeInt64:44,typeUint32:0}]) as node return node{*}"
-	res, _ := client.Uql(uql, nil)
-	nodes, schema, _ := res.Alias("node").AsNodes()
-	printers.PrintNodes(nodes, schema)
-	fmt.Println(res)
+	res, _ := client.Uql(uql, &configuration.RequestConfig{GraphName: graphName})
+
+	_, _, err := res.Alias("node").AsNodes()
+	if err != nil {
+		t.Fatalf("Insert ReturnNodes error, %v", err)
+	}
+
+	//nodes, schema, _ := res.Alias("node").AsNodes()
+	//printers.PrintNodes(nodes, schema)
+	//fmt.Println(res)
 }

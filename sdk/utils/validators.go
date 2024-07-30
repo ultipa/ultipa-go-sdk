@@ -36,8 +36,10 @@ func CheckCustomerNonIdName(name string) bool {
 	return matcher.Match([]byte(name))
 }
 
+// IsNeedToEscapeName deprecated since 4.5
 // IsNeedToEscapeName check that whether name should be escaped by “,
 // true - need to escaped, false - no need
+// Deprecated: since 4.5
 func IsNeedToEscapeName(name string) bool {
 	//if strings.Contains(name, "\"") {
 	//	return true
@@ -50,6 +52,7 @@ func IsNeedToEscapeName(name string) bool {
 
 // IsNeedToEscapeSchemaNameForProperty check that whether schema name should be escaped by “ when creating property,
 // true - need to escaped, false - no need
+// Deprecated: since 4.5
 func IsNeedToEscapeSchemaNameForProperty(name string) bool {
 	matcher := regexp.MustCompile(`^([a-zA-Z_][a-zA-Z0-9_]+)$`)
 	return !matcher.Match([]byte(name))

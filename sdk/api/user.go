@@ -1,10 +1,8 @@
 package api
 
 import (
-	"errors"
 	"fmt"
 
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
@@ -15,9 +13,6 @@ func (api *UltipaAPI) ShowUser(requestConfig *configuration.RequestConfig) (user
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	users, err = resp.Alias(http.RESP_USER_KEY).AsUsers()
@@ -35,13 +30,13 @@ func (api *UltipaAPI) GetUser(userName string, requestConfig *configuration.Requ
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
+
 	users, err := resp.Alias(http.RESP_USER_KEY).AsUsers()
 	if err != nil {
 		return nil, err
 	}
+
+	// if user no exists， uql will return err : user [userName] does not exist
 	user = users[0]
 
 	return user, nil
@@ -54,9 +49,6 @@ func (api *UltipaAPI) CreateUser(request *structs.CreateUser, requestConfig *con
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
 
 	return resp, nil
 }
@@ -68,9 +60,6 @@ func (api *UltipaAPI) AlterUser(request *structs.AlterUser, requestConfig *confi
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
 
 	return resp, nil
 }
@@ -81,9 +70,6 @@ func (api *UltipaAPI) DropUser(userName string, requestConfig *configuration.Req
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	return resp, nil

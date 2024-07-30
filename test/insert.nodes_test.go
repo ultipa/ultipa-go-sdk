@@ -34,9 +34,9 @@ func TestInsertNodeWithListProperty(t *testing.T) {
 	})
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	//断言响应码
+
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 		log.Println(resp.Status.Message)
 		t.Log(resp.Status.Message)
@@ -73,9 +73,9 @@ func TestInsertPointProperty(t *testing.T) {
 	})
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	//断言响应码
+
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 		log.Println(resp.Status.Message)
 		t.Log(resp.Status.Message)
@@ -114,9 +114,9 @@ func TestInsertBlobProperty(t *testing.T) {
 	})
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	//断言响应码
+
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 		log.Println(resp.Status.Message)
 		t.Log(resp.Status.Message)
@@ -126,12 +126,14 @@ func TestInsertBlobProperty(t *testing.T) {
 	uql := fmt.Sprintf("find().nodes({@%s}) as nodes return nodes{*}", schemaName)
 	response, err := client.Uql(uql, nil)
 
-	//断言响应码
-	if response.Status.Code != ultipa.ErrorCode_SUCCESS {
-		log.Println(response.Status.Message)
-		t.Fatal(response.Status.Message)
+	if err != nil {
+		t.Fatal(err)
 	}
+
 	nodes, schemas, err := response.Alias("nodes").AsNodes()
+	if err != nil {
+		t.Fatal(err)
+	}
 	printers.PrintNodes(nodes, schemas)
 }
 
@@ -165,9 +167,9 @@ func TestInsertDecimalProperty(t *testing.T) {
 	})
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	//断言响应码
+
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 		log.Println(resp.Status.Message)
 		t.Log(resp.Status.Message)
@@ -176,13 +178,15 @@ func TestInsertDecimalProperty(t *testing.T) {
 
 	uql := fmt.Sprintf("find().nodes({@%s}) as nodes return nodes{*}", schemaName)
 	response, err := client.Uql(uql, nil)
-
-	//断言响应码
-	if response.Status.Code != ultipa.ErrorCode_SUCCESS {
-		log.Println(response.Status.Message)
-		t.Fatal(response.Status.Message)
+	if err != nil {
+		t.Fatal(err)
 	}
+
 	nodes, schemas, err := response.Alias("nodes").AsNodes()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	printers.PrintNodes(nodes, schemas)
 }
 
@@ -208,9 +212,9 @@ func TestInsertNodeWithSetProperty(t *testing.T) {
 	})
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	//断言响应码
+
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 		log.Println(resp.Status.Message)
 		t.Log(resp.Status.Message)
@@ -219,6 +223,26 @@ func TestInsertNodeWithSetProperty(t *testing.T) {
 }
 
 func TestInsertNodes(t *testing.T) {
+	schemaName := "default"
+
+	ty := ultipa.DBType_DBNODE
+	client.Truncate(&structs.Truncate{
+		GraphName: graph,
+		DbType:    &ty,
+		Schema:    schemaName,
+	}, nil)
+
+	prop := &structs.Property{
+		Name: "name",
+		Type: ultipa.PropertyType_STRING,
+	}
+	client.CreateNodeProperty(schemaName, prop, nil)
+	prop = &structs.Property{
+		Name: "salary",
+		Type: ultipa.PropertyType_DOUBLE,
+	}
+	client.CreateNodeProperty(schemaName, prop, nil)
+
 	var nodes []*structs.Node
 	node1 := structs.NewNode()
 	node1.UUID = 1
@@ -226,29 +250,64 @@ func TestInsertNodes(t *testing.T) {
 	node1.Set("salary", "6.1")
 
 	node2 := structs.NewNode()
+	node2.UUID = 2
 	node2.Set("name", "test")
 	node2.Set("salary", 6.1)
 
 	node3 := structs.NewNode()
-	node3.UUID = 2
-	node3.Set("name", "test2")
+	node3.UUID = 3
+	//node3.Set("name", "test2")
 
 	nodes = append(nodes, node1, node2, node3)
 
 	uql := structs.NodesToInsertUql(nodes)
-	log.Println(uql)
+	t.Log(uql)
 
 	requestConfig := &configuration.InsertRequestConfig{
-		RequestConfig: &configuration.RequestConfig{
-			GraphName: "test",
-		},
-		Silent: true,
+		RequestConfig: &configuration.RequestConfig{},
+		Silent:        true,
 	}
 
-	response, err := client.InsertNodes("default", nodes, requestConfig)
+	response, err := client.InsertNodes(schemaName, nodes, requestConfig)
 	if err != nil {
-		return
+		t.Error(err)
 	}
 
-	log.Println(response.Status.Message)
+	t.Log(response)
+
+	// overwrite
+	node1.Set("name", "go_sdk2")
+
+	uql = structs.NodesToInsertUql(nodes)
+	t.Log(uql)
+
+	requestConfig = &configuration.InsertRequestConfig{
+		InsertType: ultipa.InsertType_OVERWRITE,
+		Silent:     true,
+	}
+
+	response, err = client.InsertNodes(schemaName, nodes, requestConfig)
+	if err != nil {
+		t.Error(err)
+	}
+
+	t.Log(response)
+
+	// upsert
+	node2.Set("salary", 10.1)
+
+	uql = structs.NodesToInsertUql(nodes)
+	log.Println(uql)
+
+	requestConfig = &configuration.InsertRequestConfig{
+		InsertType: ultipa.InsertType_UPSERT,
+		Silent:     true,
+	}
+
+	response, err = client.InsertNodes(schemaName, nodes, requestConfig)
+	if err != nil {
+		t.Error(err)
+	}
+
+	t.Log(response)
 }

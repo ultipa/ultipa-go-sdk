@@ -1,10 +1,8 @@
 package api
 
 import (
-	"errors"
 	"fmt"
 
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 )
@@ -19,9 +17,6 @@ func (api *UltipaAPI) DeleteNodes(filter string, config *configuration.InsertReq
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
 
 	return resp, nil
 }
@@ -35,9 +30,6 @@ func (api *UltipaAPI) DeleteEdges(filter string, config *configuration.InsertReq
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	return resp, nil

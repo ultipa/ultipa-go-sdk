@@ -1,7 +1,6 @@
 package test
 
 import (
-	"log"
 	"testing"
 
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
@@ -33,7 +32,7 @@ func TestParseStatistic(t *testing.T) {
 	})
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 
 	utils.PrintJSON(res)

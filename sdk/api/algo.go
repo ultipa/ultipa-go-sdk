@@ -23,10 +23,6 @@ func (api *UltipaAPI) ShowAlgo(config *configuration.RequestConfig) ([]*structs.
 		return nil, err
 	}
 
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
-
 	algos, err := resp.Alias(http.RESP_ALGOS_KEY).AsAlgos()
 
 	if err != nil {

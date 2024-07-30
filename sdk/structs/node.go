@@ -151,7 +151,7 @@ func GetSchemasOfNodeList(nodes []*Node) map[string]*Schema {
 }
 
 func nodeToString(node *Node) string {
-	dataMap := make(map[string]interface{}, len(node.Values.Data)+2)
+	dataMap := make(map[string]interface{}, 10)
 	if node.ID != "" {
 		//_ = node.Set("_id", node.ID)
 		dataMap["_id"] = node.ID
@@ -161,8 +161,10 @@ func nodeToString(node *Node) string {
 		dataMap["_uuid"] = node.UUID
 	}
 
-	for k, v := range node.Values.Data {
-		dataMap[k] = v
+	if node.Values != nil && node.Values.Data != nil {
+		for k, v := range node.Values.Data {
+			dataMap[k] = v
+		}
 	}
 
 	jsonData, err := json.Marshal(dataMap)

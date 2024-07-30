@@ -2,10 +2,8 @@ package test
 
 import (
 	"fmt"
-	"log"
 	"testing"
 
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"github.com/ultipa/ultipa-go-sdk/utils"
 )
@@ -67,24 +65,18 @@ func TestPolicyUql(t *testing.T) {
 		//AsPolicies:           []string{"yu"},
 	}
 
-	log.Println(p.ToCreatePolicyUql())
-	log.Println(p.ToAlterPolicyUql())
+	//log.Println(p.ToCreatePolicyUql())
+	//log.Println(p.ToAlterPolicyUql())
 
-	resp, err := client.Uql(p.ToCreatePolicyUql(), nil)
+	_, err := client.Uql(p.ToCreatePolicyUql(), nil)
 
 	if err != nil {
-		log.Println(err)
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		log.Println(resp.Status.Message)
+		t.Error(err)
 	}
 
-	resp, err = client.Uql(p.ToAlterPolicyUql(), nil)
+	_, err = client.Uql(p.ToAlterPolicyUql(), nil)
 	if err != nil {
-		log.Println(err)
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		log.Println(resp.Status.Message)
+		t.Error(err)
 	}
 
 }

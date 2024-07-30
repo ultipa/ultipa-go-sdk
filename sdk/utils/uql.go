@@ -140,7 +140,7 @@ func (t *UqlItem) IsExtra() bool {
 		}
 	}
 
-	//主要处理类似kill(1)命令中有参数的语句
+	// process likee kill(1) uql contains paramter
 	_, firstCmdIsExtra := ExtraUqlCommandKeys[firstCmd]
 	if len(result) > 1 && result[0] != "" && firstCmdIsExtra && param != "" {
 		return true

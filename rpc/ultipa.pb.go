@@ -241,7 +241,7 @@ const (
 	ErrorCode_NOT_RAFT_MODE                  ErrorCode = 10
 	ErrorCode_RAFT_NO_AVAILABLE_FOLLOWERS    ErrorCode = 11
 	ErrorCode_RAFT_NO_AVAILABLE_ALGO_SERVERS ErrorCode = 12
-	//鉴权失败
+	// Authentication failed
 	ErrorCode_PERMISSION_DENIED ErrorCode = 13
 )
 

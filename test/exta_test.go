@@ -2,7 +2,7 @@
  * @Author: zhaohaichao
  * @Description:
  * @File:  exta_test
- * @Date: 2022/8/5 7:49 下午
+ * @Date: 2022/8/5 7:49 pm
  */
 
 package test
@@ -19,7 +19,7 @@ func TestInstallExta(t *testing.T) {
 	_, err := client.InstallExta("./test_algo_lib/libexta_page_rank.so", "./test_algo_lib/page_rank.yml", nil)
 
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 }
 

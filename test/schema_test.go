@@ -14,7 +14,7 @@ import (
 func TestShowSchemas(t *testing.T) {
 	res, err := client.ShowSchema(nil)
 	if err != nil {
-		log.Panic(err)
+		t.Fatal(err)
 	}
 	log.Printf(utils.JSONString(res))
 }
@@ -23,7 +23,7 @@ func TestListSchema(t *testing.T) {
 	InitCases()
 	res, err := client.ShowNodeSchema(nil)
 	if err != nil {
-		log.Panic(err)
+		t.Fatal(err)
 	}
 	log.Printf(utils.JSONString(res))
 }
@@ -102,22 +102,25 @@ func TestCompareSchema(t *testing.T) {
 		err, _ := structs.CompareSchemas(pair.First, pair.Second, false)
 
 		if err != nil {
-			log.Fatalln("Test Compare schema failed ：", index, err)
+			t.Fatal("Test Compare schema failed ：", index, err)
 		}
 	}
 
 }
 
 func TestShowSchema(t *testing.T) {
-	resp, _ := client.Uql("show().schema()", nil)
+	resp, err := client.Uql("show().schema()", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	nodeSchemas, err := resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	edgeSchemas, err := resp.Alias(http.RESP_EDGE_SCHEMA_KEY).AsSchemas()
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 
 	printers.PrintSchema(nodeSchemas)
@@ -142,11 +145,10 @@ func TestCreateSchemaWithProperties(t *testing.T) {
 		},
 	}
 
-	resp2, err := client.CreateSchema(newSchemaWithProperties, true, nil)
+	_, err := client.CreateSchema(newSchemaWithProperties, true, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Println(resp2)
 }
 
 func TestCreateSchema(t *testing.T) {

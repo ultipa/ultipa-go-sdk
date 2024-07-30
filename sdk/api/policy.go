@@ -1,10 +1,8 @@
 package api
 
 import (
-	"errors"
 	"fmt"
 
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
@@ -14,9 +12,6 @@ func (api *UltipaAPI) ShowPolicy(requestConfig *configuration.RequestConfig) (po
 	resp, err := api.Uql("show().policy()", requestConfig)
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	policies, err = resp.Alias(http.RESP_POLICY_KEY).AsPolicies()
@@ -33,9 +28,6 @@ func (api *UltipaAPI) GetPolicy(policyName string, requestConfig *configuration.
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	policies, err := resp.Alias(http.RESP_POLICY_KEY).AsPolicies()
@@ -54,9 +46,6 @@ func (api *UltipaAPI) CreatePolicy(policy *structs.Policy, requestConfig *config
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
 
 	return resp, nil
 }
@@ -68,9 +57,6 @@ func (api *UltipaAPI) AlterPolicy(policy *structs.Policy, requestConfig *configu
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
 
 	return resp, nil
 }
@@ -81,9 +67,6 @@ func (api *UltipaAPI) DropPolicy(policyName string, requestConfig *configuration
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	return resp, nil

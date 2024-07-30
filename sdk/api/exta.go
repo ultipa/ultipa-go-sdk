@@ -2,7 +2,7 @@
  * @Author: zhaohaichao
  * @Description:
  * @File:  exta
- * @Date: 2022/8/5 7:35 下午
+ * @Date: 2022/8/5 7:35 pm
  */
 
 package api
@@ -168,9 +168,6 @@ func (api *UltipaAPI) ShowExta(config *configuration.RequestConfig) ([]*structs.
 	resp, err = api.Uql(fmt.Sprintf(`show().exta()`), config)
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	extas, err = resp.Alias(http.RESP_EXTAS_KEY).AsExtas()

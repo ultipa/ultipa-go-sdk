@@ -34,9 +34,7 @@ func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EntityTable, config *config
 		EdgeTable:            table,
 		CreateNodeIfNotExist: config.CreateNodeIfNotExist,
 		InsertType:           config.InsertType,
-		//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
-		//Silent:     config.Silent,
-		Silent: true,
+		Silent:               config.Silent,
 	})
 
 	if err != nil {
@@ -314,9 +312,7 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(rows []*structs.Edge, config *configu
 			EdgeTable:            table,
 			InsertType:           config.InsertType,
 			CreateNodeIfNotExist: config.CreateNodeIfNotExist,
-			//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
-			//Silent:     config.Silent,
-			Silent: true,
+			Silent:               config.Silent,
 		})
 
 		if err != nil {
@@ -346,7 +342,19 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(rows []*structs.Edge, config *configu
 }
 
 func (api *UltipaAPI) InsertEdges(schemaName string, edges []*structs.Edge, requestConfig *configuration.InsertRequestConfig) (*http.UQLResponse, error) {
-	uql := fmt.Sprintf(`insert().into(@%s).edges([%s])`, schemaName, structs.EdgesToInsertUql(edges))
+	params := ""
+	switch requestConfig.InsertType {
+	case ultipa.InsertType_NORMAL:
+		params = "insert()"
+	case ultipa.InsertType_OVERWRITE:
+		params = "insert().overwrite()"
+	case ultipa.InsertType_UPSERT:
+		params = "upsert()"
+	default:
+		return nil, fmt.Errorf("InsertEdges error, unknown InsertType: %d", requestConfig.InsertType)
+	}
+
+	uql := fmt.Sprintf(`%s.into(@%s).edges([%s])`, params, schemaName, structs.EdgesToInsertUql(edges))
 	if requestConfig.Silent {
 		uql = uql + " as edges return edges{*}"
 	}
@@ -354,9 +362,6 @@ func (api *UltipaAPI) InsertEdges(schemaName string, edges []*structs.Edge, requ
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	return resp, nil

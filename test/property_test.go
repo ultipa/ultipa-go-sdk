@@ -2,7 +2,7 @@
  * @Author: zhaohaichao
  * @Description:
  * @File:  property_test
- * @Date: 2022/7/29 5:45 下午
+ * @Date: 2022/7/29 5:45 pm
  */
 
 package test
@@ -18,15 +18,18 @@ import (
 )
 
 func TestShowProperty(t *testing.T) {
-	resp, _ := client.Uql("show().property()", nil)
+	resp, err := client.Uql("show().property()", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	nodeProperties, err := resp.Alias(http.RESP_NODE_PROPERTY_KEY).AsProperties()
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	edgeProperties, err := resp.Alias(http.RESP_EDGE_PROPERTY_KEY).AsProperties()
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 
 	printers.PrintProperty(nodeProperties)
@@ -34,21 +37,27 @@ func TestShowProperty(t *testing.T) {
 }
 
 func TestShowNodeProperty(t *testing.T) {
-	resp, _ := client.Uql("show().node_property()", nil)
+	resp, err := client.Uql("show().node_property()", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	nodeProperties, err := resp.Alias(http.RESP_NODE_PROPERTY_KEY).AsProperties()
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	printers.PrintProperty(nodeProperties)
 }
 
 func TestShowEdgeProperty(t *testing.T) {
-	resp, _ := client.Uql("show().edge_property()", nil)
+	resp, err := client.Uql("show().edge_property()", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	edgeProperties, err := resp.Alias(http.RESP_EDGE_PROPERTY_KEY).AsProperties()
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	printers.PrintProperty(edgeProperties)
 }
@@ -58,14 +67,15 @@ func TestCreatePropertyWithUql(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		t.Fatal(resp.Status.Message)
+
+	resp, err = client.Uql("show().node_property(@People)", nil)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	resp, _ = client.Uql("show().node_property(@People)", nil)
 	nodeProperties, err := resp.Alias(http.RESP_NODE_PROPERTY_KEY).AsProperties()
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	printers.PrintProperty(nodeProperties)
 }

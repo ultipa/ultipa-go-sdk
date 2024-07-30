@@ -2,7 +2,7 @@
  * @Author: zhaohaichao
  * @Description:
  * @File:  index
- * @Date: 2022/8/4 3:27 下午
+ * @Date: 2022/8/4 3:27 pm
  */
 
 package api
@@ -46,9 +46,6 @@ func (api *UltipaAPI) CreateIndex(dbType ultipa.DBType, schemaName, propertyName
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	return resp, nil
@@ -138,9 +135,6 @@ func (api *UltipaAPI) DropIndex(dbType ultipa.DBType, schemaName, propertyName s
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
 
 	return resp, nil
 }
@@ -171,9 +165,6 @@ func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyN
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	return resp, nil

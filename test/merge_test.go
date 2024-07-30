@@ -46,7 +46,7 @@ func TestMergeStruct(t *testing.T) {
 	err := utils.MergeSameStruct(R1, R2)
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 
 	log.Printf("%#v", R1)

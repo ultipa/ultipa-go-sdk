@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"reflect"
 	"strconv"
 	"sync"
 	"testing"
@@ -15,12 +16,15 @@ import (
 )
 
 func TestSlice(t *testing.T) {
-	a := []int{2}
+	a := []int{0, 1, 2, 3}
 
-	deleteIndex := 0
-	a = append(a[:deleteIndex], a[deleteIndex+1:]...)
+	deleteIndex := 2
+	actural := append(a[:deleteIndex], a[deleteIndex+1:]...)
+	expect := []int{0, 1, 3}
+	if !reflect.DeepEqual(actural, expect) {
+		t.Fatalf("expect: %v, actural: %v", expect, actural)
+	}
 
-	log.Fatalln(a)
 }
 
 func TestBitIsInclude(t *testing.T) {
@@ -45,13 +49,13 @@ func TestTimeZoneTimestamp(t *testing.T) {
 	tt1, err := time.Parse(time.RFC3339, t1)
 
 	if err != nil {
-		log.Fatalln("E1", err)
+		t.Fatal("E1", err)
 	}
 
 	tt2, err := time.Parse("2006-01-02T15:04:05Z07:00", t2)
 
 	if err != nil {
-		log.Fatalln("E2", err)
+		t.Fatal("E2", err)
 	}
 
 	log.Println(tt1.UTC(), tt2.UTC())
@@ -132,10 +136,10 @@ func exit04() {
 		for {
 			select {
 			case <-ctx.Done():
-				fmt.Println("退出协程")
+				fmt.Println("exit goroutine")
 				return
 			default:
-				fmt.Println("监控01")
+				fmt.Println("monitoring 01")
 				time.Sleep(1 * time.Second)
 
 			}
@@ -147,14 +151,14 @@ func exit04() {
 	time.Sleep(5 * time.Second)
 	cancel()
 	time.Sleep(2 * time.Second)
-	fmt.Println("退出程序")
+	fmt.Println("exit")
 
 }
 
 func TestWg(t *testing.T) {
 	wg := sync.WaitGroup{}
 
-	err := funcName(wg)
+	err := funcName(&wg)
 
 	wg.Wait()
 	if err != nil {
@@ -163,7 +167,7 @@ func TestWg(t *testing.T) {
 
 }
 
-func funcName(wg sync.WaitGroup) (err error) {
+func funcName(wg *sync.WaitGroup) (err error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	for i := 0; i < 100; i++ {
@@ -174,18 +178,20 @@ func funcName(wg sync.WaitGroup) (err error) {
 				cancel()
 				err = errors.New("context.WithCancel(context.Background())")
 			}
-			log.Println(i1)
+			//log.Println(i1)
 		}(i)
 		select {
 		case <-ctx.Done():
-			//fmt.Println("退出 ，停止了。。。")
+			//fmt.Println("exit ，stopped。。。")
 			return err
 		default:
 			//time.Sleep(1 * time.Millisecond)
-			fmt.Println("运行中。。。")
+			//fmt.Println("running。。。")
 		}
 	}
-	return err
+
+	cancel()
+	return nil
 }
 
 func TestEnumName(t *testing.T) {

@@ -1,15 +1,17 @@
 package test
 
 import (
-	"fmt"
+	"log"
 	"testing"
 )
 
 func TestShowTask(t *testing.T) {
 	tasks, err := client.ShowTask("", 0, nil)
 	if err != nil {
-		t.Errorf("show task error %v", err)
+		t.Fatalf("show task error %v", err)
 	}
-	fmt.Printf("%v\n", tasks[0])
 
+	for _, task := range tasks {
+		log.Println(task)
+	}
 }

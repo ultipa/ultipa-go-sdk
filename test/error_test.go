@@ -10,8 +10,6 @@ import (
 func TestErrorType(t *testing.T) {
 	err := utils.NewLeaderNotYetElectedError("")
 	if reflect.TypeOf(err).Elem().String() != "utils.LeaderNotYetElectedError" {
-		t.Error("not instance of utils.LeaderNotYetElectedError")
-	} else {
-		t.Log("ok")
+		t.Fatal("not instance of utils.LeaderNotYetElectedError")
 	}
 }

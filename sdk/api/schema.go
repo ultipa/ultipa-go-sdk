@@ -19,9 +19,6 @@ func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) ([]
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
 
 	schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 	if err != nil {
@@ -50,9 +47,6 @@ func (api *UltipaAPI) ShowNodeSchema(requestConfig *configuration.RequestConfig)
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
 
 	schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 
@@ -71,9 +65,6 @@ func (api *UltipaAPI) ShowEdgeSchema(requestConfig *configuration.RequestConfig)
 	resp, err = api.Uql(fmt.Sprintf(`show().edge_schema()`), requestConfig)
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	schemas, err = resp.Alias(http.RESP_EDGE_SCHEMA_KEY).AsSchemas()
@@ -134,9 +125,6 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 	resp, err = api.Uql(uql, requestConfig)
 	if err != nil {
 		return nil, err
-	}
-	if !resp.Status.IsSuccess() {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	api.Logger.Log("Created Schema : @" + schemaName)
@@ -202,10 +190,6 @@ func (api *UltipaAPI) DropSchema(schema *structs.Schema, requestConfig *configur
 		return nil, err
 	}
 
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
-
 	return resp, nil
 }
 
@@ -241,9 +225,6 @@ func (api *UltipaAPI) AlterSchema(schema, newSchema *structs.Schema, requestConf
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	return resp, nil

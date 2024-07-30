@@ -20,15 +20,15 @@ func TestHeartBeat(t *testing.T) {
 		Debug:     true,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	client, err = sdk.NewUltipa(config)
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 
 	log.Println("TestHeartBeat - Sleep")
-	time.Sleep(100 * time.Second)
+	time.Sleep(10 * time.Second)
 
 }

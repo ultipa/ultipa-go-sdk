@@ -161,7 +161,7 @@ func GetSchemasOfEdgeList(edges []*Edge) map[string]*Schema {
 }
 
 func edgeToString(edge *Edge) string {
-	dataMap := make(map[string]interface{}, len(edge.Values.Data)+2)
+	dataMap := make(map[string]interface{}, 10)
 
 	if edge.UUID != 0 {
 		dataMap["_uuid"] = edge.UUID
@@ -179,8 +179,10 @@ func edgeToString(edge *Edge) string {
 		dataMap["_to"] = edge.To
 	}
 
-	for k, v := range edge.Values.Data {
-		dataMap[k] = v
+	if edge.Values != nil && edge.Values.Data != nil {
+		for k, v := range edge.Values.Data {
+			dataMap[k] = v
+		}
 	}
 
 	jsonData, err := json.Marshal(dataMap)

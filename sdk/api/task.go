@@ -1,10 +1,8 @@
 package api
 
 import (
-	"errors"
 	"fmt"
 
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
@@ -25,9 +23,6 @@ func (api *UltipaAPI) ShowTask(algoNameOrId string, status structs.TaskStatus, r
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	tasks, err = resp.Alias(http.RESP_TASK_KEY).AsTasks()
@@ -50,9 +45,6 @@ func (api *UltipaAPI) ClearTask(algoNameOrId string, status structs.TaskStatus, 
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
 
 	return resp, nil
 }
@@ -71,9 +63,6 @@ func (api *UltipaAPI) StopTask(id string, config *configuration.RequestConfig) (
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	return resp, nil

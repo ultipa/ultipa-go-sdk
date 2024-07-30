@@ -7,30 +7,26 @@ import (
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
-	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
-	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
-	"github.com/ultipa/ultipa-go-sdk/utils"
 )
 
 func TestShowGraph(t *testing.T) {
 	InitCases()
 	//client, _ := GetClient(hosts, graph)
-	res, err := client.ShowGraph(nil)
+	graphs, err := client.ShowGraph(nil)
 	if err != nil {
-		log.Panic(err)
+		t.Fatal(err)
 	}
-	log.Printf(utils.JSONString(res))
+	if len(graphs) == 0 {
+		t.Fatal("show().graph() no data return")
+	}
+
+	//log.Printf(utils.JSONString(res))
 }
 
 func TestCreateGraph(t *testing.T) {
 
-	client, err := GetClient(hosts, graph)
-
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	//client, err := GetClient(hosts, graph)
 
 	client.DropGraph(graph, nil)
 
@@ -40,14 +36,10 @@ func TestCreateGraph(t *testing.T) {
 
 	client.SetCurrentGraph(graph)
 
-	resp, err := client.Uql("insert().nodes({}).into(@default)", nil)
+	_, err := client.Uql("insert().nodes({}).into(@default)", nil)
 
 	if err != nil {
-		logger.PrintError(err.Error())
-	}
-
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		logger.PrintError(resp.Status.Message)
+		t.Error(err)
 	}
 
 }
@@ -62,22 +54,27 @@ func TestAsGraph(t *testing.T) {
 	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphSets()
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	printers.PrintGraphSet(graphs)
+
+	if len(graphs) == 0 {
+		t.Fatal("show().graph() no data return")
+	}
+
+	//printers.PrintGraphSet(graphs)
 }
 
 func TestCreateGraphIfNotExist(t *testing.T) {
 
-	client, err := GetClient(hosts, graph)
+	//client, err := GetClient(hosts, graph)
 
-	if err != nil {
-		t.Fatalf("failed to connect to server %v", err)
-	}
+	//if err != nil {
+	//	t.Fatalf("failed to connect to server %v", err)
+	//}
 
 	client.DropGraph(graph, nil)
 
-	_, _, err = client.CreateGraphIfNotExist(&structs.GraphSet{
+	_, _, err := client.CreateGraphIfNotExist(&structs.GraphSet{
 		Name: graph,
 	}, nil)
 	if err != nil {

@@ -8,10 +8,6 @@ import (
 )
 
 func TestExportAsNodesEdges(t *testing.T) {
-	//garphName := "Yuri_LegalTech"
-	//schemaName := "Judgement"
-	//client, _ := GetClient([]string{"192.168.2.142:60062"}, garphName)
-	//
 	//schema := &structs.Schema{
 	//	Name: schemaName,
 	//	Properties: []*structs.Property{

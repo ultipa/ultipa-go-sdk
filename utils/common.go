@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-// StructToJSONBytes 把数据转成json的bytes
+// StructToJSONBytes transfer data to json bytes
 func StructToJSONBytes(data interface{}) ([]byte, error) {
 	b, err := json.Marshal(data)
 	if err != nil {

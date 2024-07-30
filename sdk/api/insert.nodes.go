@@ -335,7 +335,19 @@ func (api *UltipaAPI) InsertNodesBatchAuto(rows []*structs.Node, config *configu
 }
 
 func (api *UltipaAPI) InsertNodes(schemaName string, nodes []*structs.Node, requestConfig *configuration.InsertRequestConfig) (*http.UQLResponse, error) {
-	uql := fmt.Sprintf(`insert().into(@%s).nodes([%s])`, schemaName, structs.NodesToInsertUql(nodes))
+	params := ""
+	switch requestConfig.InsertType {
+	case ultipa.InsertType_NORMAL:
+		params = "insert()"
+	case ultipa.InsertType_OVERWRITE:
+		params = "insert().overwrite()"
+	case ultipa.InsertType_UPSERT:
+		params = "upsert()"
+	default:
+		return nil, fmt.Errorf("InsertNodes error, unknown InsertType: %d", requestConfig.InsertType)
+	}
+
+	uql := fmt.Sprintf(`%s.into(@%s).nodes([%s])`, params, schemaName, structs.NodesToInsertUql(nodes))
 	if requestConfig.Silent {
 		uql = uql + " as nodes return nodes{*}"
 	}
@@ -343,9 +355,6 @@ func (api *UltipaAPI) InsertNodes(schemaName string, nodes []*structs.Node, requ
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	return resp, nil

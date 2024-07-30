@@ -1,6 +1,8 @@
 package api
 
 import (
+	"errors"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 )
@@ -28,6 +30,10 @@ func (api *UltipaAPI) Authenticate(authenticateType ultipa.AuthenticateType, uql
 
 	if err != nil {
 		return nil, err
+	}
+
+	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Msg)
 	}
 
 	return resp, nil

@@ -48,9 +48,6 @@ func (api *UltipaAPI) CreateProperty(dbType ultipa.DBType, schemaName string, pr
 	if err != nil {
 		return nil, err
 	}
-	if !resp.Status.IsSuccess() {
-		return nil, errors.New(resp.Status.Message)
-	}
 
 	api.Logger.Log("Created Property : @" + schemaName + "." + propertyName)
 	return resp, nil
@@ -198,9 +195,6 @@ func (api *UltipaAPI) DropProperty(dbType ultipa.DBType, schemaName, propertyNam
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
 
 	return resp, nil
 }
@@ -238,9 +232,6 @@ func (api *UltipaAPI) AlterProperty(dbType ultipa.DBType, property, newProperty 
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	return resp, nil

@@ -17,7 +17,7 @@ func TestDelete(t *testing.T) {
 		log.Println(err, resp)
 	}
 
-	log.Println(resp.DataItemMap)
+	log.Println(resp)
 
 	resp, err = client.DeleteEdges("{_uuid < 200}", conf)
 	if err != nil {

@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"log"
 	"strings"
 	"testing"
@@ -18,6 +17,7 @@ var hosts []string
 var username string
 var password string
 var graph string
+var DEBUG bool
 
 func TestMain(m *testing.M) {
 	setup()
@@ -28,30 +28,31 @@ func TestMain(m *testing.M) {
 }
 
 func TestPing(t *testing.T) {
-	client, _ = GetClient(hosts, graph)
-	resp, err := client.Test(nil)
+	//client, _ = GetClient(hosts, graph)
+	_, err := client.Test(nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	fmt.Println(resp.Status.Message)
+
 }
 
 func GetClient(hosts []string, graphName string) (*api.UltipaAPI, error) {
 	var err error
+	//DEBUG = true // open if you need
 	config, err := configuration.NewUltipaConfig(&configuration.UltipaConfig{
 		Hosts:        hosts,
 		Username:     username,
 		Password:     password,
 		DefaultGraph: graphName,
-		Debug:        true,
+		Debug:        DEBUG,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 	client, err = sdk.NewUltipa(config)
 
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 
 	return client, err
@@ -77,5 +78,7 @@ func setup() {
 }
 
 func teardown() {
+	client.Close()
+
 	log.Println("Tearing down the test environment")
 }

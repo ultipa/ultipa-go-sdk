@@ -11,7 +11,7 @@ import (
 func TestShowShowPrivilege(t *testing.T) {
 	p, err := client.ShowPrivilege(nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	for _, privilege := range p {
 		fmt.Println(privilege)
@@ -38,7 +38,7 @@ func TestShowShowPrivilege(t *testing.T) {
 	policies := []string{"yu2"}
 	resp, err := client.GrantPolicy("yu", gp, sp, pp, policies, nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	log.Println(resp.Status.Code)
 }

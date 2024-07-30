@@ -6,29 +6,26 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
-func TestIsGlobalUql(t *testing.T) {
-	uql := ` top().task("567")`
-	uqlItem := utils.NewUql(uql)
-	isGlobal := uqlItem.IsGlobal()
-	t.Logf("%s is global:%v", uql, isGlobal)
+func TestIsGlobalUql2(t *testing.T) {
+	tests := []struct {
+		uql      string
+		expected bool
+	}{
+		{`top().task("567")`, true},
+		{`grant().node_privilege(["READ"]).on("",@, *).user("lzq")`, true},
+		{`grant().edge_privilege(["READ"]).on("",@, *).user("lzq")`, true},
+		{`grant().privilege(["READ"]).on("",@, *).user("lzq")`, true},
+		{`grant().system().privilege(["STAT"]).user("lzq")`, true},
+		{`show().graph()`, true},
+	}
 
-	uql = ` grant().node_privilege(["READ"]).on("",@, *).user("lzq")`
-	uqlItem = utils.NewUql(uql)
-	isGlobal = uqlItem.IsGlobal()
-	t.Logf("%s is global:%v", uql, isGlobal)
-
-	uql = ` grant().edge_privilege(["READ"]).on("",@, *).user("lzq")`
-	uqlItem = utils.NewUql(uql)
-	isGlobal = uqlItem.IsGlobal()
-	t.Logf("%s is global:%v", uql, isGlobal)
-
-	uql = ` grant().privilege(["READ"]).on("",@, *).user("lzq")`
-	uqlItem = utils.NewUql(uql)
-	isGlobal = uqlItem.IsGlobal()
-	t.Logf("%s is global:%v", uql, isGlobal)
-
-	uql = ` grant().system().privilege(["STAT"]).user("lzq")`
-	uqlItem = utils.NewUql(uql)
-	isGlobal = uqlItem.IsGlobal()
-	t.Logf("%s is global:%v", uql, isGlobal)
+	for _, tt := range tests {
+		t.Run(tt.uql, func(t *testing.T) {
+			uqlItem := utils.NewUql(tt.uql)
+			isGlobal := uqlItem.IsGlobal()
+			if isGlobal != tt.expected {
+				t.Errorf("%s is global: %v, expected: %v", tt.uql, isGlobal, tt.expected)
+			}
+		})
+	}
 }

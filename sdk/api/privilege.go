@@ -1,10 +1,8 @@
 package api
 
 import (
-	"errors"
 	"fmt"
 
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
@@ -16,9 +14,6 @@ func (api *UltipaAPI) ShowPrivilege(config *configuration.RequestConfig) (privil
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	privileges, err = resp.Alias(http.RESP_PRIVILEGE_KEY).AsPrivileges()
@@ -113,9 +108,6 @@ func (api *UltipaAPI) GrantPolicy(userName string, graphPrivileges *structs.Grap
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
 
 	return resp, nil
 }
@@ -132,9 +124,6 @@ func (api *UltipaAPI) RevokePolicy(userName string, graphPrivileges *structs.Gra
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	return resp, nil

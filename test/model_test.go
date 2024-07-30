@@ -10,14 +10,6 @@ import (
 )
 
 func TestCreateModel(t *testing.T) {
-
-	var err error
-	client, err = GetClient(hosts, graph)
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-
 	log.Println("[Test] Creating Graph Model")
 	model := models.NewGraphModel(&structs.GraphSet{
 		Name: "graph_by_model",
@@ -72,7 +64,7 @@ func TestCreateModel(t *testing.T) {
 	})
 
 	log.Println("[TEST] Initial Model")
-	err = client.InitModel(model, nil)
+	err := client.InitModel(model, nil)
 
 	if err != nil {
 		t.Fatalf("Test Error %v \n", err)

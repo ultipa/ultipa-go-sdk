@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
@@ -142,6 +143,10 @@ func (api *UltipaAPI) Uql(uql string, requestConfig *configuration.RequestConfig
 		return nil, err
 	}
 
+	if uqlResp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(uqlResp.Status.Message)
+	}
+
 	if requestConfig != nil && requestConfig.Host != "" {
 		return uqlResp, err
 	}
@@ -162,10 +167,19 @@ func (api *UltipaAPI) UQLStream(uql string, requestConfig *configuration.Request
 	if err != nil {
 		return nil, err
 	}
+
 	uqlResp, err := http.NewUQLResponseStream(resp)
+	if err != nil {
+		return nil, err
+	}
+	if uqlResp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(uqlResp.Status.Message)
+	}
+
 	if requestConfig != nil && requestConfig.Host != "" {
 		return uqlResp, err
 	}
+
 	if uqlResp.NeedRedirect() {
 		err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
 		if err != nil {
@@ -272,12 +286,12 @@ func (api *UltipaAPI) Test(requestConfig *configuration.RequestConfig) (resp *ht
 		Name: "Conn Test",
 	})
 
-	if err != nil || res.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		return nil, fmt.Errorf("tset error %v", err)
+	if err != nil {
+		return nil, fmt.Errorf("tset error %w", err)
 	}
 
 	if res.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		return nil, fmt.Errorf("tset error %s", res.Status.Msg)
+		return nil, fmt.Errorf("tset error %v", res.Status.Msg)
 	}
 	status := &http.Status{
 		Message: res.Status.Msg,

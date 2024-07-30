@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"log"
 	"testing"
 
 	"github.com/pterm/pterm"
@@ -30,7 +29,7 @@ func TestExplain(t *testing.T) {
 	resp, err := client.Uql(`explain find().nodes() as n1 find().nodes() as n2 find().nodes() as n3 with n1,n2,n3 return n1, n2, n3`, nil)
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 
 	//log.Println(resp)

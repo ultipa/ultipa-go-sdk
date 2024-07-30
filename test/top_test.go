@@ -1,17 +1,17 @@
 package test
 
 import (
-	"fmt"
+	"log"
 	"testing"
 )
 
 func TestTop(t *testing.T) {
 	tops, err := client.Top(nil)
 	if err != nil {
-		t.Error(err)
+		t.Fatalf("exec top error, %v", err)
 	}
 
 	for _, top := range tops {
-		fmt.Println(top)
+		log.Println(top)
 	}
 }

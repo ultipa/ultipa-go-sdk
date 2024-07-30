@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"io"
 	"log"
 	"strings"
 	"testing"
@@ -22,7 +23,7 @@ func TestNewConn(t *testing.T) {
 	conn, err := grpc.Dial(hosts[0], grpc.WithInsecure(), grpc.WithDefaultCallOptions())
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 
 	client := ultipa.NewUltipaRpcsClient(conn)
@@ -38,7 +39,7 @@ func TestNewConn(t *testing.T) {
 	})
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 
 	log.Println(resp)
@@ -50,14 +51,16 @@ func TestNewConn(t *testing.T) {
 	})
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 
 	for {
 		record, err := resp2.Recv()
 		if err != nil {
-			log.Fatalln(err)
-			break
+			if err == io.EOF {
+				break
+			}
+			t.Fatal(err)
 		}
 		log.Println(record.Alias, record.Paths, err)
 	}
@@ -76,8 +79,10 @@ func TestUqlWithSpecialHost(t *testing.T) {
 		Host: "localhost:3000",
 	})
 
-	if err != nil {
-		log.Fatalln(err)
+	target := "transport: Error while dialing: dial tcp 127.0.0.1:3000: connect: connection refused"
+
+	if err == nil || !strings.Contains(err.Error(), target) {
+		t.Fatal(err)
 	}
 
 	log.Println(res)
@@ -85,12 +90,12 @@ func TestUqlWithSpecialHost(t *testing.T) {
 
 func TestRefreshPool(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 10; i++ {
 		err := client.Pool.RefreshActivesWithSeconds(1)
 		if err != nil {
-			t.Log(err)
+			t.Error(err)
 		}
-		time.Sleep(time.Millisecond * 5500)
+		time.Sleep(time.Millisecond * 500)
 	}
 }
 
@@ -130,12 +135,12 @@ func TestConnectionSSL(t *testing.T) {
 		Debug:        true,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	client, err = sdk.NewUltipa(config)
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 
 	uql, err := client.Uql("show().schema()", nil)

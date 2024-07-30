@@ -21,9 +21,7 @@ func (api *UltipaAPI) ShowGraph(requestConfig *configuration.RequestConfig) (gra
 	if err != nil {
 		return nil, err
 	}
-	if res.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(res.Status.Message)
-	}
+
 	table, err := res.GetSingleTable()
 	if err != nil {
 		return nil, err
@@ -69,12 +67,8 @@ func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, requestConfig *config
 	resp, err := api.Uql(fmt.Sprintf(`create().graph("%v", "%v")`, graph.Name, graph.Description), requestConfig)
 
 	if err != nil {
+		api.Logger.Log("create graph failed : " + graph.Name + " " + err.Error())
 		return nil, err
-	}
-
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		api.Logger.Log("create graph failed : " + graph.Name + " " + resp.Status.Message)
-		return resp, errors.New(resp.Status.Message)
 	}
 
 	api.Logger.Log("Creating Graph Request OK! - " + graph.Name)
@@ -165,9 +159,6 @@ func (api *UltipaAPI) AlterGraph(oldGraph, newGraph *structs.GraphSet, requestCo
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
 
 	return resp, nil
 }
@@ -216,9 +207,6 @@ func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configu
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
 
 	return resp, nil
 }
@@ -230,9 +218,6 @@ func (api *UltipaAPI) Compact(graphName string, requestConfig *configuration.Req
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	return resp, err
@@ -246,9 +231,6 @@ func (api *UltipaAPI) MountGraph(graphName string, requestConfig *configuration.
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
-	}
 
 	return resp, nil
 }
@@ -260,9 +242,6 @@ func (api *UltipaAPI) UnmountGraph(graphName string, requestConfig *configuratio
 
 	if err != nil {
 		return nil, err
-	}
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(resp.Status.Message)
 	}
 
 	return resp, nil

@@ -10,7 +10,7 @@ func TestDownload(t *testing.T) {
 
 	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.ModePerm)
 	if err != nil {
-		panic(err)
+		t.Error(err)
 	}
 	defer file.Close()
 
@@ -24,7 +24,7 @@ func TestDownload(t *testing.T) {
 	}
 	err = client.DownloadAlgoResultFile(fileName, "1", nil, receive)
 	if err != nil {
-		panic(err)
+		t.Error(err)
 	}
 }
 
@@ -33,7 +33,7 @@ func TestDownloadAll(t *testing.T) {
 
 		file, err := os.OpenFile("./data/"+fileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.ModePerm)
 		if err != nil {
-			panic(err)
+			t.Error(err)
 		}
 		defer file.Close()
 
@@ -47,6 +47,6 @@ func TestDownloadAll(t *testing.T) {
 	}
 	err := client.DownloadAllAlgoResultFile("1", nil, receive)
 	if err != nil {
-		panic(err)
+		t.Error(err)
 	}
 }
