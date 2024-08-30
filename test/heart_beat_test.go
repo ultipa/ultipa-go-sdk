@@ -4,28 +4,31 @@ import (
 	"log"
 	"testing"
 	"time"
-	"ultipa-go-sdk/sdk"
-	"ultipa-go-sdk/sdk/configuration"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 )
 
 func TestHeartBeat(t *testing.T) {
 
 	var err error
-	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
-		Hosts:    []string{"192.168.1.85:60701"},
-		Username: "root",
-		Password: "root",
+	config, err := configuration.NewUltipaConfig(&configuration.UltipaConfig{
+		Hosts:     hosts,
+		Username:  username,
+		Password:  password,
 		HeartBeat: 1,
-		Debug: true,
+		Debug:     true,
 	})
-
+	if err != nil {
+		t.Fatal(err)
+	}
 	client, err = sdk.NewUltipa(config)
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 
 	log.Println("TestHeartBeat - Sleep")
-	time.Sleep(100 * time.Second)
+	time.Sleep(10 * time.Second)
 
 }

@@ -3,91 +3,192 @@ package test
 import (
 	"log"
 	"testing"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/http"
-	"ultipa-go-sdk/sdk/printers"
-	"ultipa-go-sdk/sdk/structs"
-	"ultipa-go-sdk/sdk/utils/logger"
-	"ultipa-go-sdk/utils"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func TestListGraph(t *testing.T) {
+func TestShowGraph(t *testing.T) {
 	InitCases()
-	client, _ := GetClient([]string{"192.168.1.85:61099"}, "miniCircle")
-	res, err := client.ListGraph(nil)
+	//client, _ := GetClient(hosts, graph)
+	graphs, err := client.ShowGraph(nil)
 	if err != nil {
-		log.Panic(err)
+		t.Fatal(err)
 	}
-	log.Printf(utils.JSONString(res))
+	if len(graphs) == 0 {
+		t.Fatal("show().graph() no data return")
+	}
+
+	//log.Printf(utils.JSONString(res))
 }
 
 func TestCreateGraph(t *testing.T) {
 
-	graphName := "sdk_test"
-	hosts := []string{
-		"192.168.1.85:61099",
-	}
-	client, err := GetClient(hosts, "default")
+	//client, err := GetClient(hosts, graph)
 
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	client.DropGraph(graph, nil)
 
-	client.DropGraph(graphName, nil)
-
-	client.CreateGraph(&structs.Graph{
-		Name: graphName,
+	client.CreateGraph(&structs.GraphSet{
+		Name: graph,
 	}, nil)
 
-	client.SetCurrentGraph(graphName)
+	client.SetCurrentGraph(graph)
 
-	resp, err := client.UQL(`insert().nodes({"_id":1}).into(@default)`, nil)
+	_, err := client.Uql("insert().nodes({}).into(@default)", nil)
 
 	if err != nil {
-		logger.PrintError(err.Error())
-	}
-
-	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
-		logger.PrintError(resp.Status.Message)
+		t.Error(err)
 	}
 
 }
 
-func TestDeleteGraph(t *testing.T) {
+func TestDropGraph(t *testing.T) {
 	client.DropGraph("test_creation", nil)
 }
 
 func TestAsGraph(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:61099"}, "default")
-	resp, _ := client.UQL("show().graph()", nil)
-	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphs()
+	//client, _ := GetClient(hosts, graph)
+	resp, _ := client.Uql("show().graph()", nil)
+	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphSets()
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	printers.PrintGraph(graphs)
+
+	if len(graphs) == 0 {
+		t.Fatal("show().graph() no data return")
+	}
+
+	//printers.PrintGraphSet(graphs)
 }
 
 func TestCreateGraphIfNotExist(t *testing.T) {
-	graphName := "test111"
-	hosts := []string{
-		"192.168.1.85:61099",
-	}
-	client, err := GetClient(hosts, "miniCircle")
 
-	if err != nil {
-		t.Fatalf("failed to connect to server %v", err)
-	}
+	//client, err := GetClient(hosts, graph)
 
-	client.DropGraph(graphName, nil)
+	//if err != nil {
+	//	t.Fatalf("failed to connect to server %v", err)
+	//}
 
-	_, _, err = client.CreateGraphIfNotExit(&structs.Graph{
-		Name:        graphName,
-		Shards:      "1,2",
-		PartitionBy: "Crc32",
+	client.DropGraph(graph, nil)
+
+	_, _, err := client.CreateGraphIfNotExist(&structs.GraphSet{
+		Name: graph,
 	}, nil)
 	if err != nil {
 		t.Fatalf("failed to create graph %v", err)
 	}
+}
+
+func TestUltipaAPI_AlterGraph(t *testing.T) {
+	type args struct {
+		oldGraphName string
+		newGraphName string
+		description  string
+		config       *configuration.RequestConfig
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Old graph name is empty",
+			args: args{
+				oldGraphName: "",
+				newGraphName: "validNewGraphName",
+				description:  "Valid description",
+				config:       nil,
+			},
+			wantErr: true,
+		},
+		{
+			name: "Old graph name contains illegal characters",
+			args: args{
+				oldGraphName: "1",
+				newGraphName: "validNewGraphName",
+				description:  "Valid description",
+				config:       nil,
+			},
+			wantErr: true,
+		},
+		{
+			name: "New graph name is empty",
+			args: args{
+				oldGraphName: "amz",
+				newGraphName: "",
+				description:  "new description",
+				config:       nil,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Description is empty",
+			args: args{
+				oldGraphName: "amz",
+				newGraphName: "amz1",
+				description:  "",
+				config:       nil,
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			oldGraph := &structs.GraphSet{Name: tt.args.oldGraphName}
+			newGraph := &structs.GraphSet{
+				Name:        tt.args.newGraphName,
+				Description: tt.args.description,
+			}
+			rsp, err := client.AlterGraph(oldGraph, newGraph, tt.args.config)
+			_ = rsp
+			if (tt.wantErr && err == nil) || (!tt.wantErr && err != nil) {
+				t.Errorf("AlterGraph() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+		})
+	}
+}
+
+func TestTruncate(t *testing.T) {
+	tr := &structs.Truncate{
+		GraphName: "test",
+		DbType:    nil,
+		Schema:    "*",
+	}
+	response, err := client.Truncate(tr, nil)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(response)
+
+	db := ultipa.DBType_DBNODE
+	tr.DbType = &db
+	response, err = client.Truncate(tr, nil)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(response)
+
+	db = ultipa.DBType_DBEDGE
+	tr.DbType = &db
+	tr.Schema = "中文"
+	response, err = client.Truncate(tr, nil)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(response)
+
+	tr.DbType = nil
+	tr.Schema = ""
+	response, err = client.Truncate(tr, nil)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(response)
+
 }

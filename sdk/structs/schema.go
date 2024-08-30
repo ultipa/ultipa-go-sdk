@@ -2,8 +2,9 @@ package structs
 
 import (
 	"errors"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/utils"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
 type Schema struct {

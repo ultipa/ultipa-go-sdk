@@ -2,8 +2,9 @@ package test
 
 import (
 	"testing"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/utils"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
 func TestStringAsInterface(t *testing.T) {
@@ -55,5 +56,17 @@ func TestSerializePoint(t *testing.T) {
 	}
 	t.Log(pointBytes)
 	t.Log(string(pointBytes))
+
+}
+
+func TestSerializeBlob(t *testing.T) {
+	value := []byte{97, 98, 99}
+
+	bytes, err := utils.ConvertInterfaceToBytesSafe(value, ultipa.PropertyType_BLOB, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(bytes)
+	t.Log(string(bytes))
 
 }

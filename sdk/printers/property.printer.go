@@ -1,16 +1,22 @@
 package printers
 
 import (
-	"github.com/alexeyco/simpletable"
 	"log"
 	"strconv"
-	"ultipa-go-sdk/sdk/structs"
+
+	"github.com/alexeyco/simpletable"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 func PrintProperty(properties []*structs.Property) {
 
 	table := simpletable.New()
-	table.Header.Cells = []*simpletable.Cell{&simpletable.Cell{Text: "Name"}, &simpletable.Cell{Text: "Description"}, &simpletable.Cell{Text: "Type"}, &simpletable.Cell{Text: "LTE"}, &simpletable.Cell{Text: "Schema"}}
+	table.Header.Cells = []*simpletable.Cell{{Text: "Name"}, {Text: "Description"},
+		{Text: "Type"}, {Text: "LTE"},
+		{Text: "READ"}, {Text: "WRITE"},
+		{Text: "Schema"}, {Text: "Extra"},
+		{Text: "Encrypt"},
+	}
 
 	for _, prop := range properties {
 		propertyTypeStr, err := prop.GetStringType()
@@ -19,11 +25,15 @@ func PrintProperty(properties []*structs.Property) {
 		}
 
 		cells := []*simpletable.Cell{
-			&simpletable.Cell{Text: prop.Name},
-			&simpletable.Cell{Text: prop.Desc},
-			&simpletable.Cell{Text: propertyTypeStr},
-			&simpletable.Cell{Text: strconv.FormatBool(prop.Lte)},
-			&simpletable.Cell{Text: prop.Schema},
+			{Text: prop.Name},
+			{Text: prop.Desc},
+			{Text: propertyTypeStr},
+			{Text: strconv.FormatBool(prop.Lte)},
+			{Text: strconv.FormatBool(prop.Read)},
+			{Text: strconv.FormatBool(prop.Write)},
+			{Text: prop.Schema},
+			{Text: prop.Extra},
+			{Text: prop.Encrypt},
 		}
 		table.Body.Cells = append(table.Body.Cells, cells)
 	}

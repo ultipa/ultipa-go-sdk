@@ -1,9 +1,10 @@
 package sdk
+
 //
 //import (
-//	ultipa "ultipa-go-sdk/rpc"
-//	"ultipa-go-sdk/types"
-//	"ultipa-go-sdk/utils"
+//	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+//	"github.com/ultipa/ultipa-go-sdk/types"
+//	"github.com/ultipa/ultipa-go-sdk/utils"
 //)
 //
 //type GetLeaderRequest struct {

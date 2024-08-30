@@ -3,19 +3,27 @@ package test
 import (
 	"log"
 	"testing"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/http"
-	"ultipa-go-sdk/sdk/printers"
-	"ultipa-go-sdk/sdk/structs"
-	"ultipa-go-sdk/utils"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
+	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"github.com/ultipa/ultipa-go-sdk/utils"
 )
+
+func TestShowSchemas(t *testing.T) {
+	res, err := client.ShowSchema(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Printf(utils.JSONString(res))
+}
 
 func TestListSchema(t *testing.T) {
 	InitCases()
-	client, _ := GetClient([]string{"192.168.1.85:61099"}, "java_sdk_test")
-	res, err := client.ListNodeSchema(nil)
+	res, err := client.ShowNodeSchema(nil)
 	if err != nil {
-		log.Panic(err)
+		t.Fatal(err)
 	}
 	log.Printf(utils.JSONString(res))
 }
@@ -94,23 +102,25 @@ func TestCompareSchema(t *testing.T) {
 		err, _ := structs.CompareSchemas(pair.First, pair.Second, false)
 
 		if err != nil {
-			log.Fatalln("Test Compare schema failed ：", index, err)
+			t.Fatal("Test Compare schema failed ：", index, err)
 		}
 	}
 
 }
 
 func TestShowSchema(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:61099"}, "java_sdk_test")
-	resp, _ := client.UQL("show().schema()", nil)
+	resp, err := client.Uql("show().schema()", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	nodeSchemas, err := resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	edgeSchemas, err := resp.Alias(http.RESP_EDGE_SCHEMA_KEY).AsSchemas()
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 
 	printers.PrintSchema(nodeSchemas)
@@ -118,7 +128,7 @@ func TestShowSchema(t *testing.T) {
 }
 
 func TestCreateSchemaWithProperties(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.87:61090"}, "default")
+	//client, _ := GetClient(hosts, graph)
 	// create schema with properties
 	newSchemaWithProperties := &structs.Schema{
 		Name: "_abc _acd",
@@ -135,15 +145,13 @@ func TestCreateSchemaWithProperties(t *testing.T) {
 		},
 	}
 
-	resp2, err := client.CreateSchema(newSchemaWithProperties, true, nil)
+	_, err := client.CreateSchema(newSchemaWithProperties, true, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Println(resp2)
 }
 
 func TestCreateSchema(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:61099"}, "sdk_test")
 	// create schema with properties
 	newSchemaWithoutProperties := &structs.Schema{
 		Name: "People",
@@ -151,5 +159,21 @@ func TestCreateSchema(t *testing.T) {
 	}
 
 	resp2, _ := client.CreateSchema(newSchemaWithoutProperties, false, nil)
+	log.Println(resp2)
+}
+
+func TestAlterSchema(t *testing.T) {
+	// create schema with properties
+	schema := &structs.Schema{
+		DBType: ultipa.DBType_DBNODE,
+		Name:   "People",
+		//Desc:   "People",
+	}
+	newSchema := &structs.Schema{
+		Name: "People2",
+		Desc: "People2",
+	}
+
+	resp2, _ := client.AlterSchema(schema, newSchema, nil)
 	log.Println(resp2)
 }

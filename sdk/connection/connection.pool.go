@@ -4,17 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"golang.org/x/sync/errgroup"
-	"google.golang.org/grpc/metadata"
 	"log"
 	"reflect"
 	"strings"
 	"sync"
 	"time"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/utils"
-	"ultipa-go-sdk/sdk/utils/logger"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
+	"golang.org/x/sync/errgroup"
+	"google.golang.org/grpc/metadata"
 )
 
 type GraphClusterInfo struct {
@@ -22,7 +23,7 @@ type GraphClusterInfo struct {
 	Leader        *Connection
 	Followers     []*Connection
 	Algos         []*Connection
-	LastAlgoIndex int //记录上次使用的 Task 节点索引
+	LastAlgoIndex int // Record the index of the last Task node used
 }
 
 // handle all connections
@@ -40,7 +41,7 @@ type ConnectionPool struct {
 func NewConnectionPool(config *configuration.UltipaConfig) (*ConnectionPool, error) {
 
 	if len(config.Hosts) < 1 {
-		return nil, errors.New("Error Hosts can not by empty")
+		return nil, errors.New("error Hosts can not by empty")
 	}
 
 	pool := &ConnectionPool{
@@ -89,7 +90,7 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) error {
 	pool.muActiveSafely.Lock()
 	defer pool.muActiveSafely.Unlock()
 	if time.Now().Sub(pool.LastActivesTime) <= 5*time.Second && len(pool.Connections) == len(pool.Actives) {
-		// 避免频繁刷新
+		// Avoid frequent refreshing
 		return nil
 	}
 	defer func() {
@@ -166,7 +167,7 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) error {
 			//any connection success, will pass.
 			return nil
 		}
-		//connection error: desc = "transport: Error while dialing dial tcp 192.168.1.80:61095: connectex: No connection could be made because the target machine actively refused it."
+		//connection error: desc = "transport: Error while dialing dial tcp xxx.xxx.1.xx:xxxxx: connectex: No connection could be made because the target machine actively refused it."
 		if !strings.Contains(connError.Error(), "Error while dialing dial tcp") {
 			isTcpErr = false
 			logger.PrintError(fmt.Sprintf("failed to connect to host %s: %v", hosts[idx], connError))
@@ -179,7 +180,7 @@ func (pool *ConnectionPool) RefreshActivesWithSeconds(seconds int32) error {
 	}
 }
 
-// 更新查看哪些连接还有效
+// RefreshActives Update to see which connections are still valid
 func (pool *ConnectionPool) RefreshActives() error {
 	return pool.RefreshActivesWithSeconds(6)
 }
@@ -188,11 +189,11 @@ func (pool *ConnectionPool) ForceRefreshClusterInfo(graphName string) error {
 	return pool.RefreshClusterInfo(graphName)
 }
 
-// sync cluster info from server
+// RefreshClusterInfo sync cluster info from server
 func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 	err := pool.doRefreshClusterInfo(graphName)
 	if err != nil && reflect.TypeOf(err).Elem().String() == "utils.LeaderNotYetElectedError" {
-		//若是leader未选出的错误类型，再重试一次
+		// If the leader has not selected the wrong type, try again
 		err = pool.RefreshActives()
 		if err != nil {
 			return err
@@ -219,14 +220,16 @@ func (pool *ConnectionPool) doRefreshClusterInfo(graphName string) error {
 			continue
 		}
 		allIsNill = false
-		// 如果该图集暂无初始化时
+		//If the graph is not initialized yet
 		if pool.GraphMgr.GetLeader(graphName) == nil {
 			conn = activeConn
 		} else {
-			// 已经初始化后
+			// After initialization
 			conn = pool.GraphMgr.GetLeader(graphName)
 		}
-		logger.PrintInfo(fmt.Sprintf("refresh graph [%s] cluster info with connection to host [%s]", graphName, conn.Host))
+		if pool.Config.Debug {
+			logger.PrintDebug(fmt.Sprintf("refresh graph [%s] cluster info with connection to host [%s]", graphName, conn.Host))
+		}
 		err = pool.resolveClusterInfo(graphName, conn)
 		if err == nil {
 			return nil
@@ -238,7 +241,7 @@ func (pool *ConnectionPool) doRefreshClusterInfo(graphName string) error {
 	return err
 }
 
-//resolveClusterInfo resolve graphName cluster info with connection conn
+// resolveClusterInfo resolve graphName cluster info with connection conn
 func (pool *ConnectionPool) resolveClusterInfo(graphName string, conn *Connection) error {
 
 	ctx, cancel, err := pool.NewContext(&configuration.RequestConfig{GraphName: graphName})
@@ -356,7 +359,7 @@ func (pool *ConnectionPool) GetMasterConn(config *configuration.UltipaConfig) (*
 
 }
 
-//SetMasterConn (graphName , *conn) Set master client
+// SetMasterConn (graphName , *conn) Set master client
 func (pool *ConnectionPool) SetMasterConn(graphName string, conn *Connection) {
 	pool.GraphMgr.SetLeader(graphName, conn)
 }
@@ -462,7 +465,7 @@ func (pool *ConnectionPool) RunHeartBeat() {
 					})
 
 					if err != nil || (resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS) {
-						log.Printf("heart beat failed : ", conn.Host)
+						log.Printf("heart beat failed : %v\n", conn.Host)
 						continue
 					}
 				}

@@ -3,11 +3,18 @@ package structs
 import (
 	"errors"
 	"strings"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/types"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/types"
 )
 
-type Graph struct {
+type Truncate struct {
+	GraphName string
+	DbType    *ultipa.DBType
+	Schema    string
+}
+
+type GraphSet struct {
 	ID          types.ID
 	Name        string
 	Description string

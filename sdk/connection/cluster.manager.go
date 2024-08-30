@@ -1,9 +1,8 @@
 package connection
 
 /**
-	Raft Cluster Manager, Update Raft Infos for client
- */
-
+Raft Cluster Manager, Update Raft Infos for client
+*/
 
 //type ClusterManager struct {
 //	Leader *Connection

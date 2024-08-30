@@ -10,5 +10,3 @@ func RandStr(n int) string {
 	rand.Read(result)
 	return hex.EncodeToString(result)
 }
-
-

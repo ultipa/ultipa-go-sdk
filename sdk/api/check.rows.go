@@ -2,7 +2,7 @@
  * @Author: zhaohaichao
  * @Description:
  * @File:  check.rows
- * @Date: 2022/8/2 6:43 下午
+ * @Date: 2022/8/2 6:43 pm
  */
 
 package api
@@ -10,7 +10,8 @@ package api
 import (
 	"errors"
 	"fmt"
-	"ultipa-go-sdk/sdk/structs"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 func CheckValuesAndProperties(properties []*structs.Property, values *structs.Values, index int) (err error) {

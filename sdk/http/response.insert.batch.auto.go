@@ -2,7 +2,7 @@
  * @Author: zhaohaichao
  * @Description:
  * @File:  response.insert.batch.auto.go
- * @Date: 2022/9/2 5:20 下午
+ * @Date: 2022/9/2 5:20 pm
  */
 
 package http

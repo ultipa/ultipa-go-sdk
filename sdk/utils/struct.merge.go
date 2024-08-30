@@ -14,7 +14,6 @@ func MergeSameStruct(struct1 interface{}, struct2 interface{}) error {
 	s1p := reflect.ValueOf(struct1)
 	s2p := reflect.ValueOf(struct2)
 
-
 	log.Println("Kinds", s1p.Type().Kind(), s2p.Type().Kind())
 
 	if s1p.Type().Kind() != reflect.Ptr || s2p.Type().Kind() != reflect.Ptr {

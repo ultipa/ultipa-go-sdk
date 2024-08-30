@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"google.golang.org/protobuf/proto"
 	"log"
 	"strconv"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/structs"
-	"ultipa-go-sdk/sdk/utils"
+	"time"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
+	"google.golang.org/protobuf/proto"
 )
 
 type DataItem struct {
@@ -37,23 +39,28 @@ func NodeTableToNodes(nt *ultipa.EntityTable, alias string) ([]*structs.Node, ma
 	}
 
 	for _, oNode := range nt.EntityRows {
-		node := &structs.Node{
-			Name:   alias,
-			ID:     oNode.Id,
-			UUID:   oNode.Uuid,
-			Schema: oNode.SchemaName,
-		}
-
-		// set values
-		node.Values = structs.NewValues()
-		schema := schemas[oNode.SchemaName]
-		for index, v := range oNode.Values {
-			prop := schema.Properties[index]
-			value, err := utils.ConvertBytesToInterface(v, prop.Type, prop.SubTypes)
-			if err != nil {
-				return nil, nil, err
+		var node *structs.Node
+		if oNode.IsNull {
+			node = nil
+		} else {
+			node = &structs.Node{
+				Name:   alias,
+				ID:     oNode.Id,
+				UUID:   oNode.Uuid,
+				Schema: oNode.SchemaName,
 			}
-			node.Values.Set(prop.Name, value)
+
+			// set values
+			node.Values = structs.NewValues()
+			schema := schemas[oNode.SchemaName]
+			for index, v := range oNode.Values {
+				prop := schema.Properties[index]
+				value, err := utils.ConvertBytesToInterface(v, prop.Type, prop.SubTypes)
+				if err != nil {
+					return nil, nil, err
+				}
+				node.Values.Set(prop.Name, value)
+			}
 		}
 
 		nodes = append(nodes, node)
@@ -75,28 +82,32 @@ func EdgeTableToEdges(et *ultipa.EntityTable, alias string) ([]*structs.Edge, ma
 			schema.Properties = append(schema.Properties, &structs.Property{Name: header.PropertyName, Type: header.PropertyType, SubTypes: header.SubTypes})
 		}
 	}
-
+	var edge *structs.Edge
 	for _, oEdge := range et.EntityRows {
-		edge := &structs.Edge{
-			Name:     alias,
-			UUID:     oEdge.Uuid,
-			From:     oEdge.FromId,
-			FromUUID: oEdge.FromUuid,
-			To:       oEdge.ToId,
-			ToUUID:   oEdge.ToUuid,
-			Schema:   oEdge.SchemaName,
-		}
-
-		// set values
-		edge.Values = structs.NewValues()
-		schema := schemas[oEdge.SchemaName]
-		for index, v := range oEdge.Values {
-			prop := schema.Properties[index]
-			value, err := utils.ConvertBytesToInterface(v, prop.Type, prop.SubTypes)
-			if err != nil {
-				return nil, nil, err
+		if oEdge.IsNull {
+			edge = nil
+		} else {
+			edge = &structs.Edge{
+				Name:     alias,
+				UUID:     oEdge.Uuid,
+				From:     oEdge.FromId,
+				FromUUID: oEdge.FromUuid,
+				To:       oEdge.ToId,
+				ToUUID:   oEdge.ToUuid,
+				Schema:   oEdge.SchemaName,
 			}
-			edge.Values.Set(prop.Name, value)
+
+			// set values
+			edge.Values = structs.NewValues()
+			schema := schemas[oEdge.SchemaName]
+			for index, v := range oEdge.Values {
+				prop := schema.Properties[index]
+				value, err := utils.ConvertBytesToInterface(v, prop.Type, prop.SubTypes)
+				if err != nil {
+					return nil, nil, err
+				}
+				edge.Values.Set(prop.Name, value)
+			}
 		}
 
 		edges = append(edges, edge)
@@ -274,7 +285,7 @@ func (di *DataItem) AsAttr() (*structs.Attr, error) {
 		return midAttr.ListAttrAsAttr()
 
 	case ultipa.PropertyType_SET:
-		return nil, errors.New(fmt.Sprintf("DataItem %v is not either Type Attr or LIST Attr, but SET, not supported yet.", di.Alias))
+		return midAttr.ListAttrAsAttr()
 	case ultipa.PropertyType_MAP:
 		return nil, errors.New(fmt.Sprintf("DataItem %v is not either Type Attr or LIST Attr, but MAP, not supported yet.", di.Alias))
 	default:
@@ -392,7 +403,7 @@ func handleAttrValues(oAttr *ultipa.Attr, attr *structs.Attr) error {
 	return nil
 }
 
-// parseAttrList parse the oAttr that PropertyType is ultipa.PropertyType_LIST, set the parsed value to attr.
+// parseAttrList parse the oAttr that PropertyType is ultipa.PropertyType_LIST or ultipa.PropertyType_SET, set the parsed value to attr.
 func parseAttrList(oAttr *ultipa.Attr, attr *structs.Attr) error {
 	var resultType ultipa.ResultType
 	for _, v := range oAttr.Values {
@@ -497,8 +508,8 @@ func parseAttrMap(oAttr *ultipa.Attr) ([]*structs.AttrMapData, error) {
 	return mapDataRows, nil
 }
 
-// AsGraphs the types will be tables and alias is nodeSchema and edgeSchema
-func (di *DataItem) AsGraphs() (graphs []*structs.Graph, err error) {
+// AsGraphSets the types will be tables and alias is nodeSchema and edgeSchema
+func (di *DataItem) AsGraphSets() (graphs []*structs.GraphSet, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return graphs, nil
@@ -522,7 +533,7 @@ func (di *DataItem) AsGraphs() (graphs []*structs.Graph, err error) {
 
 	for _, row := range values {
 		//0:id, 1: name, 2: totalNodes ,3:totalEdges ,4:description ,5:status
-		graph := structs.Graph{}
+		graph := structs.GraphSet{}
 		graph.ID = row.Get("id").(string)
 		graph.Name = row.Get("name").(string)
 		var totalNodes uint64 = 0
@@ -615,6 +626,7 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 			Type        string
 			Description string
 			Lte         string
+			Extra       string
 		}
 
 		err = json.Unmarshal(propertyJson, &props)
@@ -636,6 +648,7 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 				Desc:   prop.Description,
 				Lte:    lte,
 				Schema: schema.Name,
+				Extra:  prop.Extra,
 			}
 			p.SetTypeByString(prop.Type)
 			schema.Properties = append(schema.Properties, &p)
@@ -668,22 +681,48 @@ func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 		//0:name, 1: type, 2: lte, 3: schema, 4: description
 		values := row.GetValues()
 
-		lte, err := strconv.ParseBool(string(values[2]))
+		rowValues := map[string][]byte{}
+		for idx, header := range table.Headers {
+			rowValues[header.PropertyName] = values[idx]
+		}
+
+		name := getOrDefault("name", "", rowValues)
+		lteStr := getOrDefault("lte", "false", rowValues)
+		typeStr := getOrDefault("type", "", rowValues)
+		read := getOrDefault("read", "0", rowValues)
+		write := getOrDefault("write", "0", rowValues)
+		schema := getOrDefault("schema", "0", rowValues)
+		desc := getOrDefault("description", "", rowValues)
+		lte, err := strconv.ParseBool(lteStr)
+		extra := getOrDefault("extra", "", rowValues)
+		encrypt := getOrDefault("encrypt", "", rowValues)
 		if err != nil {
 			log.Fatalln(err)
 		}
 		p := structs.Property{
-			Name:   string(values[0]),
-			Desc:   string(values[4]),
-			Lte:    lte,
-			Schema: string(values[3]),
+			Name:    name,
+			Desc:    desc,
+			Lte:     lte,
+			Read:    "1" == read,
+			Write:   "1" == write,
+			Schema:  schema,
+			Extra:   extra,
+			Encrypt: encrypt,
 		}
-		p.SetTypeByString(string(values[1]))
+		p.SetTypeByString(typeStr)
 		properties = append(properties, &p)
 
 	}
 
 	return properties, err
+}
+
+func getOrDefault(name string, defaultValue string, container map[string][]byte) string {
+	bytes, ok := container[name]
+	if ok {
+		return string(bytes)
+	}
+	return defaultValue
 }
 
 // AsIndexes the types will be tables and alias is nodeIndex and edgeIndex
@@ -698,20 +737,27 @@ func (di *DataItem) AsIndexes() (indexes []*structs.Index, err error) {
 	}
 
 	table := di.Data.(*ultipa.Table)
+	indexType := ""
 
-	if table.TableName != RESP_NODE_INDEX_KEY && table.TableName != RESP_EDGE_INDEX_KEY {
+	if table.TableName == RESP_NODE_INDEX_KEY {
+		indexType = "node"
+	} else if table.TableName == RESP_EDGE_INDEX_KEY {
+		indexType = "edge"
+	} else {
 		return nil, errors.New("DataItem " + di.Alias + " is not a Index list")
 	}
 
 	for _, row := range table.TableRows {
-		//0:name, 1: properties, 2: schema, 3: status
+		//0:name, 1: properties, 2: schema, 3: status 4: size
 		values := row.GetValues()
-
+		size, _ := strconv.Atoi(string(values[4]))
 		i := structs.Index{
 			Name:       string(values[0]),
 			Properties: string(values[1]),
 			Schema:     string(values[2]),
 			Status:     string(values[3]),
+			Size:       size,
+			Type:       indexType,
 		}
 		indexes = append(indexes, &i)
 
@@ -720,8 +766,8 @@ func (di *DataItem) AsIndexes() (indexes []*structs.Index, err error) {
 	return indexes, err
 }
 
-// AsFullText the types will be tables and alias is node fulltext Index and edge fulltext Index
-func (di *DataItem) AsFullText() (fullTextIndexes []*structs.Index, err error) {
+// AsFullTexts the types will be tables and alias is node fulltext Index and edge fulltext Index
+func (di *DataItem) AsFullTexts() (fullTextIndexes []*structs.Index, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return fullTextIndexes, nil
@@ -784,6 +830,40 @@ func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {
 	return algos, nil
 }
 
+// AsGraph convert graphAlias to structs.Graph for uql syntax toGraph(listUnion(collect(n1), collect(n2)), collect(e)) as graph return graph
+//func (di *DataItem) AsGraph() (graph *structs.Graph, err error) {
+//
+//	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+//		return graph, nil
+//	}
+//
+//	if di.Type != ultipa.ResultType_RESULT_TYPE_GRAPH {
+//		return nil, errors.New(fmt.Sprintf("dataItem %s is not Graph result type", di.Alias))
+//	}
+//
+//	if di.Data == nil {
+//		return nil, nil
+//	}
+//	graphAlias := di.Data.(*ultipa.GraphAlias)
+//
+//	return parseGraphs(graphAlias.Graph, graphAlias.Alias)
+//}
+
+//func parseGraphs(oGraph *ultipa.Graph, name string) (graph *structs.Graph, err error) {
+//	graph = structs.NewGraph()
+//	graph.Name = name
+//	graph.Nodes, graph.NodeSchemas, err = NodeTableToNodes(oGraph.NodeTable, "")
+//	if err != nil {
+//		return nil, err
+//	}
+//	graph.Edges, graph.EdgeSchemas, err = EdgeTableToEdges(oGraph.EdgeTable, "")
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return graph, nil
+//}
+
 func (di *DataItem) AsAny() (interface{}, error) {
 
 	switch di.Type {
@@ -799,8 +879,333 @@ func (di *DataItem) AsAny() (interface{}, error) {
 		return nodes, err
 	case ultipa.ResultType_RESULT_TYPE_TABLE:
 		return di.AsTable()
+	//case ultipa.ResultType_RESULT_TYPE_GRAPH:
+	//	return di.AsGraph()
 	default:
 		return di.Data, nil
 	}
 
+}
+
+func (di *DataItem) AsPolicies() (policies []*structs.Policy, err error) {
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, errors.New("RESULT_TYPE_UNSET")
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_POLICY_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a policy list")
+	}
+
+	var policy *structs.Policy
+	for _, row := range table.TableRows {
+		//0:name, 1: properties, 2: schema, 3: status
+		values := row.GetValues()
+		policy, err = bytesToPolicy(values)
+		if err != nil {
+			return nil, err
+		}
+
+		policies = append(policies, policy)
+	}
+
+	return policies, err
+}
+
+func bytesToPolicy(data [][]byte) (*structs.Policy, error) {
+	if len(data) != 5 {
+		return nil, fmt.Errorf("invalid data length, expected 5 but got %d", len(data))
+	}
+
+	var policy structs.Policy
+
+	// Name
+	policy.Name = string(data[0])
+
+	// GraphPrivileges
+	if err := json.Unmarshal(data[1], &policy.GraphPrivileges); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal GraphPrivileges: %w", err)
+	}
+
+	// SystemPrivileges
+	if err := json.Unmarshal(data[2], &policy.SystemPrivileges); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal SystemPrivileges: %w", err)
+	}
+
+	// PropertyPrivileges
+	if err := json.Unmarshal(data[3], &policy.PropertyPrivileges); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal PropertyPrivileges: %w", err)
+	}
+
+	// AsPolicies
+	if err := json.Unmarshal(data[4], &policy.Policies); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal AsPolicies: %w", err)
+	}
+
+	return &policy, nil
+}
+
+func (di *DataItem) AsExtas() (extas []*structs.Exta, err error) {
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_EXTAS_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a exta list")
+	}
+
+	for _, row := range table.TableRows {
+		values := row.GetValues()
+
+		i := structs.Exta{
+			Name:    string(values[0]),
+			Author:  string(values[1]),
+			Version: string(values[2]),
+			Detail:  string(values[3]),
+		}
+		extas = append(extas, &i)
+
+	}
+
+	return extas, nil
+}
+
+func (di *DataItem) AsTasks() (tasks []*structs.Task, err error) {
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_TASK_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a task list")
+	}
+
+	type TempTask struct {
+		Param    string            `json:"param"`
+		TaskInfo structs.TaskInfo  `json:"task_info"`
+		Result   map[string]string `json:"result"`
+		ErrorMsg string            `json:"error_msg"`
+	}
+
+	for _, row := range table.TableRows {
+		values := row.GetValues()
+
+		var tempTask TempTask
+		err = json.Unmarshal(values[0], &tempTask)
+		if err != nil {
+			return nil, err
+		}
+
+		var param map[string]string
+		err = json.Unmarshal([]byte(tempTask.Param), &param)
+		if err != nil {
+			return nil, err
+		}
+
+		task := structs.Task{
+			Param:    param,
+			TaskInfo: tempTask.TaskInfo,
+			Result:   tempTask.Result,
+			ErrorMsg: tempTask.ErrorMsg,
+		}
+
+		tasks = append(tasks, &task)
+	}
+
+	return tasks, nil
+}
+
+func (di *DataItem) AsTops() (tops []*structs.Top, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return tops, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_TOP_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a top list")
+	}
+
+	for _, row := range table.TableRows {
+		values := row.GetValues()
+
+		i := structs.Top{
+			ProcessId:  string(values[0]),
+			Status:     string(values[1]),
+			ProcessUql: string(values[2]),
+			Duration:   string(values[3]),
+		}
+		tops = append(tops, &i)
+
+	}
+
+	return tops, err
+}
+
+func (di *DataItem) AsStats() (stat *structs.Stat, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, errors.New("ResultType_RESULT_TYPE_UNSET")
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_STATISTIC_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a top list")
+	}
+
+	row := table.TableRows[0]
+	values := row.GetValues()
+
+	dateStr := string(values[2])
+	parsedTime, err := time.Parse("Mon Jan 2 15:04:05 2006", dateStr)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing date: %v", err)
+	}
+	formattedDate := parsedTime.Format("2006-01-02 15:04:05")
+
+	s := &structs.Stat{
+		CPUUsage:    string(values[0]),
+		MemUsage:    string(values[1]),
+		ExpiredDate: formattedDate,
+		CPUCores:    string(values[3]),
+		Company:     string(values[4]),
+		ServerType:  string(values[5]),
+		Version:     string(values[6]),
+	}
+	stat = s
+
+	return stat, err
+}
+
+func (di *DataItem) AsPrivileges() (privileges []*structs.Privilege, err error) {
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_PRIVILEGE_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a privilege list")
+	}
+
+	for _, row := range table.TableRows {
+		values := row.GetValues()
+
+		var graphPrivileges, systemPrivileges []string
+		err = json.Unmarshal(values[0], &graphPrivileges)
+		if err != nil {
+			return nil, errors.New("graphPrivileges Unmarshal failed" + err.Error())
+		}
+		err = json.Unmarshal(values[1], &systemPrivileges)
+		if err != nil {
+			return nil, errors.New("systemPrivileges Unmarshal failed" + err.Error())
+		}
+
+		i := structs.Privilege{
+			GraphPrivileges:  graphPrivileges,
+			SystemPrivileges: systemPrivileges,
+		}
+		privileges = append(privileges, &i)
+
+	}
+
+	return privileges, nil
+}
+
+func (di *DataItem) AsUsers() (users []*structs.User, err error) {
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_USER_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a user list")
+	}
+
+	for _, row := range table.TableRows {
+		values := row.GetValues()
+
+		user, err := bytesToUser(values)
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+
+	}
+
+	return users, nil
+}
+
+func bytesToUser(data [][]byte) (*structs.User, error) {
+	if len(data) != 6 {
+		return nil, fmt.Errorf("invalid data length, expected 6 but got %d", len(data))
+	}
+
+	var user structs.User
+
+	// Name
+	user.UserName = string(data[0])
+
+	// Create
+	timestamp, _ := strconv.ParseInt(string(data[1]), 10, 64)
+	create := time.Unix(timestamp, 0)
+	user.Create = create.Format("2006-01-02 15:04:05")
+
+	// GraphPrivileges
+	if err := json.Unmarshal(data[2], &user.GraphPrivileges); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal GraphPrivileges: %w", err)
+	}
+
+	// SystemPrivileges
+	if err := json.Unmarshal(data[3], &user.SystemPrivileges); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal SystemPrivileges: %w", err)
+	}
+
+	// PropertyPrivileges
+	if err := json.Unmarshal(data[4], &user.PropertyPrivileges); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal PropertyPrivileges: %w", err)
+	}
+
+	// AsPolicies
+	if err := json.Unmarshal(data[5], &user.Policies); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal AsPolicies: %w", err)
+	}
+
+	return &user, nil
 }

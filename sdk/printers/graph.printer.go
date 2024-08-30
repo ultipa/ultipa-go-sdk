@@ -2,26 +2,42 @@ package printers
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/alexeyco/simpletable"
-	"ultipa-go-sdk/sdk/structs"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func PrintGraph(graphs []*structs.Graph) {
+func PrintGraph(graph *structs.Graph) {
+	if graph == nil {
+		fmt.Println("No graph data found.")
+		return
+	}
+	fmt.Println(getSchemaNameContent(ultipa.DBType_DBNODE, graph.NodeSchemas))
+	fmt.Println()
+	fmt.Println()
+	fmt.Println(getSchemaNameContent(ultipa.DBType_DBEDGE, graph.EdgeSchemas))
+
+	fmt.Println(getNodeTableString(graph.Nodes, graph.NodeSchemas))
+	fmt.Println(getEdgeTableString(graph.Edges, graph.EdgeSchemas))
+}
+
+func getSchemaNameContent(dbType ultipa.DBType, schemas map[string]*structs.Schema) string {
 	table := simpletable.New()
-	table.Header.Cells = []*simpletable.Cell{&simpletable.Cell{Text: "ID"}, &simpletable.Cell{Text: "Name"}, &simpletable.Cell{Text: "Description"}, &simpletable.Cell{Text: "Total Node"}, &simpletable.Cell{Text: "Total Edge"}, &simpletable.Cell{Text: "Status"}}
-	for _, graph := range graphs {
+	if ultipa.DBType_DBNODE == dbType {
+		table.Header.Cells = []*simpletable.Cell{{Text: "#"}, {Text: "Node schemas"}}
 
+	} else {
+		table.Header.Cells = []*simpletable.Cell{{Text: "#"}, {Text: "Edge schemas"}}
+	}
+	i := 1
+	for _, schema := range schemas {
 		table.Body.Cells = append(table.Body.Cells, []*simpletable.Cell{
-			&simpletable.Cell{Text: graph.ID},
-			&simpletable.Cell{Text: graph.Name},
-			&simpletable.Cell{Text: graph.Description},
-			&simpletable.Cell{Text: fmt.Sprint(graph.TotalNodes)},
-			&simpletable.Cell{Text: fmt.Sprint(graph.TotalEdges)},
-			&simpletable.Cell{Text: graph.Status},
+			{Text: strconv.Itoa(i)},
+			{Text: schema.Name},
 		})
-
+		i++
 	}
-	if len(table.Body.Cells) > 0 {
-		table.Println()
-	}
+	return table.String()
 }

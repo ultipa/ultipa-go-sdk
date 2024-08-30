@@ -1,6 +1,6 @@
 package http
 
-import ultipa "ultipa-go-sdk/rpc"
+import ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 
 type StatusCode = int
 
@@ -23,7 +23,7 @@ const (
 
 type Status struct {
 	Message string
-	Code ultipa.ErrorCode
+	Code    ultipa.ErrorCode
 }
 
 func (t *Status) IsSuccess() bool {

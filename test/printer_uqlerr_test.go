@@ -2,7 +2,8 @@ package test
 
 import (
 	"testing"
-	"ultipa-go-sdk/sdk/printers"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
 )
 
 func TestPrintUQLErr(t *testing.T) {

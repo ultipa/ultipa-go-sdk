@@ -4,10 +4,11 @@ import (
 	"log"
 	"reflect"
 	"testing"
-	"ultipa-go-sdk/sdk/utils"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
-//TODO:
+// TODO:
 func TestMergeStruct(t *testing.T) {
 	type Company struct {
 		Name string
@@ -18,10 +19,9 @@ func TestMergeStruct(t *testing.T) {
 	}
 
 	type Relations struct {
-		Users []*User
+		Users     []*User
 		Companies []*Company
 	}
-
 
 	R1 := &Relations{
 		Users: []*User{
@@ -46,7 +46,7 @@ func TestMergeStruct(t *testing.T) {
 	err := utils.MergeSameStruct(R1, R2)
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 
 	log.Printf("%#v", R1)

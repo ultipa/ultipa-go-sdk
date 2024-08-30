@@ -2,7 +2,7 @@ package printers
 
 import (
 	"github.com/alexeyco/simpletable"
-	"ultipa-go-sdk/sdk/structs"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 func PrintAlgoList(algos []*structs.Algo) {

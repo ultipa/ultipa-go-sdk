@@ -1,26 +1,26 @@
 # Ultipa GO SDK
 
----
-## Prepare
-Supported server version see ultipa.Version.<br>
-This sdk depends on Protocol Buffer and grpc, so we need to compile the proto file first:<br>
-go install google.golang.org/grpc/cmd/protoc-gen-go@latest<br>
-go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest<br>
+## Installation
 
-then execute the build shell:<br>
-cd ./rpc <br>
-sh ./build-proto.sh
+```shell
 
-after this, remove protoc-gen-go and protoc-gen-go-grpc dependencies from go.mod
+go get github.com/ultipa/ultipa-go-sdk
+go mod tidy
+
+```
+
+## Document
+
+Read Ultipa Go SDK document  [ultipa.com](https://www.ultipa.com/document/ultipa-drivers/go-installation/v4.5)
 
 ## Create Client
 
 ```go
 
 import (
-    "ultipa-go-sdk/sdk"
-    "ultipa-go-sdk/sdk/api"
-    "ultipa-go-sdk/sdk/configuration"
+    "github.com/ultipa/ultipa-go-sdk/sdk"
+    "github.com/ultipa/ultipa-go-sdk/sdk/api"
+    "github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 )
 
 config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
@@ -54,16 +54,24 @@ nodes := resp.alias("nodes").asNodes()
 - asTable() : (table *structs.Table, err error)
 - asArray() : (arr *structs.Array, err error)
 - asAttr()  : (arr *structs.Array, err error)
-- asGraphs() : (graphs []*structs.Graph, err error)
+- AsGraphSets() (graphs []*structs.GraphSet, err error)
 - asSchemas() : (schemas []*structs.Schema, err error)
+- AsProperties() : (properties []*structs.Property, err error)
+- AsIndexes() : (indexes []*structs.Index, err error)
+- AsFullTexts() : (fullTextIndexes []*structs.Index, err error)
 - asAlgos() : ([]*structs.Algo, error)
+- AsGraph() : (graph *structs.Graph, err error)
 - asAny() : (interface{}, error)
+- AsPolicies() : (policies []*structs.Policy, err error)
+- AsExtas() : (extas []*structs.Exta, err error)
+- AsTasks() : (tasks []*structs.Task, err error)
+- AsTops() : (tops []*structs.Top, err error)
+- AsStats() : (stat *structs.Stat, err error)
+- AsPrivileges() : (privileges []*structs.Privilege, err error)
+- AsUsers() : (users []*structs.User, err error)
 
 ## Batch Insert
 
 Check Go Transporter For Details
 
-
-
-
-
+---

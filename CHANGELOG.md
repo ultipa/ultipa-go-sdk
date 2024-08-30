@@ -1,5 +1,37 @@
 # CHANGE LOGS
-###4.3.0
+
+### 4.4.0
+
+- Add Graph result type, Change original DateItem.asGraphs() method to DateItem.asGraphInfos() and return
+  List<GraphInfo>, new asGraphs() will return List<Graph> for the new Graph result type.
+
+### 4.3.5
+
+- fix
+
+### 4.3.4
+
+- remove backup method
+- add encrypt attribute for property.
+
+### 4.3.3
+
+- Support set data type.
+
+### 4.3.2
+
+- Support decimal data type.
+
+### 4.3.1
+
+- Support blob data type.
+- Add passwordEncrypt option for configuration to encrypt password. Available values are MD5, LDAP, NOTHING, MD5 is
+  default.
+- Add read and write properties for Ultipa property for server > 4.3.64
+- Send grant().system(), grant().privilege, grant().node_privilege and grant().edge_privilege to global graph set.
+
+### 4.3.0
+
 - Support data type LIST and POINT, remove ARRAY data type.
 - AsAttr support LIST data type.
 - Support NULL value.
@@ -7,8 +39,7 @@
 - Improve error message when failed to create connection pool
 - Differentiate timestamp and datetime when parse from string
 - Support special character when create/show schema and create property
-- 
-
+-
 
 ## Version 4.2.1
 
@@ -32,14 +63,12 @@
 - Attr add PropertyType
 - Add more comments to request configurations and connection configurations
 
-
-
 ## Version 4.0.4 - release
 
 - Add Model Manager
-  - manage model(graph)
-    - manage schemas for a model
+    - manage model(graph)
+        - manage schemas for a model
 - Add load db config from yaml
 - Add asFirstNode、asFirstEdge Methods for DataItem
 - Bug Fix
-  - Fix Context Memory leak
+    - Fix Context Memory leak

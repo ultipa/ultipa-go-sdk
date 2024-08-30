@@ -1,19 +1,27 @@
 package structs
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
-	ultipa "ultipa-go-sdk/rpc"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 )
 
 type Property struct {
 	Name     string
 	Desc     string
 	Lte      bool
+	Read     bool
+	Write    bool
 	Schema   string
 	Type     ultipa.PropertyType
 	SubTypes []ultipa.PropertyType
+	// extra info for property in json format, e.g. DecimalExtra: precision and scale for decimal type.
+	Extra   string
+	Encrypt string
 }
 
 const (
@@ -76,6 +84,11 @@ var PropertyReverseMap = map[ultipa.PropertyType]string{
 	ultipa.PropertyType_BOOL:      "bool",
 }
 
+type DecimalExtra struct {
+	Precision int `json:"precision"`
+	Scale     int `json:"scale"`
+}
+
 func (p *Property) IsIDType() bool {
 
 	idTyps := []ultipa.PropertyType{
@@ -101,11 +114,41 @@ func (p *Property) IsIgnore() bool {
 }
 
 func (p *Property) SetTypeByString(s string) {
+	// set typeStr "set(string)"
+	// decimal typeStr "decimal"
+	// list typeStr "string[]"
 	if strings.HasSuffix(s, "[]") {
 		p.Type = ultipa.PropertyType_LIST
 		p.SubTypes = append(p.SubTypes, GetPropertyTypeByString(strings.TrimSuffix(s, "[]")))
 		return
 	}
+	reg := regexp.MustCompile(`set\(([^)]+)\)`)
+	if reg.MatchString(strings.ReplaceAll(s, " ", "")) {
+		matches := reg.FindStringSubmatch(strings.ReplaceAll(s, " ", ""))
+		p.Type = ultipa.PropertyType_SET
+		p.SubTypes = append(p.SubTypes, GetPropertyTypeByString(matches[1]))
+		return
+	}
+	//re := regexp.MustCompile(`^decimal\((\d+),(\d+)\)$`)
+	//if re.MatchString(strings.ReplaceAll(s, " ", "")) {
+	//	p.Type = ultipa.PropertyType_DECIMAL
+	//	matches := re.FindStringSubmatch(strings.ReplaceAll(s, " ", ""))
+	//	precision, err := strconv.Atoi(matches[1])
+	//	scale, err := strconv.Atoi(matches[2])
+	//	if err != nil {
+	//		return
+	//	}
+	//	extraData := DecimalExtra{
+	//		Precision: precision,
+	//		Scale:     scale,
+	//	}
+	//	extraJson, err := json.Marshal(extraData)
+	//	if err != nil {
+	//		return
+	//	}
+	//	p.Extra = string(extraJson)
+	//	return
+	//}
 	p.Type = GetPropertyTypeByString(s)
 }
 
@@ -115,6 +158,21 @@ func (p *Property) GetStringType() (string, error) {
 			return "", errors.New(fmt.Sprintf("Property [%s] is List but not specified subTypes", p.Name))
 		}
 		return GetStringByPropertyType(p.SubTypes[0]) + "[]", nil
+	}
+	if p.Type == ultipa.PropertyType_SET {
+		if len(p.SubTypes) == 0 {
+			return "", errors.New(fmt.Sprintf("Property [%s] is Set but not specified subTypes", p.Name))
+		}
+		return fmt.Sprintf("set(%s)", GetStringByPropertyType(p.SubTypes[0])), nil
+	}
+	if p.Type == ultipa.PropertyType_DECIMAL {
+		var extraData DecimalExtra
+		err := json.Unmarshal([]byte(p.Extra), &extraData)
+		if err != nil {
+			return GetStringByPropertyType(p.Type), nil
+		}
+		extraString := fmt.Sprintf("(%d,%d)", extraData.Precision, extraData.Scale)
+		return GetStringByPropertyType(p.Type) + extraString, nil
 	}
 	return GetStringByPropertyType(p.Type), nil
 }

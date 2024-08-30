@@ -3,10 +3,11 @@ package structs
 import (
 	"errors"
 	"fmt"
-	ultipa "ultipa-go-sdk/rpc"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 )
 
-//ListAttrAsAttrNodes returns AttrNodes, if PropertyType of attr is LIST and inner result type is Node
+// ListAttrAsAttrNodes returns AttrNodes, if PropertyType of attr is LIST and inner result type is Node
 func (attr *Attr) ListAttrAsAttrNodes() (*AttrNodes, error) {
 	if ultipa.PropertyType_LIST != attr.PropertyType {
 		return nil, errors.New(fmt.Sprintf("value of this %v is not a LIST type", attr.Name))
@@ -33,7 +34,7 @@ func (attr *Attr) ListAttrAsAttrNodes() (*AttrNodes, error) {
 	return result, nil
 }
 
-//ListAttrAsAttrEdges returns AttrEdges, if PropertyType of attr is LIST and inner result type is Edge
+// ListAttrAsAttrEdges returns AttrEdges, if PropertyType of attr is LIST and inner result type is Edge
 func (attr *Attr) ListAttrAsAttrEdges() (*AttrEdges, error) {
 	if ultipa.PropertyType_LIST != attr.PropertyType {
 		return nil, errors.New(fmt.Sprintf("value of this %v is not a LIST type", attr.Name))
@@ -61,7 +62,7 @@ func (attr *Attr) ListAttrAsAttrEdges() (*AttrEdges, error) {
 	return result, nil
 }
 
-//ListAttrAsAttrPaths returns AttrPaths, if PropertyType of attr is LIST and inner result type is Path
+// ListAttrAsAttrPaths returns AttrPaths, if PropertyType of attr is LIST and inner result type is Path
 func (attr *Attr) ListAttrAsAttrPaths() (*AttrPaths, error) {
 	if ultipa.PropertyType_LIST != attr.PropertyType {
 		return nil, errors.New(fmt.Sprintf("value of this %v is not a LIST type", attr.Name))
@@ -89,11 +90,11 @@ func (attr *Attr) ListAttrAsAttrPaths() (*AttrPaths, error) {
 
 }
 
-//ListAttrAsAttr returns an attr, if PropertyType of attr is LIST and inner result type is Attr.
-//inner result type is attr, then regarded it as basic type, e.g. string,uint64, float64 etc.
+// ListAttrAsAttr returns an attr, if PropertyType of attr is LIST/SET and inner result type is Attr.
+// inner result type is attr, then regarded it as basic type, e.g. string,uint64, float64 etc.
 func (attr *Attr) ListAttrAsAttr() (*Attr, error) {
-	if ultipa.PropertyType_LIST != attr.PropertyType {
-		return nil, errors.New(fmt.Sprintf("value of this %v is not a LIST type", attr.Name))
+	if ultipa.PropertyType_LIST != attr.PropertyType && ultipa.PropertyType_SET != attr.PropertyType {
+		return nil, errors.New(fmt.Sprintf("value of this %v is not a LIST or SET type", attr.Name))
 	}
 	result := NewAttr()
 	result.Name = attr.Name
@@ -144,7 +145,7 @@ func (attr *Attr) ListAttrAsAttr() (*Attr, error) {
 	return newAttr, nil
 }
 
-//@depreacated
+// @depreacated
 func (attr *Attr) parseAttrOfAttrListDataToInterface() []interface{} {
 	var result []interface{}
 	switch attr.PropertyType {

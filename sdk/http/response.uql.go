@@ -1,14 +1,15 @@
 /**
- * Returns UQL Results by one time
+ * Returns Uql Results by one time
  */
 
 package http
 
 import (
 	"io"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/structs"
-	"ultipa-go-sdk/sdk/utils"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
 type UQLResponse struct {

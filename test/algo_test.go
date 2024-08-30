@@ -1,62 +1,81 @@
 package test
 
 import (
-	"log"
-	"os"
+	"fmt"
+	"strings"
 	"testing"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/printers"
-	"ultipa-go-sdk/sdk/utils/logger"
 )
 
-func TestListAlgo(t *testing.T) {
-
-	//client, _ := GetClient([]string{"210.13.32.146:60074"}, "default")
-	client, _ := GetClient([]string{"192.168.1.85:61095"}, "default")
+func TestShowAlgo(t *testing.T) {
+	//client, _ := GetClient(hosts, graph)
 
 	algos, err := client.ShowAlgo(nil)
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-
-	printers.PrintAlgoList(algos)
+	if len(algos) == 0 {
+		t.Log("no algo return")
+	}
+	//printers.PrintAlgoList(algos)
 }
 
-func TestInstallAlgo(t *testing.T) {
-	//client, _ := GetClient([]string{"210.13.32.146:60074"}, "default")
-	client, _ := GetClient([]string{"192.168.1.60:60061"}, "default")
+var algoName = "lpa"
 
-	resp, err := client.InstallAlgo("./test_algo_lib/libplugin_lpa.so", "./test_algo_lib/lpa.yml", nil)
+func TestAlgo(t *testing.T) {
+	algo, _ := client.GetAlgo(algoName, nil)
 
-	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		logger.PrintError(resp.Status.Msg)
-		os.Exit(1)
+	//UninstallAlgo
+	removeErr := fmt.Sprintf(`remove .//algo/libs//libplugin_%s.so failed!`, algoName)
+	_, err := client.UninstallAlgo(algoName, nil)
+	if algo == nil && !strings.Contains(err.Error(), removeErr) {
+		t.Errorf("UninstallAlgo failed %v", err)
 	}
+
+	if algo != nil && err != nil {
+		t.Errorf("UninstallAlgo failed %v", err)
+	}
+
+	// UninstallAlgo not exist again
+	_, err = client.UninstallAlgo(algoName, nil)
+	if !strings.Contains(err.Error(), removeErr) {
+		t.Errorf("Uninstall not exist Algo failed %v", err)
+	}
+
+	// UninstallAlgo empty algoName, will success
+	_, err = client.UninstallAlgo("", nil)
+	if err != nil {
+		t.Errorf("UninstallAlgo empty algoName failed %v", err)
+	}
+
+	// InstallAlgo
+	_, err = client.InstallAlgo("./data/installAlgo/libplugin_lpa.so", "./data/installAlgo/lpa.yml", nil)
 
 	if err != nil {
-		logger.PrintErrAndExist(err.Error())
+		t.Errorf("InstallAlgo error, %v", err)
 	}
 
-	TestListAlgo(t)
+	_, err = client.InstallAlgo("./data/installAlgo/libplugin_lpa.so", "./data/installAlgo/lpa.yml", nil)
+	versionErr := fmt.Sprintf("libplugin_%s.so:The new algo version must be greater than old!", algoName)
+	if !strings.Contains(err.Error(), versionErr) {
+		t.Errorf("InstallAlgo error, %v", err)
+	}
+
+	algo, _ = client.GetAlgo(algoName, nil)
+	if algo == nil {
+		t.Error("No installed algorithm found")
+	}
+
+	// UninstallAlgo Avoid unexpected problems due to inconsistent algorithm versions and servers
+	if !t.Run("UninstallAlgo", TestUninstallAlgo) {
+		t.Error("UninstallAlgo failed")
+	}
 }
 
 func TestUninstallAlgo(t *testing.T) {
-
-	//client, _ := GetClient([]string{"210.13.32.146:60074"}, "default")
-	client, _ := GetClient([]string{"192.168.1.87:60099"}, "default")
-
-	resp, err := client.UninstallAlgo("lpa", nil)
-
-	if resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		logger.PrintError(resp.Status.Msg)
-		os.Exit(1)
-	}
+	_, err := client.UninstallAlgo(algoName, nil)
 
 	if err != nil {
-		logger.PrintErrAndExist(err.Error())
+		t.Fatalf("UninstallAlgo error, %v", err)
 	}
-
-	TestListAlgo(t)
-
 }

@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-//StructToJSONBytes 把数据转成json的bytes
+// StructToJSONBytes transfer data to json bytes
 func StructToJSONBytes(data interface{}) ([]byte, error) {
 	b, err := json.Marshal(data)
 	if err != nil {
@@ -24,14 +24,14 @@ func JSONString(data interface{}) string {
 	}
 	return string(b[:])
 }
-func StructToJSONString(data interface{})  (string, error){
+func StructToJSONString(data interface{}) (string, error) {
 	bs, err := StructToJSONBytes(data)
 	if err != nil {
 		return "", err
 	}
 	return BytesToString(bs), nil
 }
-func StructToPrettyJSONString(data interface{})  (string, error)  {
+func StructToPrettyJSONString(data interface{}) (string, error) {
 	b, err := json.MarshalIndent(data, "", "  ")
 
 	if err != nil {
@@ -53,6 +53,7 @@ func Remove(s []string, r string) []string {
 	}
 	return s
 }
+
 //func RemoveRaftInfos(infos []*types.RaftPeerInfo, host string) []*types.RaftPeerInfo {
 //	for i, v := range infos {
 //		if v.Host == host {
@@ -62,7 +63,7 @@ func Remove(s []string, r string) []string {
 //	return infos
 //}
 
-func Md5ToString(str string) string  {
+func Md5ToString(str string) string {
 	h := md5.New()
 	h.Write([]byte(str))
 	return hex.EncodeToString(h.Sum(nil))

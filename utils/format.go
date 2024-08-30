@@ -1,4 +1,5 @@
 package utils
+
 //
 //import (
 //	"bytes"
@@ -7,8 +8,8 @@ package utils
 //	"fmt"
 //	"math"
 //	"strconv"
-//	ultipa "ultipa-go-sdk/rpc"
-//	"ultipa-go-sdk/types"
+//	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+//	"github.com/ultipa/ultipa-go-sdk/types"
 //)
 //
 //var ultipaTime = UltipaTime{}
@@ -65,10 +66,10 @@ package utils
 //	_missHeaders := false
 //	if len(values) > len(types_) || len(values) > len(headers) {
 //		_missHeaders = true
-//		fmt.Println("‼️ BUG 服务器没有返回header")
+//		fmt.Println("‼️ BUG server not return header")
 //	}
 //	for _index, vv := range values {
-//		vvType := types.PROPERTY_TYPE_STRING // 服务端有bug，所以，硬修复下 0513
+//		vvType := types.PROPERTY_TYPE_STRING // server side bug，so，hard-coded fix 0513
 //		var key string
 //		if _missHeaders == false {
 //			vvType = types_[_index]

@@ -6,7 +6,8 @@ import (
 	"regexp"
 	"strings"
 	"testing"
-	"ultipa-go-sdk/sdk/utils"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
 func TestEasyUqlParse(t *testing.T) {
@@ -59,7 +60,7 @@ func TestParseGraph(t *testing.T) {
 func TestIsExtra(t *testing.T) {
 
 	uqls := map[string]bool{}
-	for uql, _ := range utils.ExtraUqlCommandKeys {
+	for uql := range utils.ExtraUqlCommandKeys {
 		uqls[uql] = true
 	}
 	uqls[`kill("*")`] = true
@@ -160,7 +161,6 @@ func TestRegularExpress(t *testing.T) {
 		fmt.Printf("%d:%q\n", idx, matcher.FindStringSubmatch(uql))
 	}
 }
-
 
 func TestRegularExpressWithGroupName(t *testing.T) {
 	uqls := []string{

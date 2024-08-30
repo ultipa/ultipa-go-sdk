@@ -1,8 +1,9 @@
 syntax = "proto3";
 
+option go_package = ".;ultipa";
+
 package ultipa;
 
-option go_package = ".;ultipa";
 
 // The ultipa service definition.
 service UltipaRpcs {

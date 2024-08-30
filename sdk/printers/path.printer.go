@@ -2,8 +2,9 @@ package printers
 
 import (
 	"fmt"
+
 	"github.com/alexeyco/simpletable"
-	"ultipa-go-sdk/sdk/structs"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 func PrintPaths(paths []*structs.Path) {
@@ -29,6 +30,10 @@ func getPathTableString(paths []*structs.Path) string {
 		pathString := ""
 		for index, edge := range path.GetEdges() {
 			node := path.GetNodes()[index]
+			if edge == nil || node == nil {
+				pathString = "nil"
+				continue
+			}
 			d1 := "-"
 			d2 := "-"
 
@@ -40,7 +45,9 @@ func getPathTableString(paths []*structs.Path) string {
 
 			pathString += fmt.Sprintf("(%v) %v [%v] %v ", node.UUID, d1, edge.UUID, d2)
 		}
-		pathString += fmt.Sprintf("(%v)", path.GetLastNode().UUID)
+		if path.GetLastNode() != nil {
+			pathString += fmt.Sprintf("(%v)", path.GetLastNode().UUID)
+		}
 		row = append(row, &simpletable.Cell{Text: pathString})
 		table.Body.Cells = append(table.Body.Cells, row)
 	}

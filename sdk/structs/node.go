@@ -1,11 +1,14 @@
 package structs
 
 import (
+	"encoding/json"
 	"fmt"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/types"
-	"ultipa-go-sdk/sdk/utils"
+	"strings"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/types"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
 type Node struct {
@@ -125,7 +128,7 @@ func GetSchemasOfNodeList(nodes []*Node) map[string]*Schema {
 		if !ok {
 			schemaPropertiesMap[node.Schema] = []string{}
 		}
-		for property, _ := range node.Values.Data {
+		for property := range node.Values.Data {
 			if !utils.Contains(propertyList, property) {
 				propertyList = append(propertyList, property)
 				schemaPropertiesMap[node.Schema] = propertyList
@@ -145,4 +148,41 @@ func GetSchemasOfNodeList(nodes []*Node) map[string]*Schema {
 		schemaMap[schemaName] = schema
 	}
 	return schemaMap
+}
+
+func nodeToString(node *Node) string {
+	dataMap := make(map[string]interface{}, 10)
+	if node.ID != "" {
+		//_ = node.Set("_id", node.ID)
+		dataMap["_id"] = node.ID
+	}
+	if node.UUID != 0 {
+		//_ = node.Set("_uuid", node.UUID)
+		dataMap["_uuid"] = node.UUID
+	}
+
+	if node.Values != nil && node.Values.Data != nil {
+		for k, v := range node.Values.Data {
+			dataMap[k] = v
+		}
+	}
+
+	jsonData, err := json.Marshal(dataMap)
+	if err != nil {
+		fmt.Println("Error marshaling JSON:", err)
+		return ""
+	}
+
+	return string(jsonData)
+}
+
+func NodesToInsertUql(nodes []*Node) string {
+	var nodeStrings []string
+	for _, node := range nodes {
+		nodeString := nodeToString(node)
+		if nodeString != "" {
+			nodeStrings = append(nodeStrings, nodeString)
+		}
+	}
+	return fmt.Sprintf("%s", strings.Join(nodeStrings, ", "))
 }

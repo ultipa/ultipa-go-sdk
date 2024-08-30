@@ -1,16 +1,19 @@
 package test
 
 import (
+	"fmt"
 	"log"
 	"testing"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/structs"
-	"ultipa-go-sdk/sdk/types"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"github.com/ultipa/ultipa-go-sdk/sdk/types"
 )
 
 func TestInsertNodeWithListProperty(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.87:50051"}, "default")
+	//client, _ := GetClient(hosts, graph)
 
 	schema := structs.NewSchema("default")
 	schema.Properties = append(schema.Properties, &structs.Property{
@@ -31,9 +34,9 @@ func TestInsertNodeWithListProperty(t *testing.T) {
 	})
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	//断言响应码
+
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 		log.Println(resp.Status.Message)
 		t.Log(resp.Status.Message)
@@ -42,7 +45,7 @@ func TestInsertNodeWithListProperty(t *testing.T) {
 }
 
 func TestInsertPointProperty(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:61090"}, "listPropertyGraphTest")
+	//client, _ := GetClient(hosts, graph)
 	schema := structs.NewSchema("nodeSchemaList")
 	schema.Properties = append(schema.Properties, &structs.Property{
 		Name:     "typePoint",
@@ -70,9 +73,9 @@ func TestInsertPointProperty(t *testing.T) {
 	})
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	//断言响应码
+
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 		log.Println(resp.Status.Message)
 		t.Log(resp.Status.Message)
@@ -81,45 +84,230 @@ func TestInsertPointProperty(t *testing.T) {
 
 }
 
-func TestInsertBoolProperty(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:61099"}, "sdk_test")
-	schema := structs.NewSchema("People")
+func TestInsertBlobProperty(t *testing.T) {
+	//client, _ := GetClient(hosts, graph)
+	schemaName := "node_schema"
+	schema := structs.NewSchema(schemaName)
 	schema.Properties = append(schema.Properties, &structs.Property{
-		Name: "bool_prop",
-		Type: ultipa.PropertyType_BOOL,
+		Name:     "name",
+		Type:     ultipa.PropertyType_TEXT,
+		SubTypes: nil,
+	}, &structs.Property{
+		Name:     "blob_prop",
+		Type:     ultipa.PropertyType_BLOB,
+		SubTypes: nil,
 	})
 
 	var nodes []*structs.Node
 	node1 := structs.NewNode()
-	node1.ID = "1"
-	node1.Set("bool_prop", true)
+	node1.Set("name", "go_sdk")
+	node1.Set("blob_prop", []byte{97, 98, 99})
 
 	node2 := structs.NewNode()
-	node2.ID = "2"
-	node2.Set("bool_prop", "true")
+	node2.Set("name", "test")
+	node2.Set("blob_prop", "def")
 
-	node3 := structs.NewNode()
-	node3.ID = "3"
-	node3.Set("bool_prop", "false")
-
-	node4 := structs.NewNode()
-	node4.ID = "4"
-	node4.Set("bool_prop", false)
-
-	nodes = append(nodes, node1, node2, node3, node4)
+	nodes = append(nodes, node1, node2)
 
 	resp, err := client.InsertNodesBatchBySchema(schema, nodes, &configuration.InsertRequestConfig{
 		InsertType: ultipa.InsertType_OVERWRITE,
 	})
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
-	//断言响应码
+
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 		log.Println(resp.Status.Message)
 		t.Log(resp.Status.Message)
 	}
 	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
 
+	uql := fmt.Sprintf("find().nodes({@%s}) as nodes return nodes{*}", schemaName)
+	response, err := client.Uql(uql, nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	nodes, schemas, err := response.Alias("nodes").AsNodes()
+	if err != nil {
+		t.Fatal(err)
+	}
+	printers.PrintNodes(nodes, schemas)
+}
+
+func TestInsertDecimalProperty(t *testing.T) {
+	//client, _ := GetClient(hosts, graph)
+	schemaName := "default"
+	schema := structs.NewSchema(schemaName)
+	schema.Properties = append(schema.Properties, &structs.Property{
+		Name:     "name",
+		Type:     ultipa.PropertyType_STRING,
+		SubTypes: nil,
+	}, &structs.Property{
+		Name:     "salary",
+		Type:     ultipa.PropertyType_DECIMAL,
+		SubTypes: nil,
+	})
+
+	var nodes []*structs.Node
+	node1 := structs.NewNode()
+	node1.Set("name", "go_sdk")
+	node1.Set("salary", "6.1")
+
+	node2 := structs.NewNode()
+	node2.Set("name", "test")
+	node2.Set("salary", 6.1)
+
+	nodes = append(nodes, node1, node2)
+
+	resp, err := client.InsertNodesBatchBySchema(schema, nodes, &configuration.InsertRequestConfig{
+		InsertType: ultipa.InsertType_OVERWRITE,
+	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		log.Println(resp.Status.Message)
+		t.Log(resp.Status.Message)
+	}
+	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
+
+	uql := fmt.Sprintf("find().nodes({@%s}) as nodes return nodes{*}", schemaName)
+	response, err := client.Uql(uql, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	nodes, schemas, err := response.Alias("nodes").AsNodes()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	printers.PrintNodes(nodes, schemas)
+}
+
+func TestInsertNodeWithSetProperty(t *testing.T) {
+	//client, _ := GetClient(hosts, graph)
+
+	schema := structs.NewSchema("default")
+	schema.Properties = append(schema.Properties, &structs.Property{
+		Name:     "string_set",
+		Type:     ultipa.PropertyType_SET,
+		SubTypes: []ultipa.PropertyType{ultipa.PropertyType_STRING},
+	})
+
+	var nodes []*structs.Node
+	node := structs.NewNode()
+
+	node.Set("string_set", []string{"list", "set", "map"})
+
+	nodes = append(nodes, node)
+
+	resp, err := client.InsertNodesBatchBySchema(schema, nodes, &configuration.InsertRequestConfig{
+		InsertType: ultipa.InsertType_OVERWRITE,
+	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		log.Println(resp.Status.Message)
+		t.Log(resp.Status.Message)
+	}
+	log.Println(resp.Statistic.EngineCost, "|", resp.Statistic.TotalCost)
+}
+
+func TestInsertNodes(t *testing.T) {
+	schemaName := "default"
+
+	ty := ultipa.DBType_DBNODE
+	client.Truncate(&structs.Truncate{
+		GraphName: graph,
+		DbType:    &ty,
+		Schema:    schemaName,
+	}, nil)
+
+	prop := &structs.Property{
+		Name: "name",
+		Type: ultipa.PropertyType_STRING,
+	}
+	client.CreateNodeProperty(schemaName, prop, nil)
+	prop = &structs.Property{
+		Name: "salary",
+		Type: ultipa.PropertyType_DOUBLE,
+	}
+	client.CreateNodeProperty(schemaName, prop, nil)
+
+	var nodes []*structs.Node
+	node1 := structs.NewNode()
+	node1.UUID = 1
+	node1.Set("name", "go_sdk")
+	node1.Set("salary", "6.1")
+
+	node2 := structs.NewNode()
+	node2.UUID = 2
+	node2.Set("name", "test")
+	node2.Set("salary", 6.1)
+
+	node3 := structs.NewNode()
+	node3.UUID = 3
+	//node3.Set("name", "test2")
+
+	nodes = append(nodes, node1, node2, node3)
+
+	uql := structs.NodesToInsertUql(nodes)
+	t.Log(uql)
+
+	requestConfig := &configuration.InsertRequestConfig{
+		RequestConfig: &configuration.RequestConfig{},
+		Silent:        true,
+	}
+
+	response, err := client.InsertNodes(schemaName, nodes, requestConfig)
+	if err != nil {
+		t.Error(err)
+	}
+
+	t.Log(response)
+
+	// overwrite
+	node1.Set("name", "go_sdk2")
+
+	uql = structs.NodesToInsertUql(nodes)
+	t.Log(uql)
+
+	requestConfig = &configuration.InsertRequestConfig{
+		InsertType: ultipa.InsertType_OVERWRITE,
+		Silent:     true,
+	}
+
+	response, err = client.InsertNodes(schemaName, nodes, requestConfig)
+	if err != nil {
+		t.Error(err)
+	}
+
+	t.Log(response)
+
+	// upsert
+	node2.Set("salary", 10.1)
+
+	uql = structs.NodesToInsertUql(nodes)
+	log.Println(uql)
+
+	requestConfig = &configuration.InsertRequestConfig{
+		InsertType: ultipa.InsertType_UPSERT,
+		Silent:     true,
+	}
+
+	response, err = client.InsertNodes(schemaName, nodes, requestConfig)
+	if err != nil {
+		t.Error(err)
+	}
+
+	t.Log(response)
 }

@@ -5,12 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"sync"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/http"
-	"ultipa-go-sdk/sdk/structs"
-	"ultipa-go-sdk/sdk/utils"
-	"ultipa-go-sdk/sdk/utils/logger"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 )
 
 func (api *UltipaAPI) InsertNodesBatch(table *ultipa.EntityTable, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
@@ -32,9 +33,7 @@ func (api *UltipaAPI) InsertNodesBatch(table *ultipa.EntityTable, config *config
 		GraphName:  conf.CurrentGraph,
 		NodeTable:  table,
 		InsertType: config.InsertType,
-		//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
-		//Silent:     config.Silent,
-		Silent: true,
+		Silent:     config.Silent,
 	})
 
 	if err != nil {
@@ -102,9 +101,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		GraphName:  conf.CurrentGraph,
 		NodeTable:  table,
 		InsertType: config.InsertType,
-		//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
-		//Silent:     config.Silent,
-		Silent: true,
+		Silent:     config.Silent,
 	})
 
 	if err != nil {
@@ -118,7 +115,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 	return http.NewNodesInsertResponse(resp)
 }
 
-func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node, req *configuration.RequestConfig) (error, []*ultipa.EntityRow) {
+func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node, config *configuration.RequestConfig) (error, []*ultipa.EntityRow) {
 	wg := sync.WaitGroup{}
 	var err error
 	ctx, cancel := context.WithCancel(context.Background())
@@ -134,7 +131,7 @@ func setPropertiesToNodeRow(schema *structs.Schema, rows []*structs.Node, req *c
 		go func(index int, row *structs.Node) {
 			defer wg.Done()
 			var newNode *ultipa.EntityRow
-			newNode, err = doConvertSdkNodeRowToUltipaNodeRow(schema, row, index, req)
+			newNode, err = doConvertSdkNodeRowToUltipaNodeRow(schema, row, index, config)
 			if err != nil {
 				cancel()
 				return
@@ -162,15 +159,15 @@ func checkNodeProperties(schema *structs.Schema, row *structs.Node, index int) e
 	return nil
 }
 
-func convertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Node, index int, req *configuration.RequestConfig) (*ultipa.EntityRow, error) {
+func convertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Node, index int, config *configuration.RequestConfig) (*ultipa.EntityRow, error) {
 	err := checkNodeProperties(schema, row, index)
 	if err != nil {
 		return nil, err
 	}
-	return doConvertSdkNodeRowToUltipaNodeRow(schema, row, index, req)
+	return doConvertSdkNodeRowToUltipaNodeRow(schema, row, index, config)
 }
 
-func doConvertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Node, index int, req *configuration.RequestConfig) (*ultipa.EntityRow, error) {
+func doConvertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Node, index int, config *configuration.RequestConfig) (*ultipa.EntityRow, error) {
 	newNode := &ultipa.EntityRow{
 		Id:         row.ID,
 		Uuid:       row.UUID,
@@ -183,7 +180,7 @@ func doConvertSdkNodeRowToUltipaNodeRow(schema *structs.Schema, row *structs.Nod
 		if !row.Values.Contain(prop.Name) {
 			return nil, errors.New(fmt.Sprintf("node row [%d] error: values doesn't contain property [%s]", index, prop.Name))
 		}
-		bs, err := row.GetBytesSafe(prop.Name, prop.Type, prop.SubTypes, req)
+		bs, err := row.GetBytesSafe(prop.Name, prop.Type, prop.SubTypes, config)
 		if err != nil {
 			logger.PrintError("Get row bytes value failed  " + prop.Name + " " + err.Error())
 			err = errors.New(fmt.Sprintf("node row [%d] error: failed to serialize value of property %s,value=%v", index, prop.Name, row.Values.Get(prop.Name)))
@@ -201,7 +198,7 @@ type Batch struct {
 }
 
 // InsertNodesBatchAuto Nodes interface values should be string
-func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *configuration.InsertRequestConfig) (*http.InsertBatchAutoResponse, error) {
+func (api *UltipaAPI) InsertNodesBatchAuto(rows []*structs.Node, config *configuration.InsertRequestConfig) (*http.InsertBatchAutoResponse, error) {
 
 	resps := &http.InsertBatchAutoResponse{
 		Resps:     map[string]*http.InsertResponse{},
@@ -209,9 +206,9 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 		Statistic: &http.Statistic{},
 	}
 
-	// collect schema and node index in nodes
+	// collect schema and node index in rows
 	m := map[string]map[int]int{}
-	schemas, err := api.ListSchema(ultipa.DBType_DBNODE, config.RequestConfig)
+	schemas, err := api.ShowNodeSchema(config.RequestConfig)
 
 	if err != nil {
 		return nil, err
@@ -219,7 +216,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 
 	batches := map[string]*Batch{}
 
-	for index, node := range nodes {
+	for index, node := range rows {
 		if _, ok := m[node.Schema]; !ok {
 			m[node.Schema] = map[int]int{}
 		}
@@ -241,7 +238,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 		}
 
 		batch := batches[node.Schema]
-		// add nodes
+		// add rows
 		row, err := convertSdkNodeRowToUltipaNodeRow(batch.Schema, node, index, config.RequestConfig)
 		if err != nil {
 			return nil, err
@@ -307,9 +304,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 			GraphName:  conf.CurrentGraph,
 			NodeTable:  table,
 			InsertType: config.InsertType,
-			//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
-			//Silent:     config.Silent,
-			Silent: true,
+			Silent:     config.Silent,
 		})
 
 		if err != nil {
@@ -337,4 +332,30 @@ func (api *UltipaAPI) InsertNodesBatchAuto(nodes []*structs.Node, config *config
 	}
 
 	return resps, nil
+}
+
+func (api *UltipaAPI) InsertNodes(schemaName string, nodes []*structs.Node, requestConfig *configuration.InsertRequestConfig) (*http.UQLResponse, error) {
+	params := ""
+	switch requestConfig.InsertType {
+	case ultipa.InsertType_NORMAL:
+		params = "insert()"
+	case ultipa.InsertType_OVERWRITE:
+		params = "insert().overwrite()"
+	case ultipa.InsertType_UPSERT:
+		params = "upsert()"
+	default:
+		return nil, fmt.Errorf("InsertNodes error, unknown InsertType: %d", requestConfig.InsertType)
+	}
+
+	uql := fmt.Sprintf(`%s.into(@%s).nodes([%s])`, params, schemaName, structs.NodesToInsertUql(nodes))
+	if requestConfig.Silent {
+		uql = uql + " as nodes return nodes{*}"
+	}
+	resp, err := api.Uql(uql, requestConfig.RequestConfig)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }

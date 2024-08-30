@@ -1,4 +1,5 @@
 package sdk
+
 //
 //import (
 //	"context"
@@ -9,8 +10,8 @@ package sdk
 //	"strings"
 //	"sync"
 //	"time"
-//	ultipa "ultipa-go-sdk/rpc"
-//	"ultipa-go-sdk/utils"
+//	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+//	"github.com/ultipa/ultipa-go-sdk/utils"
 //
 //	"google.golang.org/grpc"
 //	"google.golang.org/grpc/credentials"
@@ -97,7 +98,7 @@ package sdk
 //	opts = append(opts, grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(math.MaxInt32)))
 //	opts = append(opts, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(math.MaxInt32)))
 //	if len(t.crtFile) == 0 {
-//		// 兼容2.0
+//		// compatible 2.0
 //		opts = append(opts, grpc.WithInsecure())
 //		conn, _ := grpc.Dial(host, opts...)
 //		clientInfo := ClientInfo{}
@@ -158,7 +159,7 @@ package sdk
 //		return t.defaultClientInfo
 //	}
 //
-//	// 负载均衡，随机挑一个
+//	// Load balancing, random selection
 //	all := t.getAllClientInfos(true, false)
 //	return all[rand.Intn(len(all))]
 //}
@@ -427,7 +428,7 @@ package sdk
 //
 //func (t *Connection) autoGetRaftLeader(host string, commonReq *types.Request_Common, retry int) (*RaftLeaderResSimple, error) {
 //	conn, err := GetConnection(host, t.username, t.password, t.crtFile, t.DefaultConfig)
-//	// 用一次就关掉
+//	// do once ,and close
 //	defer conn.CloseAll()
 //	if err != nil {
 //		return nil, err

@@ -2,15 +2,12 @@ package test
 
 import (
 	"testing"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/structs"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 func TestExportAsNodesEdges(t *testing.T) {
-	//garphName := "Yuri_LegalTech"
-	//schemaName := "Judgement"
-	//client, _ := GetClient([]string{"192.168.2.142:60062"}, garphName)
-	//
 	//schema := &structs.Schema{
 	//	Name: schemaName,
 	//	Properties: []*structs.Property{
@@ -18,9 +15,8 @@ func TestExportAsNodesEdges(t *testing.T) {
 	//		{Name: "ssz"}, {Name: "szDec"}, {Name: "annullamentoConRinvio"}, {Name: "annullamentoSenzaRinvio"}, {Name: "rigettato"}, {Name: "inammissibile"}, {Name: "fullDocument"},
 	//	}}
 
-	garphName := "graphInsertTest"
 	schemaName := "nodeSchema"
-	client, _ := GetClient([]string{"192.168.1.88:60903"}, garphName)
+	//client, _ := GetClient(hosts, graph)
 
 	schema := &structs.Schema{
 		Name: schemaName,

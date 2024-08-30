@@ -2,54 +2,83 @@ package test
 
 import (
 	"log"
+	"strings"
 	"testing"
-	"ultipa-go-sdk/sdk"
-	"ultipa-go-sdk/sdk/api"
-	"ultipa-go-sdk/sdk/configuration"
+
+	"github.com/joho/godotenv"
+	"github.com/ultipa/ultipa-go-sdk/sdk"
+	"github.com/ultipa/ultipa-go-sdk/sdk/api"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 )
 
+var env map[string]string
 var client *api.UltipaAPI
-
 var hosts []string
+var username string
+var password string
+var graph string
+var DEBUG bool
 
 func TestMain(m *testing.M) {
-	var err error
-
-	hosts = []string{
-		//"210.13.32.147:60095",
-		"192.168.1.85:61090",
-		"192.168.1.87:61090",
-		"192.168.1.88:61090",
-	}
-	client, err = GetClient(hosts, "gosdk")
-
-	if err != nil {
-		log.Fatalln(err)
-	}
+	setup()
 
 	m.Run()
+
+	teardown()
 }
 
 func TestPing(t *testing.T) {
-	client, _ = GetClient(hosts, "default")
-	client.Test()
+	//client, _ = GetClient(hosts, graph)
+	_, err := client.Test(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 }
 
 func GetClient(hosts []string, graphName string) (*api.UltipaAPI, error) {
 	var err error
-	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
+	//DEBUG = true // open if you need
+	config, err := configuration.NewUltipaConfig(&configuration.UltipaConfig{
 		Hosts:        hosts,
-		Username:     "root",
-		Password:     "root",
+		Username:     username,
+		Password:     password,
 		DefaultGraph: graphName,
-		Debug:        true,
+		Debug:        DEBUG,
 	})
-
+	if err != nil {
+		panic(err)
+	}
 	client, err = sdk.NewUltipa(config)
 
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 
 	return client, err
+}
+
+func setup() {
+	log.Println("Setting up the test environment")
+	var err error
+	env, err = godotenv.Read(".env")
+
+	if err != nil {
+		panic("Get env error, " + err.Error())
+	}
+
+	hosts = strings.Split(env["hosts"], ",")
+	username, password, graph = env["username"], env["password"], env["graph"]
+
+	client, err = GetClient(hosts, graph)
+
+	if err != nil {
+		panic("GetClient error, " + err.Error())
+	}
+}
+
+func teardown() {
+	client.Close()
+
+	log.Println("Tearing down the test environment")
 }

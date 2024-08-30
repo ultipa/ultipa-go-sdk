@@ -2,35 +2,34 @@ package test
 
 import (
 	"fmt"
-	"github.com/pterm/pterm"
-	"github.com/pterm/pterm/putils"
-	"log"
 	"testing"
-	"ultipa-go-sdk/sdk/printers"
-	"ultipa-go-sdk/sdk/structs"
+
+	"github.com/pterm/pterm"
+	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
 func TestExplain(t *testing.T) {
 
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "default")
+	//client, _ := GetClient(hosts, graph)
 
-	//resp, err := client.UQL("explain find().nodes() as nodes limit 1 return nodes limit 10", nil)
-	//	resp, err := client.UQL(`explain n({@account} as buyer).e().n({@card}).re({@transaction} as buy).n()
+	//resp, err := client.Uql("explain find().nodes() as nodes limit 1 return nodes limit 10", nil)
+	//	resp, err := client.Uql(`explain n({@account} as buyer).e().n({@card}).re({@transaction} as buy).n()
 	//with buyer, buy
 	//group by buyer
 	//with collect(distinct(day_of_week(buy.time))) as array
 	//where (1 in array || 7 in array) && 2 nin array && 3 nin array && 4 nin array && 5 nin array && 6 nin array
 	//return buyer{*} limit 100`, nil)
 
-	//	resp, err := client.UQL(`explain find().nodes() as n1 limit 1
+	//	resp, err := client.Uql(`explain find().nodes() as n1 limit 1
 	// find().nodes() as n2 limit 1
 	// find().nodes() as n3 limit 1
 	//return n1,n2,n3 limit 10`, nil)
 
-	resp, err := client.UQL(`explain find().nodes() as n1 find().nodes() as n2 find().nodes() as n3 with n1,n2,n3 return n1, n2, n3`, nil)
+	resp, err := client.Uql(`explain find().nodes() as n1 find().nodes() as n2 find().nodes() as n3 with n1,n2,n3 return n1, n2, n3`, nil)
 
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 
 	//log.Println(resp)
@@ -63,9 +62,10 @@ func TestExplain1(t *testing.T) {
 	node := buildTreeNode(explainChan)
 
 	traverse(node, 0)
-	tree := putils.TreeFromLeveledList(leveledList)
+	// FIXME:
+	//tree := putils.TreeFromLeveledList(leveledList)
 
-	pterm.DefaultTree.WithIndent(3).WithRoot(tree).Render()
+	//pterm.DefaultTree.WithIndent(3).WithRoot(tree).Render()
 
 }
 

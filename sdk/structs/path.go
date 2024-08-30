@@ -1,13 +1,12 @@
 package structs
 
 type Path struct {
-	Name string
-	Nodes []*Node
-	Edges []*Edge
+	Name        string
+	Nodes       []*Node
+	Edges       []*Edge
 	NodeSchemas map[string]*Schema
 	EdgeSchemas map[string]*Schema
 }
-
 
 func NewPath() *Path {
 	return &Path{

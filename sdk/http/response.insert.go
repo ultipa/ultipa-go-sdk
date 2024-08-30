@@ -1,12 +1,12 @@
 /**
- * Returns UQL Results by one time
+ * Returns Uql Results by one time
  */
 
 package http
 
 import (
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/types"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/types"
 )
 
 type InsertResponse struct {

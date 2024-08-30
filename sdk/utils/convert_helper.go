@@ -8,8 +8,6 @@ import (
 	"strconv"
 )
 
-
-
 func FloatStr2IntStr(floatStr string) (string, error) {
 	f, e := strconv.ParseFloat(floatStr, 0)
 	return fmt.Sprintf("%.0f", f), e
@@ -24,7 +22,7 @@ func Str2Int(s string) (int64, error) {
 	i, e := strconv.ParseInt(s, 10, 0)
 	return i, e
 }
-func Str2Float (floatStr string) (float64, error)  {
+func Str2Float(floatStr string) (float64, error) {
 	f, e := strconv.ParseFloat(floatStr, 1000000)
 	return f, e
 }
@@ -52,7 +50,7 @@ func ToJSONStringPretty(data interface{}) string {
 	}
 	return string(prettyJSON.Bytes())
 }
-func ToJSONString(data interface{})  string{
+func ToJSONString(data interface{}) string {
 	bs, err := StructToJSONBytes(data)
 	if err != nil {
 		return "{}"

@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"ultipa-go-sdk/utils"
+
+	"github.com/ultipa/ultipa-go-sdk/utils"
 )
 
 type UQLMAKER struct {
@@ -19,9 +20,8 @@ type UQLMAKER struct {
 type UQLCommand string
 
 const (
-	UQLCommand_listGraph          UQLCommand = "show().graph"
-	UQLCommand_listNodeSchema          UQLCommand = "show().node_schema"
-
+	UQLCommand_listGraph      UQLCommand = "show().graph"
+	UQLCommand_listNodeSchema UQLCommand = "show().node_schema"
 
 	UQLCommand_ab                 UQLCommand = "ab"
 	UQLCommand_khop               UQLCommand = "khop"
@@ -76,7 +76,7 @@ const (
 	UQLCommand_updateGraph        UQLCommand = "updateGraph"
 )
 
-func replace_doller(str string) string  {
+func replace_doller(str string) string {
 	reg := regexp.MustCompile(`"(\$[a-z_A-Z]+)"`)
 	return reg.ReplaceAllString(str, "${1}")
 }

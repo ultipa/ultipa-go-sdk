@@ -2,7 +2,7 @@
  * @Author: zhaohaichao
  * @Description:
  * @File:  index_test
- * @Date: 2022/8/4 3:41 下午
+ * @Date: 2022/8/4 3:41 pm
  */
 
 package test
@@ -10,65 +10,66 @@ package test
 import (
 	"log"
 	"testing"
-	"ultipa-go-sdk/utils"
+
+	"github.com/ultipa/ultipa-go-sdk/utils"
 )
 
 func TestListIndex(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	//client, _ := GetClient(hosts, graph)
 
-	indexes, err := client.ListIndex(nil)
+	indexes, err := client.ShowIndex(nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	log.Printf(utils.JSONString(indexes))
 }
 
 func TestListNodeIndex(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	//client, _ := GetClient(hosts, graph)
 
-	indexes, err := client.ListNodeIndex(nil)
+	indexes, err := client.ShowNodeIndex(nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	log.Printf(utils.JSONString(indexes))
 }
 
 func TestListEdgeIndex(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	//client, _ := GetClient(hosts, graph)
 
-	indexes, err := client.ListEdgeIndex(nil)
+	indexes, err := client.ShowEdgeIndex(nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	log.Printf(utils.JSONString(indexes))
 }
 
 func TestListFullText(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	//client, _ := GetClient(hosts, graph)
 
-	indexes, err := client.ListFullText(nil)
+	indexes, err := client.ShowFullText(nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	log.Printf(utils.JSONString(indexes))
 }
 
 func TestListNodeFullText(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	//client, _ := GetClient(hosts, graph)
 
-	indexes, err := client.ListNodeFullText(nil)
+	indexes, err := client.ShowNodeFullText(nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	log.Printf(utils.JSONString(indexes))
 }
 
 func TestListEdgeFullText(t *testing.T) {
-	client, _ := GetClient([]string{"192.168.1.85:60701"}, "miniCircle")
+	//client, _ := GetClient(hosts, graph)
 
-	indexes, err := client.ListEdgeFullText(nil)
+	indexes, err := client.ShowEdgeFullText(nil)
 	if err != nil {
-		log.Fatalln(err)
+		t.Fatal(err)
 	}
 	log.Printf(utils.JSONString(indexes))
 }

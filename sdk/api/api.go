@@ -1,18 +1,20 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/connection"
-	"ultipa-go-sdk/sdk/http"
-	"ultipa-go-sdk/sdk/utils"
-	"ultipa-go-sdk/sdk/utils/logger"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/connection"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 )
 
-// UQL, Insert, Export, Download ... API methods
+// Uql, Insert, Export, Download ... API methods
 
 type UltipaAPI struct {
 	Pool   *connection.ConnectionPool
@@ -125,12 +127,12 @@ func (api *UltipaAPI) GetControlClientAndConfig(config *configuration.RequestCon
 	return client, conf, nil
 }
 
-// UQL send a uql string to ultipa graph, and return a http UQL Response
-// get Alias from UQL Response and convert to any type you need by asNodes, asEdges, asPaths, asTable, as asArray...
-// Check DataItem to learn more about UQL Response
-func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*http.UQLResponse, error) {
+// Uql send a uql string to ultipa graph, and return a http Uql Response
+// get Alias from Uql Response and convert to any type you need by asNodes, asEdges, asPaths, asTable, as asArray...
+// Check DataItem to learn more about Uql Response
+func (api *UltipaAPI) Uql(uql string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 
-	resp, conf, err := api.doExecuteUql(uql, config)
+	resp, conf, err := api.doExecuteUql(uql, requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +143,11 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 		return nil, err
 	}
 
-	if config != nil && config.Host != "" {
+	if uqlResp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(uqlResp.Status.Message)
+	}
+
+	if requestConfig != nil && requestConfig.Host != "" {
 		return uqlResp, err
 	}
 
@@ -150,27 +156,36 @@ func (api *UltipaAPI) UQL(uql string, config *configuration.RequestConfig) (*htt
 		if err != nil {
 			return nil, err
 		}
-		return api.UQL(uql, config)
+		return api.Uql(uql, requestConfig)
 	}
 
 	return uqlResp, nil
 }
 
-func (api *UltipaAPI) UQLStream(uql string, config *configuration.RequestConfig) (*http.UQLResponseStream, error) {
-	resp, conf, err := api.doExecuteUql(uql, config)
+func (api *UltipaAPI) UQLStream(uql string, requestConfig *configuration.RequestConfig) (*http.UQLResponseStream, error) {
+	resp, conf, err := api.doExecuteUql(uql, requestConfig)
 	if err != nil {
 		return nil, err
 	}
+
 	uqlResp, err := http.NewUQLResponseStream(resp)
-	if config != nil && config.Host != "" {
+	if err != nil {
+		return nil, err
+	}
+	if uqlResp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(uqlResp.Status.Message)
+	}
+
+	if requestConfig != nil && requestConfig.Host != "" {
 		return uqlResp, err
 	}
+
 	if uqlResp.NeedRedirect() {
 		err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
 		if err != nil {
 			return nil, err
 		}
-		return api.UQLStream(uql, config)
+		return api.UQLStream(uql, requestConfig)
 	}
 	return uqlResp, nil
 }
@@ -254,29 +269,39 @@ func (api *UltipaAPI) buildUqlRequest(uql string, config *configuration.RequestC
 	return uqlRequest
 }
 
-// test connections
-func (api *UltipaAPI) Test() (bool, error) {
+// Test connection test
+func (api *UltipaAPI) Test(requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	conn, err := api.Pool.GetConn(nil)
 
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	client := conn.GetClient()
-	ctx, cancel, err := api.Pool.NewContext(nil)
+	ctx, cancel, err := api.Pool.NewContext(requestConfig)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	defer cancel()
-	resp, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
+	res, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
 		Name: "Conn Test",
 	})
 
-	if err != nil || resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		return false, err
+	if err != nil {
+		return nil, fmt.Errorf("tset error %w", err)
 	}
 
-	return true, err
+	if res.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, fmt.Errorf("tset error %v", res.Status.Msg)
+	}
+	status := &http.Status{
+		Message: res.Status.Msg,
+		Code:    res.Status.ErrorCode,
+	}
+	resp = &http.UQLResponse{Status: status}
+
+	return resp, nil
 }
+
 func (api *UltipaAPI) GetActiveClientTest() (bool, *connection.Connection, error) {
 	conn, err := api.Pool.GetConn(nil)
 

@@ -1,10 +1,14 @@
 package structs
 
 import (
-	ultipa "ultipa-go-sdk/rpc"
-	"ultipa-go-sdk/sdk/configuration"
-	"ultipa-go-sdk/sdk/types"
-	"ultipa-go-sdk/sdk/utils"
+	"encoding/json"
+	"fmt"
+	"strings"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/types"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
 type Edge struct {
@@ -134,7 +138,7 @@ func GetSchemasOfEdgeList(edges []*Edge) map[string]*Schema {
 		if !ok {
 			schemaPropertiesMap[edge.Schema] = []string{}
 		}
-		for property, _ := range edge.Values.Data {
+		for property := range edge.Values.Data {
 			if !utils.Contains(propertyList, property) {
 				propertyList = append(propertyList, property)
 				schemaPropertiesMap[edge.Schema] = propertyList
@@ -154,4 +158,49 @@ func GetSchemasOfEdgeList(edges []*Edge) map[string]*Schema {
 		schemaMap[schemaName] = schema
 	}
 	return schemaMap
+}
+
+func edgeToString(edge *Edge) string {
+	dataMap := make(map[string]interface{}, 10)
+
+	if edge.UUID != 0 {
+		dataMap["_uuid"] = edge.UUID
+	}
+	if edge.FromUUID != 0 {
+		dataMap["_from_uuid"] = edge.FromUUID
+	}
+	if edge.ToUUID != 0 {
+		dataMap["_to_uuid"] = edge.ToUUID
+	}
+	if edge.From != "" {
+		dataMap["_from"] = edge.From
+	}
+	if edge.To != "" {
+		dataMap["_to"] = edge.To
+	}
+
+	if edge.Values != nil && edge.Values.Data != nil {
+		for k, v := range edge.Values.Data {
+			dataMap[k] = v
+		}
+	}
+
+	jsonData, err := json.Marshal(dataMap)
+	if err != nil {
+		fmt.Println("Error marshaling JSON:", err)
+		return ""
+	}
+
+	return string(jsonData)
+}
+
+func EdgesToInsertUql(edges []*Edge) string {
+	var edgeStrings []string
+	for _, edge := range edges {
+		edgeString := edgeToString(edge)
+		if edgeString != "" {
+			edgeStrings = append(edgeStrings, edgeString)
+		}
+	}
+	return fmt.Sprintf("%s", strings.Join(edgeStrings, ", "))
 }
