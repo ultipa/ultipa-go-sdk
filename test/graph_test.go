@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
 	"log"
 	"testing"
 
@@ -22,25 +23,54 @@ func TestShowGraph(t *testing.T) {
 	}
 
 	//log.Printf(utils.JSONString(res))
+	//printers.PrintGraphSet(graphs)
 }
 
 func TestCreateGraph(t *testing.T) {
 
 	//client, err := GetClient(hosts, graph)
+	graphName := "test_go_sdk"
+	exit, err := client.HasGraph(graphName, nil)
+	if err != nil {
+		return
+	}
 
-	client.DropGraph(graph, nil)
+	if exit {
+		_, err := client.DropGraph(graphName, nil)
+		if err != nil {
+			t.Error(err)
+		}
+	}
 
-	client.CreateGraph(&structs.GraphSet{
-		Name: graph,
-	}, nil)
+	graphSet := &structs.GraphSet{
+		Name:        graphName,
+		Shards:      "2,3",
+		PartitionBy: "Crc32",
+	}
+	_, err = client.CreateGraph(graphSet, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	client.SetCurrentGraph(graph)
-
-	_, err := client.Uql("insert().nodes({}).into(@default)", nil)
-
+	err = client.SetCurrentGraph(graphName)
 	if err != nil {
 		t.Error(err)
 	}
+
+	_, err = client.Uql("insert().into(@default).nodes({_id:\"1\"})", nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	_, exist, err := client.CreateGraphIfNotExist(graphSet, nil)
+	if exist {
+		t.Logf("graph %s exist", graphSet.Name)
+	}
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	client.DropGraph(graphName, nil)
 
 }
 
@@ -75,7 +105,9 @@ func TestCreateGraphIfNotExist(t *testing.T) {
 	client.DropGraph(graph, nil)
 
 	_, _, err := client.CreateGraphIfNotExist(&structs.GraphSet{
-		Name: graph,
+		Name:        graph,
+		Shards:      "1,2",
+		PartitionBy: "Crc32",
 	}, nil)
 	if err != nil {
 		t.Fatalf("failed to create graph %v", err)
@@ -191,4 +223,21 @@ func TestTruncate(t *testing.T) {
 	}
 	log.Println(response)
 
+}
+
+func TestGetGraph(t *testing.T) {
+	g, err := client.GetGraph("miniCircle", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	printers.PrintGraphSet(append([]*structs.GraphSet{}, g))
+
+}
+
+func TestCompact(t *testing.T) {
+	job, err := client.Compact("miniCircle", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(job)
 }

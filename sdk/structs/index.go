@@ -8,10 +8,11 @@
 package structs
 
 type Index struct {
+	Id         int
 	Name       string
 	Properties string
 	Schema     string
 	Status     string
-	Size       int
-	Type       string
+	//Size       int
+	Type string
 }

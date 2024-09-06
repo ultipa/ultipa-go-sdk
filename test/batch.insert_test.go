@@ -17,6 +17,7 @@ import (
 
 func TestBatchInsertNodes(t *testing.T) {
 	//conn, _ := GetClient(hosts, graph)
+	client.SetCurrentGraph("go_sdk_test")
 	schema := "text_schema"
 	createSchema(t, schema, client)
 	batchInsert(schema, client)
@@ -41,7 +42,7 @@ func batchInsert(schema string, conn *api.UltipaAPI) []*structs.Node {
 
 		node := structs.NewNode()
 
-		node.ID = fmt.Sprint(total)
+		node.ID = "AA" + fmt.Sprint(total)
 		value := rand.Intn(1000)
 		node.Set("username", fmt.Sprintf("user_%d", value))
 		node.Set("password", RandStr(2000))
@@ -125,6 +126,7 @@ func checkInsertionResult(t *testing.T, conn *api.UltipaAPI, schema string) {
 
 func TestBatchInsertEdges(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
+	client.SetCurrentGraph("go_sdk_test")
 
 	total := 500
 	finished := 0
@@ -134,22 +136,22 @@ func TestBatchInsertEdges(t *testing.T) {
 	var edges []*structs.Edge
 
 	schema := structs.NewSchema("default")
-	schema.Properties = append(schema.Properties, &structs.Property{
-		Name: "e1",
-		Type: ultipa.PropertyType_STRING,
-	}, &structs.Property{
-		Name: "e2",
-		Type: ultipa.PropertyType_STRING,
-	}, &structs.Property{
-		Name: "e3",
-		Type: ultipa.PropertyType_STRING,
-	}, &structs.Property{
-		Name: "e4",
-		Type: ultipa.PropertyType_STRING,
-	}, &structs.Property{
-		Name: "e5",
-		Type: ultipa.PropertyType_STRING,
-	})
+	//schema.Properties = append(schema.Properties, &structs.Property{
+	//    Name: "e1",
+	//    Type: ultipa.PropertyType_STRING,
+	//}, &structs.Property{
+	//    Name: "e2",
+	//    Type: ultipa.PropertyType_STRING,
+	//}, &structs.Property{
+	//    Name: "e3",
+	//    Type: ultipa.PropertyType_STRING,
+	//}, &structs.Property{
+	//    Name: "e4",
+	//    Type: ultipa.PropertyType_STRING,
+	//}, &structs.Property{
+	//    Name: "e5",
+	//    Type: ultipa.PropertyType_STRING,
+	//})
 
 	start := time.Now()
 	rand.Seed(int64(time.Now().Second()))
@@ -160,14 +162,14 @@ func TestBatchInsertEdges(t *testing.T) {
 		}
 
 		edge := structs.NewEdge()
-		edge.From = fmt.Sprint(total)
-		edge.To = fmt.Sprint(total - 1)
+		edge.From = "AA" + fmt.Sprint(total)
+		edge.To = "AA" + fmt.Sprint(total+1)
 
-		edge.Set("e1", "abc")
-		edge.Set("e2", "abc")
-		edge.Set("e3", "abc")
-		edge.Set("e4", "abc")
-		edge.Set("e5", "abc")
+		//edge.Set("e1", "abc")
+		//edge.Set("e2", "abc")
+		//edge.Set("e3", "abc")
+		//edge.Set("e4", "abc")
+		//edge.Set("e5", "abc")
 
 		edges = append(edges, edge)
 

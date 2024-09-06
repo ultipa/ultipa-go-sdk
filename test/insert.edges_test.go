@@ -9,8 +9,9 @@ import (
 )
 
 func TestInsertEdge(t *testing.T) {
-	t.Run("insert node", TestInsertNodes)
+	//t.Run("insert node", TestInsertNodes)
 
+	client.SetCurrentGraph("go_sdk_test")
 	schemaName := "default"
 	prop := &structs.Property{
 		Name: "value",
@@ -20,15 +21,15 @@ func TestInsertEdge(t *testing.T) {
 
 	var edges []*structs.Edge
 	edge1 := structs.NewEdge()
-	edge1.UUID = 1
-	edge1.FromUUID = 1
-	edge1.ToUUID = 2
+	//edge1.UUID = 1
+	edge1.From = "1"
+	edge1.To = "2"
 	edge1.Set("value", 1.0)
 
 	edge2 := structs.NewEdge()
-	edge2.UUID = 2
-	edge2.From = "ULTIPA8000000000000002"
-	edge2.To = "ULTIPA8000000000000003"
+	//edge2.UUID = 2
+	edge2.From = "11"
+	edge2.To = "12"
 	edge2.Set("value", "1212")
 
 	edge3 := structs.NewEdge()
@@ -36,7 +37,7 @@ func TestInsertEdge(t *testing.T) {
 	edge3.FromUUID = 1
 	edge3.ToUUID = 2
 
-	edges = append(edges, edge1, edge2, edge3)
+	edges = append(edges, edge1, edge2)
 
 	uql := structs.EdgesToInsertUql(edges)
 	t.Log(uql)

@@ -370,7 +370,10 @@ func TestUqlFindPointProperty(t *testing.T) {
 func TestOnePathAsPaths(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
 	var uql = "ab().src(51).dest(103).depth(1) as paths return paths{}"
-	resp, _ := client.Uql(uql, nil)
+	resp, err := client.Uql(uql, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 	paths, _ := resp.Alias("paths").AsPaths()
 	printers.PrintPaths(paths)
 }

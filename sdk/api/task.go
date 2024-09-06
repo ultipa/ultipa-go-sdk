@@ -9,6 +9,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
+// Deprecated: 5.0 not support, should use ShowJob
 func (api *UltipaAPI) ShowTask(algoNameOrId string, status structs.TaskStatus, requestConfig *configuration.RequestConfig) (tasks []*structs.Task, err error) {
 	uql := ""
 	if len(algoNameOrId) == 0 {

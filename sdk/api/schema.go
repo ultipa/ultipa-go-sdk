@@ -3,24 +3,23 @@ package api
 import (
 	"errors"
 	"fmt"
-
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) ([]*structs.Schema, error) {
+func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) (*structs.Schemas, error) {
 	var resp *http.UQLResponse
 	var err error
-	var schemas []*structs.Schema
+	var schemas = &structs.Schemas{}
 
 	resp, err = api.Uql(fmt.Sprintf(`show().schema()`), requestConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
+	nodeSchemas, err := resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 	if err != nil {
 		return nil, err
 	}
@@ -29,9 +28,29 @@ func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) ([]
 		return nil, err
 	}
 
-	schemas = append(schemas, edgesSchemas...)
+	schemas.Schemas = append(nodeSchemas, edgesSchemas...)
 
-	if len(schemas) == 0 {
+	graphCount, err := resp.Alias(http.RESP_GRAPH_COUNT_KEY).AsGraphCount()
+	if err != nil {
+		return nil, err
+	}
+	for _, g := range graphCount {
+		switch g.Type {
+		case "total_nodes":
+			schemas.TotalNodes = g.SP.Count
+		case "total_edges":
+			schemas.TotalEdges = g.SP.Count
+		case "node", "edge":
+			for _, schema := range schemas.Schemas {
+				if schema.Name == g.Schema && schema.Type == g.Type {
+					schema.SetTotalByGraphCount(g)
+				}
+			}
+		}
+
+	}
+
+	if len(schemas.Schemas) == 0 {
 		return nil, fmt.Errorf("no data return")
 	}
 
@@ -86,7 +105,7 @@ func (api *UltipaAPI) GetSchema(schemaName string, dbType ultipa.DBType, request
 		return nil, err
 	}
 
-	for _, schema := range schemas {
+	for _, schema := range schemas.Schemas {
 		if schemaName == schema.Name && schema.DBType == dbType {
 			return schema, nil
 		}
@@ -161,7 +180,7 @@ func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, requestConf
 
 	exist = true
 	if s == nil {
-		_, err = api.CreateSchema(schema, false, requestConfig)
+		_, err = api.CreateSchema(schema, true, requestConfig)
 		exist = false
 	}
 

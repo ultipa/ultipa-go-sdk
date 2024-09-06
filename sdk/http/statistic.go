@@ -26,8 +26,13 @@ func ParseStatistic(table *ultipa.Table) (*Statistic, error) {
 	kv := map[string]string{}
 
 	for index, header := range table.Headers {
+		// 暂时兼容server返回的table Header 超过4 ,如header= 8个，TableRows=2个
+		if index >= 4 {
+			break
+		}
 
 		key := header.PropertyName
+
 		value := table.TableRows[0].Values[index]
 		kv[key] = string(value)
 	}

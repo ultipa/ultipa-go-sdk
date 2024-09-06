@@ -8,6 +8,7 @@
 package test
 
 import (
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"log"
 	"testing"
 
@@ -18,16 +19,19 @@ import (
 )
 
 func TestShowProperty(t *testing.T) {
-	resp, err := client.Uql("show().property()", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	nodeProperties, err := resp.Alias(http.RESP_NODE_PROPERTY_KEY).AsProperties()
+	nodeProperties, err := client.ShowProperty(ultipa.DBType_DBNODE, "t1", &configuration.RequestConfig{
+		GraphName: "go_sdk_test",
+	})
+
 	if err != nil {
 		t.Fatal(err)
 	}
-	edgeProperties, err := resp.Alias(http.RESP_EDGE_PROPERTY_KEY).AsProperties()
+	printers.PrintProperty(nodeProperties)
+
+	edgeProperties, err := client.ShowProperty(ultipa.DBType_DBEDGE, "e2", &configuration.RequestConfig{
+		GraphName: "go_sdk_test",
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -83,11 +87,13 @@ func TestCreatePropertyWithUql(t *testing.T) {
 func TestCreateProperty(t *testing.T) {
 	// Create Node Property
 	newProp := &structs.Property{
-		Name: "gender",
-		Type: ultipa.PropertyType_STRING,
+		Name: "Bool",
+		Type: ultipa.PropertyType_BOOL,
 	}
 
-	resp, err := client.CreateProperty(ultipa.DBType_DBNODE, "People", newProp, nil)
+	resp, err := client.CreateProperty(ultipa.DBType_DBNODE, "default", newProp, &configuration.RequestConfig{
+		GraphName: "go_sdk_test",
+	})
 	if err != nil {
 		t.Fatal(err)
 	}

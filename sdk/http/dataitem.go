@@ -556,6 +556,44 @@ func (di *DataItem) AsGraphSets() (graphs []*structs.GraphSet, err error) {
 	return graphs, err
 }
 
+func (di *DataItem) AsGraphCount() (graphCounts []*structs.GraphCount, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return graphCounts, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_GRAPH_COUNT_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a graph count list")
+	}
+
+	for _, row := range table.TableRows {
+
+		//0:type, 1: schema, 2: from_schema,3:to_schema, 4:count
+		values := row.GetValues()
+		count, _ := strconv.Atoi(string(values[4]))
+
+		sp := &structs.SchemaPair{
+			FromSchema: string(values[2]),
+			ToSchema:   string(values[3]),
+			Count:      count,
+		}
+		i := &structs.GraphCount{
+			Type:   string(values[0]),
+			Schema: string(values[1]),
+			SP:     sp,
+		}
+		graphCounts = append(graphCounts, i)
+	}
+
+	return graphCounts, err
+}
+
 // AsSchemas the types will be tables and alias is nodeSchema and edgeSchema
 func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 
@@ -586,24 +624,38 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		TotalIndex = 3
 	}
 
-	var NameIndex = 0
-	var DescIndex = 1
-	var PropertyIndex = 2
-	var IdIndex = 3
+	var IdIndex = 0
+	var NameIndex = 1
+	var StatusIndex = 2
+	var DescIndex = 3
+	var PropertyIndex = 4
+
 	for index, header := range table.Headers {
-		if header.PropertyName == "name" {
-			NameIndex = index
-		} else if header.PropertyName == "description" {
-			DescIndex = index
-		} else if header.PropertyName == "properties" {
-			PropertyIndex = index
-		} else if header.PropertyName == "totalNodes" {
-			TotalIndex = index
-		} else if header.PropertyName == "totalEdges" {
-			TotalIndex = index
-		} else if header.PropertyName == "id" {
+		switch header.PropertyName {
+		case "id":
 			IdIndex = index
+		case "name":
+			NameIndex = index
+		case "status":
+			StatusIndex = index
+		case "description":
+			DescIndex = index
+		case "properties":
+			PropertyIndex = index
 		}
+		//if header.PropertyName == "name" {
+		//    NameIndex = index
+		//} else if header.PropertyName == "description" {
+		//    DescIndex = index
+		//} else if header.PropertyName == "properties" {
+		//    PropertyIndex = index
+		//    //} else if header.PropertyName == "totalNodes" {
+		//    //	TotalIndex = index
+		//    //} else if header.PropertyName == "totalEdges" {
+		//    //	TotalIndex = index
+		//} else if header.PropertyName == "id" {
+		//    IdIndex = index
+		//}
 	}
 
 	for _, row := range table.TableRows {
@@ -612,6 +664,7 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		schema := structs.NewSchema(string(values[NameIndex]))
 		schema.Desc = string(values[DescIndex])
 		schema.Type = Type
+		schema.Status = string(values[StatusIndex])
 		propertyJson := values[PropertyIndex]
 		schema.Total, _ = strconv.Atoi(utils.AsString(values[TotalIndex]))
 		schema.Id = utils.AsUint64(values[IdIndex])
@@ -748,16 +801,17 @@ func (di *DataItem) AsIndexes() (indexes []*structs.Index, err error) {
 	}
 
 	for _, row := range table.TableRows {
-		//0:name, 1: properties, 2: schema, 3: status 4: size
+		//0：id 1:name, 2: properties, 3: schema, 4: status
 		values := row.GetValues()
-		size, _ := strconv.Atoi(string(values[4]))
+		id, _ := strconv.Atoi(string(values[0]))
 		i := structs.Index{
-			Name:       string(values[0]),
-			Properties: string(values[1]),
-			Schema:     string(values[2]),
-			Status:     string(values[3]),
-			Size:       size,
-			Type:       indexType,
+			Id:         id,
+			Name:       string(values[1]),
+			Properties: string(values[2]),
+			Schema:     string(values[3]),
+			Status:     string(values[4]),
+			//Size:       size,
+			Type: indexType,
 		}
 		indexes = append(indexes, &i)
 
@@ -779,7 +833,12 @@ func (di *DataItem) AsFullTexts() (fullTextIndexes []*structs.Index, err error) 
 
 	table := di.Data.(*ultipa.Table)
 
-	if table.TableName != RESP_NODE_FULLTEXT_KEY && table.TableName != RESP_EDGE_FULLTEXT_KEY {
+	indexType := ""
+	if table.TableName == RESP_NODE_INDEX_KEY {
+		indexType = "node"
+	} else if table.TableName == RESP_EDGE_INDEX_KEY {
+		indexType = "edge"
+	} else {
 		return nil, errors.New("DataItem " + di.Alias + " is not a Fulltext Index list")
 	}
 
@@ -792,6 +851,7 @@ func (di *DataItem) AsFullTexts() (fullTextIndexes []*structs.Index, err error) 
 			Properties: string(values[1]),
 			Schema:     string(values[2]),
 			Status:     string(values[3]),
+			Type:       indexType,
 		}
 		fullTextIndexes = append(fullTextIndexes, &i)
 
@@ -1208,4 +1268,41 @@ func bytesToUser(data [][]byte) (*structs.User, error) {
 	}
 
 	return &user, nil
+}
+
+func (di *DataItem) AsJobs() (jobs []*structs.Job, err error) {
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return nil, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_JOB_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a job list")
+	}
+
+	for _, row := range table.TableRows {
+		values := row.GetValues()
+
+		job := structs.Job{
+			JobID:     string(values[0]),
+			GraphName: string(values[1]),
+			Type:      string(values[2]),
+			UQL:       string(values[3]),
+			Status:    string(values[4]),
+			ErrMsg:    string(values[5]),
+			Result:    string(values[6]),
+			StartTime: string(values[7]),
+			EndTime:   string(values[8]),
+			Progress:  string(values[9]),
+		}
+
+		jobs = append(jobs, &job)
+	}
+
+	return jobs, nil
 }

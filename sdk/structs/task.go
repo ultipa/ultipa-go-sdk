@@ -17,6 +17,7 @@ const (
 	TaskStatusStopped
 )
 
+// Deprecated: 5.0 not support, should use CreateNodeIndex or CreateEdgeIndex
 var taskStatusDescriptions = map[TaskStatus]string{
 	TaskstatusAll:       "*",
 	TaskstatusPending:   "pending",

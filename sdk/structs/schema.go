@@ -2,19 +2,39 @@ package structs
 
 import (
 	"errors"
-
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
+
+type Schemas struct {
+	Schemas    []*Schema
+	TotalNodes int
+	TotalEdges int
+}
 
 type Schema struct {
 	Name       string
 	Properties []*Property
 	Desc       string
+	Status     string
 	Type       string
 	DBType     ultipa.DBType
 	Total      int
 	Id         uint64
+	Pair       []*SchemaPair // only for EdgeSchema
+}
+
+// only for EdgeSchema
+type SchemaPair struct {
+	FromSchema string
+	ToSchema   string
+	Count      int
+}
+
+type GraphCount struct {
+	Type   string
+	Schema string
+	SP     *SchemaPair
 }
 
 func NewSchema(name string) *Schema {
@@ -112,4 +132,18 @@ func CompareSchemas(schema1 *Schema, schema2 *Schema, fit bool) (error, []*Prope
 	}
 
 	return nil, NotExistProperties
+}
+
+// SetTotalByGraphCount for type = node edge
+func (s *Schema) SetTotalByGraphCount(g *GraphCount) {
+	s.Total += g.SP.Count
+
+	if g.Type == "edge" && g.SP.FromSchema != "" && g.SP.ToSchema != "" {
+		p := &SchemaPair{
+			FromSchema: g.SP.FromSchema,
+			ToSchema:   g.SP.ToSchema,
+			Count:      g.SP.Count,
+		}
+		s.Pair = append(s.Pair, p)
+	}
 }

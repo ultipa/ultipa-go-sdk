@@ -15,10 +15,9 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-// ShowAlgo get all algo
+// Deprecated: 5.0 not support, should use ShowHDCAlgo
 func (api *UltipaAPI) ShowAlgo(config *configuration.RequestConfig) ([]*structs.Algo, error) {
 	resp, err := api.Uql("show().algo()", config)
-
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +32,7 @@ func (api *UltipaAPI) ShowAlgo(config *configuration.RequestConfig) ([]*structs.
 }
 
 // InstallAlgo install algo
-func (api *UltipaAPI) InstallAlgo(soFilePath string, infoFilePath string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
+func (api *UltipaAPI) InstallAlgo(soFilePath, infoFilePath, hdcName string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
 
 	chunkSize := 1024 * 1024 * 1 // 2MB
 
@@ -93,9 +92,10 @@ func (api *UltipaAPI) InstallAlgo(soFilePath string, infoFilePath string, config
 		}
 
 		err = streamClient.Send(&ultipa.InstallAlgoRequest{
-			FileName: path.Base(algoFile.Name()),
-			Md5:      algoFileMD5,
-			Chunk:    chunk[:n],
+			FileName:   path.Base(algoFile.Name()),
+			Md5:        algoFileMD5,
+			Chunk:      chunk[:n],
+			WithServer: &ultipa.WithServer{HdcServerName: hdcName},
 		})
 
 		if err != nil {
@@ -134,6 +134,11 @@ func (api *UltipaAPI) InstallAlgo(soFilePath string, infoFilePath string, config
 		return nil, err
 	}
 
+	// reply status 暂时没有初始化，返回nil 按成功处理
+	if reply.Status == nil {
+		return reply, nil
+	}
+
 	if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
 		return nil, errors.New(reply.Status.Msg)
 	}
@@ -143,7 +148,7 @@ func (api *UltipaAPI) InstallAlgo(soFilePath string, infoFilePath string, config
 }
 
 // UninstallAlgo uninstall algo
-func (api *UltipaAPI) UninstallAlgo(algoName string, config *configuration.RequestConfig) (*ultipa.UninstallAlgoReply, error) {
+func (api *UltipaAPI) UninstallAlgo(algoName, hdcName string, config *configuration.RequestConfig) (*ultipa.UninstallAlgoReply, error) {
 
 	client, err := api.GetControlClient(config)
 
@@ -158,7 +163,39 @@ func (api *UltipaAPI) UninstallAlgo(algoName string, config *configuration.Reque
 	defer cancel()
 
 	reply, err := client.UninstallAlgo(ctx, &ultipa.UninstallAlgoRequest{
-		AlgoName: algoName,
+		AlgoName:   algoName,
+		WithServer: &ultipa.WithServer{HdcServerName: hdcName},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(reply.Status.Msg)
+	}
+
+	return reply, nil
+}
+
+// RollbackHDCAlgo Rollback HDC Algo
+func (api *UltipaAPI) RollbackHDCAlgo(algoName, hdcName string, config *configuration.RequestConfig) (*ultipa.RollbackAlgoReply, error) {
+
+	client, err := api.GetControlClient(config)
+
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel, err := api.Pool.NewContext(config)
+	if err != nil {
+		return nil, err
+	}
+	defer cancel()
+
+	reply, err := client.RollbackAlgo(ctx, &ultipa.RollbackAlgoRequest{
+		AlgoName:   algoName,
+		WithServer: &ultipa.WithServer{HdcServerName: hdcName},
 	})
 
 	if err != nil {

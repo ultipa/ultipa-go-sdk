@@ -17,9 +17,9 @@ type Truncate struct {
 type GraphSet struct {
 	ID          types.ID
 	Name        string
-	Description string
 	TotalNodes  uint64
 	TotalEdges  uint64
+	Description string
 	Status      string
 	Shards      string
 	SlotNum     string

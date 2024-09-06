@@ -223,6 +223,7 @@ func TestInsertNodeWithSetProperty(t *testing.T) {
 }
 
 func TestInsertNodes(t *testing.T) {
+	client.SetCurrentGraph("go_sdk_test")
 	schemaName := "default"
 
 	ty := ultipa.DBType_DBNODE
@@ -245,17 +246,17 @@ func TestInsertNodes(t *testing.T) {
 
 	var nodes []*structs.Node
 	node1 := structs.NewNode()
-	node1.UUID = 1
+	node1.ID = "11131"
 	node1.Set("name", "go_sdk")
 	node1.Set("salary", "6.1")
 
 	node2 := structs.NewNode()
-	node2.UUID = 2
+	node2.ID = "223222"
 	node2.Set("name", "test")
 	node2.Set("salary", 6.1)
 
 	node3 := structs.NewNode()
-	node3.UUID = 3
+	node3.ID = "333433"
 	//node3.Set("name", "test2")
 
 	nodes = append(nodes, node1, node2, node3)

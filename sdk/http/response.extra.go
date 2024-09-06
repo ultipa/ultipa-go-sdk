@@ -29,12 +29,13 @@ package http
 //}
 //
 //type ResponseSchema struct {
-//	Name        string
-//	Description string
-//	Properties  []*ResponseProperty
-//	TotalNodes  int64
-//	TotalEdges  int64
+//    Name        string
+//    Description string
+//    Properties  []*ResponseProperty
+//    TotalNodes  int64
+//    TotalEdges  int64
 //}
+
 //
 //type ResponseNodeSchemas struct {
 //	Status  *Status

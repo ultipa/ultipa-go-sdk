@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
@@ -115,40 +116,55 @@ func (p *Property) IsIgnore() bool {
 
 func (p *Property) SetTypeByString(s string) {
 	// set typeStr "set(string)"
-	// decimal typeStr "decimal"
+	// decimal typeStr "decimal(x,y)"
 	// list typeStr "string[]"
+
+	s = strings.ReplaceAll(s, " ", "")
+
+	// list
 	if strings.HasSuffix(s, "[]") {
 		p.Type = ultipa.PropertyType_LIST
 		p.SubTypes = append(p.SubTypes, GetPropertyTypeByString(strings.TrimSuffix(s, "[]")))
 		return
 	}
+
+	// set
 	reg := regexp.MustCompile(`set\(([^)]+)\)`)
-	if reg.MatchString(strings.ReplaceAll(s, " ", "")) {
-		matches := reg.FindStringSubmatch(strings.ReplaceAll(s, " ", ""))
+	if reg.MatchString(s) {
+		matches := reg.FindStringSubmatch(s)
 		p.Type = ultipa.PropertyType_SET
 		p.SubTypes = append(p.SubTypes, GetPropertyTypeByString(matches[1]))
+
+		// server暂不支持 set 类型，将类型设置为 UNSET
+		p.Type = ultipa.PropertyType_UNSET
 		return
 	}
-	//re := regexp.MustCompile(`^decimal\((\d+),(\d+)\)$`)
-	//if re.MatchString(strings.ReplaceAll(s, " ", "")) {
-	//	p.Type = ultipa.PropertyType_DECIMAL
-	//	matches := re.FindStringSubmatch(strings.ReplaceAll(s, " ", ""))
-	//	precision, err := strconv.Atoi(matches[1])
-	//	scale, err := strconv.Atoi(matches[2])
-	//	if err != nil {
-	//		return
-	//	}
-	//	extraData := DecimalExtra{
-	//		Precision: precision,
-	//		Scale:     scale,
-	//	}
-	//	extraJson, err := json.Marshal(extraData)
-	//	if err != nil {
-	//		return
-	//	}
-	//	p.Extra = string(extraJson)
-	//	return
-	//}
+
+	// decimal
+	re := regexp.MustCompile(`^decimal\((\d+),(\d+)\)$`)
+	if re.MatchString(s) {
+		p.Type = ultipa.PropertyType_DECIMAL
+		matches := re.FindStringSubmatch(s)
+		precision, err := strconv.Atoi(matches[1])
+		scale, err := strconv.Atoi(matches[2])
+		if err != nil {
+			return
+		}
+		extraData := DecimalExtra{
+			Precision: precision,
+			Scale:     scale,
+		}
+		extraJson, err := json.Marshal(extraData)
+		if err != nil {
+			return
+		}
+		p.Extra = string(extraJson)
+
+		// server暂不支持 set 类型，将类型设置为 UNSET
+		p.Type = ultipa.PropertyType_UNSET
+		return
+	}
+
 	p.Type = GetPropertyTypeByString(s)
 }
 

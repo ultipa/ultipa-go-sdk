@@ -11,39 +11,40 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
-	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
 func (api *UltipaAPI) ShowGraph(requestConfig *configuration.RequestConfig) (graphSets []*structs.GraphSet, err error) {
-	uql := utils.UQLMAKER{}
-	uql.SetCommand(utils.UQLCommand_listGraph)
-	res, err := api.Uql(uql.ToString(), requestConfig)
+	res, err := api.Uql("show().graph().more()", requestConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	table, err := res.GetSingleTable()
+	g, err := res.Alias(http.RESP_GRAPH_KEY).AsTable()
 	if err != nil {
 		return nil, err
 	}
 
-	values := table.ToKV()
+	values := g.ToKV()
 	for _, v := range values {
-		id, _ := v.Get("id").(string)
+		id := v.Get("id").(string)
+		name := v.Get("name").(string)
 		status := v.Get("status").(string)
 		description := v.Get("description").(string)
 		shards := v.Get("shards").(string)
 		slotNum := v.Get("slot_num").(string)
 		replicaNum := v.Get("replica_num").(string)
 		partitionBy := v.Get("partition_by").(string)
+
 		var totalNodes uint64 = 0
-		if v := v.Get("totalNodes"); v != nil {
+		if v := v.Get("total_nodes"); v != nil {
 			totalNodes, _ = strconv.ParseUint(v.(string), 10, 64)
+
 		}
 		var totalEdges uint64 = 0
-		if v := v.Get("totalEdges"); v != nil {
-			totalEdges, _ = strconv.ParseUint(v.(string), 10, 64)
+		if v := v.Get("total_edges"); v != nil {
+			totalEdges, err = strconv.ParseUint(v.(string), 10, 64)
 		}
+
 		//clusterId := ""
 		//if v := v.Get("clusterId"); v != nil {
 		//    clusterId = v.(string)
@@ -51,7 +52,7 @@ func (api *UltipaAPI) ShowGraph(requestConfig *configuration.RequestConfig) (gra
 		graphSets = append(graphSets, &structs.GraphSet{
 			ID: id,
 			//ClusterId:   clusterId,
-			Name:        v.Get("name").(string),
+			Name:        name,
 			TotalNodes:  totalNodes,
 			TotalEdges:  totalEdges,
 			Status:      status,
@@ -77,8 +78,9 @@ func (api *UltipaAPI) CreateGraphIfNotExist(graph *structs.GraphSet, requestConf
 	return resp, exist, err
 }
 
+// CreateGraph 5.0 partitionByHash:Crc32/CityHash64
 func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
-	resp, err := api.Uql(fmt.Sprintf(`create().graph("%v", "%v")`, graph.Name, graph.Description), requestConfig)
+	resp, err := api.Uql(fmt.Sprintf(`create().graph("%v", "%v").shards([%v]).partitionByHash('%v',_id)`, graph.Name, graph.Description, graph.Shards, graph.PartitionBy), requestConfig)
 
 	if err != nil {
 		api.Logger.Log("create graph failed : " + graph.Name + " " + err.Error())
@@ -225,7 +227,7 @@ func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configu
 	return resp, nil
 }
 
-func (api *UltipaAPI) Compact(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) Compact(graphName string, requestConfig *configuration.RequestConfig) (*http.JobResponse, error) {
 	uql := fmt.Sprintf(`compact().graph("%v")`, graphName)
 
 	resp, err := api.Uql(uql, requestConfig)
@@ -234,7 +236,7 @@ func (api *UltipaAPI) Compact(graphName string, requestConfig *configuration.Req
 		return nil, err
 	}
 
-	return resp, err
+	return http.GetJobResponseFromUqlResponse(resp)
 }
 
 func (api *UltipaAPI) MountGraph(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
