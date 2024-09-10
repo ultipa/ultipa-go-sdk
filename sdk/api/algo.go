@@ -58,9 +58,12 @@ func (api *UltipaAPI) InstallAlgo(soFilePath, infoFilePath, hdcName string, conf
 
 	algoInfoFileMD5, _ := checksum.MD5sum(infoFilePath)
 
-	client := api.Conn.GetControlClient()
+	client, err := api.GetControlClient(config)
+	if err != nil {
+		return nil, err
+	}
 
-	ctx, cancel, err := api.Conn.NewContext(config)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return nil, err
 	}
@@ -146,9 +149,12 @@ func (api *UltipaAPI) InstallAlgo(soFilePath, infoFilePath, hdcName string, conf
 // UninstallAlgo uninstall algo
 func (api *UltipaAPI) UninstallAlgo(algoName, hdcName string, config *configuration.RequestConfig) (*ultipa.UninstallAlgoReply, error) {
 
-	client := api.Conn.GetControlClient()
+	client, err := api.GetControlClient(config)
+	if err != nil {
+		return nil, err
+	}
 
-	ctx, cancel, err := api.Conn.NewContext(config)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return nil, err
 	}
@@ -173,9 +179,12 @@ func (api *UltipaAPI) UninstallAlgo(algoName, hdcName string, config *configurat
 // RollbackHDCAlgo Rollback HDC Algo
 func (api *UltipaAPI) RollbackHDCAlgo(algoName, hdcName string, config *configuration.RequestConfig) (*ultipa.RollbackAlgoReply, error) {
 
-	client := api.Conn.GetControlClient()
+	client, err := api.GetControlClient(config)
+	if err != nil {
+		return nil, err
+	}
 
-	ctx, cancel, err := api.Conn.NewContext(config)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return nil, err
 	}

@@ -22,19 +22,19 @@ const (
 )
 
 //func (api *UltipaAPI) RefreshClusterInfo(graphName string) error {
-//    return api.Conn.RefreshClusterInfo(graphName)
+//    return api.Pool.RefreshClusterInfo(graphName)
 //}
 
 //func (api *UltipaAPI) GetConnByUQL(uql string, graphName string) (uqlType UQLType, leader *connection.Connection, followers []*connection.Connection, global *connection.Connection, err error) {
 //
-//    graph := api.Conn.GraphMgr.GetGraph(graphName)
+//    graph := api.Pool.GraphMgr.GetGraph(graphName)
 //
 //    if graph == nil {
-//        err = api.Conn.RefreshClusterInfo(graphName)
+//        err = api.Pool.RefreshClusterInfo(graphName)
 //        if err != nil {
 //            return 0, nil, nil, nil, err
 //        }
-//        graph = api.Conn.GraphMgr.GetGraph(graphName)
+//        graph = api.Pool.GraphMgr.GetGraph(graphName)
 //    }
 //
 //    // refresh , but not get graph info
@@ -42,13 +42,13 @@ const (
 //        return 0, nil, nil, nil, errors.New("unavailable to get graph cluster infos : " + graphName)
 //    }
 //
-//    leader = api.Conn.GraphMgr.GetLeader(graphName)
+//    leader = api.Pool.GraphMgr.GetLeader(graphName)
 //    if leader == nil {
 //        return 0, nil, nil, nil, errors.New(fmt.Sprintf("no leader found for graph %s", graphName))
 //    }
 //
-//    followers = api.Conn.GraphMgr.GetGraph(graphName).Followers
-//    global, err = api.Conn.GetGlobalMasterConn(nil)
+//    followers = api.Pool.GraphMgr.GetGraph(graphName).Followers
+//    global, err = api.Pool.GetGlobalMasterConn(nil)
 //
 //    uqlItem := utils.NewUql(uql)
 //

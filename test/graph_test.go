@@ -29,7 +29,7 @@ func TestShowGraph(t *testing.T) {
 func TestCreateGraph(t *testing.T) {
 
 	//client, err := GetClient(hosts, graph)
-	graphName := "test_go_sdk"
+	graphName := "go_sdk_test"
 	exit, err := client.HasGraph(graphName, nil)
 	if err != nil {
 		return
@@ -75,7 +75,11 @@ func TestCreateGraph(t *testing.T) {
 }
 
 func TestDropGraph(t *testing.T) {
-	client.DropGraph("test_creation", nil)
+	response, err := client.DropGraph("go_test_sdk", nil)
+	if err != nil {
+		t.Fatal("drop graph error: ", err)
+	}
+	t.Log(response.Status.Code.String())
 }
 
 func TestAsGraph(t *testing.T) {
@@ -235,7 +239,7 @@ func TestGetGraph(t *testing.T) {
 }
 
 func TestCompact(t *testing.T) {
-	job, err := client.Compact("miniCircle", nil)
+	job, err := client.Compact("go_sdk_test", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

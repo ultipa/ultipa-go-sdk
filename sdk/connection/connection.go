@@ -24,7 +24,7 @@ type Connection struct {
 	Active ultipa.ServerStatus
 }
 
-func NewConnection(config *configuration.UltipaConfig) (*Connection, error) {
+func NewConnection(host string, config *configuration.UltipaConfig) (*Connection, error) {
 	var err error
 	if len(config.Hosts) < 1 {
 		return nil, errors.New("hosts can not be empty")
@@ -32,7 +32,7 @@ func NewConnection(config *configuration.UltipaConfig) (*Connection, error) {
 
 	connection := &Connection{
 		Config: config,
-		Host:   config.Hosts[0],
+		Host:   host,
 	}
 
 	// add default mac receive size
@@ -41,19 +41,19 @@ func NewConnection(config *configuration.UltipaConfig) (*Connection, error) {
 	}
 
 	// Try to get a certificate
-	certificate := utils.GetCertificate(connection.Host)
+	certificate := utils.GetCertificate(host)
 	if config.Crt == nil && certificate != nil {
 		cred := credentials.NewTLS(nil)
-		connection.Conn, err = grpc.Dial(connection.Host, grpc.WithTransportCredentials(cred), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(config.MaxRecvSize), grpc.MaxCallSendMsgSize(config.MaxRecvSize)))
+		connection.Conn, err = grpc.Dial(host, grpc.WithTransportCredentials(cred), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(config.MaxRecvSize), grpc.MaxCallSendMsgSize(config.MaxRecvSize)))
 	} else if config.Crt == nil {
-		connection.Conn, err = grpc.Dial(connection.Host, grpc.WithInsecure(), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(config.MaxRecvSize), grpc.MaxCallSendMsgSize(config.MaxRecvSize)))
+		connection.Conn, err = grpc.Dial(host, grpc.WithInsecure(), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(config.MaxRecvSize), grpc.MaxCallSendMsgSize(config.MaxRecvSize)))
 	} else {
 		certPool := x509.NewCertPool()
 		certPool.AppendCertsFromPEM(config.Crt)
 		cred := credentials.NewTLS(&tls.Config{
 			RootCAs: certPool,
 		})
-		connection.Conn, err = grpc.Dial(connection.Host, grpc.WithTransportCredentials(cred), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(config.MaxRecvSize)))
+		connection.Conn, err = grpc.Dial(host, grpc.WithTransportCredentials(cred), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(config.MaxRecvSize)))
 	}
 
 	if err != nil {

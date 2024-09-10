@@ -12,9 +12,12 @@ import (
 func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, taskId string, requestConfig *configuration.RequestConfig, receive func(data []byte) error) error {
 	var err error
 
-	client := api.Conn.GetControlClient()
+	client, err := api.GetControlClient(requestConfig)
+	if err != nil {
+		return err
+	}
 
-	ctx, cancel, err := api.Conn.NewContext(requestConfig)
+	ctx, cancel, err := api.Pool.NewContext(requestConfig)
 	if err != nil {
 		return err
 	}
@@ -47,9 +50,12 @@ func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, taskId string, req
 func (api *UltipaAPI) DownloadAllAlgoResultFile(taskId string, requestConfig *configuration.RequestConfig, receive func(data []byte, fileName string) error) error {
 	var err error
 
-	client := api.Conn.GetControlClient()
+	client, err := api.GetControlClient(requestConfig)
+	if err != nil {
+		return err
+	}
 
-	ctx, cancel, err := api.Conn.NewContext(requestConfig)
+	ctx, cancel, err := api.Pool.NewContext(requestConfig)
 	if err != nil {
 		return err
 	}

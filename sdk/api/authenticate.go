@@ -11,9 +11,12 @@ func (api *UltipaAPI) Authenticate(authenticateType ultipa.AuthenticateType, uql
 
 	var err error
 
-	client := api.Conn.GetControlClient()
+	client, err := api.GetControlClient(config)
+	if err != nil {
+		return nil, err
+	}
 
-	ctx, cancel, err := api.Conn.NewContext(config)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return nil, err
 	}

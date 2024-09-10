@@ -15,8 +15,8 @@ import (
 //    //}
 //
 //    for i := 0; i < 10; i++ {
-//        err := client.Conn.RefreshClusterInfo("global")
-//        // utils.PrintJSON(client.Conn.GraphMgr)
+//        err := client.Pool.RefreshClusterInfo("global")
+//        // utils.PrintJSON(client.Pool.GraphMgr)
 //        if err != nil {
 //            t.Fatal(err)
 //        }
@@ -36,13 +36,13 @@ func TestSendNewGraphUQL(t *testing.T) {
 //        t.Fatal(err)
 //    }
 //    var connHosts []string
-//    for _, connection := range client.Conn.Connections {
+//    for _, connection := range client.Pool.Connections {
 //        connHosts = append(connHosts, connection.Host)
 //    }
 //    t.Logf("connections:%s", strings.Join(connHosts, ","))
 //
 //    var active []string
-//    for _, connection := range client.Conn.Actives {
+//    for _, connection := range client.Pool.Actives {
 //        active = append(active, connection.Host)
 //    }
 //    t.Logf("active:%s", strings.Join(active, ","))

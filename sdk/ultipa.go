@@ -16,11 +16,11 @@ func NewUltipa(config *configuration.UltipaConfig) (*api.UltipaAPI, error) {
 	config.FillDefault()
 
 	// set connection pool
-	pool, err := connection.NewConnection(config)
+	pool, err := connection.NewConnectionPool(config)
 	if err != nil {
 		return nil, err
 	}
-	//// set heartbeat for Connection Conn
+	//// set heartbeat for Connection Pool
 	//pool.RunHeartBeat()
 	//
 	//if err != nil {

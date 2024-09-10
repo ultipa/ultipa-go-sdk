@@ -7,9 +7,9 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 )
 
-func (api *UltipaAPI) Gql(uql string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) Gql(gql string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 
-	resp, _, err := api.doExecuteQuery(uql, ultipa.QueryType_GQL, requestConfig)
+	resp, _, err := api.doExecuteQuery(gql, ultipa.QueryType_GQL, requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -29,18 +29,18 @@ func (api *UltipaAPI) Gql(uql string, requestConfig *configuration.RequestConfig
 	}
 
 	//if uqlResp.NeedRedirect() {
-	//    err = api.Conn.RefreshClusterInfo(conf.CurrentGraph)
+	//    err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
 	//    if err != nil {
 	//        return nil, err
 	//    }
-	//    return api.Uql(uql, requestConfig)
+	//    return api.Uql(gql, requestConfig)
 	//}
 
 	return uqlResp, nil
 }
 
-func (api *UltipaAPI) GQLStream(uql string, requestConfig *configuration.RequestConfig) (*http.UQLResponseStream, error) {
-	resp, _, err := api.doExecuteQuery(uql, ultipa.QueryType_UQL, requestConfig)
+func (api *UltipaAPI) GQLStream(gql string, requestConfig *configuration.RequestConfig) (*http.UQLResponseStream, error) {
+	resp, _, err := api.doExecuteQuery(gql, ultipa.QueryType_GQL, requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -58,11 +58,11 @@ func (api *UltipaAPI) GQLStream(uql string, requestConfig *configuration.Request
 	}
 
 	//if uqlResp.NeedRedirect() {
-	//    err = api.Conn.RefreshClusterInfo(conf.CurrentGraph)
+	//    err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
 	//    if err != nil {
 	//        return nil, err
 	//    }
-	//    return api.UQLStream(uql, requestConfig)
+	//    return api.UQLStream(gql, requestConfig)
 	//}
 	return uqlResp, nil
 }

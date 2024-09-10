@@ -115,7 +115,7 @@ func TestUqlWithSpecialHost(t *testing.T) {
 //func TestRefreshPool(t *testing.T) {
 //    //client, _ := GetClient(hosts, graph)
 //    for i := 0; i < 10; i++ {
-//        err := client.Conn.RefreshActivesWithSeconds(1)
+//        err := client.Pool.RefreshActivesWithSeconds(1)
 //        if err != nil {
 //            t.Error(err)
 //        }

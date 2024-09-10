@@ -16,7 +16,7 @@ import (
 // Uql, Insert, Export, Download ... API methods
 
 type UltipaAPI struct {
-	Conn   *connection.Connection
+	Pool   *connection.ConnectionPool
 	Config *configuration.UltipaConfig
 	Logger *logger.Logger
 }
@@ -28,10 +28,10 @@ const (
 	ClientTypeControl ClientType = 2
 )
 
-func NewUltipaAPI(conn *connection.Connection) *UltipaAPI {
+func NewUltipaAPI(conn *connection.ConnectionPool) *UltipaAPI {
 
 	api := &UltipaAPI{
-		Conn:   conn,
+		Pool:   conn,
 		Config: conn.Config,
 		Logger: logger.NewLogger(conn.Config.Debug),
 	}
@@ -43,40 +43,23 @@ func (api *UltipaAPI) GetConn(config *configuration.RequestConfig) (*connection.
 	var err error
 	var conn *connection.Connection
 
-	conf := api.Conn.Config
+	conf := api.Pool.Config
 
 	if config != nil {
-		conf = api.Conn.Config.MergeRequestConfig(config)
+		conf = api.Pool.Config.MergeRequestConfig(config)
 		//UqlItem := utils.NewUql(config.Uql)
 
-		conn, err = connection.NewConnection(conf)
-		if err != nil {
-			return nil, nil, err
-		}
-
 		// Check if User set Host Address
-		//if config.Host != "" {
-		//
-		//
-		//    // if is raft mode, check if contains CUD ops or exec task
-		//}
-		//} else if api.Conn.IsRaft {
-		//    if UqlItem.IsGlobal() || config.UseControl {
-		//        conn, err = api.Conn.GetGlobalMasterConn(conf)
-		//        if UqlItem.IsGlobal() {
-		//            conf.CurrentGraph = "global"
-		//        }
-		//    } else if UqlItem.HasWrite() || config.UseMaster || conf.Consistency {
-		//        ok, graph := UqlItem.ParseGraph()
-		//        if ok && graph != "" {
-		//            conf.CurrentGraph = graph
-		//        }
-		//        conn, err = api.Conn.GetMasterConn(conf)
-		//    } else if UqlItem.HasExecTask() {
-		//        conn, err = api.Conn.GetAnalyticsConn(conf)
-		//    }
-		//}
+		if config.Host != "" {
+			conn, err = connection.NewConnection(config.Host, conf)
+			if err != nil {
+				return nil, nil, err
+			}
+			// if is raft mode, check if contains CUD ops or exec task
+		} else {
+			conn, err = api.Pool.GetRandomConn(conf)
 
+		}
 	}
 
 	if err != nil {
@@ -99,36 +82,36 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 	return client, conf, nil
 }
 
-//func (api *UltipaAPI) GetControlClient(config *configuration.RequestConfig) (ultipa.UltipaControlsClient, error) {
-//
-//    client, _, err := api.GetControlClientAndConfig(config)
-//    return client, err
-//}
-//
-//func (api *UltipaAPI) GetControlClientAndConfig(config *configuration.RequestConfig) (ultipa.UltipaControlsClient, *configuration.UltipaConfig, error) {
-//
-//    if config == nil {
-//        config = &configuration.RequestConfig{}
-//    }
-//
-//    config.UseControl = true
-//
-//    conn, conf, err := api.GetConn(config)
-//
-//    if err != nil {
-//        return nil, conf, err
-//    }
-//    client := conn.GetControlClient()
-//    api.Logger.Log(fmt.Sprintf("fetch control client, hit host:[%s], role [%v], graph=[%s]", conn.Host, conn.Role, conf.CurrentGraph))
-//    return client, conf, nil
-//}
+func (api *UltipaAPI) GetControlClient(config *configuration.RequestConfig) (ultipa.UltipaControlsClient, error) {
+
+	client, _, err := api.GetControlClientAndConfig(config)
+	return client, err
+}
+
+func (api *UltipaAPI) GetControlClientAndConfig(config *configuration.RequestConfig) (ultipa.UltipaControlsClient, *configuration.UltipaConfig, error) {
+
+	if config == nil {
+		config = &configuration.RequestConfig{}
+	}
+
+	config.UseControl = true
+
+	conn, conf, err := api.GetConn(config)
+
+	if err != nil {
+		return nil, conf, err
+	}
+	client := conn.GetControlClient()
+	api.Logger.Log(fmt.Sprintf("fetch control client, hit host:[%s], role [%v], graph=[%s]", conn.Host, conn.Role, conf.CurrentGraph))
+	return client, conf, nil
+}
 
 // Uql send a uql string to ultipa graph, and return a http Uql Response
 // get Alias from Uql Response and convert to any type you need by asNodes, asEdges, asPaths, asTable, as asArray...
 // Check DataItem to learn more about Uql Response
 func (api *UltipaAPI) Uql(uql string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 
-	resp, _, err := api.doExecuteQuery(uql, ultipa.QueryType_GQL, requestConfig)
+	resp, _, err := api.doExecuteQuery(uql, ultipa.QueryType_UQL, requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +131,7 @@ func (api *UltipaAPI) Uql(uql string, requestConfig *configuration.RequestConfig
 	}
 
 	//if uqlResp.NeedRedirect() {
-	//    err = api.Conn.RefreshClusterInfo(conf.CurrentGraph)
+	//    err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
 	//    if err != nil {
 	//        return nil, err
 	//    }
@@ -177,7 +160,7 @@ func (api *UltipaAPI) UQLStream(uql string, requestConfig *configuration.Request
 	}
 
 	//if uqlResp.NeedRedirect() {
-	//    err = api.Conn.RefreshClusterInfo(conf.CurrentGraph)
+	//    err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
 	//    if err != nil {
 	//        return nil, err
 	//    }
@@ -206,7 +189,7 @@ func (api *UltipaAPI) doExecuteQuery(query string, queryType ultipa.QueryType, c
 	}
 	//CurrentGraph of conf may be changed by query
 	config.GraphName = conf.CurrentGraph
-	ctx, cancel, err := api.Conn.NewContext(config)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		defer cancel()
 		return nil, conf, err
@@ -217,7 +200,7 @@ func (api *UltipaAPI) doExecuteQuery(query string, queryType ultipa.QueryType, c
 
 	if err != nil {
 		// if get error, ex: unavailable
-		//err = api.Conn.RefreshClusterInfo(conf.CurrentGraph)
+		//err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
 
 		//if err != nil {
 		//    return nil, conf, err
@@ -255,12 +238,13 @@ func (api *UltipaAPI) buildQueryRequest(query string, queryType ultipa.QueryType
 
 // Test connection test
 func (api *UltipaAPI) Test(requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
-	client := api.Conn.GetControlClient()
+	conn, err := api.Pool.GetConn(nil)
 
 	if err != nil {
 		return nil, err
 	}
-	ctx, cancel, err := api.Conn.NewContext(requestConfig)
+	client := conn.GetClient()
+	ctx, cancel, err := api.Pool.NewContext(requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -286,19 +270,19 @@ func (api *UltipaAPI) Test(requestConfig *configuration.RequestConfig) (resp *ht
 }
 
 //func (api *UltipaAPI) GetActiveClientTest() (bool, *connection.Connection, error) {
-//    conn, err := api.Conn.GetConn(nil)
+//    conn, err := api.Pool.GetConn(nil)
 //
 //    if err != nil {
 //        return false, nil, err
 //    }
 //    client := conn.GetClient()
-//    ctx, cancel, err := api.Conn.NewContext(nil)
+//    ctx, cancel, err := api.Pool.NewContext(nil)
 //    if err != nil {
 //        return false, nil, err
 //    }
 //    defer cancel()
 //    resp, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
-//        Name: "Conn Test",
+//        Name: "Pool Test",
 //    })
 //
 //    if err != nil || resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
@@ -314,12 +298,12 @@ func (api *UltipaAPI) SetCurrentGraph(graphName string) error {
 }
 
 func (api *UltipaAPI) Close() error {
-	return api.Conn.Close()
+	return api.Pool.Close()
 }
 
 func (api *UltipaAPI) SafelyClose() error {
-	if api != nil && api.Conn != nil {
-		return api.Conn.Close()
+	if api != nil && api.Pool != nil {
+		return api.Pool.Close()
 	}
 	return nil
 }

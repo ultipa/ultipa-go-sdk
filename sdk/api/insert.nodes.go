@@ -23,7 +23,7 @@ func (api *UltipaAPI) InsertNodesBatch(table *ultipa.EntityTable, config *config
 		return nil, err
 	}
 
-	ctx, cancel, err := api.Conn.NewContext(config.RequestConfig)
+	ctx, cancel, err := api.Pool.NewContext(config.RequestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		return nil, err
 	}
 
-	ctx, cancel, err := api.Conn.NewContext(config.RequestConfig)
+	ctx, cancel, err := api.Pool.NewContext(config.RequestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +269,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(rows []*structs.Node, config *configu
 			return nil, err
 		}
 
-		ctx, cancel, err := api.Conn.NewContext(config.RequestConfig)
+		ctx, cancel, err := api.Pool.NewContext(config.RequestConfig)
 		if err != nil {
 			return nil, err
 		}

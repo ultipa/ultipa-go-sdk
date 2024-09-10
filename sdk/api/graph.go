@@ -94,7 +94,7 @@ func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, requestConfig *config
 	//    }
 	//
 	//    api.Logger.Log("Detecting New Graph - " + graph.Name + " Leader")
-	//    clusterErr := api.Conn.RefreshClusterInfo(graph.Name)
+	//    clusterErr := api.Pool.RefreshClusterInfo(graph.Name)
 	//
 	//    if clusterErr != nil {
 	//        if reflect.TypeOf(clusterErr).Elem().String() != "utils.LeaderNotYetElectedError" {
@@ -104,7 +104,7 @@ func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, requestConfig *config
 	//        continue
 	//    }
 	//
-	//    conn := api.Conn.GraphMgr.GetLeader(graph.Name)
+	//    conn := api.Pool.GraphMgr.GetLeader(graph.Name)
 	//
 	//    if conn != nil {
 	//        api.Logger.Log("Detected New Graph - " + graph.Name + " Leader - OK")
@@ -236,26 +236,26 @@ func (api *UltipaAPI) Compact(graphName string, requestConfig *configuration.Req
 	return http.GetJobResponseFromUqlResponse(resp)
 }
 
-func (api *UltipaAPI) MountGraph(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
-	uql := fmt.Sprintf(`mount().graph("%v")`, graphName)
-
-	resp, err := api.Uql(uql, requestConfig)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
-func (api *UltipaAPI) UnmountGraph(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
-	uql := fmt.Sprintf(`unmount().graph("%v")`, graphName)
-
-	resp, err := api.Uql(uql, requestConfig)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
+//func (api *UltipaAPI) MountGraph(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+//	uql := fmt.Sprintf(`mount().graph("%v")`, graphName)
+//
+//	resp, err := api.Uql(uql, requestConfig)
+//
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return resp, nil
+//}
+//
+//func (api *UltipaAPI) UnmountGraph(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+//	uql := fmt.Sprintf(`unmount().graph("%v")`, graphName)
+//
+//	resp, err := api.Uql(uql, requestConfig)
+//
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return resp, nil
+//}

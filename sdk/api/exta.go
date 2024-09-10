@@ -55,7 +55,7 @@ package api
 //        return nil, err
 //    }
 //
-//    ctx, cancel, err := api.Conn.NewContext(requestConfig)
+//    ctx, cancel, err := api.Pool.NewContext(requestConfig)
 //    if err != nil {
 //        return nil, err
 //    }
@@ -140,7 +140,7 @@ package api
 //        return nil, err
 //    }
 //
-//    ctx, cancel, err := api.Conn.NewContext(requestConfig)
+//    ctx, cancel, err := api.Pool.NewContext(requestConfig)
 //    if err != nil {
 //        return nil, err
 //    }
