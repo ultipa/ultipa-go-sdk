@@ -23,7 +23,7 @@ func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EntityTable, config *config
 		return nil, err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(config.RequestConfig)
+	ctx, cancel, err := api.Conn.NewContext(config.RequestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 		return nil, err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(config.RequestConfig)
+	ctx, cancel, err := api.Conn.NewContext(config.RequestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -276,7 +276,7 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(rows []*structs.Edge, config *configu
 			return nil, err
 		}
 
-		ctx, cancel, err := api.Pool.NewContext(config.RequestConfig)
+		ctx, cancel, err := api.Conn.NewContext(config.RequestConfig)
 		if err != nil {
 			return nil, err
 		}

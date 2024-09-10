@@ -8,7 +8,7 @@ import (
 )
 
 // Version represents the current version of the SDK.
-const Version = "v4.5.0"
+const Version = "v5.0.0-new"
 
 // NewUltipa Create an Ultipa Client
 func NewUltipa(config *configuration.UltipaConfig) (*api.UltipaAPI, error) {
@@ -16,16 +16,16 @@ func NewUltipa(config *configuration.UltipaConfig) (*api.UltipaAPI, error) {
 	config.FillDefault()
 
 	// set connection pool
-	pool, err := connection.NewConnectionPool(config)
+	pool, err := connection.NewConnection(config)
 	if err != nil {
 		return nil, err
 	}
-	// set heartbeat for Connection Pool
-	pool.RunHeartBeat()
-
-	if err != nil {
-		return nil, err
-	}
+	//// set heartbeat for Connection Conn
+	//pool.RunHeartBeat()
+	//
+	//if err != nil {
+	//    return nil, err
+	//}
 
 	return api.NewUltipaAPI(pool), err
 }

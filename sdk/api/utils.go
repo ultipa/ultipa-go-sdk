@@ -6,7 +6,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ultipa/ultipa-go-sdk/sdk/connection"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
@@ -22,50 +21,50 @@ const (
 	UQLType_Global = 3
 )
 
-func (api *UltipaAPI) RefreshClusterInfo(graphName string) error {
-	return api.Pool.RefreshClusterInfo(graphName)
-}
+//func (api *UltipaAPI) RefreshClusterInfo(graphName string) error {
+//    return api.Conn.RefreshClusterInfo(graphName)
+//}
 
-func (api *UltipaAPI) GetConnByUQL(uql string, graphName string) (uqlType UQLType, leader *connection.Connection, followers []*connection.Connection, global *connection.Connection, err error) {
-
-	graph := api.Pool.GraphMgr.GetGraph(graphName)
-
-	if graph == nil {
-		err = api.Pool.RefreshClusterInfo(graphName)
-		if err != nil {
-			return 0, nil, nil, nil, err
-		}
-		graph = api.Pool.GraphMgr.GetGraph(graphName)
-	}
-
-	// refresh , but not get graph info
-	if graph == nil {
-		return 0, nil, nil, nil, errors.New("unavailable to get graph cluster infos : " + graphName)
-	}
-
-	leader = api.Pool.GraphMgr.GetLeader(graphName)
-	if leader == nil {
-		return 0, nil, nil, nil, errors.New(fmt.Sprintf("no leader found for graph %s", graphName))
-	}
-
-	followers = api.Pool.GraphMgr.GetGraph(graphName).Followers
-	global, err = api.Pool.GetGlobalMasterConn(nil)
-
-	uqlItem := utils.NewUql(uql)
-
-	uqlType = UQLType_Normal
-
-	if uqlItem.HasWrite() {
-		uqlType = UQLType_Master
-	}
-
-	if uqlItem.IsGlobal() {
-		uqlType = UQLType_Global
-	}
-
-	return uqlType, leader, followers, global, err
-
-}
+//func (api *UltipaAPI) GetConnByUQL(uql string, graphName string) (uqlType UQLType, leader *connection.Connection, followers []*connection.Connection, global *connection.Connection, err error) {
+//
+//    graph := api.Conn.GraphMgr.GetGraph(graphName)
+//
+//    if graph == nil {
+//        err = api.Conn.RefreshClusterInfo(graphName)
+//        if err != nil {
+//            return 0, nil, nil, nil, err
+//        }
+//        graph = api.Conn.GraphMgr.GetGraph(graphName)
+//    }
+//
+//    // refresh , but not get graph info
+//    if graph == nil {
+//        return 0, nil, nil, nil, errors.New("unavailable to get graph cluster infos : " + graphName)
+//    }
+//
+//    leader = api.Conn.GraphMgr.GetLeader(graphName)
+//    if leader == nil {
+//        return 0, nil, nil, nil, errors.New(fmt.Sprintf("no leader found for graph %s", graphName))
+//    }
+//
+//    followers = api.Conn.GraphMgr.GetGraph(graphName).Followers
+//    global, err = api.Conn.GetGlobalMasterConn(nil)
+//
+//    uqlItem := utils.NewUql(uql)
+//
+//    uqlType = UQLType_Normal
+//
+//    if uqlItem.HasWrite() {
+//        uqlType = UQLType_Master
+//    }
+//
+//    if uqlItem.IsGlobal() {
+//        uqlType = UQLType_Global
+//    }
+//
+//    return uqlType, leader, followers, global, err
+//
+//}
 
 func CheckName(name string) error {
 	if len(name) < 2 || len(name) > 64 {

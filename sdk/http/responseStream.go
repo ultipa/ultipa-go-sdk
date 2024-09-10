@@ -15,14 +15,14 @@ type UQLResponseStream struct {
 		DataItem *DataItem
 		Index    int
 	}
-	Reply     *ultipa.UqlReply
+	Reply     *ultipa.QueryReply
 	Status    *Status
 	Statistic *Statistic
 	AliasList []string
-	Resp      ultipa.UltipaRpcs_UqlClient
+	Resp      ultipa.UltipaRpcs_QueryClient
 }
 
-func NewUQLResponseStream(resp ultipa.UltipaRpcs_UqlClient) (response *UQLResponseStream, err error) {
+func NewUQLResponseStream(resp ultipa.UltipaRpcs_QueryClient) (response *UQLResponseStream, err error) {
 
 	response = &UQLResponseStream{
 		Resp:   resp,

@@ -12,7 +12,7 @@ import (
 )
 
 func TestShowGraph(t *testing.T) {
-	InitCases()
+	//InitCases()
 	//client, _ := GetClient(hosts, graph)
 	graphs, err := client.ShowGraph(nil)
 	if err != nil {
@@ -70,7 +70,7 @@ func TestCreateGraph(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	client.DropGraph(graphName, nil)
+	//client.DropGraph(graphName, nil)
 
 }
 

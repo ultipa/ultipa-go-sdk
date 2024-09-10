@@ -17,20 +17,20 @@ type UQLResponse struct {
 		DataItem *DataItem
 		Index    int
 	}
-	Reply       *ultipa.UqlReply
+	Reply       *ultipa.QueryReply
 	Status      *Status
 	Statistic   *Statistic
 	ExplainPlan *ExplainPlan
 	AliasList   []string
-	Resp        ultipa.UltipaRpcs_UqlClient
+	Resp        ultipa.UltipaRpcs_QueryClient
 }
 
-func NewUQLResponse(resp ultipa.UltipaRpcs_UqlClient) (response *UQLResponse, err error) {
+func NewUQLResponse(resp ultipa.UltipaRpcs_QueryClient) (response *UQLResponse, err error) {
 
 	response = &UQLResponse{
 		Resp:   resp,
 		Status: &Status{},
-		//Reply:  &ultipa.UqlReply{},
+		//Reply:  &ultipa.QueryReply{},
 		DataItemMap: map[string]struct {
 			DataItem *DataItem
 			Index    int

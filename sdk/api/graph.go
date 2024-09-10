@@ -3,14 +3,11 @@ package api
 import (
 	"errors"
 	"fmt"
-	"reflect"
-	"strconv"
-	"time"
-
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"strconv"
 )
 
 func (api *UltipaAPI) ShowGraph(requestConfig *configuration.RequestConfig) (graphSets []*structs.GraphSet, err error) {
@@ -90,33 +87,33 @@ func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, requestConfig *config
 	api.Logger.Log("Creating Graph Request OK! - " + graph.Name)
 
 	// Try to detect the graph is created, default times is 600
-	times := 60
-	for {
-		if times < 0 {
-			break
-		}
-
-		api.Logger.Log("Detecting New Graph - " + graph.Name + " Leader")
-		clusterErr := api.Pool.RefreshClusterInfo(graph.Name)
-
-		if clusterErr != nil {
-			if reflect.TypeOf(clusterErr).Elem().String() != "utils.LeaderNotYetElectedError" {
-				api.Logger.Log(fmt.Sprintf("failed to detect New Graph - %s Leader", graph.Name))
-				return nil, clusterErr
-			}
-			continue
-		}
-
-		conn := api.Pool.GraphMgr.GetLeader(graph.Name)
-
-		if conn != nil {
-			api.Logger.Log("Detected New Graph - " + graph.Name + " Leader - OK")
-			break
-		}
-
-		time.Sleep(time.Second)
-		times--
-	}
+	//times := 60
+	//for {
+	//    if times < 0 {
+	//        break
+	//    }
+	//
+	//    api.Logger.Log("Detecting New Graph - " + graph.Name + " Leader")
+	//    clusterErr := api.Conn.RefreshClusterInfo(graph.Name)
+	//
+	//    if clusterErr != nil {
+	//        if reflect.TypeOf(clusterErr).Elem().String() != "utils.LeaderNotYetElectedError" {
+	//            api.Logger.Log(fmt.Sprintf("failed to detect New Graph - %s Leader", graph.Name))
+	//            return nil, clusterErr
+	//        }
+	//        continue
+	//    }
+	//
+	//    conn := api.Conn.GraphMgr.GetLeader(graph.Name)
+	//
+	//    if conn != nil {
+	//        api.Logger.Log("Detected New Graph - " + graph.Name + " Leader - OK")
+	//        break
+	//    }
+	//
+	//    time.Sleep(time.Second)
+	//    times--
+	//}
 
 	return resp, err
 }

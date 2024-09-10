@@ -22,6 +22,13 @@ var DEBUG bool
 func TestMain(m *testing.M) {
 	setup()
 
+	//conn, err := grpc.Dial("192.168.1.85:61299", grpc.WithInsecure())
+	//if err != nil {
+	//    log.Fatal(err)
+	//}
+	//
+	//client := ultipa.NewUltipaControlsClient(conn)
+	//client.SayHello()
 	m.Run()
 
 	teardown()

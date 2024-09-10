@@ -12,21 +12,16 @@ import (
 func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, taskId string, requestConfig *configuration.RequestConfig, receive func(data []byte) error) error {
 	var err error
 
-	client, err := api.GetControlClient(requestConfig)
+	client := api.Conn.GetControlClient()
 
-	if err != nil {
-		return err
-	}
-
-	ctx, cancel, err := api.Pool.NewContext(requestConfig)
+	ctx, cancel, err := api.Conn.NewContext(requestConfig)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	resp, err := client.DownloadFileV2(ctx, &ultipa.DownloadFileRequestV2{
+	resp, err := client.DownloadFile(ctx, &ultipa.DownloadFileRequest{
 		FileName: fileName,
-		TaskId:   taskId,
 	})
 
 	if err != nil {
@@ -52,13 +47,9 @@ func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, taskId string, req
 func (api *UltipaAPI) DownloadAllAlgoResultFile(taskId string, requestConfig *configuration.RequestConfig, receive func(data []byte, fileName string) error) error {
 	var err error
 
-	client, err := api.GetControlClient(requestConfig)
+	client := api.Conn.GetControlClient()
 
-	if err != nil {
-		return err
-	}
-
-	ctx, cancel, err := api.Pool.NewContext(requestConfig)
+	ctx, cancel, err := api.Conn.NewContext(requestConfig)
 	if err != nil {
 		return err
 	}
@@ -75,9 +66,9 @@ func (api *UltipaAPI) DownloadAllAlgoResultFile(taskId string, requestConfig *co
 	}
 
 	for _, file := range files {
-		resp, err := client.DownloadFileV2(ctx, &ultipa.DownloadFileRequestV2{
+		resp, err := client.DownloadFile(ctx, &ultipa.DownloadFileRequest{
 			FileName: file,
-			TaskId:   taskId,
+			//TaskId:   taskId,
 		})
 
 		if err != nil {

@@ -6,7 +6,7 @@ import (
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 )
 
-func CheckAliasExist(reply *ultipa.UqlReply, alias string) bool {
+func CheckAliasExist(reply *ultipa.QueryReply, alias string) bool {
 	for _, a := range reply.Alias {
 		if a.Alias == alias {
 			return true
@@ -16,7 +16,7 @@ func CheckAliasExist(reply *ultipa.UqlReply, alias string) bool {
 	return false
 }
 
-func FindAliasDataInReply(reply *ultipa.UqlReply, alias string) (data interface{}, t ultipa.ResultType) {
+func FindAliasDataInReply(reply *ultipa.QueryReply, alias string) (data interface{}, t ultipa.ResultType) {
 
 	if CheckAliasExist(reply, alias) == false {
 		return nil, ultipa.ResultType_RESULT_TYPE_UNSET
@@ -124,7 +124,7 @@ func FindAliasDataInReply(reply *ultipa.UqlReply, alias string) (data interface{
 //	return err
 //}
 
-func MergeUQLReply(reply1 *ultipa.UqlReply, reply2 *ultipa.UqlReply) *ultipa.UqlReply {
+func MergeUQLReply(reply1 *ultipa.QueryReply, reply2 *ultipa.QueryReply) *ultipa.QueryReply {
 
 	//err := MergeSameStruct(reply1, reply2)
 

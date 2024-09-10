@@ -19,13 +19,9 @@ type Listener interface {
 func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, requestConfig *configuration.RequestConfig, cb func(nodes []*structs.Node, edges []*structs.Edge) error) error {
 	var err error
 
-	client, err := api.GetControlClient(requestConfig)
+	client := api.Conn.GetControlClient()
 
-	if err != nil {
-		return err
-	}
-
-	ctx, cancel, err := api.Pool.NewContext(requestConfig)
+	ctx, cancel, err := api.Conn.NewContext(requestConfig)
 	if err != nil {
 		return err
 	}
@@ -130,13 +126,9 @@ func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, requ
 func (api *UltipaAPI) Export(request *ultipa.ExportRequest, listener Listener, requestConfig *configuration.RequestConfig) error {
 	var err error
 
-	client, err := api.GetControlClient(requestConfig)
+	client := api.Conn.GetControlClient()
 
-	if err != nil {
-		return err
-	}
-
-	ctx, cancel, err := api.Pool.NewContext(requestConfig)
+	ctx, cancel, err := api.Conn.NewContext(requestConfig)
 	if err != nil {
 		return err
 	}

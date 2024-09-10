@@ -23,7 +23,7 @@ func ParseExplainPlan(ex *ultipa.ExplainPlan) (*ExplainPlan, error) {
 			//Type:        planNode.GetType(),
 			Alias:       planNode.GetAlias(),
 			ChildrenNum: planNode.GetChildrenNum(),
-			Uql:         planNode.GetUql(),
+			Uql:         planNode.GetQueryText(),
 			Infos:       planNode.GetInfos(),
 		}
 		explainPlan.Explain = append(explainPlan.Explain, &explain)

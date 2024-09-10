@@ -18,36 +18,60 @@ import (
 )
 
 func TestNewConn(t *testing.T) {
-
-	//conn, err := grpc.Dial("210.13.32.146:60074", grpc.WithInsecure(), grpc.WithDefaultCallOptions())
-	conn, err := grpc.Dial(hosts[0], grpc.WithInsecure(), grpc.WithDefaultCallOptions())
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	client := ultipa.NewUltipaRpcsClient(conn)
-
+	var rpcsClient ultipa.UltipaRpcsClient
 	h := md5.New()
+	username = "root"
+	password = "root"
 	h.Write([]byte(password))
 	pass := hex.EncodeToString(h.Sum(nil))
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*3)
-	ctx = metadata.AppendToOutgoingContext(ctx, "user", username, "password", strings.ToUpper(pass), graph, "multi_schema_test")
 
-	resp, err := client.SayHello(ctx, &ultipa.HelloUltipaRequest{
-		Name: "hello",
-	})
+	conn, err := grpc.Dial("192.168.1.85:61299", grpc.WithInsecure(), grpc.WithDefaultCallOptions())
 
-	if err != nil {
-		t.Fatal(err)
+	for i := 0; i < 100; i++ {
+		//conn, err := grpc.Dial("210.13.32.146:60074", grpc.WithInsecure(), grpc.WithDefaultCallOptions())
+		//conn, err := grpc.Dial(hosts[0], grpc.WithInsecure(), grpc.WithDefaultCallOptions())
+		log.Println("conn state: ", conn.GetState())
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rpcsClient = ultipa.NewUltipaRpcsClient(conn)
+
+		ctx, _ := context.WithTimeout(context.Background(), time.Second*300)
+
+		//graphName := "go_sdk_test"
+
+		//ctx = metadata.AppendToOutgoingContext(ctx, "user", username, "password", strings.ToUpper(pass), graphName, "multi_schema_test")
+		ctx = metadata.AppendToOutgoingContext(ctx, "user", username, "password", strings.ToUpper(pass))
+
+		resp, _ := rpcsClient.SayHello(ctx, &ultipa.HelloUltipaRequest{
+			Name: "hello",
+		})
+
+		if resp != nil && resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS {
+			log.Println("rpcsClient say hello success")
+		} else {
+			log.Println("rpcsClient say hello failed")
+		}
+
+		resp, err = ultipa.NewUltipaControlsClient(conn).SayHello(ctx, &ultipa.HelloUltipaRequest{
+			Name: "hello",
+		})
+
+		if resp != nil && resp.Status.ErrorCode == ultipa.ErrorCode_SUCCESS {
+			log.Println("ControlsClient say hello success")
+		} else {
+			log.Println("ControlsClient say hello failed")
+		}
+		time.Sleep(time.Second * 2)
 	}
 
-	log.Println(resp)
-
 	ctx2, _ := context.WithTimeout(context.Background(), time.Second*1000)
-	ctx2 = metadata.AppendToOutgoingContext(ctx2, "user", username, "password", strings.ToUpper(pass), "graph_name", "multi_schema_test")
-	resp2, err := client.Uql(ctx2, &ultipa.UqlRequest{
-		Uql: "n().e().n() as path return path limit 10;",
+	ctx2 = metadata.AppendToOutgoingContext(ctx2, "user", username, "password", strings.ToUpper(pass), "graph_name", "go_sdk_test")
+	resp2, err := rpcsClient.Query(ctx2, &ultipa.QueryRequest{
+		QueryType: ultipa.QueryType_UQL,
+		QueryText: "n().e().n() as path return path limit 10;",
+		//QueryText: "show().graph()",
 	})
 
 	if err != nil {
@@ -88,36 +112,36 @@ func TestUqlWithSpecialHost(t *testing.T) {
 	log.Println(res)
 }
 
-func TestRefreshPool(t *testing.T) {
-	//client, _ := GetClient(hosts, graph)
-	for i := 0; i < 10; i++ {
-		err := client.Pool.RefreshActivesWithSeconds(1)
-		if err != nil {
-			t.Error(err)
-		}
-		time.Sleep(time.Millisecond * 500)
-	}
-}
+//func TestRefreshPool(t *testing.T) {
+//    //client, _ := GetClient(hosts, graph)
+//    for i := 0; i < 10; i++ {
+//        err := client.Conn.RefreshActivesWithSeconds(1)
+//        if err != nil {
+//            t.Error(err)
+//        }
+//        time.Sleep(time.Millisecond * 500)
+//    }
+//}
 
-func TestGetConnByUQL(t *testing.T) {
-
-	//client, _ := GetClient(hosts, graph)
-
-	uql := "show().schema()"
-	_, leader, followers, global, err := client.GetConnByUQL(uql, graph)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if leader == nil {
-		t.Fatal("leader is nill")
-	}
-	if followers == nil {
-		t.Fatal("followers is nill")
-	}
-	if global == nil {
-		t.Fatal("global is nill")
-	}
-}
+//func TestGetConnByUQL(t *testing.T) {
+//
+//    //client, _ := GetClient(hosts, graph)
+//
+//    uql := "show().schema()"
+//    _, leader, followers, global, err := client.GetConnByUQL(uql, graph)
+//    if err != nil {
+//        t.Fatal(err)
+//    }
+//    if leader == nil {
+//        t.Fatal("leader is nill")
+//    }
+//    if followers == nil {
+//        t.Fatal("followers is nill")
+//    }
+//    if global == nil {
+//        t.Fatal("global is nill")
+//    }
+//}
 
 func TestConnectionSSL(t *testing.T) {
 

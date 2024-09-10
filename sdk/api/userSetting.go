@@ -10,13 +10,9 @@ import (
 func (api *UltipaAPI) SetUserSetting(request *structs.SetUserSetting, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 	var err error
 
-	client, err := api.GetControlClient(requestConfig)
+	client := api.Conn.GetControlClient()
 
-	if err != nil {
-		return nil, err
-	}
-
-	ctx, cancel, err := api.Pool.NewContext(requestConfig)
+	ctx, cancel, err := api.Conn.NewContext(requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -54,13 +50,9 @@ func (api *UltipaAPI) SetUserSetting(request *structs.SetUserSetting, requestCon
 func (api *UltipaAPI) GetUserSetting(request *structs.GetUserSetting, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 	var err error
 
-	client, err := api.GetControlClient(requestConfig)
+	client := api.Conn.GetControlClient()
 
-	if err != nil {
-		return nil, err
-	}
-
-	ctx, cancel, err := api.Pool.NewContext(requestConfig)
+	ctx, cancel, err := api.Conn.NewContext(requestConfig)
 	if err != nil {
 		return nil, err
 	}

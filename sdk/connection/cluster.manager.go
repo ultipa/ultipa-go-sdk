@@ -8,18 +8,18 @@ Raft Cluster Manager, Update Raft Infos for client
 //	Leader *Connection
 //	Followers []*Connection
 //	Config *configuration.UltipaConfig
-//	Pool *ConnectionPool
+//	Conn *ConnectionPool
 //}
 //
 //func NewClusterManager(connP *ConnectionPool) *ClusterManager {
 //	return &ClusterManager{
 //		Config: connP.Config,
-//		Pool: connP,
+//		Conn: connP,
 //	}
 //}
 //
 //func (c *ClusterManager) RefreshGraphCluster(name string) error {
-//	conn, err := c.Pool.GetConn()
+//	conn, err := c.Conn.GetConn()
 //	defer conn.Close()
 //
 //	if err != nil {
@@ -27,7 +27,7 @@ Raft Cluster Manager, Update Raft Infos for client
 //	}
 //
 //	client := conn.GetClient()
-//	ctx, err := c.Pool.NewContext(nil)
+//	ctx, err := c.Conn.NewContext(nil)
 //
 //	if err != nil {
 //		return err

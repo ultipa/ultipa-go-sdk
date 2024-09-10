@@ -4,79 +4,40 @@ option go_package = ".;ultipa";
 
 package ultipa;
 
-
 // The ultipa service definition.
 service UltipaRpcs {
-  //1.Sends a greeting
-  rpc SayHello (HelloUltipaRequest) returns (HelloUltipaReply) {
-  }
-  //2.uql
-  rpc Uql (UqlRequest) returns (stream UqlReply) {
-  }
-
-  //3.插入点
-  rpc InsertNodes (InsertNodesRequest) returns (InsertNodesReply) {
-  }
-
-  //4.插入边
-  rpc InsertEdges (InsertEdgesRequest) returns (InsertEdgesReply) {
-  }
+  // Sends a greeting
+  rpc SayHello (HelloUltipaRequest) returns (HelloUltipaReply) {}
+  // Query
+  rpc Query (QueryRequest) returns (stream QueryReply) {}
+  // 插入点
+  rpc InsertNodes (InsertNodesRequest) returns (InsertNodesReply) {}
+  // 插入边
+  rpc InsertEdges (InsertEdgesRequest) returns (InsertEdgesReply) {}
 }
 
 service UltipaControls{
-  //1.Sends a greeting
-  rpc SayHello (HelloUltipaRequest) returns (HelloUltipaReply) {
-  }
-  //2.用户设置(用于存储用户配置信息,用户自主控制)
-  rpc UserSetting (UserSettingRequest) returns (UserSettingReply) {
-  }
-  //3. 获取raft的leader
-  rpc GetLeader (GetLeaderRequest) returns (GetLeaderReply) {
-  }
-  //4.uql扩展，以下命令在此接口执行执行 top, kill show().* stats
-  rpc UqlEx (UqlRequest) returns (stream UqlReply) {
-  }
-  //5.导出点,边数据
-  rpc Export (ExportRequest) returns (stream ExportReply) {
-  }
-  //6.下载算法生成文件
-  //下载算法生成文件 v2 下载文件请求改为 算法名 + 任务号
-  rpc DownloadFileV2 (DownloadFileRequestV2) returns (stream DownloadFileReply) {
-  }
+  // Sends a greeting
+  rpc SayHello (HelloUltipaRequest) returns (HelloUltipaReply) {}
+  // 用户设置(用于存储用户配置信息,用户自主控制)
+  rpc UserSetting (UserSettingRequest) returns (UserSettingReply) {}
+  // query扩展，以下命令在此接口执行执行 top, kill show().* stats
+  rpc QueryEx (QueryRequest) returns (stream QueryReply) {}
+  // 导出点,边数据
+  rpc Export (ExportRequest) returns (stream ExportReply) {}
+  // 下载算法生成文件
+  rpc DownloadFile (DownloadFileRequest) returns (stream DownloadFileReply) {}
+  // 算法安装
+  rpc InstallAlgo (stream InstallAlgoRequest) returns (InstallAlgoReply){}
 
-  //7.算法安装
-  rpc InstallAlgo (stream InstallAlgoRequest) returns (InstallAlgoReply){
-  }
-  //8.算法卸载
-  rpc UninstallAlgo (UninstallAlgoRequest) returns (UninstallAlgoReply){
-  }
-  //8.1 算法回退
-  rpc RollbackAlgo (RollbackAlgoRequest) returns (RollbackAlgoReply){
-  }
-
-  //9.remote graph loader
-  rpc Uploader (stream UploaderRequest) returns (UploaderReply){
-  }
-
-  //10.create graph by uploader
-  rpc CreateGraphByUploader (CreateGraphByUploaderRequest) returns (CreateGraphByUploaderReply){
-  }
-
-  //11.扩展算法安装
-  rpc InstallExta (stream InstallExtaRequest) returns (InstallExtaReply){
-  }
-  //12.扩展算法卸载
-  rpc UninstallExta (UninstallExtaRequest) returns (UninstallExtaReply){
-  }
-  //13.仅鉴权
-  rpc Authenticate (AuthenticateRequest) returns (AuthenticateReply){
-  }
-  //14.backup data
-  rpc Backup (BackupRequest) returns (BackupReply){
-  }
+  // 算法卸载
+  rpc UninstallAlgo (UninstallAlgoRequest) returns (UninstallAlgoReply){}
+  // 算法回退
+  rpc RollbackAlgo (RollbackAlgoRequest) returns (RollbackAlgoReply){}
+  // 仅鉴权
+  rpc Authenticate (AuthenticateRequest) returns (AuthenticateReply){}
 }
 
-/*------------------------1.SayHello------------------------------*/
 message HelloUltipaRequest {
   string name = 1;
 }
@@ -85,30 +46,29 @@ message HelloUltipaReply {
   Status status = 1;
   string message = 2;
 }
-/*--------------------------SayHello----------------------------*/
 
-/*------------------------2.Uql------------------------------*/
-/*
-*uql : ab.src(1).dest(2).depth(1).limit(10).select(*)
-*db_name : default
-*timeout  1s 单位:秒
-*/
-
-enum QLType {
-  QL_UNSET = 0;
+enum QueryType {
+  QUERY_UNSET = 0;
   UQL = 1;
   GQL = 2;
 }
 
-message UqlRequest {
-  string uql = 1;
-  uint32 timeout = 2;
-  string graph_name = 3;
-  string user_name = 4;
-  uint32 thread_num = 5;
-  string tz = 6;
-  string tz_offset = 7;
-  QLType ql = 8;
+/*
+*query_text : ab.src(1).dest(2).depth(1).limit(10).select(*)
+*query_type : UQL or GQL
+*db_name : default
+*timeout  1s 单位:秒
+*/
+
+message QueryRequest {
+  string query_text = 1;
+  QueryType query_type = 2;
+  uint32 timeout = 3;
+  string graph_name = 4;
+  string user_name = 5;
+  uint32 thread_num = 6;
+  string tz = 7;
+  string tz_offset = 8;
 }
 
 enum ResultType {
@@ -125,7 +85,7 @@ message ResultAlias {
   ResultType result_type = 2;
 }
 
-message UqlReply {
+message QueryReply {
   Status status = 1;
   int32 total_time_cost = 2;
   int32 engine_time_cost = 3;
@@ -181,10 +141,6 @@ message AttrMapData {
   bool is_null = 3;
 }
 
-/*------------------------2.Uql------------------------------*/
-
-
-/*------------------------3.UserSetting------------------------------*/
 message UserSettingRequest {
   enum OPTION {
     OPT_GET = 0;
@@ -202,22 +158,17 @@ message UserSettingReply {
   Status status = 1;
   string data = 2;
 }
-/*--------------------------UserSetting------------------------------*/
 
-/*------------------------4.Download------------------------------*/
 //下载算法生成文件
-message DownloadFileRequestV2 {
+message DownloadFileRequest {
   string file_name = 1;
-  string task_id = 2;
 }
 message DownloadFileReply {
   Status status = 1;
   int32 total_size = 2;
   bytes chunk = 3;
 }
-/*------------------------Download------------------------------*/
 
-/*------------------------5.Export------------------------------*/
 //导出数据
 // limit < 0 全量导出
 // limit >= 0 导出limit条
@@ -235,24 +186,13 @@ message ExportReply {
   EntityTable node_table = 2;
   EntityTable edge_table = 3;
 }
-/*------------------------Export------------------------------*/
-
-/*------------------------6.GetLeader------------------------------*/
-message GetLeaderRequest {
-  string graph_name = 1;
-}
-
-message GetLeaderReply {
-  Status status = 1;
-}
-/*--------------------------GetLeader----------------------------*/
 
 enum InsertType {
   NORMAL = 0;
   OVERWRITE = 1;
   UPSERT = 2;
 }
-/*------------------------7.InsertNodes------------------------------*/
+
 message InsertNodesRequest {
   EntityTable node_table = 1;
   //if true return ids
@@ -275,9 +215,7 @@ message InsertNodesReply {
   repeated uint32 ignore_error_code = 7;
   EntityTable nodes = 8; //for internal usage
 }
-/*------------------------InsertNodes------------------------------*/
 
-/*------------------------8.InsertEdges------------------------------*/
 message InsertEdgesRequest {
   EntityTable edge_table = 1;
   //if true return ids
@@ -298,9 +236,7 @@ message InsertEdgesReply {
   repeated uint32 ignore_error_code = 6;
   EntityTable edges = 7;
 }
-/*------------------------InsertEdges------------------------------*/
 
-/*------------------------10.InstallAlgo------------------------------*/
 message WithServer {
   string hdc_server_name = 1;
 }
@@ -314,9 +250,7 @@ message InstallAlgoRequest {
 message InstallAlgoReply {
   Status status = 1;
 }
-/*------------------------InstallAlgo------------------------------*/
 
-/*------------------------11.UninstallAlgo------------------------------*/
 message UninstallAlgoRequest {
   string algo_name = 1;
   WithServer with_server = 2;
@@ -325,9 +259,7 @@ message UninstallAlgoRequest {
 message UninstallAlgoReply {
   Status status = 1;
 }
-/*------------------------UninstallAlgo------------------------------*/
 
-/*------------------------RollbackAlgo------------------------------*/
 message RollbackAlgoRequest {
   string algo_name = 1;
   WithServer with_server = 2;
@@ -336,70 +268,6 @@ message RollbackAlgoRequest {
 message RollbackAlgoReply {
   Status status = 1;
 }
-/*------------------------RollbackAlgo------------------------------*/
-
-
-/*------------------------12.RemoteGraphLoader------------------------------*/
-message UploaderRequest {
-  DBType db_type = 1;
-  string graph_name = 2;
-  uint64 total_file_counts = 3 [jstype = JS_STRING];
-  string file_name = 4;
-  uint64 file_size = 5 [jstype = JS_STRING];
-  bytes chunk = 6;
-}
-
-message UploaderReply {
-  Status status = 1;
-}
-/*------------------------RemoteGraphLoader------------------------------*/
-
-/*------------------------13.RemoteGraphLoader------------------------------*/
-message CreateGraphByUploaderRequest {
-  string graph_name = 1;
-  string graph_description = 2;
-}
-
-message CreateGraphByUploaderReply {
-  Status status = 1;
-}
-/*------------------------RemoteGraphLoader------------------------------*/
-
-/*------------------------14.InstallExta------------------------------*/
-message InstallExtaRequest {
-  string file_name = 1;
-  string md5 = 2;
-  bytes chunk = 3;
-  WithServer with_server = 4;
-}
-
-message InstallExtaReply {
-  Status status = 1;
-}
-/*------------------------InstallExta------------------------------*/
-
-/*------------------------15.UninstallExta------------------------------*/
-message UninstallExtaRequest {
-  string exta_name = 1;
-  WithServer with_server = 2;
-}
-
-message UninstallExtaReply {
-  Status status = 1;
-}
-/*------------------------UninstallExta------------------------------*/
-
-/*------------------------16.Backup------------------------------*/
-message BackupRequest {
-  string backup_path = 1;
-}
-
-message BackupReply {
-  Status status = 1;
-}
-/*------------------------UninstallExta------------------------------*/
-
-/*------------------------public message-----------------------*/
 
 enum PropertyType {
   UNSET = 0;
@@ -430,22 +298,24 @@ enum ErrorCode {
   BASE_DB_ERROR = 3;
   ENGINE_ERROR = 4;
   SYSTEM_ERROR = 5;
-  RAFT_REDIRECT = 6;
-  RAFT_LEADER_NOT_YET_ELECTED = 7;
-  RAFT_LOG_ERROR = 8;
-  UQL_ERROR = 9;
-  NOT_RAFT_MODE = 10;
-  RAFT_NO_AVAILABLE_FOLLOWERS = 11;
-  RAFT_NO_AVAILABLE_ALGO_SERVERS = 12;
-  //鉴权失败
-  PERMISSION_DENIED = 13;
-  DUPLICATE_ID = 14;
+  SYNTAX_ERROR = 6;
+  PERMISSION_DENIED = 7;
+  DUPLICATE_ID = 8;
+
+  //for internal usage
+  RAFT_REDIRECT = 10001;
+  RAFT_LEADER_NOT_YET_ELECTED = 10002;
+  RAFT_LOG_ERROR = 10003;
+  NOT_RAFT_MODE = 10004;
+  RAFT_NO_AVAILABLE_FOLLOWERS = 10005;
+  RAFT_NO_AVAILABLE_ALGO_SERVERS = 10006;
+
 }
 
 message Status {
   ErrorCode error_code = 1;
   string msg = 2;
-  ClusterInfo cluster_info = 3;
+  ClusterInfo cluster_info = 3; //for internal usage
 }
 
 enum FollowerRole {
@@ -474,6 +344,7 @@ message ClusterInfo {
   repeated RaftFollower followers = 3;
   string leader_stream_address = 4;
 }
+
 
 enum DBType {
   DBNODE = 0;
@@ -559,13 +430,13 @@ message MapData {
 }
 
 
-enum TASK_STATUS {
-  TASK_PENDING = 0;
-  TASK_COMPUTING = 1;
-  TASK_WRITING = 2;
-  TASK_DONE = 3;
-  TASK_FAILED = 4;
-  TASK_STOPPED = 5;
+enum JOB_STATUS {
+  JOB_PENDING = 0;
+  JOB_COMPUTING = 1;
+  JOB_WRITING = 2;
+  JOB_DONE = 3;
+  JOB_FAILED = 4;
+  JOB_STOPPED = 5;
 }
 
 message ExplainPlan {
@@ -577,27 +448,26 @@ message PlanNode {
   string alias = 1;
   uint32 children_num = 2;
 
-  string uql = 3;
+  string query_text = 3;
   string infos = 4;
 }
 
 enum AuthenticateType {
-  PERMISSION_TYPE_UQL = 0;
-  PERMISSION_TYPE_INSERTNODES = 1;
-  PERMISSION_TYPE_INSERTEDGES = 2;
-  PERMISSION_TYPE_EXPORT = 3;
-  PERMISSION_TYPE_DOWNLOADFILE = 4;
-  PERMISSION_TYPE_INSTALLALGO = 5;
-  PERMISSION_TYPE_UNINSTALLALGO = 6;
-  PERMISSION_TYPE_UPLOADER = 7;
-  PERMISSION_TYPE_CREATEGRAPHBYUPLOADER = 8;
-  PERMISSION_TYPE_INSTALLEXTA = 9;
-  PERMISSION_TYPE_UNINSTALLEXTA = 10;
+  PERMISSION_TYPE_UNSET = 0;
+  PERMISSION_TYPE_UQL = 1;
+  PERMISSION_TYPE_GQL = 2;
+  PERMISSION_TYPE_INSERTNODES = 3;
+  PERMISSION_TYPE_INSERTEDGES = 4;
+  PERMISSION_TYPE_EXPORT = 5;
+  PERMISSION_TYPE_DOWNLOADFILE = 6;
+  PERMISSION_TYPE_INSTALLALGO = 7;
+  PERMISSION_TYPE_UNINSTALLALGO = 8;
+  PERMISSION_TYPE_ROLLBACKALGO = 9;
 }
 
 message AuthenticateRequest {
   AuthenticateType type = 1;
-  string uql = 2;
+  string query_text = 2;
 }
 
 message AuthenticateReply {
@@ -612,4 +482,12 @@ message MigrationDataArray {
   repeated MigrationData datas = 1;
 }
 
-/*------------------------public message-----------------------*/
+
+
+message GetLeaderRequest {
+  string graph_name = 1;
+}
+
+message GetLeaderReply {
+  Status status = 1;
+}

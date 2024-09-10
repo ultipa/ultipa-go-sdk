@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	UltipaRpcs_SayHello_FullMethodName    = "/ultipa.UltipaRpcs/SayHello"
-	UltipaRpcs_Uql_FullMethodName         = "/ultipa.UltipaRpcs/Uql"
+	UltipaRpcs_Query_FullMethodName       = "/ultipa.UltipaRpcs/Query"
 	UltipaRpcs_InsertNodes_FullMethodName = "/ultipa.UltipaRpcs/InsertNodes"
 	UltipaRpcs_InsertEdges_FullMethodName = "/ultipa.UltipaRpcs/InsertEdges"
 )
@@ -29,13 +29,13 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UltipaRpcsClient interface {
-	// 1.Sends a greeting
+	// Sends a greeting
 	SayHello(ctx context.Context, in *HelloUltipaRequest, opts ...grpc.CallOption) (*HelloUltipaReply, error)
-	// 2.uql
-	Uql(ctx context.Context, in *UqlRequest, opts ...grpc.CallOption) (UltipaRpcs_UqlClient, error)
-	// 3.插入点
+	// Query
+	Query(ctx context.Context, in *QueryRequest, opts ...grpc.CallOption) (UltipaRpcs_QueryClient, error)
+	// 插入点
 	InsertNodes(ctx context.Context, in *InsertNodesRequest, opts ...grpc.CallOption) (*InsertNodesReply, error)
-	// 4.插入边
+	// 插入边
 	InsertEdges(ctx context.Context, in *InsertEdgesRequest, opts ...grpc.CallOption) (*InsertEdgesReply, error)
 }
 
@@ -56,12 +56,12 @@ func (c *ultipaRpcsClient) SayHello(ctx context.Context, in *HelloUltipaRequest,
 	return out, nil
 }
 
-func (c *ultipaRpcsClient) Uql(ctx context.Context, in *UqlRequest, opts ...grpc.CallOption) (UltipaRpcs_UqlClient, error) {
-	stream, err := c.cc.NewStream(ctx, &UltipaRpcs_ServiceDesc.Streams[0], UltipaRpcs_Uql_FullMethodName, opts...)
+func (c *ultipaRpcsClient) Query(ctx context.Context, in *QueryRequest, opts ...grpc.CallOption) (UltipaRpcs_QueryClient, error) {
+	stream, err := c.cc.NewStream(ctx, &UltipaRpcs_ServiceDesc.Streams[0], UltipaRpcs_Query_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &ultipaRpcsUqlClient{stream}
+	x := &ultipaRpcsQueryClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -71,17 +71,17 @@ func (c *ultipaRpcsClient) Uql(ctx context.Context, in *UqlRequest, opts ...grpc
 	return x, nil
 }
 
-type UltipaRpcs_UqlClient interface {
-	Recv() (*UqlReply, error)
+type UltipaRpcs_QueryClient interface {
+	Recv() (*QueryReply, error)
 	grpc.ClientStream
 }
 
-type ultipaRpcsUqlClient struct {
+type ultipaRpcsQueryClient struct {
 	grpc.ClientStream
 }
 
-func (x *ultipaRpcsUqlClient) Recv() (*UqlReply, error) {
-	m := new(UqlReply)
+func (x *ultipaRpcsQueryClient) Recv() (*QueryReply, error) {
+	m := new(QueryReply)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -110,13 +110,13 @@ func (c *ultipaRpcsClient) InsertEdges(ctx context.Context, in *InsertEdgesReque
 // All implementations must embed UnimplementedUltipaRpcsServer
 // for forward compatibility
 type UltipaRpcsServer interface {
-	// 1.Sends a greeting
+	// Sends a greeting
 	SayHello(context.Context, *HelloUltipaRequest) (*HelloUltipaReply, error)
-	// 2.uql
-	Uql(*UqlRequest, UltipaRpcs_UqlServer) error
-	// 3.插入点
+	// Query
+	Query(*QueryRequest, UltipaRpcs_QueryServer) error
+	// 插入点
 	InsertNodes(context.Context, *InsertNodesRequest) (*InsertNodesReply, error)
-	// 4.插入边
+	// 插入边
 	InsertEdges(context.Context, *InsertEdgesRequest) (*InsertEdgesReply, error)
 	mustEmbedUnimplementedUltipaRpcsServer()
 }
@@ -128,8 +128,8 @@ type UnimplementedUltipaRpcsServer struct {
 func (UnimplementedUltipaRpcsServer) SayHello(context.Context, *HelloUltipaRequest) (*HelloUltipaReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
 }
-func (UnimplementedUltipaRpcsServer) Uql(*UqlRequest, UltipaRpcs_UqlServer) error {
-	return status.Errorf(codes.Unimplemented, "method Uql not implemented")
+func (UnimplementedUltipaRpcsServer) Query(*QueryRequest, UltipaRpcs_QueryServer) error {
+	return status.Errorf(codes.Unimplemented, "method Query not implemented")
 }
 func (UnimplementedUltipaRpcsServer) InsertNodes(context.Context, *InsertNodesRequest) (*InsertNodesReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InsertNodes not implemented")
@@ -168,24 +168,24 @@ func _UltipaRpcs_SayHello_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UltipaRpcs_Uql_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(UqlRequest)
+func _UltipaRpcs_Query_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(QueryRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(UltipaRpcsServer).Uql(m, &ultipaRpcsUqlServer{stream})
+	return srv.(UltipaRpcsServer).Query(m, &ultipaRpcsQueryServer{stream})
 }
 
-type UltipaRpcs_UqlServer interface {
-	Send(*UqlReply) error
+type UltipaRpcs_QueryServer interface {
+	Send(*QueryReply) error
 	grpc.ServerStream
 }
 
-type ultipaRpcsUqlServer struct {
+type ultipaRpcsQueryServer struct {
 	grpc.ServerStream
 }
 
-func (x *ultipaRpcsUqlServer) Send(m *UqlReply) error {
+func (x *ultipaRpcsQueryServer) Send(m *QueryReply) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -247,8 +247,8 @@ var UltipaRpcs_ServiceDesc = grpc.ServiceDesc{
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "Uql",
-			Handler:       _UltipaRpcs_Uql_Handler,
+			StreamName:    "Query",
+			Handler:       _UltipaRpcs_Query_Handler,
 			ServerStreams: true,
 		},
 	},
@@ -256,58 +256,39 @@ var UltipaRpcs_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	UltipaControls_SayHello_FullMethodName              = "/ultipa.UltipaControls/SayHello"
-	UltipaControls_UserSetting_FullMethodName           = "/ultipa.UltipaControls/UserSetting"
-	UltipaControls_GetLeader_FullMethodName             = "/ultipa.UltipaControls/GetLeader"
-	UltipaControls_UqlEx_FullMethodName                 = "/ultipa.UltipaControls/UqlEx"
-	UltipaControls_Export_FullMethodName                = "/ultipa.UltipaControls/Export"
-	UltipaControls_DownloadFileV2_FullMethodName        = "/ultipa.UltipaControls/DownloadFileV2"
-	UltipaControls_InstallAlgo_FullMethodName           = "/ultipa.UltipaControls/InstallAlgo"
-	UltipaControls_UninstallAlgo_FullMethodName         = "/ultipa.UltipaControls/UninstallAlgo"
-	UltipaControls_RollbackAlgo_FullMethodName          = "/ultipa.UltipaControls/RollbackAlgo"
-	UltipaControls_Uploader_FullMethodName              = "/ultipa.UltipaControls/Uploader"
-	UltipaControls_CreateGraphByUploader_FullMethodName = "/ultipa.UltipaControls/CreateGraphByUploader"
-	UltipaControls_InstallExta_FullMethodName           = "/ultipa.UltipaControls/InstallExta"
-	UltipaControls_UninstallExta_FullMethodName         = "/ultipa.UltipaControls/UninstallExta"
-	UltipaControls_Authenticate_FullMethodName          = "/ultipa.UltipaControls/Authenticate"
-	UltipaControls_Backup_FullMethodName                = "/ultipa.UltipaControls/Backup"
+	UltipaControls_SayHello_FullMethodName      = "/ultipa.UltipaControls/SayHello"
+	UltipaControls_UserSetting_FullMethodName   = "/ultipa.UltipaControls/UserSetting"
+	UltipaControls_QueryEx_FullMethodName       = "/ultipa.UltipaControls/QueryEx"
+	UltipaControls_Export_FullMethodName        = "/ultipa.UltipaControls/Export"
+	UltipaControls_DownloadFile_FullMethodName  = "/ultipa.UltipaControls/DownloadFile"
+	UltipaControls_InstallAlgo_FullMethodName   = "/ultipa.UltipaControls/InstallAlgo"
+	UltipaControls_UninstallAlgo_FullMethodName = "/ultipa.UltipaControls/UninstallAlgo"
+	UltipaControls_RollbackAlgo_FullMethodName  = "/ultipa.UltipaControls/RollbackAlgo"
+	UltipaControls_Authenticate_FullMethodName  = "/ultipa.UltipaControls/Authenticate"
 )
 
 // UltipaControlsClient is the client API for UltipaControls service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UltipaControlsClient interface {
-	// 1.Sends a greeting
+	// Sends a greeting
 	SayHello(ctx context.Context, in *HelloUltipaRequest, opts ...grpc.CallOption) (*HelloUltipaReply, error)
-	// 2.用户设置(用于存储用户配置信息,用户自主控制)
+	// 用户设置(用于存储用户配置信息,用户自主控制)
 	UserSetting(ctx context.Context, in *UserSettingRequest, opts ...grpc.CallOption) (*UserSettingReply, error)
-	// 3. 获取raft的leader
-	GetLeader(ctx context.Context, in *GetLeaderRequest, opts ...grpc.CallOption) (*GetLeaderReply, error)
-	// 4.uql扩展，以下命令在此接口执行执行 top, kill show().* stats
-	UqlEx(ctx context.Context, in *UqlRequest, opts ...grpc.CallOption) (UltipaControls_UqlExClient, error)
-	// 5.导出点,边数据
+	// query扩展，以下命令在此接口执行执行 top, kill show().* stats
+	QueryEx(ctx context.Context, in *QueryRequest, opts ...grpc.CallOption) (UltipaControls_QueryExClient, error)
+	// 导出点,边数据
 	Export(ctx context.Context, in *ExportRequest, opts ...grpc.CallOption) (UltipaControls_ExportClient, error)
-	// 6.下载算法生成文件
-	// 下载算法生成文件 v2 下载文件请求改为 算法名 + 任务号
-	DownloadFileV2(ctx context.Context, in *DownloadFileRequestV2, opts ...grpc.CallOption) (UltipaControls_DownloadFileV2Client, error)
-	// 7.算法安装
+	// 下载算法生成文件
+	DownloadFile(ctx context.Context, in *DownloadFileRequest, opts ...grpc.CallOption) (UltipaControls_DownloadFileClient, error)
+	// 算法安装
 	InstallAlgo(ctx context.Context, opts ...grpc.CallOption) (UltipaControls_InstallAlgoClient, error)
-	// 8.算法卸载
+	// 算法卸载
 	UninstallAlgo(ctx context.Context, in *UninstallAlgoRequest, opts ...grpc.CallOption) (*UninstallAlgoReply, error)
-	// 8.1 算法回退
+	// 算法回退
 	RollbackAlgo(ctx context.Context, in *RollbackAlgoRequest, opts ...grpc.CallOption) (*RollbackAlgoReply, error)
-	// 9.remote graph loader
-	Uploader(ctx context.Context, opts ...grpc.CallOption) (UltipaControls_UploaderClient, error)
-	// 10.create graph by uploader
-	CreateGraphByUploader(ctx context.Context, in *CreateGraphByUploaderRequest, opts ...grpc.CallOption) (*CreateGraphByUploaderReply, error)
-	// 11.扩展算法安装
-	InstallExta(ctx context.Context, opts ...grpc.CallOption) (UltipaControls_InstallExtaClient, error)
-	// 12.扩展算法卸载
-	UninstallExta(ctx context.Context, in *UninstallExtaRequest, opts ...grpc.CallOption) (*UninstallExtaReply, error)
-	// 13.仅鉴权
+	// 仅鉴权
 	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateReply, error)
-	// 14.backup data
-	Backup(ctx context.Context, in *BackupRequest, opts ...grpc.CallOption) (*BackupReply, error)
 }
 
 type ultipaControlsClient struct {
@@ -336,21 +317,12 @@ func (c *ultipaControlsClient) UserSetting(ctx context.Context, in *UserSettingR
 	return out, nil
 }
 
-func (c *ultipaControlsClient) GetLeader(ctx context.Context, in *GetLeaderRequest, opts ...grpc.CallOption) (*GetLeaderReply, error) {
-	out := new(GetLeaderReply)
-	err := c.cc.Invoke(ctx, UltipaControls_GetLeader_FullMethodName, in, out, opts...)
+func (c *ultipaControlsClient) QueryEx(ctx context.Context, in *QueryRequest, opts ...grpc.CallOption) (UltipaControls_QueryExClient, error) {
+	stream, err := c.cc.NewStream(ctx, &UltipaControls_ServiceDesc.Streams[0], UltipaControls_QueryEx_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
-}
-
-func (c *ultipaControlsClient) UqlEx(ctx context.Context, in *UqlRequest, opts ...grpc.CallOption) (UltipaControls_UqlExClient, error) {
-	stream, err := c.cc.NewStream(ctx, &UltipaControls_ServiceDesc.Streams[0], UltipaControls_UqlEx_FullMethodName, opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &ultipaControlsUqlExClient{stream}
+	x := &ultipaControlsQueryExClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -360,17 +332,17 @@ func (c *ultipaControlsClient) UqlEx(ctx context.Context, in *UqlRequest, opts .
 	return x, nil
 }
 
-type UltipaControls_UqlExClient interface {
-	Recv() (*UqlReply, error)
+type UltipaControls_QueryExClient interface {
+	Recv() (*QueryReply, error)
 	grpc.ClientStream
 }
 
-type ultipaControlsUqlExClient struct {
+type ultipaControlsQueryExClient struct {
 	grpc.ClientStream
 }
 
-func (x *ultipaControlsUqlExClient) Recv() (*UqlReply, error) {
-	m := new(UqlReply)
+func (x *ultipaControlsQueryExClient) Recv() (*QueryReply, error) {
+	m := new(QueryReply)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -409,12 +381,12 @@ func (x *ultipaControlsExportClient) Recv() (*ExportReply, error) {
 	return m, nil
 }
 
-func (c *ultipaControlsClient) DownloadFileV2(ctx context.Context, in *DownloadFileRequestV2, opts ...grpc.CallOption) (UltipaControls_DownloadFileV2Client, error) {
-	stream, err := c.cc.NewStream(ctx, &UltipaControls_ServiceDesc.Streams[2], UltipaControls_DownloadFileV2_FullMethodName, opts...)
+func (c *ultipaControlsClient) DownloadFile(ctx context.Context, in *DownloadFileRequest, opts ...grpc.CallOption) (UltipaControls_DownloadFileClient, error) {
+	stream, err := c.cc.NewStream(ctx, &UltipaControls_ServiceDesc.Streams[2], UltipaControls_DownloadFile_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &ultipaControlsDownloadFileV2Client{stream}
+	x := &ultipaControlsDownloadFileClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -424,16 +396,16 @@ func (c *ultipaControlsClient) DownloadFileV2(ctx context.Context, in *DownloadF
 	return x, nil
 }
 
-type UltipaControls_DownloadFileV2Client interface {
+type UltipaControls_DownloadFileClient interface {
 	Recv() (*DownloadFileReply, error)
 	grpc.ClientStream
 }
 
-type ultipaControlsDownloadFileV2Client struct {
+type ultipaControlsDownloadFileClient struct {
 	grpc.ClientStream
 }
 
-func (x *ultipaControlsDownloadFileV2Client) Recv() (*DownloadFileReply, error) {
+func (x *ultipaControlsDownloadFileClient) Recv() (*DownloadFileReply, error) {
 	m := new(DownloadFileReply)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -493,104 +465,9 @@ func (c *ultipaControlsClient) RollbackAlgo(ctx context.Context, in *RollbackAlg
 	return out, nil
 }
 
-func (c *ultipaControlsClient) Uploader(ctx context.Context, opts ...grpc.CallOption) (UltipaControls_UploaderClient, error) {
-	stream, err := c.cc.NewStream(ctx, &UltipaControls_ServiceDesc.Streams[4], UltipaControls_Uploader_FullMethodName, opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &ultipaControlsUploaderClient{stream}
-	return x, nil
-}
-
-type UltipaControls_UploaderClient interface {
-	Send(*UploaderRequest) error
-	CloseAndRecv() (*UploaderReply, error)
-	grpc.ClientStream
-}
-
-type ultipaControlsUploaderClient struct {
-	grpc.ClientStream
-}
-
-func (x *ultipaControlsUploaderClient) Send(m *UploaderRequest) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *ultipaControlsUploaderClient) CloseAndRecv() (*UploaderReply, error) {
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	m := new(UploaderReply)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *ultipaControlsClient) CreateGraphByUploader(ctx context.Context, in *CreateGraphByUploaderRequest, opts ...grpc.CallOption) (*CreateGraphByUploaderReply, error) {
-	out := new(CreateGraphByUploaderReply)
-	err := c.cc.Invoke(ctx, UltipaControls_CreateGraphByUploader_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *ultipaControlsClient) InstallExta(ctx context.Context, opts ...grpc.CallOption) (UltipaControls_InstallExtaClient, error) {
-	stream, err := c.cc.NewStream(ctx, &UltipaControls_ServiceDesc.Streams[5], UltipaControls_InstallExta_FullMethodName, opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &ultipaControlsInstallExtaClient{stream}
-	return x, nil
-}
-
-type UltipaControls_InstallExtaClient interface {
-	Send(*InstallExtaRequest) error
-	CloseAndRecv() (*InstallExtaReply, error)
-	grpc.ClientStream
-}
-
-type ultipaControlsInstallExtaClient struct {
-	grpc.ClientStream
-}
-
-func (x *ultipaControlsInstallExtaClient) Send(m *InstallExtaRequest) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *ultipaControlsInstallExtaClient) CloseAndRecv() (*InstallExtaReply, error) {
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	m := new(InstallExtaReply)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *ultipaControlsClient) UninstallExta(ctx context.Context, in *UninstallExtaRequest, opts ...grpc.CallOption) (*UninstallExtaReply, error) {
-	out := new(UninstallExtaReply)
-	err := c.cc.Invoke(ctx, UltipaControls_UninstallExta_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *ultipaControlsClient) Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateReply, error) {
 	out := new(AuthenticateReply)
 	err := c.cc.Invoke(ctx, UltipaControls_Authenticate_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *ultipaControlsClient) Backup(ctx context.Context, in *BackupRequest, opts ...grpc.CallOption) (*BackupReply, error) {
-	out := new(BackupReply)
-	err := c.cc.Invoke(ctx, UltipaControls_Backup_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -601,37 +478,24 @@ func (c *ultipaControlsClient) Backup(ctx context.Context, in *BackupRequest, op
 // All implementations must embed UnimplementedUltipaControlsServer
 // for forward compatibility
 type UltipaControlsServer interface {
-	// 1.Sends a greeting
+	// Sends a greeting
 	SayHello(context.Context, *HelloUltipaRequest) (*HelloUltipaReply, error)
-	// 2.用户设置(用于存储用户配置信息,用户自主控制)
+	// 用户设置(用于存储用户配置信息,用户自主控制)
 	UserSetting(context.Context, *UserSettingRequest) (*UserSettingReply, error)
-	// 3. 获取raft的leader
-	GetLeader(context.Context, *GetLeaderRequest) (*GetLeaderReply, error)
-	// 4.uql扩展，以下命令在此接口执行执行 top, kill show().* stats
-	UqlEx(*UqlRequest, UltipaControls_UqlExServer) error
-	// 5.导出点,边数据
+	// query扩展，以下命令在此接口执行执行 top, kill show().* stats
+	QueryEx(*QueryRequest, UltipaControls_QueryExServer) error
+	// 导出点,边数据
 	Export(*ExportRequest, UltipaControls_ExportServer) error
-	// 6.下载算法生成文件
-	// 下载算法生成文件 v2 下载文件请求改为 算法名 + 任务号
-	DownloadFileV2(*DownloadFileRequestV2, UltipaControls_DownloadFileV2Server) error
-	// 7.算法安装
+	// 下载算法生成文件
+	DownloadFile(*DownloadFileRequest, UltipaControls_DownloadFileServer) error
+	// 算法安装
 	InstallAlgo(UltipaControls_InstallAlgoServer) error
-	// 8.算法卸载
+	// 算法卸载
 	UninstallAlgo(context.Context, *UninstallAlgoRequest) (*UninstallAlgoReply, error)
-	// 8.1 算法回退
+	// 算法回退
 	RollbackAlgo(context.Context, *RollbackAlgoRequest) (*RollbackAlgoReply, error)
-	// 9.remote graph loader
-	Uploader(UltipaControls_UploaderServer) error
-	// 10.create graph by uploader
-	CreateGraphByUploader(context.Context, *CreateGraphByUploaderRequest) (*CreateGraphByUploaderReply, error)
-	// 11.扩展算法安装
-	InstallExta(UltipaControls_InstallExtaServer) error
-	// 12.扩展算法卸载
-	UninstallExta(context.Context, *UninstallExtaRequest) (*UninstallExtaReply, error)
-	// 13.仅鉴权
+	// 仅鉴权
 	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateReply, error)
-	// 14.backup data
-	Backup(context.Context, *BackupRequest) (*BackupReply, error)
 	mustEmbedUnimplementedUltipaControlsServer()
 }
 
@@ -645,17 +509,14 @@ func (UnimplementedUltipaControlsServer) SayHello(context.Context, *HelloUltipaR
 func (UnimplementedUltipaControlsServer) UserSetting(context.Context, *UserSettingRequest) (*UserSettingReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserSetting not implemented")
 }
-func (UnimplementedUltipaControlsServer) GetLeader(context.Context, *GetLeaderRequest) (*GetLeaderReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetLeader not implemented")
-}
-func (UnimplementedUltipaControlsServer) UqlEx(*UqlRequest, UltipaControls_UqlExServer) error {
-	return status.Errorf(codes.Unimplemented, "method UqlEx not implemented")
+func (UnimplementedUltipaControlsServer) QueryEx(*QueryRequest, UltipaControls_QueryExServer) error {
+	return status.Errorf(codes.Unimplemented, "method QueryEx not implemented")
 }
 func (UnimplementedUltipaControlsServer) Export(*ExportRequest, UltipaControls_ExportServer) error {
 	return status.Errorf(codes.Unimplemented, "method Export not implemented")
 }
-func (UnimplementedUltipaControlsServer) DownloadFileV2(*DownloadFileRequestV2, UltipaControls_DownloadFileV2Server) error {
-	return status.Errorf(codes.Unimplemented, "method DownloadFileV2 not implemented")
+func (UnimplementedUltipaControlsServer) DownloadFile(*DownloadFileRequest, UltipaControls_DownloadFileServer) error {
+	return status.Errorf(codes.Unimplemented, "method DownloadFile not implemented")
 }
 func (UnimplementedUltipaControlsServer) InstallAlgo(UltipaControls_InstallAlgoServer) error {
 	return status.Errorf(codes.Unimplemented, "method InstallAlgo not implemented")
@@ -666,23 +527,8 @@ func (UnimplementedUltipaControlsServer) UninstallAlgo(context.Context, *Uninsta
 func (UnimplementedUltipaControlsServer) RollbackAlgo(context.Context, *RollbackAlgoRequest) (*RollbackAlgoReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RollbackAlgo not implemented")
 }
-func (UnimplementedUltipaControlsServer) Uploader(UltipaControls_UploaderServer) error {
-	return status.Errorf(codes.Unimplemented, "method Uploader not implemented")
-}
-func (UnimplementedUltipaControlsServer) CreateGraphByUploader(context.Context, *CreateGraphByUploaderRequest) (*CreateGraphByUploaderReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateGraphByUploader not implemented")
-}
-func (UnimplementedUltipaControlsServer) InstallExta(UltipaControls_InstallExtaServer) error {
-	return status.Errorf(codes.Unimplemented, "method InstallExta not implemented")
-}
-func (UnimplementedUltipaControlsServer) UninstallExta(context.Context, *UninstallExtaRequest) (*UninstallExtaReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UninstallExta not implemented")
-}
 func (UnimplementedUltipaControlsServer) Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Authenticate not implemented")
-}
-func (UnimplementedUltipaControlsServer) Backup(context.Context, *BackupRequest) (*BackupReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Backup not implemented")
 }
 func (UnimplementedUltipaControlsServer) mustEmbedUnimplementedUltipaControlsServer() {}
 
@@ -733,42 +579,24 @@ func _UltipaControls_UserSetting_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UltipaControls_GetLeader_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetLeaderRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UltipaControlsServer).GetLeader(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UltipaControls_GetLeader_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UltipaControlsServer).GetLeader(ctx, req.(*GetLeaderRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UltipaControls_UqlEx_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(UqlRequest)
+func _UltipaControls_QueryEx_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(QueryRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(UltipaControlsServer).UqlEx(m, &ultipaControlsUqlExServer{stream})
+	return srv.(UltipaControlsServer).QueryEx(m, &ultipaControlsQueryExServer{stream})
 }
 
-type UltipaControls_UqlExServer interface {
-	Send(*UqlReply) error
+type UltipaControls_QueryExServer interface {
+	Send(*QueryReply) error
 	grpc.ServerStream
 }
 
-type ultipaControlsUqlExServer struct {
+type ultipaControlsQueryExServer struct {
 	grpc.ServerStream
 }
 
-func (x *ultipaControlsUqlExServer) Send(m *UqlReply) error {
+func (x *ultipaControlsQueryExServer) Send(m *QueryReply) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -793,24 +621,24 @@ func (x *ultipaControlsExportServer) Send(m *ExportReply) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _UltipaControls_DownloadFileV2_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(DownloadFileRequestV2)
+func _UltipaControls_DownloadFile_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(DownloadFileRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(UltipaControlsServer).DownloadFileV2(m, &ultipaControlsDownloadFileV2Server{stream})
+	return srv.(UltipaControlsServer).DownloadFile(m, &ultipaControlsDownloadFileServer{stream})
 }
 
-type UltipaControls_DownloadFileV2Server interface {
+type UltipaControls_DownloadFileServer interface {
 	Send(*DownloadFileReply) error
 	grpc.ServerStream
 }
 
-type ultipaControlsDownloadFileV2Server struct {
+type ultipaControlsDownloadFileServer struct {
 	grpc.ServerStream
 }
 
-func (x *ultipaControlsDownloadFileV2Server) Send(m *DownloadFileReply) error {
+func (x *ultipaControlsDownloadFileServer) Send(m *DownloadFileReply) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -876,94 +704,6 @@ func _UltipaControls_RollbackAlgo_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UltipaControls_Uploader_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(UltipaControlsServer).Uploader(&ultipaControlsUploaderServer{stream})
-}
-
-type UltipaControls_UploaderServer interface {
-	SendAndClose(*UploaderReply) error
-	Recv() (*UploaderRequest, error)
-	grpc.ServerStream
-}
-
-type ultipaControlsUploaderServer struct {
-	grpc.ServerStream
-}
-
-func (x *ultipaControlsUploaderServer) SendAndClose(m *UploaderReply) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *ultipaControlsUploaderServer) Recv() (*UploaderRequest, error) {
-	m := new(UploaderRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func _UltipaControls_CreateGraphByUploader_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateGraphByUploaderRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UltipaControlsServer).CreateGraphByUploader(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UltipaControls_CreateGraphByUploader_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UltipaControlsServer).CreateGraphByUploader(ctx, req.(*CreateGraphByUploaderRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UltipaControls_InstallExta_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(UltipaControlsServer).InstallExta(&ultipaControlsInstallExtaServer{stream})
-}
-
-type UltipaControls_InstallExtaServer interface {
-	SendAndClose(*InstallExtaReply) error
-	Recv() (*InstallExtaRequest, error)
-	grpc.ServerStream
-}
-
-type ultipaControlsInstallExtaServer struct {
-	grpc.ServerStream
-}
-
-func (x *ultipaControlsInstallExtaServer) SendAndClose(m *InstallExtaReply) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *ultipaControlsInstallExtaServer) Recv() (*InstallExtaRequest, error) {
-	m := new(InstallExtaRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func _UltipaControls_UninstallExta_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UninstallExtaRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UltipaControlsServer).UninstallExta(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UltipaControls_UninstallExta_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UltipaControlsServer).UninstallExta(ctx, req.(*UninstallExtaRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _UltipaControls_Authenticate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AuthenticateRequest)
 	if err := dec(in); err != nil {
@@ -978,24 +718,6 @@ func _UltipaControls_Authenticate_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UltipaControlsServer).Authenticate(ctx, req.(*AuthenticateRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UltipaControls_Backup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BackupRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UltipaControlsServer).Backup(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UltipaControls_Backup_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UltipaControlsServer).Backup(ctx, req.(*BackupRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1016,10 +738,6 @@ var UltipaControls_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UltipaControls_UserSetting_Handler,
 		},
 		{
-			MethodName: "GetLeader",
-			Handler:    _UltipaControls_GetLeader_Handler,
-		},
-		{
 			MethodName: "UninstallAlgo",
 			Handler:    _UltipaControls_UninstallAlgo_Handler,
 		},
@@ -1028,26 +746,14 @@ var UltipaControls_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UltipaControls_RollbackAlgo_Handler,
 		},
 		{
-			MethodName: "CreateGraphByUploader",
-			Handler:    _UltipaControls_CreateGraphByUploader_Handler,
-		},
-		{
-			MethodName: "UninstallExta",
-			Handler:    _UltipaControls_UninstallExta_Handler,
-		},
-		{
 			MethodName: "Authenticate",
 			Handler:    _UltipaControls_Authenticate_Handler,
-		},
-		{
-			MethodName: "Backup",
-			Handler:    _UltipaControls_Backup_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "UqlEx",
-			Handler:       _UltipaControls_UqlEx_Handler,
+			StreamName:    "QueryEx",
+			Handler:       _UltipaControls_QueryEx_Handler,
 			ServerStreams: true,
 		},
 		{
@@ -1056,23 +762,13 @@ var UltipaControls_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 		{
-			StreamName:    "DownloadFileV2",
-			Handler:       _UltipaControls_DownloadFileV2_Handler,
+			StreamName:    "DownloadFile",
+			Handler:       _UltipaControls_DownloadFile_Handler,
 			ServerStreams: true,
 		},
 		{
 			StreamName:    "InstallAlgo",
 			Handler:       _UltipaControls_InstallAlgo_Handler,
-			ClientStreams: true,
-		},
-		{
-			StreamName:    "Uploader",
-			Handler:       _UltipaControls_Uploader_Handler,
-			ClientStreams: true,
-		},
-		{
-			StreamName:    "InstallExta",
-			Handler:       _UltipaControls_InstallExta_Handler,
 			ClientStreams: true,
 		},
 	},
