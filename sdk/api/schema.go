@@ -111,7 +111,7 @@ func (api *UltipaAPI) GetSchema(schemaName string, dbType ultipa.DBType, request
 		}
 	}
 
-	return nil, nil
+	return nil, fmt.Errorf("schema [%s] not exist in db", schemaName)
 }
 
 func (api *UltipaAPI) GetNodeSchema(schemaName string, requestConfig *configuration.RequestConfig) (*structs.Schema, error) {
