@@ -74,7 +74,6 @@ func (p *Policy) ToCreatePolicyUql() string {
 
 	if p.Policies != nil {
 		s = utils.ToJSONString(p.Policies) + ",\n"
-		uql += s
 	} else {
 		s = "[],\n"
 	}

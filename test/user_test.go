@@ -17,7 +17,7 @@ func TestUser(t *testing.T) {
 		fmt.Println(user)
 	}
 
-	user, err := client.GetUser("yu", nil)
+	user, err := client.GetUser("root", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -30,30 +30,31 @@ func TestUserUql(t *testing.T) {
 	//	"default": []string{"UPDATE", "DELETE"},
 	//	"amz":     []string{"UPDATE"},
 	//}
-	pp := structs.PropertyPrivileges{
-		"node": {
-			"read":  {},
-			"write": {{"default", "*", "*"}, {"amz", "nodx", "age"}},
-			"deny":  {},
-		},
-		"edge": {
-			"read":  {},
-			"write": {{"default", "*", "*"}},
-			"deny":  {},
-		},
-	}
+	//pp := structs.PropertyPrivileges{
+	//    "node": {
+	//        "read":  {},
+	//        "write": {{"default", "*", "*"}, {"amz", "nodx", "age"}},
+	//        "deny":  {},
+	//    },
+	//    "edge": {
+	//        "read":  {},
+	//        "write": {{"default", "*", "*"}},
+	//        "deny":  {},
+	//    },
+	//}
 
 	p := structs.CreateUser{
-		UserName:           "yu2345",
-		PassWord:           "111asdad2",
-		GraphPrivileges:    structs.GraphPrivileges{},
-		SystemPrivileges:   []string{},
-		PropertyPrivileges: pp,
+		UserName: "gosdk",
+		PassWord: "gosdk1212",
+		//GraphPrivileges:  structs.GraphPrivileges{},
+		//SystemPrivileges: []string{},
+		//PropertyPrivileges: pp,
 		//AsPolicies:           []string{"yu"},
-		Policies: []string{"yu"},
+		//Policies: []string{"yu"},
 	}
 
 	fmt.Println(p.ToCreateUserUql())
+
 	p1 := structs.AlterUser(p)
 	fmt.Println(p1.ToAlterUserUql())
 

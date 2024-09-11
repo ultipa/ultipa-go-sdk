@@ -23,7 +23,7 @@ func TestCreateIndex(t *testing.T) {
 	//    t.Fatal(err)
 	//}
 
-	resp, err := client.CreateNodeIndex("@t1.name(10)", "name212sssds11", nil)
+	resp, err := client.CreateNodeIndex("@`中文Schema`.`中文Property(10)`", "name1", nil)
 
 	if err != nil {
 		t.Error(err)

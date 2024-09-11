@@ -23,31 +23,32 @@ import (
 // }
 // )
 type User struct {
-	UserName           string             `json:"-"`
-	PassWord           string             `json:"password,omitempty"`
-	Create             string             `json:"-"`
-	GraphPrivileges    GraphPrivileges    `json:"graph_privileges,omitempty"`
-	SystemPrivileges   []string           `json:"system_privileges,omitempty"`
-	Policies           []string           `json:"policies,omitempty"`
-	PropertyPrivileges PropertyPrivileges `json:"property_privileges,omitempty"`
+	UserName         string          `json:"-"`
+	PassWord         string          `json:"password,omitempty"`
+	LastLogin        string          `json:"lastLogin"`
+	Create           string          `json:"-"`
+	GraphPrivileges  GraphPrivileges `json:"graph_privileges,omitempty"`
+	SystemPrivileges []string        `json:"system_privileges,omitempty"`
+	Policies         []string        `json:"policies,omitempty"`
+	//PropertyPrivileges PropertyPrivileges `json:"property_privileges,omitempty"`
 }
 
 type CreateUser struct {
-	UserName           string             `json:"-"`
-	PassWord           string             `json:"password,omitempty"`
-	GraphPrivileges    GraphPrivileges    `json:"graph_privileges,omitempty"`
-	SystemPrivileges   []string           `json:"system_privileges,omitempty"`
-	Policies           []string           `json:"policies,omitempty"`
-	PropertyPrivileges PropertyPrivileges `json:"property_privileges,omitempty"`
+	UserName         string          `json:"-"`
+	PassWord         string          `json:"password,omitempty"`
+	GraphPrivileges  GraphPrivileges `json:"graph_privileges,omitempty"`
+	SystemPrivileges []string        `json:"system_privileges,omitempty"`
+	Policies         []string        `json:"policies,omitempty"`
+	//PropertyPrivileges PropertyPrivileges `json:"property_privileges,omitempty"`
 }
 
 type AlterUser struct {
-	UserName           string             `json:"-"`
-	PassWord           string             `json:"password,omitempty"`
-	GraphPrivileges    GraphPrivileges    `json:"graph_privileges,omitempty"`
-	SystemPrivileges   []string           `json:"system_privileges,omitempty"`
-	Policies           []string           `json:"policies,omitempty"`
-	PropertyPrivileges PropertyPrivileges `json:"property_privileges,omitempty"`
+	UserName         string          `json:"-"`
+	PassWord         string          `json:"password,omitempty"`
+	GraphPrivileges  GraphPrivileges `json:"graph_privileges,omitempty"`
+	SystemPrivileges []string        `json:"system_privileges,omitempty"`
+	Policies         []string        `json:"policies,omitempty"`
+	//PropertyPrivileges PropertyPrivileges `json:"property_privileges,omitempty"`
 }
 
 //func (p *User) ToCreateUserUql() string {
@@ -80,17 +81,17 @@ func (u *CreateUser) ToCreateUserUql() string {
 	if u.Policies != nil {
 		s = utils.ToJSONString(u.Policies) + ",\n"
 	} else {
-		s = "[],\n"
+		s = "[]\n"
 	}
 	uql += s
 
-	if u.PropertyPrivileges != nil {
-		s = utils.ToJSONString(u.PropertyPrivileges) + "\n"
-	} else {
-		s = "{}\n"
-	}
+	//if u.PropertyPrivileges != nil {
+	//    s = utils.ToJSONString(u.PropertyPrivileges) + "\n"
+	//} else {
+	//    s = "{}\n"
+	//}
 
-	uql += s
+	//uql += s
 
 	uql += ")"
 
@@ -137,13 +138,13 @@ func (u *AlterUser) ToAlterUserUql() string {
 		uql += s
 	}
 
-	if u.PropertyPrivileges != nil {
-		if s != "" {
-			s = ",\n"
-		}
-		s += "property_privileges:" + utils.ToJSONString(u.PropertyPrivileges)
-		uql += s
-	}
+	//if u.PropertyPrivileges != nil {
+	//    if s != "" {
+	//        s = ",\n"
+	//    }
+	//    s += "property_privileges:" + utils.ToJSONString(u.PropertyPrivileges)
+	//    uql += s
+	//}
 
 	uql += "\n})"
 

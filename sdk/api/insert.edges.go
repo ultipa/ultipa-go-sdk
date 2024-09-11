@@ -355,7 +355,7 @@ func (api *UltipaAPI) InsertEdges(schemaName string, edges []*structs.Edge, requ
 	}
 
 	uql := fmt.Sprintf(`%s.into(@%s).edges([%s])`, params, schemaName, structs.EdgesToInsertUql(edges))
-	if requestConfig.Silent {
+	if !requestConfig.Silent {
 		uql = uql + " as edges return edges{*}"
 	}
 	resp, err := api.Uql(uql, requestConfig.RequestConfig)

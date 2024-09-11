@@ -348,7 +348,7 @@ func (api *UltipaAPI) InsertNodes(schemaName string, nodes []*structs.Node, requ
 	}
 
 	uql := fmt.Sprintf(`%s.into(@%s).nodes([%s])`, params, schemaName, structs.NodesToInsertUql(nodes))
-	if requestConfig.Silent {
+	if !requestConfig.Silent {
 		uql = uql + " as nodes return nodes{*}"
 	}
 	resp, err := api.Uql(uql, requestConfig.RequestConfig)
