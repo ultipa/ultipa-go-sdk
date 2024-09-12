@@ -9,7 +9,10 @@ import (
 
 func (api *UltipaAPI) ShowLicense(requestConfig *configuration.RequestConfig) (license *structs.License, err error) {
 	uql := fmt.Sprintf("license.dump()")
+	return api.license(uql, requestConfig)
+}
 
+func (api *UltipaAPI) license(uql string, requestConfig *configuration.RequestConfig) (license *structs.License, err error) {
 	resp, err := api.Uql(uql, requestConfig)
 
 	if err != nil {

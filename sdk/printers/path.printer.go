@@ -30,23 +30,23 @@ func getPathTableString(paths []*structs.Path) string {
 		pathString := ""
 		for index, edge := range path.GetEdges() {
 			node := path.GetNodes()[index]
-			if edge == nil || node == nil {
+			if edge == 0 || node == 0 {
 				pathString = "nil"
 				continue
 			}
 			d1 := "-"
 			d2 := "-"
 
-			if edge.FromUUID == node.UUID {
-				d2 = "->"
-			} else {
-				d1 = "<-"
-			}
+			//if edge.FromUUID == node.UUID {
+			//	d2 = "->"
+			//} else {
+			//	d1 = "<-"
+			//}
 
-			pathString += fmt.Sprintf("(%v) %v [%v] %v ", node.UUID, d1, edge.UUID, d2)
+			pathString += fmt.Sprintf("(%v) %v [%v] %v ", node, d1, edge, d2)
 		}
-		if path.GetLastNode() != nil {
-			pathString += fmt.Sprintf("(%v)", path.GetLastNode().UUID)
+		if path.GetLastNode() != 0 {
+			pathString += fmt.Sprintf("(%v)", path.GetLastNode())
 		}
 		row = append(row, &simpletable.Cell{Text: pathString})
 		table.Body.Cells = append(table.Body.Cells, row)

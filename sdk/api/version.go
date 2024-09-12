@@ -22,9 +22,11 @@ func (api *UltipaAPI) GetServerVersion() (string, error) {
 	//}
 	//return "", nil
 
-	stats, err := api.Stats(nil)
-	if err != nil {
-		return "", err
-	}
-	return stats.Version, nil
+	//stats, err := api.Stats(nil)
+	//if err != nil {
+	//	return "", err
+	//}
+	//return stats.Version, nil
+	// 5.0 stats和license结构一样，没有version字段
+	return "", nil
 }

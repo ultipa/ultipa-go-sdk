@@ -369,13 +369,17 @@ func TestUqlFindPointProperty(t *testing.T) {
 
 func TestOnePathAsPaths(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
-	var uql = "ab().src(51).dest(103).depth(1) as paths return paths{}"
+	client.SetCurrentGraph("miniCircle")
+
+	//var uql = "ab().src(51).dest(103).depth(1) as paths return paths{}"
+	var uql = "n().e()[2].n() as paths return paths{} limit 100"
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	paths, _ := resp.Alias("paths").AsPaths()
-	printers.PrintPaths(paths)
+	paths, _ := resp.Alias("paths").AsGraph()
+	//printers.PrintPaths(paths)
+	t.Log(paths)
 }
 func TestDateTime(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)

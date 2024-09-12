@@ -226,7 +226,6 @@ func ExampleUltipaAPI_UQL2() {
 }
 
 func ExampleUltipaAPI_UQL3() {
-
 	resp, _ := client.Uql("n().e()[2].n() as paths return paths{*} limit 1", nil)
 	paths, err := resp.Get(0).AsPaths()
 

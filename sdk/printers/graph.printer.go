@@ -1,7 +1,6 @@
 package printers
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/alexeyco/simpletable"
@@ -9,19 +8,19 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func PrintGraph(graph *structs.Graph) {
-	if graph == nil {
-		fmt.Println("No graph data found.")
-		return
-	}
-	fmt.Println(getSchemaNameContent(ultipa.DBType_DBNODE, graph.NodeSchemas))
-	fmt.Println()
-	fmt.Println()
-	fmt.Println(getSchemaNameContent(ultipa.DBType_DBEDGE, graph.EdgeSchemas))
-
-	fmt.Println(getNodeTableString(graph.Nodes, graph.NodeSchemas))
-	fmt.Println(getEdgeTableString(graph.Edges, graph.EdgeSchemas))
-}
+//func PrintGraph(graph *structs.Graph) {
+//	if graph == nil {
+//		fmt.Println("No graph data found.")
+//		return
+//	}
+//	fmt.Println(getSchemaNameContent(ultipa.DBType_DBNODE, graph.Edges))
+//	fmt.Println()
+//	fmt.Println()
+//	fmt.Println(getSchemaNameContent(ultipa.DBType_DBEDGE, graph.EdgeSchemas))
+//
+//	fmt.Println(getNodeTableString(graph.Nodes, graph.NodeSchemas))
+//	fmt.Println(getEdgeTableString(graph.Edges, graph.EdgeSchemas))
+//}
 
 func getSchemaNameContent(dbType ultipa.DBType, schemas map[string]*structs.Schema) string {
 	table := simpletable.New()

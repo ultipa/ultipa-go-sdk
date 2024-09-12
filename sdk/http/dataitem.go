@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/ultipa/ultipa-go-sdk/sdk/types"
 	"log"
 	"strconv"
 	"time"
@@ -67,6 +68,20 @@ func NodeTableToNodes(nt *ultipa.EntityTable, alias string) ([]*structs.Node, ma
 	}
 
 	return nodes, schemas, nil
+}
+
+func NodeTableToUUIDs(nt *ultipa.EntityTable) []types.UUID {
+	uuids := make([]types.UUID, 0, len(nt.EntityRows))
+	for _, oNode := range nt.EntityRows {
+		if oNode.IsNull {
+			continue
+		}
+
+		uuids = append(uuids, oNode.Uuid)
+
+	}
+
+	return uuids
 }
 
 func EdgeTableToEdges(et *ultipa.EntityTable, alias string) ([]*structs.Edge, map[string]*structs.Schema, error) {
@@ -167,18 +182,19 @@ func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
 	}
 	pathAlias := di.Data.(*ultipa.PathAlias)
 
-	return parsePaths(pathAlias.Paths, pathAlias.Alias)
+	//return parsePaths(pathAlias.Paths, pathAlias.Alias)
+	return parsePaths(pathAlias.Paths)
 }
 
-func parsePaths(oPaths []*ultipa.Path, name string) (paths []*structs.Path, err error) {
+func parsePaths(oPaths []*ultipa.Path) (paths []*structs.Path, err error) {
 	for _, oPath := range oPaths {
-		path := structs.NewPath()
-		path.Name = name
-		path.Nodes, path.NodeSchemas, err = NodeTableToNodes(oPath.NodeTable, path.Name)
+		path := &structs.Path{}
+		//path.Name = name
+		path.NodeUUIDs = NodeTableToUUIDs(oPath.NodeTable)
 		if err != nil {
 			return nil, err
 		}
-		path.Edges, path.EdgeSchemas, err = EdgeTableToEdges(oPath.EdgeTable, path.Name)
+		path.EdgeUUIDs = NodeTableToUUIDs(oPath.EdgeTable)
 		if err != nil {
 			return nil, err
 		}
@@ -442,7 +458,7 @@ func parseAttrList(oAttr *ultipa.Attr, attr *structs.Attr) error {
 				resultType = listData.ResultType
 			}
 		case ultipa.ResultType_RESULT_TYPE_PATH:
-			paths, err := parsePaths(oListData.Paths, "")
+			paths, err := parsePaths(oListData.Paths)
 			if err != nil {
 				return err
 			}
@@ -891,38 +907,52 @@ func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {
 }
 
 // AsGraph convert graphAlias to structs.Graph for uql syntax toGraph(listUnion(collect(n1), collect(n2)), collect(e)) as graph return graph
-//func (di *DataItem) AsGraph() (graph *structs.Graph, err error) {
-//
-//	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
-//		return graph, nil
-//	}
-//
-//	if di.Type != ultipa.ResultType_RESULT_TYPE_GRAPH {
-//		return nil, errors.New(fmt.Sprintf("dataItem %s is not Graph result type", di.Alias))
-//	}
-//
-//	if di.Data == nil {
-//		return nil, nil
-//	}
-//	graphAlias := di.Data.(*ultipa.GraphAlias)
-//
-//	return parseGraphs(graphAlias.Graph, graphAlias.Alias)
-//}
+func (di *DataItem) AsGraph() (graph *structs.Graph, err error) {
+	paths, err := di.AsPaths()
+	if err != nil {
+		return nil, err
+	}
 
-//func parseGraphs(oGraph *ultipa.Graph, name string) (graph *structs.Graph, err error) {
-//	graph = structs.NewGraph()
-//	graph.Name = name
-//	graph.Nodes, graph.NodeSchemas, err = NodeTableToNodes(oGraph.NodeTable, "")
-//	if err != nil {
-//		return nil, err
-//	}
-//	graph.Edges, graph.EdgeSchemas, err = EdgeTableToEdges(oGraph.EdgeTable, "")
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	return graph, nil
-//}
+	if paths == nil {
+		return nil, errors.New("empty graphs")
+	}
+
+	pathAlias := di.Data.(*ultipa.PathAlias)
+
+	graph, err = parseGraphs(pathAlias.Paths)
+	if err != nil {
+		return nil, err
+	}
+	graph.Paths = paths
+
+	return graph, nil
+}
+
+func parseGraphs(oPaths []*ultipa.Path) (graph *structs.Graph, err error) {
+	graph = structs.NewGraph()
+
+	for _, oPath := range oPaths {
+		//path.Name = name
+		nodes, _, err := NodeTableToNodes(oPath.NodeTable, "")
+		if err != nil {
+			return nil, err
+		}
+
+		for _, node := range nodes {
+			graph.Nodes[node.UUID] = node
+		}
+
+		edges, _, err := EdgeTableToEdges(oPath.EdgeTable, "")
+		if err != nil {
+			return nil, err
+		}
+
+		for _, edge := range edges {
+			graph.Edges[edge.UUID] = edge
+		}
+	}
+	return graph, nil
+}
 
 func (di *DataItem) AsAny() (interface{}, error) {
 
@@ -1136,7 +1166,7 @@ func (di *DataItem) AsStats() (stat *structs.Stat, err error) {
 	table := di.Data.(*ultipa.Table)
 
 	if table.TableName != RESP_STATISTIC_KEY {
-		return nil, errors.New("DataItem " + di.Alias + " is not a top list")
+		return nil, errors.New("DataItem " + di.Alias + " is not a stats list")
 	}
 
 	row := table.TableRows[0]
