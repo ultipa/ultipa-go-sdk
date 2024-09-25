@@ -96,6 +96,7 @@ func TestFormatSchemas(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := api.FormatHdcGraphSchemas(tt.schemas)
+			t.Log(result)
 			if result != tt.expected {
 				t.Errorf("formatSchemas() = %v, want %v", result, tt.expected)
 			}

@@ -97,6 +97,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		return nil, err
 	}
 	table.EntityRows = nodeRows
+	//log.Printf("transporter debug UltipaRpcsClient.InsertNodes contexValue graph_name: %v \n", ctx.Value("graph_name"))
 	resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
 		GraphName:  conf.CurrentGraph,
 		NodeTable:  table,

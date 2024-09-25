@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"log"
 	"testing"
 
@@ -8,12 +9,14 @@ import (
 )
 
 func TestUQLStream(t *testing.T) {
-	uql := `find().nodes({@nodx}) limit 1000000 return nodes{*} `
+	uql := `find().nodes() limit 10000 return nodes{*} `
 
 	log.Println("Exec : ", uql)
 
 	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
-	stream, err := client.UQLStream(uql, nil)
+	stream, err := client.UQLStream(uql, &configuration.RequestConfig{
+		GraphName: "alimama",
+	})
 
 	if err != nil {
 		t.Fatal(err)

@@ -112,6 +112,7 @@ func (api *UltipaAPI) GetControlClientAndConfig(config *configuration.RequestCon
 func (api *UltipaAPI) Uql(uql string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 
 	resp, _, err := api.doExecuteQuery(uql, ultipa.QueryType_UQL, requestConfig)
+	//log.Println(uql)
 	if err != nil {
 		return nil, err
 	}

@@ -588,6 +588,9 @@ func (di *DataItem) AsGraphCount() (graphCounts []*structs.GraphCount, err error
 		return nil, errors.New("DataItem " + di.Alias + " is not a graph count list")
 	}
 
+	if len(table.Headers) <= 4 {
+		return nil, nil
+	}
 	for _, row := range table.TableRows {
 
 		//0:type, 1: schema, 2: from_schema,3:to_schema, 4:count
@@ -683,7 +686,7 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		schema.Status = string(values[StatusIndex])
 		propertyJson := values[PropertyIndex]
 		schema.Total, _ = strconv.Atoi(utils.AsString(values[TotalIndex]))
-		schema.Id = utils.AsUint64(values[IdIndex])
+		schema.Id, _ = strconv.ParseUint(utils.AsString(values[IdIndex]), 10, 64)
 		schema.DBType, err = structs.GetDBTypeByString(schema.Type)
 
 		if err != nil {
@@ -850,9 +853,9 @@ func (di *DataItem) AsFullTexts() (fullTextIndexes []*structs.Index, err error) 
 	table := di.Data.(*ultipa.Table)
 
 	indexType := ""
-	if table.TableName == RESP_NODE_INDEX_KEY {
+	if table.TableName == RESP_NODE_FULLTEXT_KEY {
 		indexType = "node"
-	} else if table.TableName == RESP_EDGE_INDEX_KEY {
+	} else if table.TableName == RESP_EDGE_FULLTEXT_KEY {
 		indexType = "edge"
 	} else {
 		return nil, errors.New("DataItem " + di.Alias + " is not a Fulltext Index list")

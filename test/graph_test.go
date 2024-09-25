@@ -22,6 +22,8 @@ func TestShowGraph(t *testing.T) {
 		t.Fatal("show().graph() no data return")
 	}
 
+	printers.PrintGraphSet(graphs)
+
 	//log.Printf(utils.JSONString(res))
 	//printers.PrintGraphSet(graphs)
 }

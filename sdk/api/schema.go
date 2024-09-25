@@ -34,6 +34,9 @@ func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) (*s
 	if err != nil {
 		return nil, err
 	}
+	if graphCount == nil {
+		return schemas, nil
+	}
 	for _, g := range graphCount {
 		switch g.Type {
 		case "total_nodes":

@@ -93,9 +93,7 @@ func TestListEdgeIndex(t *testing.T) {
 func TestListFullText(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
 
-	indexes, err := client.ShowFullText(&configuration.RequestConfig{
-		GraphName: "go_sdk_test",
-	})
+	indexes, err := client.ShowFullText(nil)
 	if err != nil {
 		t.Fatal(err)
 	}

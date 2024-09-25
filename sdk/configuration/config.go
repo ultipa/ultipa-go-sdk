@@ -83,7 +83,6 @@ func (config *UltipaConfig) MergeRequestConfig(rConfig *RequestConfig) *UltipaCo
 }
 
 func (config *UltipaConfig) ToContextKV(rConfig *RequestConfig) []string {
-
 	graphName := config.CurrentGraph
 
 	if rConfig != nil && rConfig.GraphName != "" {
@@ -108,7 +107,7 @@ func (config *UltipaConfig) ToContextKV(rConfig *RequestConfig) []string {
 	} else if rConfig.Timezone != "" {
 		headers = append(headers, "tz", rConfig.Timezone)
 	}
-
+	//log.Printf("transporter debug UltipaConfig.ToContextKV %v\n", headers)
 	return headers
 }
 

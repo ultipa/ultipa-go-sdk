@@ -75,8 +75,17 @@ func (api *UltipaAPI) CreateGraphIfNotExist(graph *structs.GraphSet, requestConf
 	return resp, exist, err
 }
 
-// CreateGraph 5.0 partitionByHash:Crc32/CityHash64
+// CreateGraph 5.0 graph Name/Shards/PartitionBy cannot be empty.
+//
+// partitionByHash:Crc32/CityHash64
 func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+	if graph == nil {
+		return nil, errors.New("graph cannot be nil")
+	}
+	if graph.Name == "" || graph.PartitionBy == "" || graph.Shards == "" {
+		return nil, errors.New("graph Name/Shards/PartitionBy cannot be empty")
+	}
+
 	resp, err := api.Uql(fmt.Sprintf(`create().graph("%v", "%v").shards([%v]).partitionByHash('%v',_id)`, graph.Name, graph.Description, graph.Shards, graph.PartitionBy), requestConfig)
 
 	if err != nil {

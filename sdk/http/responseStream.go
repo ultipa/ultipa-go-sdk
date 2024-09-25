@@ -73,11 +73,12 @@ func (r *UQLResponseStream) Recv(fetch bool) (response *UQLResponse, err error) 
 	}
 
 	response.Reply = record
-	response.Status.Code = record.Status.ErrorCode
-	response.Status.Message = record.Status.Msg
-
-	if response.Status.Code != ultipa.ErrorCode_SUCCESS {
-		return response, nil
+	if record.Status != nil {
+		response.Status.Code = record.Status.ErrorCode
+		response.Status.Message = record.Status.Msg
+		if response.Status.Code != ultipa.ErrorCode_SUCCESS {
+			return response, nil
+		}
 	}
 
 	var aliasList []string

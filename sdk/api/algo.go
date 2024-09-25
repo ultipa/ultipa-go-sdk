@@ -31,14 +31,14 @@ func (api *UltipaAPI) ShowAlgo(config *configuration.RequestConfig) ([]*structs.
 	return algos, nil
 }
 
-// InstallAlgo install algo
-func (api *UltipaAPI) InstallAlgo(soFilePath, infoFilePath, hdcName string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
+// InstallHDCAlgo install algo
+func (api *UltipaAPI) InstallHDCAlgo(soFile, ymlFile, hdcName string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
 
 	chunkSize := 1024 * 1024 * 1 // 2MB
 
 	// check file status
 
-	algoFile, err := os.OpenFile(soFilePath, os.O_RDONLY, 0644)
+	algoFile, err := os.OpenFile(soFile, os.O_RDONLY, 0644)
 
 	if err != nil {
 		return nil, err
@@ -46,9 +46,9 @@ func (api *UltipaAPI) InstallAlgo(soFilePath, infoFilePath, hdcName string, conf
 
 	algoFileReader := bufio.NewReader(algoFile)
 
-	algoFileMD5, _ := checksum.MD5sum(soFilePath)
+	algoFileMD5, _ := checksum.MD5sum(soFile)
 
-	algoInfoFile, err := os.OpenFile(infoFilePath, os.O_RDONLY, 0644)
+	algoInfoFile, err := os.OpenFile(ymlFile, os.O_RDONLY, 0644)
 
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (api *UltipaAPI) InstallAlgo(soFilePath, infoFilePath, hdcName string, conf
 
 	algoInfoFileReader := bufio.NewReader(algoInfoFile)
 
-	algoInfoFileMD5, _ := checksum.MD5sum(infoFilePath)
+	algoInfoFileMD5, _ := checksum.MD5sum(ymlFile)
 
 	client, err := api.GetControlClient(config)
 	if err != nil {
@@ -146,8 +146,8 @@ func (api *UltipaAPI) InstallAlgo(soFilePath, infoFilePath, hdcName string, conf
 
 }
 
-// UninstallAlgo uninstall algo
-func (api *UltipaAPI) UninstallAlgo(algoName, hdcName string, config *configuration.RequestConfig) (*ultipa.UninstallAlgoReply, error) {
+// UninstallHDCAlgo uninstall algo
+func (api *UltipaAPI) UninstallHDCAlgo(algoName, hdcName string, config *configuration.RequestConfig) (*ultipa.UninstallAlgoReply, error) {
 
 	client, err := api.GetControlClient(config)
 	if err != nil {
