@@ -3,7 +3,7 @@ package http
 import "fmt"
 
 type JobResponse struct {
-	JObId uint32
+	JobId uint32
 }
 
 func GetJobResponseFromUqlResponse(response *UQLResponse) (*JobResponse, error) {

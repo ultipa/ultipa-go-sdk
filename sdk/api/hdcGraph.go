@@ -27,6 +27,9 @@ func (api *UltipaAPI) CreateHDCGraphBySchema(graphName string, nodeSchemas, edge
 	nodes: {%s},
 	edges: {%s},
 	update: "%s"
+	query: "query",
+    type: "Graph",
+    default: true
 	}).to("%s")`, graphName, nodeSchema, edgeSchema, update, hdcName)
 
 	resp, err := api.Uql(uql, requestConfig)
@@ -81,7 +84,7 @@ func (api *UltipaAPI) ShowHDCGraph(graphName string, requestConfig *configuratio
 }
 
 func (api *UltipaAPI) DropHDCGraph(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
-	uql := fmt.Sprintf(`hdc.graph.drop(%s)`, graphName)
+	uql := fmt.Sprintf(`hdc.graph.drop('%s')`, graphName)
 
 	return api.Uql(uql, requestConfig)
 }
