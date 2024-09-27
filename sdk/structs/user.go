@@ -79,7 +79,7 @@ func (u *CreateUser) ToCreateUserUql() string {
 	uql += s
 
 	if u.Policies != nil {
-		s = utils.ToJSONString(u.Policies) + ",\n"
+		s = utils.ToJSONString(u.Policies) + "\n"
 	} else {
 		s = "[]\n"
 	}
@@ -132,7 +132,7 @@ func (u *AlterUser) ToAlterUserUql() string {
 
 	if u.Policies != nil {
 		if s != "" {
-			s = ",\n"
+			s = "\n"
 		}
 		s += "policies:" + utils.ToJSONString(u.Policies)
 		uql += s

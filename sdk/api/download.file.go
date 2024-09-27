@@ -2,15 +2,28 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"io"
+	"path/filepath"
+	"strconv"
+	"strings"
 
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
-	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, taskId string, requestConfig *configuration.RequestConfig, receive func(data []byte) error) error {
+func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, jobId string, requestConfig *configuration.RequestConfig, receive func(data []byte) error) error {
 	var err error
+
+	err, files := api.getFilesByJobId(jobId, requestConfig)
+	if err != nil {
+		return err
+	}
+	for _, file := range files {
+		if strings.HasSuffix(file, fileName) {
+			fileName = file
+		}
+	}
 
 	client, err := api.GetControlClient(requestConfig)
 	if err != nil {
@@ -37,6 +50,8 @@ func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, taskId string, req
 			break
 		} else if err != nil {
 			return err
+		} else if record.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+			return errors.New(record.Status.Msg)
 		}
 		err = receive(record.Chunk)
 		if err != nil {
@@ -47,7 +62,7 @@ func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, taskId string, req
 	return err
 }
 
-func (api *UltipaAPI) DownloadAllAlgoResultFile(taskId string, requestConfig *configuration.RequestConfig, receive func(data []byte, fileName string) error) error {
+func (api *UltipaAPI) DownloadAllAlgoResultFile(jobId string, requestConfig *configuration.RequestConfig, receive func(data []byte, fileName string) error) error {
 	var err error
 
 	client, err := api.GetControlClient(requestConfig)
@@ -61,12 +76,7 @@ func (api *UltipaAPI) DownloadAllAlgoResultFile(taskId string, requestConfig *co
 	}
 	defer cancel()
 
-	tasks, err := api.ShowTask(taskId, structs.TaskstatusAll, requestConfig)
-	if err != nil {
-		return errors.New("get task failed, " + err.Error())
-	}
-
-	files, err := tasks[0].GetTaskFileName()
+	err, files := api.getFilesByJobId(jobId, requestConfig)
 	if err != nil {
 		return err
 	}
@@ -74,7 +84,7 @@ func (api *UltipaAPI) DownloadAllAlgoResultFile(taskId string, requestConfig *co
 	for _, file := range files {
 		resp, err := client.DownloadFile(ctx, &ultipa.DownloadFileRequest{
 			FileName: file,
-			//TaskId:   taskId,
+			//TaskId:   jobId,
 		})
 
 		if err != nil {
@@ -87,8 +97,12 @@ func (api *UltipaAPI) DownloadAllAlgoResultFile(taskId string, requestConfig *co
 				break
 			} else if err != nil {
 				return err
+			} else if record.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+				return err
 			}
-			err = receive(record.Chunk, file)
+
+			fileName := filepath.Base(file)
+			err = receive(record.Chunk, fileName)
 			if err != nil {
 				return err
 			}
@@ -96,4 +110,42 @@ func (api *UltipaAPI) DownloadAllAlgoResultFile(taskId string, requestConfig *co
 	}
 
 	return err
+}
+
+func (api *UltipaAPI) getFilesByJobId(jobId string, requestConfig *configuration.RequestConfig) (error, []string) {
+	var files []string
+	jobs, err := api.ShowJob(jobId, requestConfig)
+	if err != nil {
+		return fmt.Errorf("show job error: %v", err), files
+	}
+	if len(jobs) == 0 {
+		return errors.New("job not found"), files
+	}
+
+	job := jobs[0]
+	if job.Result == nil {
+		return errors.New("job result is empty"), files
+
+	}
+
+	i := 0
+	for {
+		key := "output_file" + strconv.Itoa(i)
+		if i == 0 {
+			key = "output_file"
+		}
+
+		if file, ok := job.Result[key]; ok {
+			files = append(files, file)
+			i++
+		} else {
+			break
+		}
+	}
+
+	if len(files) == 0 {
+		return errors.New("empty files"), nil
+	}
+
+	return nil, files
 }

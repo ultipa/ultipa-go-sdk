@@ -34,7 +34,9 @@ func (api *UltipaAPI) GetPolicy(policyName string, requestConfig *configuration.
 	if err != nil {
 		return nil, err
 	}
-	policy = policies[0]
+	if len(policies) != 0 {
+		policy = policies[0]
+	}
 
 	return
 }

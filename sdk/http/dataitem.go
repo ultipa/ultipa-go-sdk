@@ -1011,8 +1011,8 @@ func (di *DataItem) AsPolicies() (policies []*structs.Policy, err error) {
 }
 
 func bytesToPolicy(data [][]byte) (*structs.Policy, error) {
-	if len(data) != 5 {
-		return nil, fmt.Errorf("invalid data length, expected 5 but got %d", len(data))
+	if len(data) != 4 {
+		return nil, fmt.Errorf("invalid data length, expected 4 but got %d", len(data))
 	}
 
 	var policy structs.Policy
@@ -1031,12 +1031,12 @@ func bytesToPolicy(data [][]byte) (*structs.Policy, error) {
 	}
 
 	// PropertyPrivileges
-	if err := json.Unmarshal(data[3], &policy.PropertyPrivileges); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal PropertyPrivileges: %w", err)
-	}
+	//if err := json.Unmarshal(data[3], &policy.PropertyPrivileges); err != nil {
+	//	return nil, fmt.Errorf("failed to unmarshal PropertyPrivileges: %w", err)
+	//}
 
 	// AsPolicies
-	if err := json.Unmarshal(data[4], &policy.Policies); err != nil {
+	if err := json.Unmarshal(data[3], &policy.Policies); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal AsPolicies: %w", err)
 	}
 
@@ -1333,7 +1333,7 @@ func (di *DataItem) AsJobs() (jobs []*structs.Job, err error) {
 			UQL:       string(values[3]),
 			Status:    string(values[4]),
 			ErrMsg:    string(values[5]),
-			Result:    string(values[6]),
+			Result:    bytes2result(values[6]),
 			StartTime: string(values[7]),
 			EndTime:   string(values[8]),
 			Progress:  string(values[9]),
@@ -1343,4 +1343,30 @@ func (di *DataItem) AsJobs() (jobs []*structs.Job, err error) {
 	}
 
 	return jobs, nil
+}
+
+func bytes2result(data []byte) map[string]string {
+
+	if len(data) == 0 {
+		return nil
+	}
+
+	// 用于存储解析后的数据
+	var result map[string]interface{}
+
+	// 将 []byte 的 JSON 数据解析为 map[string]interface{}
+	if err := json.Unmarshal(data, &result); err != nil {
+		fmt.Println("Error Unmarshal result:", err)
+		return nil
+	}
+
+	// 创建一个 map[string]string 以存储最终结果
+	finalResult := make(map[string]string)
+
+	// 遍历 map，将所有键值对转换为字符串
+	for key, value := range result {
+		finalResult[key] = fmt.Sprintf("%v", value)
+	}
+
+	return finalResult
 }

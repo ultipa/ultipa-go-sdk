@@ -35,16 +35,16 @@ package structs
 
 // Job represents the job data structure
 type Job struct {
-	JobID     string `json:"job_id"`     // "job_id" field
-	GraphName string `json:"graph_name"` // "graph_name" field
-	Type      string `json:"type"`       // "type" field
-	UQL       string `json:"uql"`        // "uql" field
-	Status    string `json:"status"`     // "status" field
-	ErrMsg    string `json:"err_msg"`    // "err_msg" field
-	Result    string `json:"result"`     // "result" field
-	StartTime string `json:"start_time"` // "start_time" field, converted to time.Time type
-	EndTime   string `json:"end_time"`   // "end_time" field, converted to time.Time type
-	Progress  string `json:"progress"`   // "progress" field
+	JobID     string            `json:"job_id"`     // "job_id" field
+	GraphName string            `json:"graph_name"` // "graph_name" field
+	Type      string            `json:"type"`       // "type" field
+	UQL       string            `json:"uql"`        // "uql" field
+	Status    string            `json:"status"`     // "status" field
+	ErrMsg    string            `json:"err_msg"`    // "err_msg" field
+	Result    map[string]string `json:"result"`     // "result" field
+	StartTime string            `json:"start_time"` // "start_time" field, converted to time.Time type
+	EndTime   string            `json:"end_time"`   // "end_time" field, converted to time.Time type
+	Progress  string            `json:"progress"`   // "progress" field
 }
 
 //type ReturnType struct {

@@ -21,6 +21,9 @@ func TestShowPolicy(t *testing.T) {
 	}
 	fmt.Println(utils.JSONString(policy))
 
+	if policy == nil {
+		return
+	}
 	policy.Name = "yu_new"
 	_, err = client.CreatePolicy(policy, nil)
 	if err != nil {

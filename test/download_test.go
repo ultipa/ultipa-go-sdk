@@ -6,9 +6,9 @@ import (
 )
 
 func TestDownload(t *testing.T) {
-	fileName := "data/ids"
+	fileName := "degree_min.txt"
 
-	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.ModePerm)
+	file, err := os.OpenFile("./data/"+fileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.ModePerm)
 	if err != nil {
 		t.Error(err)
 	}
@@ -22,7 +22,7 @@ func TestDownload(t *testing.T) {
 		}
 		return nil
 	}
-	err = client.DownloadAlgoResultFile(fileName, "1", nil, receive)
+	err = client.DownloadAlgoResultFile(fileName, "6", nil, receive)
 	if err != nil {
 		t.Error(err)
 	}
@@ -45,7 +45,7 @@ func TestDownloadAll(t *testing.T) {
 
 		return nil
 	}
-	err := client.DownloadAllAlgoResultFile("1", nil, receive)
+	err := client.DownloadAllAlgoResultFile("8", nil, receive)
 	if err != nil {
 		t.Error(err)
 	}
