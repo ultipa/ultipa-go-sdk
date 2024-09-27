@@ -8,6 +8,7 @@
 package test
 
 import (
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"log"
 	"testing"
@@ -17,19 +18,24 @@ import (
 
 func TestCreateIndex(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
-	client.SetCurrentGraph("go_sdk_test")
+	//client.SetCurrentGraph("go_sdk_test")
 	//resp, err := client.CreateIndex(ultipa.DBType_DBNODE, "t1", "name(10)", "name3", nil)
 	//if err != nil {
 	//    t.Fatal(err)
 	//}
 
-	resp, err := client.CreateNodeIndex("@`中文Schema`.`中文Property(10)`", "name1", nil)
+	resp, err := client.CreateNodeIndex("@`account`.`industry`(10)", "name1", nil)
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	resp, err = client.CreateEdgeIndex("@e1(name(10), age)", "edgeIndex_name_age", nil)
+	resp, err = client.CreateEdgeIndex("@review.`中文名`(23)", "edgeIndex_name_age", nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	_, err = client.DropIndex(ultipa.DBType_DBNODE, "name1", nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -118,4 +124,21 @@ func TestListEdgeFullText(t *testing.T) {
 		t.Fatal(err)
 	}
 	log.Printf(utils.JSONString(indexes))
+}
+
+func TestCreateFullText(t *testing.T) {
+	//client, _ := GetClient(hosts, graph)
+
+	resp, err := client.CreateFullText(ultipa.DBType_DBNODE, "account", "中文名", "full", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Printf(resp.Status.Code.String())
+
+	resp, err = client.DropFullText("full", ultipa.DBType_DBNODE, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Printf(resp.Status.Code.String())
+
 }

@@ -154,27 +154,27 @@ func (api *UltipaAPI) ShowNodeIndex(requestConfig *configuration.RequestConfig) 
 	return indexes, err
 }
 
-func (api *UltipaAPI) DropIndex(dbType ultipa.DBType, schemaName, propertyName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) DropIndex(dbType ultipa.DBType, indexName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	uql := ""
-	if schemaName == "" {
-		schemaName = "*"
-	}
-
-	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
-	}
-
-	propertyName, err = CheckReplaceSchemaPropertyName(propertyName)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), propertyName))
-	}
+	//if schemaName == "" {
+	//	schemaName = "*"
+	//}
+	//
+	//schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
+	//if err != nil {
+	//	return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
+	//}
+	//
+	//propertyName, err = CheckReplaceSchemaPropertyName(propertyName)
+	//if err != nil {
+	//	return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), propertyName))
+	//}
 
 	switch dbType {
 	case ultipa.DBType_DBNODE:
-		uql = fmt.Sprintf(`drop().node_index(@%v.%v)`, schemaName, propertyName)
+		uql = fmt.Sprintf(`drop().node_index("%v")`, indexName)
 	case ultipa.DBType_DBEDGE:
-		uql = fmt.Sprintf(`drop().edge_index(@%v.%v)`, schemaName, propertyName)
+		uql = fmt.Sprintf(`drop().edge_index("%v")`, indexName)
 	default:
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
@@ -188,7 +188,6 @@ func (api *UltipaAPI) DropIndex(dbType ultipa.DBType, schemaName, propertyName s
 	return resp, nil
 }
 
-// Deprecated: 5.0 not support, should use CreateNodeIndex or CreateEdgeIndex
 func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyName, fulltextName string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	uql := ""
 
