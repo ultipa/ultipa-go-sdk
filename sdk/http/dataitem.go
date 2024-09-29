@@ -525,10 +525,10 @@ func parseAttrMap(oAttr *ultipa.Attr) ([]*structs.AttrMapData, error) {
 }
 
 // AsGraphSets the types will be tables and alias is nodeSchema and edgeSchema
-func (di *DataItem) AsGraphSets() (graphs []*structs.GraphSet, err error) {
+func (di *DataItem) AsGraphSets() (graphSets []*structs.GraphSet, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
-		return graphs, nil
+		return graphSets, nil
 	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
@@ -541,35 +541,48 @@ func (di *DataItem) AsGraphSets() (graphs []*structs.GraphSet, err error) {
 		return nil, errors.New("DataItem " + di.Alias + " is not a Graph list")
 	}
 
-	structTable, err := di.AsTable()
+	g, err := di.AsTable()
 	if err != nil {
 		return nil, err
 	}
-	values := structTable.ToKV()
 
-	for _, row := range values {
-		//0:id, 1: name, 2: totalNodes ,3:totalEdges ,4:description ,5:status
-		graph := structs.GraphSet{}
-		graph.ID = row.Get("id").(string)
-		graph.Name = row.Get("name").(string)
+	values := g.ToKV()
+	for _, v := range values {
+		id := v.Get("id").(string)
+		name := v.Get("name").(string)
+		status := v.Get("status").(string)
+		description := v.Get("description").(string)
+		shards := v.Get("shards").(string)
+		slotNum := v.Get("slot_num").(string)
+		replicaNum := v.Get("replica_num").(string)
+		partitionBy := v.Get("partition_by").(string)
+
 		var totalNodes uint64 = 0
-		if v := row.Get("totalNodes"); v != nil {
+		if v := v.Get("total_nodes"); v != nil {
 			totalNodes, _ = strconv.ParseUint(v.(string), 10, 64)
-		}
-		graph.TotalNodes = totalNodes
 
+		}
 		var totalEdges uint64 = 0
-		if v := row.Get("totalEdges"); v != nil {
-			totalEdges, _ = strconv.ParseUint(v.(string), 10, 64)
+		if v := v.Get("total_edges"); v != nil {
+			totalEdges, err = strconv.ParseUint(v.(string), 10, 64)
 		}
-		graph.TotalEdges = totalEdges
-		graph.Description = row.Get("description").(string)
-		graph.Status = row.Get("status").(string)
 
-		graphs = append(graphs, &graph)
+		graphSets = append(graphSets, &structs.GraphSet{
+			ID: id,
+			//ClusterId:   clusterId,
+			Name:        name,
+			TotalNodes:  totalNodes,
+			TotalEdges:  totalEdges,
+			Status:      status,
+			Description: description,
+			Shards:      shards,
+			SlotNum:     slotNum,
+			ReplicaNum:  replicaNum,
+			PartitionBy: partitionBy,
+		})
 	}
 
-	return graphs, err
+	return graphSets, err
 }
 
 func (di *DataItem) AsGraphCount() (graphCounts []*structs.GraphCount, err error) {

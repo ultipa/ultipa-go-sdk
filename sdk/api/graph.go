@@ -7,7 +7,6 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
-	"strconv"
 )
 
 func (api *UltipaAPI) ShowGraph(requestConfig *configuration.RequestConfig) (graphSets []*structs.GraphSet, err error) {
@@ -16,52 +15,8 @@ func (api *UltipaAPI) ShowGraph(requestConfig *configuration.RequestConfig) (gra
 		return nil, err
 	}
 
-	g, err := res.Alias(http.RESP_GRAPH_KEY).AsTable()
-	if err != nil {
-		return nil, err
-	}
-
-	values := g.ToKV()
-	for _, v := range values {
-		id := v.Get("id").(string)
-		name := v.Get("name").(string)
-		status := v.Get("status").(string)
-		description := v.Get("description").(string)
-		shards := v.Get("shards").(string)
-		slotNum := v.Get("slot_num").(string)
-		replicaNum := v.Get("replica_num").(string)
-		partitionBy := v.Get("partition_by").(string)
-
-		var totalNodes uint64 = 0
-		if v := v.Get("total_nodes"); v != nil {
-			totalNodes, _ = strconv.ParseUint(v.(string), 10, 64)
-
-		}
-		var totalEdges uint64 = 0
-		if v := v.Get("total_edges"); v != nil {
-			totalEdges, err = strconv.ParseUint(v.(string), 10, 64)
-		}
-
-		//clusterId := ""
-		//if v := v.Get("clusterId"); v != nil {
-		//    clusterId = v.(string)
-		//}
-		graphSets = append(graphSets, &structs.GraphSet{
-			ID: id,
-			//ClusterId:   clusterId,
-			Name:        name,
-			TotalNodes:  totalNodes,
-			TotalEdges:  totalEdges,
-			Status:      status,
-			Description: description,
-			Shards:      shards,
-			SlotNum:     slotNum,
-			ReplicaNum:  replicaNum,
-			PartitionBy: partitionBy,
-		})
-	}
-
-	return graphSets, nil
+	graphSets, err = res.Alias(http.RESP_GRAPH_KEY).AsGraphSets()
+	return graphSets, err
 }
 
 func (api *UltipaAPI) CreateGraphIfNotExist(graph *structs.GraphSet, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, exist bool, err error) {
