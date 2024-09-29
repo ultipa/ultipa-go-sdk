@@ -761,8 +761,8 @@ func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 		name := getOrDefault("name", "", rowValues)
 		lteStr := getOrDefault("lte", "false", rowValues)
 		typeStr := getOrDefault("type", "", rowValues)
-		read := getOrDefault("read", "0", rowValues)
-		write := getOrDefault("write", "0", rowValues)
+		//read := getOrDefault("read", "0", rowValues)
+		//write := getOrDefault("write", "0", rowValues)
 		schema := getOrDefault("schema", "0", rowValues)
 		desc := getOrDefault("description", "", rowValues)
 		lte, err := strconv.ParseBool(lteStr)
@@ -772,11 +772,11 @@ func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 			log.Fatalln(err)
 		}
 		p := structs.Property{
-			Name:    name,
-			Desc:    desc,
-			Lte:     lte,
-			Read:    "1" == read,
-			Write:   "1" == write,
+			Name: name,
+			Desc: desc,
+			Lte:  lte,
+			//Read:    "1" == read,
+			//Write:   "1" == write,
 			Schema:  schema,
 			Extra:   extra,
 			Encrypt: encrypt,

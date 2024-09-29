@@ -12,11 +12,11 @@ import (
 )
 
 type Property struct {
-	Name     string
-	Desc     string
-	Lte      bool
-	Read     bool
-	Write    bool
+	Name string
+	Desc string
+	Lte  bool
+	//Read     bool
+	//Write    bool
 	Schema   string
 	Type     ultipa.PropertyType
 	SubTypes []ultipa.PropertyType

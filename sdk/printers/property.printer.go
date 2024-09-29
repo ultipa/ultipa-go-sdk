@@ -13,7 +13,7 @@ func PrintProperty(properties []*structs.Property) {
 	table := simpletable.New()
 	table.Header.Cells = []*simpletable.Cell{{Text: "Name"}, {Text: "Description"},
 		{Text: "Type"}, {Text: "LTE"},
-		{Text: "READ"}, {Text: "WRITE"},
+		//{Text: "READ"}, {Text: "WRITE"},
 		{Text: "Schema"}, {Text: "Extra"},
 		{Text: "Encrypt"},
 	}
@@ -29,8 +29,8 @@ func PrintProperty(properties []*structs.Property) {
 			{Text: prop.Desc},
 			{Text: propertyTypeStr},
 			{Text: strconv.FormatBool(prop.Lte)},
-			{Text: strconv.FormatBool(prop.Read)},
-			{Text: strconv.FormatBool(prop.Write)},
+			//{Text: strconv.FormatBool(prop.Read)},
+			//{Text: strconv.FormatBool(prop.Write)},
 			{Text: prop.Schema},
 			{Text: prop.Extra},
 			{Text: prop.Encrypt},
