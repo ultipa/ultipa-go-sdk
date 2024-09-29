@@ -50,7 +50,7 @@ func TestUserUql(t *testing.T) {
 		//SystemPrivileges: []string{},
 		//PropertyPrivileges: pp,
 		//AsPolicies:           []string{"yu"},
-		//Policies: []string{"yu"},
+		Policies: []string{"12"},
 	}
 
 	fmt.Println(p.ToCreateUserUql())

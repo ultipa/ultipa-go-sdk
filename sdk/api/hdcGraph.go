@@ -26,7 +26,7 @@ func (api *UltipaAPI) CreateHDCGraphBySchema(graphName string, nodeSchemas, edge
 	uql := fmt.Sprintf(`hdc.graph.create("%s", {
 	nodes: {%s},
 	edges: {%s},
-	update: "%s"
+	update: "%s",
 	query: "query",
     type: "Graph",
     default: true
