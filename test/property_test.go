@@ -20,7 +20,7 @@ import (
 
 func TestShowProperty(t *testing.T) {
 
-	nodeProp, edgeProp, err := client.ShowProperty(nil)
+	nodeProp, edgeProp, err := client.ShowProperty(12, "", nil)
 
 	if err != nil {
 		t.Fatal(err)

@@ -108,16 +108,16 @@ func TestCreateGraphIfNotExist(t *testing.T) {
 	//	t.Fatalf("failed to connect to server %v", err)
 	//}
 
-	client.DropGraph(graph, nil)
-
 	_, _, err := client.CreateGraphIfNotExist(&structs.GraphSet{
-		Name:        graph,
+		Name:        "test1123231",
 		Shards:      "1,2",
 		PartitionBy: "Crc32",
 	}, nil)
 	if err != nil {
 		t.Fatalf("failed to create graph %v", err)
 	}
+	client.DropGraph("test1123231", nil)
+
 }
 
 func TestUltipaAPI_AlterGraph(t *testing.T) {

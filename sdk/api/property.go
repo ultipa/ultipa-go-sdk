@@ -93,23 +93,34 @@ func (api *UltipaAPI) GetProperty(dbType ultipa.DBType, schemaName string, prope
 	return nil, nil
 }
 
-func (api *UltipaAPI) ShowProperty(requestConfig *configuration.RequestConfig) (nodeProperty, edgeProperty []*structs.Property, err error) {
-	resp, err := api.Uql("show().property()", requestConfig)
+func (api *UltipaAPI) ShowProperty(dbType ultipa.DBType, schemaName string, requestConfig *configuration.RequestConfig) (nodeProperty, edgeProperty []*structs.Property, err error) {
+	//resp, err := api.Uql("show().property()", requestConfig)
+	////
+	//if err != nil {
+	//    return nil, nil, err
+	//}
+	//
+	//nodeProperty, err = resp.Alias(http.RESP_NODE_PROPERTY_KEY).AsProperties()
+	//if err != nil {
+	//    return nil, nil, err
+	//}
+	//edgeProperty, err = resp.Alias(http.RESP_EDGE_PROPERTY_KEY).AsProperties()
+	//if err != nil {
+	//    return nil, nil, err
+	//}
+	//
+	//return nodeProperty, edgeProperty, nil
 
-	if err != nil {
-		return nil, nil, err
+	switch dbType {
+	case ultipa.DBType_DBNODE:
+		nodeProperty, err = api.ShowNodeProperty(schemaName, requestConfig)
+	case ultipa.DBType_DBEDGE:
+		edgeProperty, err = api.ShowEdgeProperty(schemaName, requestConfig)
+	default:
+		nodeProperty, err = api.ShowNodeProperty(schemaName, requestConfig)
+		edgeProperty, err = api.ShowEdgeProperty(schemaName, requestConfig)
 	}
-
-	nodeProperty, err = resp.Alias(http.RESP_NODE_PROPERTY_KEY).AsProperties()
-	if err != nil {
-		return nil, nil, err
-	}
-	edgeProperty, err = resp.Alias(http.RESP_EDGE_PROPERTY_KEY).AsProperties()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return nodeProperty, edgeProperty, nil
+	return
 }
 
 func (api *UltipaAPI) ShowNodeProperty(schemaName string, requestConfig *configuration.RequestConfig) (property []*structs.Property, err error) {
