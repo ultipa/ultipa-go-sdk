@@ -136,6 +136,7 @@ func TestCreateFullText(t *testing.T) {
 	log.Printf(resp.Status.Code.String())
 
 	resp, err = client.DropFullText("full", ultipa.DBType_DBNODE, nil)
+	resp, err = client.DropFullText("full", ultipa.DBType_DBNODE, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

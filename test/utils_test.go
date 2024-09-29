@@ -42,6 +42,7 @@ func TestReplaceSchemaPropertyNameIfNeeded(t *testing.T) {
 		{"Valid name with underscore", "Property_Name1", "Property_Name1", false},
 		{"Valid name with digits only", "12345", "12345", false},
 		{"Valid name with chinese", "账户", "`账户`", false},
+		{"Valid name with \"", `"""`, "`\"\"\"`", false},
 	}
 
 	for _, tt := range tests {

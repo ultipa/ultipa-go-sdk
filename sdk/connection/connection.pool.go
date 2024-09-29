@@ -223,7 +223,7 @@ func (pool *ConnectionPool) doRefreshClusterInfo(graphName string) error {
 		//    // After initialization
 		//    conn = pool.GraphMgr.GetLeader(graphName)
 		//}
-		if pool.Config.Debug {
+		if pool.Config.Debug && conn != nil {
 			logger.PrintDebug(fmt.Sprintf("refresh graph [%s] cluster info with connection to host [%s]", graphName, conn.Host))
 		}
 		//err = pool.resolveClusterInfo(graphName, conn)

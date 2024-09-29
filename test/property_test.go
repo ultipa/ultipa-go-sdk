@@ -20,24 +20,32 @@ import (
 
 func TestShowProperty(t *testing.T) {
 
-	nodeProperties, err := client.ShowProperty(ultipa.DBType_DBNODE, "t1", &configuration.RequestConfig{
-		GraphName: "go_sdk_test",
-	})
+	nodeProp, edgeProp, err := client.ShowProperty(nil)
 
 	if err != nil {
 		t.Fatal(err)
 	}
-	printers.PrintProperty(nodeProperties)
+	printers.PrintProperty(nodeProp)
+	printers.PrintProperty(edgeProp)
 
-	edgeProperties, err := client.ShowProperty(ultipa.DBType_DBEDGE, "e2", &configuration.RequestConfig{
-		GraphName: "go_sdk_test",
-	})
+	np, err := client.ShowNodeProperty("account", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	printers.PrintProperty(nodeProperties)
-	printers.PrintProperty(edgeProperties)
+	npall, err := client.ShowNodeProperty("", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ep, err := client.ShowEdgeProperty("rate", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	printers.PrintProperty(np)
+	printers.PrintProperty(npall)
+	printers.PrintProperty(ep)
 }
 
 func TestShowNodeProperty(t *testing.T) {
@@ -87,7 +95,7 @@ func TestCreatePropertyWithUql(t *testing.T) {
 func TestCreateProperty(t *testing.T) {
 	// Create Node Property
 	newProp := &structs.Property{
-		Name: "Bool",
+		Name: `"""`,
 		Type: ultipa.PropertyType_BOOL,
 	}
 
@@ -141,7 +149,7 @@ func TestProperty(t *testing.T) {
 		log.Println(err)
 	}
 
-	pro, err := client.ShowProperty(ultipa.DBType_DBNODE, schema.Name, nil)
+	pro, err := client.ShowNodeProperty(schema.Name, nil)
 	if err != nil {
 		log.Println(err)
 	}

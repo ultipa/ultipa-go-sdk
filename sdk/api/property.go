@@ -93,48 +93,67 @@ func (api *UltipaAPI) GetProperty(dbType ultipa.DBType, schemaName string, prope
 	return nil, nil
 }
 
-func (api *UltipaAPI) ShowProperty(dbType ultipa.DBType, schemaName string, requestConfig *configuration.RequestConfig) (property []*structs.Property, err error) {
-	var schemas []*structs.Schema
+func (api *UltipaAPI) ShowProperty(requestConfig *configuration.RequestConfig) (nodeProperty, edgeProperty []*structs.Property, err error) {
+	resp, err := api.Uql("show().property()", requestConfig)
 
-	// if "" or * , get all schema property
-	if schemaName == "" || schemaName == "*" {
-		switch dbType {
-		case ultipa.DBType_DBNODE:
-			schemas, err = api.ShowNodeSchema(requestConfig)
-		case ultipa.DBType_DBEDGE:
-			schemas, err = api.ShowEdgeSchema(requestConfig)
-		default:
-			return nil, errors.New("show property: unknown db type")
-		}
-
-		if err != nil {
-			return nil, err
-		}
-
-		for _, schema := range schemas {
-			property = append(property, schema.Properties...)
-		}
-		return property, nil
-	} else if dbType == ultipa.DBType_DBGLOBAL {
-		return nil, errors.New("show property: unknown db type")
+	if err != nil {
+		return nil, nil, err
 	}
 
-	// get one schema property
-	schema, err := api.GetSchema(schemaName, dbType, requestConfig)
+	nodeProperty, err = resp.Alias(http.RESP_NODE_PROPERTY_KEY).AsProperties()
+	if err != nil {
+		return nil, nil, err
+	}
+	edgeProperty, err = resp.Alias(http.RESP_EDGE_PROPERTY_KEY).AsProperties()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return nodeProperty, edgeProperty, nil
+}
+
+func (api *UltipaAPI) ShowNodeProperty(schemaName string, requestConfig *configuration.RequestConfig) (property []*structs.Property, err error) {
+	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
+	}
+
+	if schemaName == "" || schemaName == "*" {
+		schemaName = ""
+	} else {
+		schemaName = "@" + schemaName
+	}
+	uql := fmt.Sprintf("show().node_property(%s)", schemaName)
+	resp, err := api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return schema.Properties, nil
-}
-
-func (api *UltipaAPI) ShowNodeProperty(schemaName string, requestConfig *configuration.RequestConfig) (property []*structs.Property, err error) {
-	return api.ShowProperty(ultipa.DBType_DBNODE, schemaName, requestConfig)
+	property, err = resp.Alias(http.RESP_NODE_PROPERTY_KEY).AsProperties()
+	return property, nil
 }
 
 func (api *UltipaAPI) ShowEdgeProperty(schemaName string, requestConfig *configuration.RequestConfig) (property []*structs.Property, err error) {
-	return api.ShowProperty(ultipa.DBType_DBEDGE, schemaName, requestConfig)
+	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
+	}
+
+	if schemaName == "" || schemaName == "*" {
+		schemaName = ""
+	} else {
+		schemaName = "@" + schemaName
+	}
+	uql := fmt.Sprintf("show().edge_property(%s)", schemaName)
+	resp, err := api.Uql(uql, requestConfig)
+
+	if err != nil {
+		return nil, err
+	}
+
+	property, err = resp.Alias(http.RESP_EDGE_PROPERTY_KEY).AsProperties()
+	return property, nil
 }
 
 func (api *UltipaAPI) GetNodeProperty(schemaName string, propertyName string, requestConfig *configuration.RequestConfig) (property *structs.Property, err error) {
