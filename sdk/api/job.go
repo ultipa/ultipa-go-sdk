@@ -22,7 +22,7 @@ func (api *UltipaAPI) ShowJob(jobId string, requestConfig *configuration.Request
 	return jobs, err
 }
 
-func (api *UltipaAPI) ClearJob(jobId string, status structs.TaskStatus, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) ClearJob(jobId string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	uql := fmt.Sprintf("clear().job(%v)", jobId)
 
 	resp, err = api.Uql(uql, config)
@@ -34,7 +34,7 @@ func (api *UltipaAPI) ClearJob(jobId string, status structs.TaskStatus, config *
 	return resp, nil
 }
 
-func (api *UltipaAPI) StopJob(jobId string, status structs.TaskStatus, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) StopJob(jobId string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
 	uql := fmt.Sprintf("stop().job(%v)", jobId)
 
 	resp, err = api.Uql(uql, config)
