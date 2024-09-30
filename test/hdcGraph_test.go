@@ -6,6 +6,14 @@ import (
 	"testing"
 )
 
+func TestShowHDCGraph(t *testing.T) {
+	hdcGraph, err := client.ShowHDCGraph(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(hdcGraph)
+}
+
 func TestHDCGraph(t *testing.T) {
 	nodeSchemas := []*structs.Schema{
 		{

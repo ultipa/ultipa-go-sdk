@@ -37,4 +37,5 @@ const (
 	RESP_EXTAS_KEY         string = "_extaList"
 	RESP_JOB_KEY           string = "result"
 	RESP_LICENSE_KEY       string = "license"
+	RESP_PROJECT_KEY       string = "_projectList"
 )

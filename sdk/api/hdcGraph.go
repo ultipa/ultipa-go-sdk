@@ -73,7 +73,7 @@ func FormatHdcGraphSchemas(schemas []*structs.Schema) string {
 
 }
 
-func (api *UltipaAPI) ShowHDCGraph(requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) ShowHDCGraph(requestConfig *configuration.RequestConfig) ([]*structs.Projection, error) {
 	//if graphName != "" {
 	//	graphName = fmt.Sprintf(`"%s"`, graphName)
 	//}
@@ -81,7 +81,17 @@ func (api *UltipaAPI) ShowHDCGraph(requestConfig *configuration.RequestConfig) (
 	//uql := fmt.Sprintf(`hdc.graph.show(%s)`, graphName)
 	//
 	//return api.Uql(uql, requestConfig)
-	return api.Uql("hdc.graph.show()", requestConfig)
+	resp, err := api.Uql("hdc.graph.show()", requestConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	projections, err := resp.Alias(http.RESP_PROJECT_KEY).AsProjections()
+	if err != nil {
+		return nil, err
+	}
+
+	return projections, nil
 }
 
 func (api *UltipaAPI) DropHDCGraph(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {

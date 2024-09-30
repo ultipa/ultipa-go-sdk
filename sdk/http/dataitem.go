@@ -1383,3 +1383,46 @@ func bytes2result(data []byte) map[string]string {
 
 	return finalResult
 }
+
+func (di *DataItem) AsProjections() (projections []*structs.Projection, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return projections, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_PROJECT_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a Graph list")
+	}
+
+	g, err := di.AsTable()
+	if err != nil {
+		return nil, err
+	}
+
+	values := g.ToKV()
+
+	for _, v := range values {
+		projection := &structs.Projection{
+			ProjectName: v.Get("project_name").(string),
+			ProjectType: v.Get("project_type").(string),
+			FilterType:  v.Get("filter_type").(string),
+			IsDefault:   v.Get("is_default").(string),
+			SourceGraph: v.Get("graph_name").(string),
+			Status:      v.Get("status").(string),
+			Stats:       v.Get("stats").(string),
+			HDCName:     v.Get("hdc_server_name").(string),
+			HDCStatus:   v.Get("hdc_server_status").(string),
+			Config:      v.Get("config").(string),
+		}
+
+		projections = append(projections, projection)
+	}
+
+	return projections, err
+}
