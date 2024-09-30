@@ -7,6 +7,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"strings"
 )
 
 func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) (*structs.Schemas, error) {
@@ -236,7 +237,7 @@ func (api *UltipaAPI) AlterSchema(schema, newSchema *structs.Schema, requestConf
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
 
-	uql := fmt.Sprintf(`alter().%s(@%s).set({name: "%s", description: "%s"})`, parms, schemaName, newSchema.Name, newSchema.Desc)
+	uql := fmt.Sprintf(`alter().%s(@%s).set({name: "%s", description: "%s"})`, parms, schemaName, strings.ReplaceAll(newSchema.Name, `"`, `\"`), newSchema.Desc)
 
 	// Only modify the description of the schema
 	if newSchema.Name == "" {

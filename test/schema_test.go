@@ -164,16 +164,20 @@ func TestCreateSchema(t *testing.T) {
 
 func TestAlterSchema(t *testing.T) {
 	// create schema with properties
+	client.SetCurrentGraph("test_go_sdk")
 	schema := &structs.Schema{
 		DBType: ultipa.DBType_DBNODE,
-		Name:   "People",
+		Name:   `""`,
 		//Desc:   "People",
 	}
 	newSchema := &structs.Schema{
-		Name: "People2",
+		Name: `"""`,
 		Desc: "People2",
 	}
 
-	resp2, _ := client.AlterSchema(schema, newSchema, nil)
+	resp2, err := client.AlterSchema(schema, newSchema, nil)
 	log.Println(resp2)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
