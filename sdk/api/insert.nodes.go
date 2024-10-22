@@ -88,6 +88,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		table.Schemas[0].Properties = append(table.Schemas[0].Properties, &ultipa.Property{
 			PropertyName: prop.Name,
 			PropertyType: prop.Type,
+			SubTypes:     prop.SubTypes,
 		})
 	}
 
