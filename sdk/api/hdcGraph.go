@@ -57,10 +57,10 @@ func FormatHdcGraphSchemas(schemas []*structs.Schema) string {
 		}
 
 		if len(schema.Properties) == 0 {
-			// 如果 Properties 为空
+			// if Properties is null
 			result = append(result, fmt.Sprintf(`%s: ["*"]`, schema.Name))
 		} else {
-			// 拼接每个 Property.Name
+			// join Property.Name
 			var propertyNames []string
 			for _, prop := range schema.Properties {
 				propertyNames = append(propertyNames, prop.Name)

@@ -27,6 +27,5 @@ func (api *UltipaAPI) GetServerVersion() (string, error) {
 	//	return "", err
 	//}
 	//return stats.Version, nil
-	// 5.0 stats和license结构一样，没有version字段
 	return "", nil
 }

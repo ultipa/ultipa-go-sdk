@@ -26,7 +26,7 @@ func ParseStatistic(table *ultipa.Table) (*Statistic, error) {
 	kv := map[string]string{}
 
 	for index, header := range table.Headers {
-		// 暂时兼容server返回的table Header 超过4 ,如header= 8个，TableRows=2个
+		// fix error: server return table Header more than 4 ,for example: len(header)= 8，TableRows==2
 		if index >= 4 {
 			break
 		}

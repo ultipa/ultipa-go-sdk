@@ -1364,19 +1364,15 @@ func bytes2result(data []byte) map[string]string {
 		return nil
 	}
 
-	// 用于存储解析后的数据
 	var result map[string]interface{}
 
-	// 将 []byte 的 JSON 数据解析为 map[string]interface{}
 	if err := json.Unmarshal(data, &result); err != nil {
 		fmt.Println("Error Unmarshal result:", err)
 		return nil
 	}
 
-	// 创建一个 map[string]string 以存储最终结果
 	finalResult := make(map[string]string)
 
-	// 遍历 map，将所有键值对转换为字符串
 	for key, value := range result {
 		finalResult[key] = fmt.Sprintf("%v", value)
 	}

@@ -149,7 +149,7 @@ func (api *UltipaAPI) InstallHDCAlgo(soFile, ymlFile, hdcName string, config *co
 		return nil, err
 	}
 
-	// reply status 暂时没有初始化，返回nil 按成功处理
+	// reply status, if nil , mark success
 	if reply.Status == nil {
 		return reply, nil
 	}

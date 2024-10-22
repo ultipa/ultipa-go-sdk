@@ -347,7 +347,7 @@ func TestInsertBoolProperty(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	//断言响应码
+
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 		log.Println(resp.Status.Message)
 		t.Log(resp.Status.Message)

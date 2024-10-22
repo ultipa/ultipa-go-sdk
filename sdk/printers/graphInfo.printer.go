@@ -23,15 +23,15 @@ func PrintGraphSet(graphs []*structs.GraphSet) {
 
 	for _, graph := range graphs {
 		table.Body.Cells = append(table.Body.Cells, []*simpletable.Cell{
-			{Text: fmt.Sprint(graph.ID)}, // 添加 ID
+			{Text: fmt.Sprint(graph.ID)}, // add ID
 			{Text: graph.Name},
 			{Text: graph.Status},
 			{Text: graph.Description},
 			{Text: fmt.Sprint(graph.TotalNodes)},
 			{Text: fmt.Sprint(graph.TotalEdges)},
-			{Text: graph.Shards},     // 添加 Shards
-			{Text: graph.SlotNum},    // 添加 SlotNum
-			{Text: graph.ReplicaNum}, // 添加 ReplicaNum
+			{Text: graph.Shards},     // add Shards
+			{Text: graph.SlotNum},    // add SlotNum
+			{Text: graph.ReplicaNum}, // add ReplicaNum
 		})
 	}
 
