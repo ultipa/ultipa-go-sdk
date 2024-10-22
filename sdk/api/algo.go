@@ -30,27 +30,27 @@ func (api *UltipaAPI) ShowAlgo(config *configuration.RequestConfig) ([]*structs.
 	return algos, nil
 }
 
-// InstallHDCAlgos install algos, file: { "soFile": "ymlFile"}
-func (api *UltipaAPI) InstallHDCAlgos(files map[string]string, hdcName string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
-	if files == nil || len(files) == 0 {
-		return nil, errors.New("empty files")
-	}
+//// InstallHDCAlgos install algos, file: { "soFile": "ymlFile"}
+//func (api *UltipaAPI) InstallHDCAlgos(files map[string]string, hdcName string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
+//	if files == nil || len(files) == 0 {
+//		return nil, errors.New("empty files")
+//	}
+//
+//	var result *ultipa.InstallAlgoReply
+//	var err error
+//	for soFile, ymlFile := range files {
+//		if result, err = api.InstallHDCAlgo(soFile, ymlFile, hdcName, config); err != nil {
+//			return nil, err
+//		}
+//	}
+//
+//	return result, nil
+//}
 
-	var result *ultipa.InstallAlgoReply
-	var err error
-	for soFile, ymlFile := range files {
-		if result, err = api.InstallHDCAlgo(soFile, ymlFile, hdcName, config); err != nil {
-			return nil, err
-		}
-	}
-
-	return result, nil
-}
-
-// InstallHDCAlgo install algo
+// Deprecated:  should use InstallHDCAlgos
 func (api *UltipaAPI) InstallHDCAlgo(soFile, ymlFile, hdcName string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
 
-	chunkSize := 1024 * 1024 * 2 // 2MB
+	chunkSize := 1024 * 1024 * 1 // 2MB
 
 	// check file status
 
@@ -235,4 +235,109 @@ func (api *UltipaAPI) GetAlgo(algoName string, config *configuration.RequestConf
 		}
 	}
 	return nil, fmt.Errorf("algo %v not found", algoName)
+}
+
+// InstallHDCAlgos  install algos
+func (api *UltipaAPI) InstallHDCAlgos(soFiles []string, ymlFile, hdcName string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
+	if soFiles == nil || len(soFiles) == 0 {
+		return nil, errors.New("empty soFiles")
+	}
+
+	client, err := api.GetControlClient(config)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel, err := api.Pool.NewContext(config)
+	if err != nil {
+		return nil, err
+	}
+	defer cancel()
+
+	streamClient, err := client.InstallAlgo(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Send each so file
+	for _, soFile := range soFiles {
+		algoFile, err := os.OpenFile(soFile, os.O_RDONLY, 0644)
+		if err != nil {
+			return nil, err
+		}
+		defer algoFile.Close()
+
+		algoFileReader := bufio.NewReader(algoFile)
+		algoFileMD5, _ := checksum.MD5sum(soFile)
+
+		// Send algo so file in chunks
+		if err := sendFileChunks(algoFileReader, streamClient, path.Base(algoFile.Name()), algoFileMD5, hdcName); err != nil {
+			return nil, err
+		}
+	}
+
+	// Send algo info file, yml
+	algoInfoFile, err := os.OpenFile(ymlFile, os.O_RDONLY, 0644)
+	if err != nil {
+		return nil, err
+	}
+	defer algoInfoFile.Close()
+
+	algoInfoFileReader := bufio.NewReader(algoInfoFile)
+	algoInfoFileMD5, _ := checksum.MD5sum(ymlFile)
+
+	// Send algo info file in chunks
+	if err := sendFileChunks(algoInfoFileReader, streamClient, path.Base(algoInfoFile.Name()), algoInfoFileMD5, ""); err != nil {
+		return nil, err
+	}
+
+	reply, err := streamClient.CloseAndRecv()
+	if err != nil {
+		return nil, err
+	}
+
+	// Reply status check, handle empty reply
+	if reply.Status == nil {
+		return reply, nil
+	}
+
+	if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(reply.Status.Msg)
+	}
+
+	return reply, nil
+}
+
+// sendFileChunks sends the file in chunks to the server
+func sendFileChunks(fileReader *bufio.Reader, streamClient ultipa.UltipaControls_InstallAlgoClient, fileName, md5, hdcName string) error {
+	chunkSize := 1024 * 1024 * 1 // 1MB
+
+	for {
+		chunk := make([]byte, chunkSize)
+		n, err := fileReader.Read(chunk)
+
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return err
+		}
+
+		request := &ultipa.InstallAlgoRequest{
+			FileName: fileName,
+			Md5:      md5,
+			Chunk:    chunk[:n],
+		}
+
+		// Only include server name if provided
+		if hdcName != "" {
+			request.WithServer = &ultipa.WithServer{HdcServerName: hdcName}
+		}
+
+		if err := streamClient.Send(request); err != nil {
+			return err
+		}
+	}
+	return nil
 }

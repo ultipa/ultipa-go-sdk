@@ -50,12 +50,12 @@ func TestAlgo(t *testing.T) {
 	//}
 
 	// InstallHDCAlgo
-	//_, err := client.InstallHDCAlgo("./test_algo_lib/libplugin_lpa.so", "./test_algo_lib/lpa.yml", hdcName, nil)
-	files := map[string]string{
-		"./test_algo_lib/libplugin_lpa.so": "./test_algo_lib/lpa.yml",
-		//"./test_algo_lib/libplugin_lpa.so": "./test_algo_lib/lpa.yml",
-	}
-	_, err := client.InstallHDCAlgos(files, hdcName, nil)
+	_, err := client.InstallHDCAlgos([]string{"./test_algo_lib/libplugin_lpa.so"}, "./test_algo_lib/lpa.yml", hdcName, nil)
+	//files := map[string]string{
+	//	"./test_algo_lib/libplugin_lpa.so": "./test_algo_lib/lpa.yml",
+	//	//"./test_algo_lib/libplugin_lpa.so": "./test_algo_lib/lpa.yml",
+	//}
+	//_, err := client.InstallHDCAlgos(files, hdcName, nil)
 
 	if err != nil {
 		t.Errorf("InstallHDCAlgo error, %v", err)
