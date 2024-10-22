@@ -237,10 +237,13 @@ func (api *UltipaAPI) GetAlgo(algoName string, config *configuration.RequestConf
 	return nil, fmt.Errorf("algo %v not found", algoName)
 }
 
-// InstallHDCAlgos  install algos
-func (api *UltipaAPI) InstallHDCAlgos(soFiles []string, ymlFile, hdcName string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
-	if soFiles == nil || len(soFiles) == 0 {
-		return nil, errors.New("empty soFiles")
+// InstallHDCAlgos  install algos, files : [...so, yml]
+func (api *UltipaAPI) InstallHDCAlgos(files []string, hdcName string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
+	if files == nil || len(files) == 0 {
+		return nil, errors.New("empty files")
+	}
+	if len(files) < 2 {
+		return nil, errors.New("lack files, At least two files are required: so + yml")
 	}
 
 	client, err := api.GetControlClient(config)
@@ -259,36 +262,23 @@ func (api *UltipaAPI) InstallHDCAlgos(soFiles []string, ymlFile, hdcName string,
 		return nil, err
 	}
 
-	// Send each so file
-	for _, soFile := range soFiles {
-		algoFile, err := os.OpenFile(soFile, os.O_RDONLY, 0644)
+	// Send each so/yml file
+	for i, file := range files {
+		algoFile, err := os.OpenFile(file, os.O_RDONLY, 0644)
 		if err != nil {
 			return nil, err
 		}
 		defer algoFile.Close()
 
 		algoFileReader := bufio.NewReader(algoFile)
-		algoFileMD5, _ := checksum.MD5sum(soFile)
+		algoFileMD5, _ := checksum.MD5sum(file)
 
-		// Send algo so file in chunks
-		if err := sendFileChunks(algoFileReader, streamClient, path.Base(algoFile.Name()), algoFileMD5, hdcName); err != nil {
+		isYml := i == len(files)-1
+
+		// Send  file in chunks
+		if err := sendFileChunks(algoFileReader, streamClient, path.Base(algoFile.Name()), algoFileMD5, hdcName, isYml); err != nil {
 			return nil, err
 		}
-	}
-
-	// Send algo info file, yml
-	algoInfoFile, err := os.OpenFile(ymlFile, os.O_RDONLY, 0644)
-	if err != nil {
-		return nil, err
-	}
-	defer algoInfoFile.Close()
-
-	algoInfoFileReader := bufio.NewReader(algoInfoFile)
-	algoInfoFileMD5, _ := checksum.MD5sum(ymlFile)
-
-	// Send algo info file in chunks
-	if err := sendFileChunks(algoInfoFileReader, streamClient, path.Base(algoInfoFile.Name()), algoInfoFileMD5, ""); err != nil {
-		return nil, err
 	}
 
 	reply, err := streamClient.CloseAndRecv()
@@ -309,7 +299,7 @@ func (api *UltipaAPI) InstallHDCAlgos(soFiles []string, ymlFile, hdcName string,
 }
 
 // sendFileChunks sends the file in chunks to the server
-func sendFileChunks(fileReader *bufio.Reader, streamClient ultipa.UltipaControls_InstallAlgoClient, fileName, md5, hdcName string) error {
+func sendFileChunks(fileReader *bufio.Reader, streamClient ultipa.UltipaControls_InstallAlgoClient, fileName, md5, hdcName string, isYml bool) error {
 	chunkSize := 1024 * 1024 * 1 // 1MB
 
 	for {
@@ -331,7 +321,7 @@ func sendFileChunks(fileReader *bufio.Reader, streamClient ultipa.UltipaControls
 		}
 
 		// Only include server name if provided
-		if hdcName != "" {
+		if !isYml && hdcName != "" {
 			request.WithServer = &ultipa.WithServer{HdcServerName: hdcName}
 		}
 
