@@ -4,15 +4,14 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"io"
-	"os"
-	"path"
-
 	"github.com/codingsince1985/checksum"
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"io"
+	"os"
+	"path"
 )
 
 // Deprecated: 5.0 not support, should use ShowHDCAlgo
@@ -31,10 +30,27 @@ func (api *UltipaAPI) ShowAlgo(config *configuration.RequestConfig) ([]*structs.
 	return algos, nil
 }
 
+// InstallHDCAlgos install algos, file: { "soFile": "ymlFile"}
+func (api *UltipaAPI) InstallHDCAlgos(files map[string]string, hdcName string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
+	if files == nil || len(files) == 0 {
+		return nil, errors.New("empty files")
+	}
+
+	var result *ultipa.InstallAlgoReply
+	var err error
+	for soFile, ymlFile := range files {
+		if result, err = api.InstallHDCAlgo(soFile, ymlFile, hdcName, config); err != nil {
+			return nil, err
+		}
+	}
+
+	return result, nil
+}
+
 // InstallHDCAlgo install algo
 func (api *UltipaAPI) InstallHDCAlgo(soFile, ymlFile, hdcName string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
 
-	chunkSize := 1024 * 1024 * 1 // 2MB
+	chunkSize := 1024 * 1024 * 2 // 2MB
 
 	// check file status
 
