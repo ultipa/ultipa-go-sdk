@@ -31,7 +31,7 @@ func TestMain(m *testing.M) {
 	//client.SayHello()
 	m.Run()
 
-	teardown()
+	//teardown()
 }
 
 func TestPing(t *testing.T) {

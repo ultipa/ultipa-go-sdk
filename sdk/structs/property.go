@@ -136,7 +136,7 @@ func (p *Property) SetTypeByString(s string) {
 		p.SubTypes = append(p.SubTypes, GetPropertyTypeByString(matches[1]))
 
 		// 5.0 server not support set type，set type = UNSET
-		p.Type = ultipa.PropertyType_UNSET
+		//p.Type = ultipa.PropertyType_UNSET
 		return
 	}
 
@@ -160,7 +160,7 @@ func (p *Property) SetTypeByString(s string) {
 		}
 		p.Extra = string(extraJson)
 
-		p.Type = ultipa.PropertyType_UNSET
+		//p.Type = ultipa.PropertyType_UNSET
 		return
 	}
 

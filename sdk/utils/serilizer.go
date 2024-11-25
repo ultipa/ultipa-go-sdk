@@ -68,12 +68,16 @@ func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType, subTypes []ultipa
 		}
 		return types.PointFromStr(str)
 		//TODO
-	//case ultipa.PropertyType_DECIMAL:
-	//TODO
+	case ultipa.PropertyType_DECIMAL:
+		if len(bs) == 0 {
+			return nil, nil
+		}
+		return AsString(bs), nil
 	case ultipa.PropertyType_LIST:
 		return deserializeList(bs, subTypes)
 	//	//TODO
-	//case ultipa.PropertyType_SET:
+	case ultipa.PropertyType_SET:
+		return deserializeSet(bs, subTypes)
 	//	//TODO
 	//case ultipa.PropertyType_MAP:
 	//	//TODO
@@ -139,12 +143,12 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 	toConvertValue := value
 	if toConvertValue == nil {
 		switch t {
-		case ultipa.PropertyType_SET:
-			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+		//case ultipa.PropertyType_SET:
+		//    return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 		case ultipa.PropertyType_MAP:
 			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
-		case ultipa.PropertyType_DECIMAL:
-			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+		//case ultipa.PropertyType_DECIMAL:
+		//	return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 		default:
 			return GetNullBytes(t), nil
 		}
@@ -171,7 +175,7 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 		}
 
 	case ultipa.PropertyType_DECIMAL:
-		return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+		return serializeDecimal(value)
 	case ultipa.PropertyType_SET:
 		return SerializeSetData(value, subTypes, req)
 	case ultipa.PropertyType_MAP:

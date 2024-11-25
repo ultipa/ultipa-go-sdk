@@ -20,12 +20,26 @@ type InsertResponse struct {
 }
 
 var InsertErrorCodeMsgMap = map[int]string{
+	//10001: "uuid and id not match",
+	//10002: "id and schema not match",
+	//10003: "from_id not exist",
+	//10004: "to_id not exist",
+	//10005: "id length exceed max length(128 bytes)",
+	//10007: "duplicate ids in the data or the ids already exist in the database",
+	// update in 2024-11-12
 	10001: "uuid and id not match",
 	10002: "id and schema not match",
 	10003: "from_id not exist",
 	10004: "to_id not exist",
-	10005: "id length exceed max length(128 bytes)",
+	10005: "id length exceed max length (128 bytes)",
+	10006: "some required field is null",
 	10007: "duplicate ids in the data or the ids already exist in the database",
+	10008: "id is empty",
+	10009: "from_id is empty",
+	10010: "to_id is empty",
+	10011: "duplicate id found in the data",
+	11001: "operation succeeded but the id already existed",
+	19999: "other error",
 }
 
 func NewNodesInsertResponse(reply *ultipa.InsertNodesReply) (response *InsertResponse, err error) {
