@@ -7,6 +7,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"strings"
 )
 
 func (api *UltipaAPI) ShowGraph(requestConfig *configuration.RequestConfig) (graphSets []*structs.GraphSet, err error) {
@@ -37,11 +38,11 @@ func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, requestConfig *config
 	if graph == nil {
 		return nil, errors.New("graph cannot be nil")
 	}
-	if graph.Name == "" || graph.PartitionBy == "" || graph.Shards == "" {
+	if graph.Name == "" || graph.PartitionBy == "" || len(graph.Shards) == 0 {
 		return nil, errors.New("graph Name/Shards/PartitionBy cannot be empty")
 	}
 
-	resp, err := api.Uql(fmt.Sprintf(`create().graph("%v", "%v").shards([%v]).partitionByHash('%v',_id)`, graph.Name, graph.Description, graph.Shards, graph.PartitionBy), requestConfig)
+	resp, err := api.Uql(fmt.Sprintf(`create().graph("%v", "%v").shards([%v]).partitionByHash('%v',_id)`, graph.Name, graph.Description, strings.Join(graph.Shards, ","), graph.PartitionBy), requestConfig)
 
 	if err != nil {
 		api.Logger.Log("create graph failed : " + graph.Name + " " + err.Error())

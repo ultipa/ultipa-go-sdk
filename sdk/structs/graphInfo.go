@@ -21,9 +21,9 @@ type GraphSet struct {
 	TotalEdges  uint64
 	Description string
 	Status      string
-	Shards      string
+	Shards      []string
 	SlotNum     string
-	ReplicaNum  string
+	//ReplicaNum  string
 	PartitionBy string
 }
 

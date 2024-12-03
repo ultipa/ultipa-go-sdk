@@ -46,7 +46,7 @@ func TestCreateGraph(t *testing.T) {
 
 	graphSet := &structs.GraphSet{
 		Name:        graphName,
-		Shards:      "2,3",
+		Shards:      []string{"2,3"},
 		PartitionBy: "Crc32",
 	}
 	_, err = client.CreateGraph(graphSet, nil)
@@ -110,7 +110,7 @@ func TestCreateGraphIfNotExist(t *testing.T) {
 
 	_, _, err := client.CreateGraphIfNotExist(&structs.GraphSet{
 		Name:        "test1123231",
-		Shards:      "1,2",
+		Shards:      []string{"1,2"},
 		PartitionBy: "Crc32",
 	}, nil)
 	if err != nil {

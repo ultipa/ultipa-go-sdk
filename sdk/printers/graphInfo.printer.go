@@ -2,6 +2,7 @@ package printers
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/alexeyco/simpletable"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
@@ -29,9 +30,9 @@ func PrintGraphSet(graphs []*structs.GraphSet) {
 			{Text: graph.Description},
 			{Text: fmt.Sprint(graph.TotalNodes)},
 			{Text: fmt.Sprint(graph.TotalEdges)},
-			{Text: graph.Shards},     // add Shards
-			{Text: graph.SlotNum},    // add SlotNum
-			{Text: graph.ReplicaNum}, // add ReplicaNum
+			{Text: "[" + strings.Join(graph.Shards, ",") + "]"}, // add Shards
+			{Text: graph.SlotNum},                               // add SlotNum
+			//{Text: graph.ReplicaNum},                            // add ReplicaNum
 		})
 	}
 

@@ -7,6 +7,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/types"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
@@ -554,7 +555,7 @@ func (di *DataItem) AsGraphSets() (graphSets []*structs.GraphSet, err error) {
 		description := v.Get("description").(string)
 		shards := v.Get("shards").(string)
 		slotNum := v.Get("slot_num").(string)
-		replicaNum := v.Get("replica_num").(string)
+		//replicaNum := v.Get("replica_num").(string)
 		partitionBy := v.Get("partition_by").(string)
 
 		var totalNodes uint64 = 0
@@ -575,9 +576,9 @@ func (di *DataItem) AsGraphSets() (graphSets []*structs.GraphSet, err error) {
 			TotalEdges:  totalEdges,
 			Status:      status,
 			Description: description,
-			Shards:      shards,
+			Shards:      strings.Split(shards, ","),
 			SlotNum:     slotNum,
-			ReplicaNum:  replicaNum,
+			//ReplicaNum:  replicaNum,
 			PartitionBy: partitionBy,
 		})
 	}
