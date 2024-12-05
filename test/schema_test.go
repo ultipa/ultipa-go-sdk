@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
-	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"github.com/ultipa/ultipa-go-sdk/utils"
@@ -109,16 +108,11 @@ func TestCompareSchema(t *testing.T) {
 }
 
 func TestShowSchema(t *testing.T) {
-	resp, err := client.Uql("show().schema()", nil)
+	nodeSchemas, err := client.ShowNodeSchema(nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	nodeSchemas, err := resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
-	if err != nil {
-		t.Fatal(err)
-	}
-	edgeSchemas, err := resp.Alias(http.RESP_EDGE_SCHEMA_KEY).AsSchemas()
+	edgeSchemas, err := client.ShowEdgeSchema(nil)
 	if err != nil {
 		t.Fatal(err)
 	}

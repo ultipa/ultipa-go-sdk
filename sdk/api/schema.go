@@ -62,41 +62,43 @@ func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) (*s
 }
 
 func (api *UltipaAPI) ShowNodeSchema(requestConfig *configuration.RequestConfig) ([]*structs.Schema, error) {
-	var resp *http.UQLResponse
-	var err error
-	var schemas []*structs.Schema
-
-	resp, err = api.Uql(fmt.Sprintf(`show().node_schema()`), requestConfig)
+	var nodeSchemas []*structs.Schema
+	schemas, err := api.ShowSchema(requestConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	schemas, err = resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
-
-	if len(schemas) == 0 {
-		return nil, fmt.Errorf("no data return")
+	for _, schema := range schemas.Schemas {
+		if schema.DBType == ultipa.DBType_DBNODE {
+			nodeSchemas = append(nodeSchemas, schema)
+		}
 	}
 
-	return schemas, err
+	//if len(nodeSchemas) == 0 {
+	//	return nil, fmt.Errorf("no data return")
+	//}
+
+	return nodeSchemas, err
 }
 
 func (api *UltipaAPI) ShowEdgeSchema(requestConfig *configuration.RequestConfig) ([]*structs.Schema, error) {
-	var resp *http.UQLResponse
-	var err error
-	var schemas []*structs.Schema
-
-	resp, err = api.Uql(fmt.Sprintf(`show().edge_schema()`), requestConfig)
+	var nodeSchemas []*structs.Schema
+	schemas, err := api.ShowSchema(requestConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	schemas, err = resp.Alias(http.RESP_EDGE_SCHEMA_KEY).AsSchemas()
-
-	if len(schemas) == 0 {
-		return nil, fmt.Errorf("no data return")
+	for _, schema := range schemas.Schemas {
+		if schema.DBType == ultipa.DBType_DBEDGE {
+			nodeSchemas = append(nodeSchemas, schema)
+		}
 	}
 
-	return schemas, err
+	//if len(nodeSchemas) == 0 {
+	//	return nil, fmt.Errorf("no data return")
+	//}
+
+	return nodeSchemas, err
 }
 
 func (api *UltipaAPI) GetSchema(schemaName string, dbType ultipa.DBType, requestConfig *configuration.RequestConfig) (*structs.Schema, error) {
