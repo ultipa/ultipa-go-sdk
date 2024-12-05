@@ -19,7 +19,7 @@ func PrintGraphSet(graphs []*structs.GraphSet) {
 		{Text: "Total Edge"},
 		{Text: "Shards"},
 		{Text: "Slot Num"},
-		{Text: "Replica Num"},
+		//{Text: "Replica Num"},
 	}
 
 	for _, graph := range graphs {
