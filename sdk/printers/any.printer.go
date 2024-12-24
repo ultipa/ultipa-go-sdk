@@ -2,6 +2,7 @@ package printers
 
 import (
 	"fmt"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 	"log"
 	"strings"
 
@@ -15,6 +16,13 @@ func PrintAny(dataitem *http.DataItem) {
 		fmt.Println("No dataItem found.")
 		return
 	}
+
+	if dataitem.Data == nil {
+
+		fmt.Println(dataitem.Type.String() + ": No Return Data")
+		return
+	}
+
 	switch dataitem.Type {
 	case ultipa.ResultType_RESULT_TYPE_NODE:
 		nodes, schemas, _ := dataitem.AsNodes()
@@ -31,7 +39,8 @@ func PrintAny(dataitem *http.DataItem) {
 			schemas, err := dataitem.AsSchemas()
 
 			if err != nil {
-				log.Fatalln(err)
+				logger.PrintWarn(err.Error())
+				//log.Fatalln(err)
 			}
 
 			PrintSchema(schemas)
@@ -39,20 +48,23 @@ func PrintAny(dataitem *http.DataItem) {
 		}
 
 		// handle algo table
-		if strings.Contains(res.Name, http.RESP_ALGOS_KEY) {
-			algos, err := dataitem.AsAlgos()
-
-			if err != nil {
-				log.Fatalln(err)
-			}
-
-			PrintAlgoList(algos)
-			return
-
-		}
+		// comment in 5.0 no support algo
+		//if strings.Contains(res.Name, http.RESP_ALGOS_KEY) {
+		//    algos, err := dataitem.AsAlgos()
+		//
+		//    if err != nil {
+		//        logger.PrintWarn(err.Error())
+		//        //log.Fatalln(err)
+		//    }
+		//
+		//    PrintAlgoList(algos)
+		//    return
+		//
+		//}
 
 		if err != nil {
-			log.Fatalln(err)
+			logger.PrintWarn(err.Error())
+			//log.Fatalln(err)
 		}
 
 		PrintTable(res)
@@ -60,14 +72,16 @@ func PrintAny(dataitem *http.DataItem) {
 		paths, err := dataitem.AsPaths()
 
 		if err != nil {
-			log.Fatalln(err)
+			logger.PrintWarn(err.Error())
+			//log.Fatalln(err)
 		}
 
 		PrintPaths(paths)
 	case ultipa.ResultType_RESULT_TYPE_ATTR:
 		attr, err := dataitem.AsAttr()
 		if err != nil {
-			log.Fatalln(err)
+			logger.PrintWarn(err.Error())
+			//log.Fatalln(err)
 		}
 
 		PrintAttr(attr)

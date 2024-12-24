@@ -54,7 +54,7 @@ func (api *UltipaAPI) InstallHDCAlgo(soFile, ymlFile, hdcName string, config *co
 
 	// check file status
 
-	algoFile, err := os.OpenFile(soFile, os.O_RDONLY, 0644)
+	algoFile, err := os.Open(soFile)
 
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (api *UltipaAPI) InstallHDCAlgo(soFile, ymlFile, hdcName string, config *co
 
 	algoFileMD5, _ := checksum.MD5sum(soFile)
 
-	algoInfoFile, err := os.OpenFile(ymlFile, os.O_RDONLY, 0644)
+	algoInfoFile, err := os.Open(ymlFile)
 
 	if err != nil {
 		return nil, err
@@ -264,7 +264,7 @@ func (api *UltipaAPI) InstallHDCAlgos(files []string, hdcName string, config *co
 
 	// Send each so/yml file
 	for i, file := range files {
-		algoFile, err := os.OpenFile(file, os.O_RDONLY, 0644)
+		algoFile, err := os.Open(file)
 		if err != nil {
 			return nil, err
 		}

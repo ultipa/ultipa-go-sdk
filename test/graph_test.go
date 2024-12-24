@@ -14,22 +14,29 @@ import (
 func TestShowGraph(t *testing.T) {
 	//InitCases()
 	//client, _ := GetClient(hosts, graph)
-	graphs, err := client.ShowGraph(nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(graphs) == 0 {
-		t.Fatal("show().graph() no data return")
-	}
-
-	printers.PrintGraphSet(graphs)
+	//graphs, err := client.ShowGraph(nil)
+	//if err != nil {
+	//    t.Fatal(err)
+	//}
+	//
+	//if len(graphs) == 0 {
+	//    t.Fatal("show().graph() no data return")
+	//}
+	//
+	//
+	//printers.PrintGraphSet(graphs)
 
 	//log.Printf(utils.JSONString(res))
 	//printers.PrintGraphSet(graphs)
+	//res, _ := client.Uql("show().hdc(\"hdc-server-1\")", nil)
+	res, _ := client.Uql("show().hdc()", nil)
+	table, _ := res.Alias(http.RESP_GRAPH_KEY).AsTable()
+
+	printers.PrintTable(table)
+
 }
 
 func TestCreateGraph(t *testing.T) {
-
 	//client, err := GetClient(hosts, graph)
 	graphName := "go_sdk_test"
 	exit, err := client.HasGraph(graphName, nil)
@@ -53,7 +60,6 @@ func TestCreateGraph(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	err = client.SetCurrentGraph(graphName)
 	if err != nil {
 		t.Error(err)

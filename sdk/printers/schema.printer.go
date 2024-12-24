@@ -12,7 +12,12 @@ import (
 func PrintSchema(schemas []*structs.Schema) {
 
 	for _, schema := range schemas {
-		fmt.Println(fmt.Sprintf("Schema: %v - %v (%d)", schema.Id, schema.Name, schema.Total))
+		if schema.Total != 0 {
+			fmt.Println(fmt.Sprintf("Schema: %v - %v (%d)", schema.Id, schema.Name, schema.Total))
+		} else {
+			fmt.Println(fmt.Sprintf("Schema: %v - %v", schema.Id, schema.Name))
+		}
+
 		fmt.Println("Description: ", schema.Desc)
 		table := simpletable.New()
 		table.Header.Cells = []*simpletable.Cell{{Text: "Name"}, {Text: "Description"}, {Text: "Type"}, {Text: "LTE"}, {Text: "Schema"}}

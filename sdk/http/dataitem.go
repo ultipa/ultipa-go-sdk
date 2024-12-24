@@ -214,6 +214,11 @@ func (di *DataItem) AsTable() (table *structs.Table, err error) {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Table")
 	}
 
+	// fix top() return nil
+	if di.Data == nil {
+		return nil, errors.New(di.Type.String() + ": No Return Data")
+	}
+
 	oTable := di.Data.(*ultipa.Table)
 
 	table = structs.NewTable()
