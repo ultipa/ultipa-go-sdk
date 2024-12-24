@@ -1175,7 +1175,7 @@ func (di *DataItem) AsTops() (tops []*structs.Top, err error) {
 	return tops, err
 }
 
-func (di *DataItem) AsStats() (stat *structs.Stat, err error) {
+func (di *DataItem) AsStats() (stat *structs.Stats, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, errors.New("ResultType_RESULT_TYPE_UNSET")
@@ -1201,7 +1201,7 @@ func (di *DataItem) AsStats() (stat *structs.Stat, err error) {
 	}
 	formattedDate := parsedTime.Format("2006-01-02 15:04:05")
 
-	s := &structs.Stat{
+	s := &structs.Stats{
 		CPUUsage:    string(values[0]),
 		MemUsage:    string(values[1]),
 		ExpiredDate: formattedDate,

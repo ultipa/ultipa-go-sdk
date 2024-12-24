@@ -1,6 +1,6 @@
 package structs
 
-type Stat struct {
+type Stats struct {
 	CPUUsage    string `json:"cpuUsage"`
 	MemUsage    string `json:"memUsage"`
 	ExpiredDate string `json:"expiredDate"`
