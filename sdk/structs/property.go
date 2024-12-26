@@ -129,11 +129,18 @@ func (p *Property) SetTypeByString(s string) {
 	}
 
 	// set
-	reg := regexp.MustCompile(`set\(([^)]+)\)`)
+	reg := regexp.MustCompile(`set\(([^)]+)\)|set<([^>]+)>`)
 	if reg.MatchString(s) {
 		matches := reg.FindStringSubmatch(s)
+		var subType string
+		if matches[1] != "" { //  set(...)
+			subType = matches[1]
+		} else if matches[2] != "" { //  set<...>
+			subType = matches[2]
+		}
+
 		p.Type = ultipa.PropertyType_SET
-		p.SubTypes = append(p.SubTypes, GetPropertyTypeByString(matches[1]))
+		p.SubTypes = append(p.SubTypes, GetPropertyTypeByString(subType))
 
 		// 5.0 server not support set type，set type = UNSET
 		//p.Type = ultipa.PropertyType_UNSET

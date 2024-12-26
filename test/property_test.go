@@ -19,6 +19,11 @@ import (
 )
 
 func TestShowProperty(t *testing.T) {
+	pro3, err := client.GetProperty(ultipa.DBType_DBNODE, "insertNode", "typeSetString", nil)
+	if err != nil {
+		log.Println(err)
+	}
+	printers.PrintProperty([]*structs.Property{pro3})
 
 	nodeProp, edgeProp, err := client.ShowProperty(12, "", nil)
 
