@@ -10,7 +10,7 @@ import (
 
 type Truncate struct {
 	GraphName string
-	DbType    *ultipa.DBType
+	DBType    *ultipa.DBType
 	Schema    string
 }
 

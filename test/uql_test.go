@@ -1,8 +1,15 @@
 package test
 
 import (
+	"encoding/json"
+	"fmt"
+	"github.com/pieterclaerhout/go-waitgroup"
+	"github.com/ultipa/ultipa-go-sdk/sdk"
+	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 	"log"
+	"sync"
 	"testing"
+	"time"
 
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
@@ -67,10 +74,36 @@ return docs_path{*}, role_path{*},books`
 }
 
 func TestUQL2(t *testing.T) {
+	requestConfig := &configuration.RequestConfig{
+		UseMaster: false,
+		GraphName: "ts",
+	}
+
+	insertRequestConfig := &configuration.InsertRequestConfig{
+		Silent:        false,
+		RequestConfig: requestConfig,
+		InsertType:    ultipa.InsertType_NORMAL,
+	}
+
+	myDeletion, _ := client.DeleteNodes("{_id == 'test_silent'}", insertRequestConfig)
+	println("Operation succeeds:", myDeletion.Status.IsSuccess(), "message: ", myDeletion.Status.Message)
+	nodes, _, _ := myDeletion.Alias("nodes").AsNodes()
+	for _, node := range nodes {
+		jsonData, err := json.Marshal(node)
+		if err != nil {
+			fmt.Println("Error converting to JSON:", err)
+			return
+		}
+
+		fmt.Println(string(jsonData))
+	}
+
+	//println("Operation succeeds:", myDeletion.Status.IsSuccess())
 	//client, _ := GetClient(hosts, graph)
 
 	//uql := `n({@user && _uuid == 1}).e({@relation.relation_type == 'has'}).n({@projects} as project).re({@relation.relation_type == 'has'}).n({@etl} as etl) group by project skip 0 return table(project._id,project._uuid,count(etl)) as t limit 15 order by project.created_at desc`
-	uql := `find().nodes() return nodes limit 10`
+	//uql := `find().nodes() return nodes limit 10`
+	uql := `find().nodes({uuid in [10009, 1]}) as n return n.year`
 	//uql := `find().nodes({@movie}) as nodes return nodes{*} limit 10`
 
 	log.Println("Exec : ", uql)
@@ -82,7 +115,7 @@ func TestUQL2(t *testing.T) {
 		t.Fatal(err)
 	}
 	printers.PrintAny(resp.Get(0))
-	nodes, _, _ := resp.Get(0).AsNodes()
+	nodes, _, _ = resp.Get(0).AsNodes()
 
 	log.Println(nodes)
 
@@ -521,3 +554,142 @@ func TestInsertReturnNodes(t *testing.T) {
 	//printers.PrintNodes(nodes, schema)
 	//fmt.Println(res)
 }
+
+func TestUqlKhop(t *testing.T) {
+	//var graphName = "cli_test"
+	var uql = `khop().src({_id == "2069573"}).depth(1) as n return count(n)`
+
+	totalRequests := 10000
+	concurrency := 200
+
+	// 创建 WaitGroup 来等待所有请求完成
+	var wg sync.WaitGroup
+
+	// 使用有缓冲的通道来限制最大并发数
+	sem := make(chan struct{}, concurrency)
+	log.Println("start")
+	start := time.Now()
+
+	for i := 0; i < totalRequests; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+
+			// 控制并发数
+			sem <- struct{}{}
+
+			// 发送请求
+			_, _ = client.Uql(uql, nil)
+
+			//_, _, err := res.Alias("node").AsNodes()
+			//if err != nil {
+			//    t.Fatalf("Insert ReturnNodes error, %v", err)
+			//}
+			//if res.Status != nil{
+			//
+			//}
+
+			// 打印每次请求的结果或其他处理
+			//fmt.Printf("Request #%d completed\n", i)
+
+			// 释放信号量
+			<-sem
+		}(i)
+	}
+
+	// 等待所有请求完成
+	wg.Wait()
+	log.Println("All requests completed, cost time:", time.Since(start).Seconds())
+}
+
+func TestUqlKhop2(t *testing.T) {
+	var uql = `khop().src({_id == "2069573"}).depth(1) as n return count(n)`
+
+	totalRequests := 10000
+	//concurrency := 200
+
+	// 使用 WaitGroup 来等待所有 Goroutine 完成
+	var wg sync.WaitGroup
+
+	// 使用有缓冲的通道来控制并发
+	//sem := make(chan struct{}, concurrency)
+	log.Println("start")
+	start := time.Now()
+
+	for i := 0; i < totalRequests; i++ {
+		wg.Add(1)
+		go func() {
+			wg.Done()
+			_, _ = client.Uql(uql, nil)
+
+		}()
+	}
+
+	// 等待所有请求完成
+	wg.Wait()
+	log.Println("All requests completed, cost time:", time.Since(start).Seconds())
+}
+
+//TIP To run your code, right-click the code and select <b>Run</b>. Alternatively, click
+// the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.
+
+func TestKK(t *testing.T) {
+
+	config, _ := configuration.NewUltipaConfig(&configuration.UltipaConfig{
+		Hosts: []string{
+			"192.168.1.88:63801",
+		},
+		Password:     "root",
+		Username:     "root",
+		CurrentGraph: "ldbc_tiger_sf100_ic_fix_type",
+	})
+
+	client, err := sdk.NewUltipa(config)
+	if err != nil {
+		t.Error("connect failed,", err)
+	}
+
+	thread := 200
+	wg := waitgroup.NewWaitGroup(thread)
+
+	logger.PrintInfo("started")
+	start := time.Now()
+	totalTime := 0
+	total := 10000
+	finished := 0
+	//mu := sync.RWMutex{}
+
+	for i := 0; i < total; i++ {
+		wg.BlockAdd()
+		go func() {
+			defer wg.Done()
+
+			res, err := client.Uql(`khop().src({_id == "2069573"}).depth(1) as n return count(n)`, nil)
+
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			if !res.Status.IsSuccess() {
+				logger.PrintWarn(res.Status.Message)
+			}
+			//mu.Lock()
+			finished++
+			if finished%2000 == 0 {
+				logger.PrintInfo(fmt.Sprintf("finished:%d / %d", finished, total))
+			}
+			totalTime += res.Statistic.TotalCost
+			//mu.Unlock()
+
+		}()
+	}
+	wg.Wait()
+
+	end := time.Now()
+	duration := end.Sub(start)
+
+	fmt.Println("Thread", thread, "finishd", finished, "total time:", duration, "AVG per query(ms)", totalTime/total)
+}
+
+//TIP See GoLand help at <a href="https://www.jetbrains.com/help/go/">jetbrains.com/help/go/</a>.
+// Also, you can try interactive lessons for GoLand by selecting 'Help | Learn IDE Features' from the main menu.

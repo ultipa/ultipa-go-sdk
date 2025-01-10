@@ -23,7 +23,7 @@ func TestHDCGraph(t *testing.T) {
 			},
 		},
 	}
-	response, err := client.CreateHDCGraphBySchema("graphName", nodeSchemas, nil, "async", "hdcGraph", nil)
+	response, err := client.CreateHDCGraphBySchema("", nodeSchemas, nil, "async", "hdcGraph", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -155,7 +155,7 @@ func ExampleUltipaAPI_CreateNodeProperty() {
 	resp2, _ := client.CreateProperty(ultipa.DBType_DBEDGE, "target_schema", newEdgeProp, nil)
 	log.Println(resp2.Status.Code)
 
-	exist, _ := client.CreatePropertyIfNotExist(ultipa.DBType_DBEDGE, "target_schema", newEdgeProp, nil)
+	exist, _, _ := client.CreatePropertyIfNotExist(ultipa.DBType_DBEDGE, "target_schema", newEdgeProp, nil)
 	log.Println(exist)
 }
 

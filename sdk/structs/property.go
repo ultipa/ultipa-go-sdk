@@ -179,6 +179,9 @@ func (p *Property) GetStringType() (string, error) {
 		if len(p.SubTypes) == 0 {
 			return "", errors.New(fmt.Sprintf("Property [%s] is List but not specified subTypes", p.Name))
 		}
+		if p.SubTypes[0] == ultipa.PropertyType_DECIMAL {
+			return "", errors.New(fmt.Sprintf("Property [%s] is List, subTypes not support decimal", p.Name))
+		}
 		return GetStringByPropertyType(p.SubTypes[0]) + "[]", nil
 	}
 	if p.Type == ultipa.PropertyType_SET {

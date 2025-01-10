@@ -1030,7 +1030,7 @@ func (di *DataItem) AsPolicies() (policies []*structs.Policy, err error) {
 }
 
 func bytesToPolicy(data [][]byte) (*structs.Policy, error) {
-	if len(data) != 4 {
+	if len(data) != 5 {
 		return nil, fmt.Errorf("invalid data length, expected 4 but got %d", len(data))
 	}
 
@@ -1049,13 +1049,13 @@ func bytesToPolicy(data [][]byte) (*structs.Policy, error) {
 		return nil, fmt.Errorf("failed to unmarshal SystemPrivileges: %w", err)
 	}
 
-	// PropertyPrivileges
-	//if err := json.Unmarshal(data[3], &policy.PropertyPrivileges); err != nil {
-	//	return nil, fmt.Errorf("failed to unmarshal PropertyPrivileges: %w", err)
-	//}
+	//PropertyPrivileges
+	if err := json.Unmarshal(data[3], &policy.PropertyPrivileges); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal PropertyPrivileges: %w", err)
+	}
 
 	// AsPolicies
-	if err := json.Unmarshal(data[3], &policy.Policies); err != nil {
+	if err := json.Unmarshal(data[4], &policy.Policies); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal AsPolicies: %w", err)
 	}
 
@@ -1291,7 +1291,7 @@ func bytesToUser(data [][]byte) (*structs.User, error) {
 
 	var user structs.User
 
-	// Name
+	// UserName
 	user.UserName = string(data[0])
 
 	// Create
@@ -1300,23 +1300,28 @@ func bytesToUser(data [][]byte) (*structs.User, error) {
 	user.Create = create.Format("2006-01-02 15:04:05")
 
 	// LastLogin
-	timestamp, _ = strconv.ParseInt(string(data[1]), 10, 64)
-	lastLogin := time.Unix(timestamp, 0)
-	user.LastLogin = lastLogin.Format("2006-01-02 15:04:05")
+	//timestamp, _ = strconv.ParseInt(string(data[1]), 10, 64)
+	//lastLogin := time.Unix(timestamp, 0)
+	//user.LastLogin = lastLogin.Format("2006-01-02 15:04:05")
 
 	// GraphPrivileges
-	if err := json.Unmarshal(data[3], &user.GraphPrivileges); err != nil {
+	if err := json.Unmarshal(data[2], &user.GraphPrivileges); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal GraphPrivileges: %w", err)
 	}
 
 	// SystemPrivileges
-	if err := json.Unmarshal(data[4], &user.SystemPrivileges); err != nil {
+	if err := json.Unmarshal(data[3], &user.SystemPrivileges); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal SystemPrivileges: %w", err)
+	}
+
+	// propertyPrivileges
+	if err := json.Unmarshal(data[4], &user.PropertyPrivileges); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal PropertyPrivileges: %w", err)
 	}
 
 	// AsPolicies
 	if err := json.Unmarshal(data[5], &user.Policies); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal PropertyPrivileges: %w", err)
+		return nil, fmt.Errorf("failed to unmarshal Policies: %w", err)
 	}
 
 	//// PropertyPrivileges

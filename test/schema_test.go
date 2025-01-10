@@ -1,6 +1,7 @@
 package test
 
 import (
+	http2 "github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"log"
 	"testing"
 
@@ -108,6 +109,11 @@ func TestCompareSchema(t *testing.T) {
 }
 
 func TestShowSchema(t *testing.T) {
+	client.SetCurrentGraph("call")
+	response, _ := client.Uql("show().node_schema()", nil)
+
+	printers.PrintAny(response.Alias(http2.RESP_NODE_SCHEMA_KEY))
+
 	nodeSchemas, err := client.ShowNodeSchema(nil)
 	if err != nil {
 		t.Fatal(err)

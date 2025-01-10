@@ -220,7 +220,7 @@ func TestProperty2(t *testing.T) {
 		Desc: "中文描述",
 		Type: ultipa.PropertyType_STRING,
 	}
-	_, err := client.CreatePropertyIfNotExist(ultipa.DBType_DBNODE, "default", prop, nil)
+	_, _, err := client.CreatePropertyIfNotExist(ultipa.DBType_DBNODE, "default", prop, nil)
 	if err != nil {
 		log.Println(err)
 	}

@@ -19,7 +19,8 @@ func (api *UltipaAPI) CreateProperty(dbType ultipa.DBType, schemaName string, pr
 	case ultipa.DBType_DBEDGE:
 		params = "edge_property"
 	default:
-		return nil, errors.New("create property: unknown db type")
+		errStr := fmt.Sprintf("create property: unknown db type, %v", dbType.String())
+		return nil, errors.New(errStr)
 	}
 
 	if prop.Type == structs.PropertyType_IGNORE {
@@ -53,23 +54,23 @@ func (api *UltipaAPI) CreateProperty(dbType ultipa.DBType, schemaName string, pr
 	return resp, nil
 }
 
-func (api *UltipaAPI) CreatePropertyIfNotExist(dbType ultipa.DBType, schemaName string, prop *structs.Property, requestConfig *configuration.RequestConfig) (exist bool, err error) {
+func (api *UltipaAPI) CreatePropertyIfNotExist(dbType ultipa.DBType, schemaName string, prop *structs.Property, requestConfig *configuration.RequestConfig) (exist bool, resp *http.UQLResponse, err error) {
 	property, err := api.GetProperty(dbType, schemaName, prop.Name, requestConfig)
 
 	if err != nil {
-		return false, err
+		return false, nil, err
 	}
 
 	if property == nil {
-		_, err = api.CreateProperty(dbType, schemaName, prop, requestConfig)
+		resp, err = api.CreateProperty(dbType, schemaName, prop, requestConfig)
 		if err != nil {
-			return false, err
+			return false, resp, err
 		}
 
-		return false, nil
+		return false, resp, nil
 	}
 
-	return true, nil
+	return true, resp, nil
 }
 
 func (api *UltipaAPI) GetProperty(dbType ultipa.DBType, schemaName string, propertyName string, requestConfig *configuration.RequestConfig) (property *structs.Property, err error) {

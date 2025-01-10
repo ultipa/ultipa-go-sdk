@@ -83,6 +83,16 @@ func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, requestConfig *config
 	return resp, err
 }
 
+func (api *UltipaAPI) RebalanceGraph(graph *structs.GraphSet, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+	if graph == nil {
+		return nil, errors.New("graph cannot be nil")
+	}
+	if graph.Name == "" || graph.PartitionBy == "" || len(graph.Shards) == 0 {
+		return nil, errors.New("graph Name/Shards/PartitionBy cannot be empty")
+	}
+	return api.Uql(fmt.Sprintf(`alter().graph("%v", "%v").shards([%v]).partitionByHash('%v',_id)`, graph.Name, graph.Description, strings.Join(graph.Shards, ","), graph.PartitionBy), requestConfig)
+}
+
 func (api *UltipaAPI) DropGraph(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 	resp, err := api.Uql(fmt.Sprintf(`drop().graph("%v")`, graphName), requestConfig)
 
@@ -143,9 +153,9 @@ func (api *UltipaAPI) AlterGraph(oldGraph, newGraph *structs.GraphSet, requestCo
 
 func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 	uql := ""
-	if request.DbType == nil {
+	if request.DBType == nil {
 		t := ultipa.DBType_DBGLOBAL
-		request.DbType = &t
+		request.DBType = &t
 	}
 
 	schemaName, err := CheckReplaceSchemaPropertyName(request.Schema)
@@ -154,9 +164,9 @@ func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configu
 	}
 
 	if request.Schema != "" {
-		if !(*request.DbType == ultipa.DBType_DBNODE || *request.DbType == ultipa.DBType_DBEDGE) {
+		if !(*request.DBType == ultipa.DBType_DBNODE || *request.DBType == ultipa.DBType_DBEDGE) {
 			//return nil, fmt.Errorf("to truncate schema, dbType must be DBType_DBNODE or DBType_DBEDGE")
-			return nil, fmt.Errorf("to truncate schema, DbType is required in the parameters")
+			return nil, fmt.Errorf("to truncate schema, DBType is required in the parameters")
 		}
 
 		if request.Schema == "*" {
@@ -166,12 +176,12 @@ func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configu
 		}
 
 	} else {
-		if !(*request.DbType == ultipa.DBType_DBGLOBAL) {
+		if !(*request.DBType == ultipa.DBType_DBGLOBAL) {
 			return nil, fmt.Errorf("to truncate graph, dbType must be DBType_DBGLOBAL or nil")
 		}
 	}
 
-	switch *request.DbType {
+	switch *request.DBType {
 	case ultipa.DBType_DBNODE:
 		uql = fmt.Sprintf(`truncate().graph("%v").nodes(%v)`, request.GraphName, request.Schema)
 	case ultipa.DBType_DBEDGE:
