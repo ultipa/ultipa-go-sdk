@@ -19,6 +19,8 @@ func GetCertificate(host string) *x509.Certificate {
 	if len(certs) == 0 {
 		return nil
 	}
+	//fmt.Printf("Certificate valid from: %s\n", certs[0].NotBefore)
+	//fmt.Printf("Certificate valid until: %s\n", certs[0].NotAfter)
 
 	// Returns the first certificate
 	return certs[0]

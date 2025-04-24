@@ -22,7 +22,7 @@ func PrintAttr(attr *structs.Attr) {
 	case ultipa.PropertyType_LIST:
 		switch attr.ResultType {
 		case ultipa.ResultType_RESULT_TYPE_NODE:
-			for _, row := range attr.Rows {
+			for _, row := range attr.Values {
 				if row == nil {
 					continue
 				}
@@ -31,7 +31,7 @@ func PrintAttr(attr *structs.Attr) {
 			}
 			return
 		case ultipa.ResultType_RESULT_TYPE_EDGE:
-			for _, row := range attr.Rows {
+			for _, row := range attr.Values {
 				if row == nil {
 					continue
 				}
@@ -40,7 +40,7 @@ func PrintAttr(attr *structs.Attr) {
 			}
 			return
 		case ultipa.ResultType_RESULT_TYPE_PATH:
-			for _, row := range attr.Rows {
+			for _, row := range attr.Values {
 				if row == nil {
 					continue
 				}
@@ -115,7 +115,7 @@ func printSimpleAttr(attr *structs.Attr) {
 
 func getAttrStr(attr *structs.Attr) []string {
 	var result []string
-	for _, row := range attr.Rows {
+	for _, row := range attr.Values {
 		if row == nil {
 			result = append(result, "<nil>")
 		} else {
@@ -159,13 +159,13 @@ func getAttrStrWithList(attr *structs.Attr) []string {
 		return []string{}
 	case ultipa.PropertyType_LIST:
 		var result []string
-		for _, row := range attr.Rows {
+		for _, row := range attr.Values {
 			result = append(result, getAttrListCellString(row.(*structs.AttrListData)))
 		}
 		return result
 	default:
 		var result []string
-		for _, row := range attr.Rows {
+		for _, row := range attr.Values {
 			result = append(result, fmt.Sprintf("%v", row))
 		}
 		return result

@@ -2,11 +2,11 @@ package structs
 
 type Array struct {
 	Name string
-	Rows []*Row
+	Rows []*Value
 }
 
 func NewArray() *Array {
 	return &Array{
-		Rows: []*Row{},
+		Rows: []*Value{},
 	}
 }

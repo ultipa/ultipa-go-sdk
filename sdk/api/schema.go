@@ -141,9 +141,9 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 
 	uql := ""
 	if schema.DBType == ultipa.DBType_DBNODE {
-		uql = fmt.Sprintf(`create().node_schema(%v,"%v")`, schemaName, schema.Desc)
+		uql = fmt.Sprintf(`create().node_schema(%v,"%v")`, schemaName, schema.Description)
 	} else if schema.DBType == ultipa.DBType_DBEDGE {
-		uql = fmt.Sprintf(`create().edge_schema(%v,"%v")`, schemaName, schema.Desc)
+		uql = fmt.Sprintf(`create().edge_schema(%v,"%v")`, schemaName, schema.Description)
 	} else {
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
@@ -240,11 +240,11 @@ func (api *UltipaAPI) AlterSchema(schema, newSchema *structs.Schema, requestConf
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
 
-	uql := fmt.Sprintf(`alter().%s(@%s).set({name: "%s", description: "%s"})`, parms, schemaName, strings.ReplaceAll(newSchema.Name, `"`, `\"`), newSchema.Desc)
+	uql := fmt.Sprintf(`alter().%s(@%s).set({name: "%s", description: "%s"})`, parms, schemaName, strings.ReplaceAll(newSchema.Name, `"`, `\"`), newSchema.Description)
 
 	// Only modify the description of the schema
 	if newSchema.Name == "" {
-		uql = fmt.Sprintf(`alter().%s(@%s).set({description: "%s"})`, parms, schemaName, newSchema.Desc)
+		uql = fmt.Sprintf(`alter().%s(@%s).set({description: "%s"})`, parms, schemaName, newSchema.Description)
 	}
 
 	resp, err := api.Uql(uql, requestConfig)

@@ -2,7 +2,7 @@ package structs
 
 import ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 
-// AttrEdges represents an Attr with Rows that is List<List<Edge>>
+// AttrEdges represents an Attr with Values that is List<List<Edge>>
 type AttrEdges struct {
 	Name       string
 	ResultType ultipa.ResultType

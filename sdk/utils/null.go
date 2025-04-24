@@ -39,10 +39,15 @@ func init() {
 		},
 		ultipa.PropertyType_STRING: {0},
 		ultipa.PropertyType_TEXT:   {0},
-		ultipa.PropertyType_POINT:  {0x6e, 0x75, 0x6c, 0x6c},
-		ultipa.PropertyType_LIST:   getListNullValue(),
-		ultipa.PropertyType_MAP:    getMapNullValue(),
-		ultipa.PropertyType_BOOL:   {0x2},
+		ultipa.PropertyType_POINT: {
+			0xff, 0xff, 0xff, 0xff,
+			0xff, 0xff, 0xff, 0xff,
+			0xff, 0xff, 0xff, 0xff,
+			0xff, 0xff, 0xff, 0xff,
+		},
+		ultipa.PropertyType_LIST: getListNullValue(),
+		ultipa.PropertyType_MAP:  getMapNullValue(),
+		ultipa.PropertyType_BOOL: {0x2},
 	}
 }
 

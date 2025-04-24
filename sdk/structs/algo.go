@@ -17,6 +17,18 @@ type AlgoParam struct {
 	Desc string
 }
 
+// HDCAlgo  hdc.graph.show()
+type HDCAlgo struct {
+	Name          string
+	Desc          string
+	Type          string
+	SubType       string
+	CanRollback   string
+	ConfigContext string
+	Version       string
+	Params        []*AlgoParam
+}
+
 type Algo struct {
 	Name    string
 	Desc    string

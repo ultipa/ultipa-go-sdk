@@ -3,15 +3,15 @@ package structs
 type Table struct {
 	Name    string
 	Headers []*Property
-	Rows    []*Row
+	Rows    []*Value
 }
 
-type Row []interface{}
+type Value []interface{}
 
 func NewTable() *Table {
 	return &Table{
 		Headers: []*Property{},
-		Rows:    []*Row{},
+		Rows:    []*Value{},
 	}
 }
 
@@ -19,7 +19,7 @@ func (t *Table) GetHeaders() []*Property {
 	return t.Headers
 }
 
-func (t *Table) GetRows() []*Row {
+func (t *Table) GetRows() []*Value {
 	return t.Rows
 }
 

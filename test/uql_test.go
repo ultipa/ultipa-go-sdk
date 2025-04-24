@@ -138,7 +138,7 @@ func TestUQL3(t *testing.T) {
 
 	attrs, _ := resp.Get(0).AsAttr()
 
-	for _, row := range attrs.Rows {
+	for _, row := range attrs.Values {
 		log.Println(row)
 	}
 
@@ -402,7 +402,7 @@ func TestUqlFindPointProperty(t *testing.T) {
 
 func TestOnePathAsPaths(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
-	client.SetCurrentGraph("miniGql")
+	client.SetCurrentGraph("miniCircle")
 
 	//var uql = "ab().src(51).dest(103).depth(1) as paths return paths{}"
 	//var uql = "n().e()[2].n() as paths return paths{} limit 100"

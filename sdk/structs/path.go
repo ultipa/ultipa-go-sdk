@@ -6,6 +6,8 @@ type Path struct {
 	//Name        string
 	NodeUUIDs []types.UUID
 	EdgeUUIDs []types.UUID
+	Nodes     map[types.UUID]*Node
+	Edges     map[types.UUID]*Edge
 	//NodeSchemas map[string]*Schema
 	//EdgeSchemas map[string]*Schema
 }

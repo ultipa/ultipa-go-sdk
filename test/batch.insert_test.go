@@ -88,8 +88,8 @@ func batchInsert(schema string, conn *api.UltipaAPI) []*structs.Node {
 
 func createSchema(t *testing.T, schema string, conn *api.UltipaAPI) {
 	newSchemaWithProperties := &structs.Schema{
-		Name: schema,
-		Desc: "A Schema with 2 properties",
+		Name:        schema,
+		Description: "A Schema with 2 properties",
 		Properties: []*structs.Property{
 			{
 				Name: "username",

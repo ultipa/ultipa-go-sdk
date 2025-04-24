@@ -1,6 +1,9 @@
 package test
 
-import "testing"
+import (
+	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
+	"testing"
+)
 
 func TestShowLicense(t *testing.T) {
 	license, err := client.ShowLicense(nil)
@@ -8,4 +11,12 @@ func TestShowLicense(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Logf("%#v", license)
+}
+
+func TestShowBackup(t *testing.T) {
+	license, err := client.ShowBacukup(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	printers.PrintBackupInfoList(license)
 }

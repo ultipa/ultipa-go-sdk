@@ -26,10 +26,11 @@ func NewDataItem() *DataItem {
 	return &DataItem{}
 }
 
-func NodeTableToNodes(nt *ultipa.EntityTable, alias string) ([]*structs.Node, map[string]*structs.Schema, error) {
+func NodeTableToNodes(nt *ultipa.EntityTable, alias string) ([]*structs.Node, map[types.UUID]*structs.Node, map[string]*structs.Schema, error) {
 
 	schemas := map[string]*structs.Schema{}
-	nodes := []*structs.Node{}
+	var nodes []*structs.Node
+	nodesMap := make(map[types.UUID]*structs.Node)
 
 	for _, oSchema := range nt.Schemas {
 		schema := structs.NewSchema(oSchema.SchemaName)
@@ -46,7 +47,7 @@ func NodeTableToNodes(nt *ultipa.EntityTable, alias string) ([]*structs.Node, ma
 			node = nil
 		} else {
 			node = &structs.Node{
-				Name:   alias,
+				//Name:   alias,
 				ID:     oNode.Id,
 				UUID:   oNode.Uuid,
 				Schema: oNode.SchemaName,
@@ -59,16 +60,17 @@ func NodeTableToNodes(nt *ultipa.EntityTable, alias string) ([]*structs.Node, ma
 				prop := schema.Properties[index]
 				value, err := utils.ConvertBytesToInterface(v, prop.Type, prop.SubTypes)
 				if err != nil {
-					return nil, nil, err
+					return nil, nil, nil, err
 				}
 				node.Values.Set(prop.Name, value)
 			}
 		}
 
 		nodes = append(nodes, node)
+		nodesMap[node.UUID] = node
 	}
 
-	return nodes, schemas, nil
+	return nodes, nodesMap, schemas, nil
 }
 
 func NodeTableToUUIDs(nt *ultipa.EntityTable) []types.UUID {
@@ -85,10 +87,11 @@ func NodeTableToUUIDs(nt *ultipa.EntityTable) []types.UUID {
 	return uuids
 }
 
-func EdgeTableToEdges(et *ultipa.EntityTable, alias string) ([]*structs.Edge, map[string]*structs.Schema, error) {
+func EdgeTableToEdges(et *ultipa.EntityTable, alias string) ([]*structs.Edge, map[types.UUID]*structs.Edge, map[string]*structs.Schema, error) {
 
 	schemas := map[string]*structs.Schema{}
-	edges := []*structs.Edge{}
+	var edges []*structs.Edge
+	edgesMap := make(map[types.UUID]*structs.Edge)
 
 	for _, oSchema := range et.Schemas {
 		schema := structs.NewSchema(oSchema.SchemaName)
@@ -104,7 +107,7 @@ func EdgeTableToEdges(et *ultipa.EntityTable, alias string) ([]*structs.Edge, ma
 			edge = nil
 		} else {
 			edge = &structs.Edge{
-				Name:     alias,
+				//Name:     alias,
 				UUID:     oEdge.Uuid,
 				From:     oEdge.FromId,
 				FromUUID: oEdge.FromUuid,
@@ -120,16 +123,17 @@ func EdgeTableToEdges(et *ultipa.EntityTable, alias string) ([]*structs.Edge, ma
 				prop := schema.Properties[index]
 				value, err := utils.ConvertBytesToInterface(v, prop.Type, prop.SubTypes)
 				if err != nil {
-					return nil, nil, err
+					return nil, nil, nil, err
 				}
 				edge.Values.Set(prop.Name, value)
 			}
 		}
 
 		edges = append(edges, edge)
+		edgesMap[edge.UUID] = edge
 
 	}
-	return edges, schemas, nil
+	return edges, edgesMap, schemas, nil
 }
 
 func (di *DataItem) AsNodes() (nodes []*structs.Node, schemas map[string]*structs.Schema, err error) {
@@ -146,7 +150,11 @@ func (di *DataItem) AsNodes() (nodes []*structs.Node, schemas map[string]*struct
 	}
 	oNodes := di.Data.(*ultipa.NodeAlias)
 
-	return NodeTableToNodes(oNodes.NodeTable, oNodes.Alias)
+	nodes, _, schemas, err = NodeTableToNodes(oNodes.NodeTable, oNodes.Alias)
+	if err != nil {
+		return nil, nil, err
+	}
+	return nodes, schemas, err
 }
 
 func (di *DataItem) AsEdges() (edges []*structs.Edge, schemas map[string]*structs.Schema, err error) {
@@ -165,7 +173,11 @@ func (di *DataItem) AsEdges() (edges []*structs.Edge, schemas map[string]*struct
 
 	oEdges := di.Data.(*ultipa.EdgeAlias)
 
-	return EdgeTableToEdges(oEdges.EdgeTable, oEdges.Alias)
+	edges, _, schemas, err = EdgeTableToEdges(oEdges.EdgeTable, oEdges.Alias)
+	if err != nil {
+		return nil, nil, err
+	}
+	return edges, schemas, err
 }
 
 func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
@@ -191,10 +203,21 @@ func parsePaths(oPaths []*ultipa.Path) (paths []*structs.Path, err error) {
 	for _, oPath := range oPaths {
 		path := &structs.Path{}
 		//path.Name = name
+		_, nodesMap, _, err := NodeTableToNodes(oPath.NodeTable, "")
+		if err != nil {
+			return nil, err
+		}
+		path.Nodes = nodesMap
 		path.NodeUUIDs = NodeTableToUUIDs(oPath.NodeTable)
 		if err != nil {
 			return nil, err
 		}
+
+		_, edgesMap, _, err := EdgeTableToEdges(oPath.EdgeTable, "")
+		if err != nil {
+			return nil, err
+		}
+		path.Edges = edgesMap
 		path.EdgeUUIDs = NodeTableToUUIDs(oPath.EdgeTable)
 		if err != nil {
 			return nil, err
@@ -234,7 +257,7 @@ func (di *DataItem) AsTable() (table *structs.Table, err error) {
 
 	for _, row := range oTable.TableRows {
 
-		r := structs.Row{}
+		r := structs.Value{}
 
 		for index, field := range row.Values {
 			value, err := utils.ConvertBytesToInterface(field, table.Headers[index].Type, table.Headers[index].SubTypes)
@@ -268,7 +291,7 @@ func (di *DataItem) AsTable() (table *structs.Table, err error) {
 //	arr.Name = oArray.Alias
 //
 //	for _, oRow := range oArray.Elements {
-//		r := structs.Row{}
+//		r := structs.Value{}
 //
 //		for _, field := range oRow.Values {
 //			//TODO, check has subTypes or not?
@@ -279,7 +302,7 @@ func (di *DataItem) AsTable() (table *structs.Table, err error) {
 //			r = append(r, value)
 //		}
 //
-//		arr.Rows = append(arr.Rows, &r)
+//		arr.Values = append(arr.Values, &r)
 //	}
 //
 //	return arr, err
@@ -316,7 +339,7 @@ func (di *DataItem) AsAttr() (*structs.Attr, error) {
 	return nil, err
 }
 
-// AsAttrEdges parse DataItem as Attr with Rows that is List<List<Node>>
+// AsAttrEdges parse DataItem as Attr with Values that is List<List<Node>>
 func (di *DataItem) AsAttrNodes() (*structs.AttrNodes, error) {
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
@@ -336,7 +359,7 @@ func (di *DataItem) AsAttrNodes() (*structs.AttrNodes, error) {
 	return midAttr.ListAttrAsAttrNodes()
 }
 
-// AsAttrEdges parse DataItem as Attr with Rows that is List<List<Edge>>
+// AsAttrEdges parse DataItem as Attr with Values that is List<List<Edge>>
 func (di *DataItem) AsAttrEdges() (*structs.AttrEdges, error) {
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
@@ -356,7 +379,7 @@ func (di *DataItem) AsAttrEdges() (*structs.AttrEdges, error) {
 	return midAttr.ListAttrAsAttrEdges()
 }
 
-// AsAttrPaths parse DataItem as Attr with Rows that is List<List<Path>>
+// AsAttrPaths parse DataItem as Attr with Values that is List<List<Path>>
 func (di *DataItem) AsAttrPaths() (*structs.AttrPaths, error) {
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
@@ -406,19 +429,19 @@ func handleAttrValues(oAttr *ultipa.Attr, attr *structs.Attr) error {
 			return err
 		}
 		for _, row := range mapDataRows {
-			attr.Rows = append(attr.Rows, row)
+			attr.Values = append(attr.Values, row)
 		}
 	default:
 		attr.ResultType = ultipa.ResultType_RESULT_TYPE_ATTR
 		if oAttr.Values == nil {
-			attr.Rows = nil
+			attr.Values = nil
 		} else {
 			for _, v := range oAttr.Values {
 				value, err := utils.ConvertBytesToInterface(v, attr.PropertyType, nil)
 				if err != nil {
 					return err
 				}
-				attr.Rows = append(attr.Rows, value)
+				attr.Values = append(attr.Values, value)
 			}
 		}
 	}
@@ -435,31 +458,31 @@ func parseAttrList(oAttr *ultipa.Attr, attr *structs.Attr) error {
 			return err
 		}
 		if oListData.IsNull {
-			attr.Rows = append(attr.Rows, nil)
+			attr.Values = append(attr.Values, nil)
 			continue
 		}
 		switch oListData.Type {
 		case ultipa.ResultType_RESULT_TYPE_NODE:
-			nodes, _, err := NodeTableToNodes(oListData.Nodes, "")
+			nodes, _, _, err := NodeTableToNodes(oListData.Nodes, "")
 			if err != nil {
 				return err
 			}
 			listData := structs.NewAttrListData()
 			listData.ResultType = oListData.Type
 			listData.Nodes = append(listData.Nodes, nodes...)
-			attr.Rows = append(attr.Rows, listData)
+			attr.Values = append(attr.Values, listData)
 			if ultipa.ResultType_RESULT_TYPE_UNSET == resultType {
 				resultType = listData.ResultType
 			}
 		case ultipa.ResultType_RESULT_TYPE_EDGE:
-			edges, _, err := EdgeTableToEdges(oListData.Edges, "")
+			edges, _, _, err := EdgeTableToEdges(oListData.Edges, "")
 			if err != nil {
 				return err
 			}
 			listData := structs.NewAttrListData()
 			listData.ResultType = oListData.Type
 			listData.Edges = append(listData.Edges, edges...)
-			attr.Rows = append(attr.Rows, listData)
+			attr.Values = append(attr.Values, listData)
 			if ultipa.ResultType_RESULT_TYPE_UNSET == resultType {
 				resultType = listData.ResultType
 			}
@@ -471,7 +494,7 @@ func parseAttrList(oAttr *ultipa.Attr, attr *structs.Attr) error {
 			listData := structs.NewAttrListData()
 			listData.ResultType = oListData.Type
 			listData.Paths = append(listData.Paths, paths...)
-			attr.Rows = append(attr.Rows, listData)
+			attr.Values = append(attr.Values, listData)
 			if ultipa.ResultType_RESULT_TYPE_UNSET == resultType {
 				resultType = listData.ResultType
 			}
@@ -480,7 +503,7 @@ func parseAttrList(oAttr *ultipa.Attr, attr *structs.Attr) error {
 				resultType = ultipa.ResultType_RESULT_TYPE_ATTR
 			}
 			//not null but len==0, then set an empty slice
-			row := structs.Row{}
+			row := structs.Value{}
 
 			for _, subOAttr := range oListData.Attrs {
 				subAttr, err := parseAttr(subOAttr, "")
@@ -490,10 +513,10 @@ func parseAttrList(oAttr *ultipa.Attr, attr *structs.Attr) error {
 				if subAttr == nil {
 					row = append(row, nil)
 				} else {
-					row = append(row, subAttr.Rows...)
+					row = append(row, subAttr.Values...)
 				}
 			}
-			attr.Rows = append(attr.Rows, row)
+			attr.Values = append(attr.Values, row)
 
 		}
 	}
@@ -700,7 +723,7 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		//0:name, 1: description, 2: json(properties),3:totalNodes, 4:totalEdges
 		values := row.GetValues()
 		schema := structs.NewSchema(string(values[NameIndex]))
-		schema.Desc = string(values[DescIndex])
+		schema.Description = string(values[DescIndex])
 		schema.Type = Type
 		schema.Status = string(values[StatusIndex])
 		propertyJson := values[PropertyIndex]
@@ -780,8 +803,8 @@ func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 		name := getOrDefault("name", "", rowValues)
 		lteStr := getOrDefault("lte", "false", rowValues)
 		typeStr := getOrDefault("type", "", rowValues)
-		//read := getOrDefault("read", "0", rowValues)
-		//write := getOrDefault("write", "0", rowValues)
+		read := getOrDefault("read", "0", rowValues)
+		write := getOrDefault("write", "0", rowValues)
 		schema := getOrDefault("schema", "0", rowValues)
 		desc := getOrDefault("description", "", rowValues)
 		lte, err := strconv.ParseBool(lteStr)
@@ -791,11 +814,11 @@ func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 			log.Fatalln(err)
 		}
 		p := structs.Property{
-			Name: name,
-			Desc: desc,
-			Lte:  lte,
-			//Read:    "1" == read,
-			//Write:   "1" == write,
+			Name:    name,
+			Desc:    desc,
+			Lte:     lte,
+			Read:    "1" == read,
+			Write:   "1" == write,
 			Schema:  schema,
 			Extra:   extra,
 			Encrypt: encrypt,
@@ -945,7 +968,12 @@ func (di *DataItem) AsGraph() (graph *structs.Graph, err error) {
 	if err != nil {
 		return nil, err
 	}
-	graph.Paths = paths
+	for _, path := range paths {
+		path.Nodes = nil
+		path.Edges = nil
+		graph.Paths = append(graph.Paths, path)
+	}
+	//graph.Paths = paths
 
 	return graph, nil
 }
@@ -955,7 +983,7 @@ func parseGraphs(oPaths []*ultipa.Path) (graph *structs.Graph, err error) {
 
 	for _, oPath := range oPaths {
 		//path.Name = name
-		nodes, _, err := NodeTableToNodes(oPath.NodeTable, "")
+		nodes, _, _, err := NodeTableToNodes(oPath.NodeTable, "")
 		if err != nil {
 			return nil, err
 		}
@@ -964,7 +992,7 @@ func parseGraphs(oPaths []*ultipa.Path) (graph *structs.Graph, err error) {
 			graph.Nodes[node.UUID] = node
 		}
 
-		edges, _, err := EdgeTableToEdges(oPath.EdgeTable, "")
+		edges, _, _, err := EdgeTableToEdges(oPath.EdgeTable, "")
 		if err != nil {
 			return nil, err
 		}

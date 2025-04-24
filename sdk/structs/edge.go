@@ -12,12 +12,12 @@ import (
 )
 
 type Edge struct {
-	Name     string
-	From     types.ID
-	To       types.ID
+	//Name     string
+	UUID     types.UUID
 	FromUUID types.UUID
 	ToUUID   types.UUID
-	UUID     types.UUID
+	From     types.ID
+	To       types.ID
 	Schema   string
 	Values   *Values
 }
@@ -46,7 +46,7 @@ func NewEdgeFromEdgeRow(schema *Schema, edgeRow *ultipa.EntityRow) (*Edge, error
 	newEdge.To = edgeRow.ToId
 	newEdge.FromUUID = edgeRow.FromUuid
 	newEdge.ToUUID = edgeRow.ToUuid
-	newEdge.Name = edgeRow.SchemaName
+	newEdge.Schema = edgeRow.SchemaName
 
 	for index, v := range edgeRow.GetValues() {
 		prop := schema.Properties[index]

@@ -10,6 +10,7 @@ package structs
 //	Config      string `json:"config"`
 //}
 
+// HDCGragh
 type Projection struct {
 	ProjectName string `json:"name"`
 	ProjectType string `json:"type"`

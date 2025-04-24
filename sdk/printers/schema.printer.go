@@ -18,7 +18,7 @@ func PrintSchema(schemas []*structs.Schema) {
 			fmt.Println(fmt.Sprintf("Schema: %v - %v", schema.Id, schema.Name))
 		}
 
-		fmt.Println("Description: ", schema.Desc)
+		fmt.Println("Description: ", schema.Description)
 		table := simpletable.New()
 		table.Header.Cells = []*simpletable.Cell{{Text: "Name"}, {Text: "Description"}, {Text: "Type"}, {Text: "LTE"}, {Text: "Schema"}}
 		//table.Footer.Cells = []*simpletable.Cell{&simpletable.Cell{Span: 4, Text: fmt.Sprint("[", schema.Type, "]Schema : "+schema.Name, "(", schema.Total, ")")}}

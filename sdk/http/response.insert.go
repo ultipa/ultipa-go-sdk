@@ -64,6 +64,10 @@ func NewNodesInsertResponse(reply *ultipa.InsertNodesReply) (response *InsertRes
 		},
 	}
 
+	if len(reply.IgnoreIndexes) != len(reply.IgnoreErrorCode) {
+		return response, nil
+	}
+
 	for index := range reply.IgnoreIndexes {
 		v := int(reply.IgnoreIndexes[index])
 		code := reply.IgnoreErrorCode[index]

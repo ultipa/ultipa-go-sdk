@@ -12,7 +12,7 @@ import (
 )
 
 type Node struct {
-	Name   string
+	//Name   string
 	ID     types.ID
 	UUID   types.UUID
 	Schema string
@@ -77,7 +77,7 @@ func NewNodeFromNodeRow(schema *Schema, nodeRow *ultipa.EntityRow) (*Node, error
 
 	newNode.ID = nodeRow.Id
 	newNode.UUID = nodeRow.Uuid
-	newNode.Name = nodeRow.SchemaName
+	//newNode.Name = nodeRow.SchemaName
 	newNode.Schema = schema.Name
 	for index, v := range nodeRow.GetValues() {
 		prop := schema.Properties[index]

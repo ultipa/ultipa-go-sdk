@@ -107,8 +107,8 @@ func ExampleUltipaAPI_CreateSchema() {
 
 	// create schema with properties
 	newSchemaWithProperties := &structs.Schema{
-		Name: "my_node_schema_prop",
-		Desc: "A Schema with 2 properties",
+		Name:        "my_node_schema_prop",
+		Description: "A Schema with 2 properties",
 		Properties: []*structs.Property{
 			{
 				Name: "username",
@@ -167,7 +167,7 @@ func ExampleUltipaAPI_GetProperty() {
 func ExampleUltipaAPI_AlterNodeProperty() {
 	prop := &structs.Property{
 		Name:   "name",
-		Desc:   "name Desc",
+		Desc:   "name Description",
 		Schema: "user",
 	}
 	newProp := &structs.Property{
@@ -181,7 +181,7 @@ func ExampleUltipaAPI_AlterNodeProperty() {
 func ExampleUltipaAPI_AlterEdgeProperty() {
 	prop := &structs.Property{
 		Name:   "name",
-		Desc:   "name Desc",
+		Desc:   "name Description",
 		Schema: "relation",
 	}
 	newProp := &structs.Property{

@@ -6,12 +6,12 @@ type Attr struct {
 	Name         string
 	PropertyType ultipa.PropertyType
 	ResultType   ultipa.ResultType
-	Rows         Row
+	Values       Value
 }
 
 func NewAttr() *Attr {
 	return &Attr{
-		Rows: Row{},
+		Values: Value{},
 	}
 }
 

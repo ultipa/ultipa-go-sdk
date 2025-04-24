@@ -13,15 +13,15 @@ type Schemas struct {
 }
 
 type Schema struct {
-	Name       string
-	Properties []*Property
-	Desc       string
-	Status     string
-	Type       string
-	DBType     ultipa.DBType
-	Total      int
-	Id         uint64
-	Pair       []*SchemaPair // only for EdgeSchema
+	Name        string
+	Description string
+	Properties  []*Property
+	Status      string
+	Type        string
+	DBType      ultipa.DBType
+	Total       int
+	Id          uint64
+	Pair        []*SchemaPair // only for EdgeSchema
 }
 
 // only for EdgeSchema

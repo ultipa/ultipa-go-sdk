@@ -131,8 +131,8 @@ func TestCreateSchemaWithProperties(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
 	// create schema with properties
 	newSchemaWithProperties := &structs.Schema{
-		Name: "_abc _acd",
-		Desc: "A Schema with 2 properties",
+		Name:        "_abc _acd",
+		Description: "A Schema with 2 properties",
 		Properties: []*structs.Property{
 			{
 				Name: "username用户@",
@@ -154,8 +154,8 @@ func TestCreateSchemaWithProperties(t *testing.T) {
 func TestCreateSchema(t *testing.T) {
 	// create schema with properties
 	newSchemaWithoutProperties := &structs.Schema{
-		Name: "People",
-		Desc: "People",
+		Name:        "People",
+		Description: "People",
 	}
 
 	resp2, _ := client.CreateSchema(newSchemaWithoutProperties, false, nil)
@@ -168,11 +168,11 @@ func TestAlterSchema(t *testing.T) {
 	schema := &structs.Schema{
 		DBType: ultipa.DBType_DBNODE,
 		Name:   `""`,
-		//Desc:   "People",
+		//Description:   "People",
 	}
 	newSchema := &structs.Schema{
-		Name: `"""`,
-		Desc: "People2",
+		Name:        `"""`,
+		Description: "People2",
 	}
 
 	resp2, err := client.AlterSchema(schema, newSchema, nil)
