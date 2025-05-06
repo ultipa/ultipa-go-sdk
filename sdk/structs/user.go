@@ -23,10 +23,10 @@ import (
 // }
 // )
 type User struct {
-	UserName           string             `json:"-"`
-	PassWord           string             `json:"password,omitempty"`
-	LastLogin          string             `json:"lastLogin"`
-	Create             string             `json:"-"`
+	UserName string `json:"-"`
+	PassWord string `json:"password,omitempty"`
+	//LastLogin          string             `json:"lastLogin"`
+	CreateTime         string             `json:"-"`
 	GraphPrivileges    GraphPrivileges    `json:"graph_privileges,omitempty"`
 	SystemPrivileges   []string           `json:"system_privileges,omitempty"`
 	Policies           []string           `json:"policies,omitempty"`

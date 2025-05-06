@@ -61,11 +61,11 @@ func PrintAttr(attr *structs.Attr) {
 // PrintAttrNodes print Attr with values as List<List<Node>>
 func PrintAttrNodes(attrNodes *structs.AttrNodes) {
 	if attrNodes.NodesList == nil {
-		logger.PrintInfo(fmt.Sprintf("Alias:%s, Type:%s, resultType:%s, nodes is null.\r\n", attrNodes.Name, ultipa.PropertyType_LIST, attrNodes.ResultType))
+		logger.PrintInfo(fmt.Sprintf("Alias:%s, DBType:%s, resultType:%s, nodes is null.\r\n", attrNodes.Name, ultipa.PropertyType_LIST, attrNodes.ResultType))
 		return
 	}
 	for i, nodes := range attrNodes.NodesList {
-		logger.PrintInfo(fmt.Sprintf("Alias:%s, Type:%s, resultType:%s\r\nIndex:%d", attrNodes.Name, ultipa.PropertyType_LIST, attrNodes.ResultType, i))
+		logger.PrintInfo(fmt.Sprintf("Alias:%s, DBType:%s, resultType:%s\r\nIndex:%d", attrNodes.Name, ultipa.PropertyType_LIST, attrNodes.ResultType, i))
 		PrintNodesWithoutSchema(nodes)
 	}
 }
@@ -73,11 +73,11 @@ func PrintAttrNodes(attrNodes *structs.AttrNodes) {
 // PrintAttrEdges print Attr with values as List<List<Edge>>
 func PrintAttrEdges(attrEdges *structs.AttrEdges) {
 	if attrEdges.EdgesList == nil {
-		logger.PrintInfo(fmt.Sprintf("Alias:%s, Type:%s, resultType:%s, edges is null.\r\n", attrEdges.Name, ultipa.PropertyType_LIST, attrEdges.ResultType))
+		logger.PrintInfo(fmt.Sprintf("Alias:%s, DBType:%s, resultType:%s, edges is null.\r\n", attrEdges.Name, ultipa.PropertyType_LIST, attrEdges.ResultType))
 		return
 	}
 	for i, edges := range attrEdges.EdgesList {
-		logger.PrintInfo(fmt.Sprintf("Alias:%s, Type:%s, resultType:%s\r\nIndex:%d", attrEdges.Name, ultipa.PropertyType_LIST, attrEdges.ResultType, i))
+		logger.PrintInfo(fmt.Sprintf("Alias:%s, DBType:%s, resultType:%s\r\nIndex:%d", attrEdges.Name, ultipa.PropertyType_LIST, attrEdges.ResultType, i))
 		PrintEdgesWithoutSchema(edges)
 	}
 }
@@ -85,11 +85,11 @@ func PrintAttrEdges(attrEdges *structs.AttrEdges) {
 // PrintAttrPaths print Attr with values as List<List<Path>>
 func PrintAttrPaths(attrPaths *structs.AttrPaths) {
 	if attrPaths.PathsList == nil {
-		logger.PrintInfo(fmt.Sprintf("Alias:%s, Type:%s, resultType:%s, paths is null.\r\n", attrPaths.Name, ultipa.PropertyType_LIST, attrPaths.ResultType))
+		logger.PrintInfo(fmt.Sprintf("Alias:%s, DBType:%s, resultType:%s, paths is null.\r\n", attrPaths.Name, ultipa.PropertyType_LIST, attrPaths.ResultType))
 		return
 	}
 	for i, paths := range attrPaths.PathsList {
-		logger.PrintInfo(fmt.Sprintf("Alias:%s, Type:%s, resultType:%s\r\nIndex:%d", attrPaths.Name, ultipa.PropertyType_LIST, attrPaths.ResultType, i))
+		logger.PrintInfo(fmt.Sprintf("Alias:%s, DBType:%s, resultType:%s\r\nIndex:%d", attrPaths.Name, ultipa.PropertyType_LIST, attrPaths.ResultType, i))
 		PrintPaths(paths)
 	}
 }

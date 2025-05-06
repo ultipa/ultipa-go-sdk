@@ -3,6 +3,7 @@ package configuration
 import (
 	"crypto/md5"
 	"io/ioutil"
+	"math"
 	"strconv"
 	"time"
 
@@ -11,22 +12,25 @@ import (
 )
 
 type UltipaConfig struct {
-	Hosts            []string // hosts with ports
-	Username         string   // ultipa graph username
-	Password         string   // ultipa graph password
-	PasswordEncrypt  string   // method of encrypt password, MD5, LDAP, NOTHING
-	DefaultGraph     string   `yaml:"default_graph"` // default graph when connection established
-	Crt              []byte   // certification file for encrypt messages
-	MaxRecvSize      int      `yaml:"max_recv_size"` // grpc max receive size
-	Consistency      bool     // if consistency, reading query will send to master
-	CurrentGraph     string   `yaml:"current_graph"`      // the current graph, used when user what get the connection's current graph name
-	CurrentClusterId string   `yaml:"current_cluster_id"` // used for name server only
-	Timeout          int32    // timeout - seconds
-	Debug            bool     // debug, print more logs
-	HeartBeat        int      `yaml:"heart_beat"` // frequency:second,  if 0 means no heart beat, to make sure the connection is alive
+	Hosts           []string // hosts with ports
+	Username        string   // ultipa graph username
+	Password        string   // ultipa graph password
+	PasswordEncrypt string   // method of encrypt password, MD5, LDAP, NOTHING
+	DefaultGraph    string   `yaml:"default_graph"` // default graph when connection established
+	Crt             []byte   // certification file for encrypt messages
+	MaxRecvSize     int      `yaml:"max_recv_size"` // grpc max receive size
+	//Consistency      bool     // if consistency, reading query will send to master
+	//CurrentGraph string `yaml:"current_graph"` // the current graph, used when user what get the connection's current graph name
+	//CurrentClusterId string `yaml:"current_cluster_id"` // used for name server only
+	Timeout int32 // timeout - seconds
+	//Debug            bool   // debug, print more logs
+	HeartBeat int `yaml:"heart_beat"` // frequency:second,  if 0 means no heart beat, to make sure the connection is alive
 }
 
-var DefaultTimeout int32 = 1000
+// var DefaultTimeout int32 = 1000
+var DefaultTimeout int32 = math.MaxInt32
+var DefaultGraph = "default"
+var DefaultRecvSize = 1024 * 1024 * 32
 
 func NewUltipaConfig(config *UltipaConfig) (*UltipaConfig, error) {
 	config.FillDefault()
@@ -43,16 +47,16 @@ func NewUltipaConfig(config *UltipaConfig) (*UltipaConfig, error) {
 
 func (config *UltipaConfig) FillDefault() {
 	if config.MaxRecvSize == 0 {
-		config.MaxRecvSize = 1024 * 1024 * 10 // 10MB
+		config.MaxRecvSize = DefaultRecvSize // 10MB
 	}
 
-	if config.DefaultGraph != "" {
-		config.CurrentGraph = config.DefaultGraph
+	if config.DefaultGraph == "" {
+		config.DefaultGraph = DefaultGraph
 	}
-
-	if config.CurrentGraph == "" {
-		config.CurrentGraph = "default"
-	}
+	//
+	//if config.CurrentGraph == "" {
+	//	config.CurrentGraph = "default"
+	//}
 
 	if config.Timeout == 0 {
 		config.Timeout = DefaultTimeout
@@ -72,21 +76,21 @@ func (config *UltipaConfig) MergeRequestConfig(rConfig *RequestConfig) *UltipaCo
 		newConfig.Timeout = rConfig.Timeout
 	}
 
-	if rConfig.GraphName != "" {
-		newConfig.CurrentGraph = rConfig.GraphName
-	}
-	if rConfig.ClusterId != "" {
-		newConfig.CurrentClusterId = rConfig.ClusterId
-	}
+	//if rConfig.Graph != "" {
+	//	newConfig.CurrentGraph = rConfig.Graph
+	//}
+	//if rConfig.ClusterId != "" {
+	//	newConfig.CurrentClusterId = rConfig.ClusterId
+	//}
 
 	return newConfig
 }
 
 func (config *UltipaConfig) ToContextKV(rConfig *RequestConfig) []string {
-	graphName := config.CurrentGraph
+	graphName := config.DefaultGraph
 
-	if rConfig != nil && rConfig.GraphName != "" {
-		graphName = rConfig.GraphName
+	if rConfig != nil && rConfig.Graph != "" {
+		graphName = rConfig.Graph
 	}
 
 	headers := []string{

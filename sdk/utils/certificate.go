@@ -7,7 +7,7 @@ import (
 
 func GetCertificate(host string) *x509.Certificate {
 
-	// Create a connection to obtain the certificate of the remote server
+	// CreateTime a connection to obtain the certificate of the remote server
 	conn, err := tls.Dial("tcp", host, nil)
 	if err != nil {
 		return nil

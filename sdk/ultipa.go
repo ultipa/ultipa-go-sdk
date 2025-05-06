@@ -10,7 +10,7 @@ import (
 // Version represents the current version of the SDK.
 const Version = "v5.0.0-new"
 
-// NewUltipa Create an Ultipa Client
+// NewUltipa CreateTime an Ultipa Client
 func NewUltipa(config *configuration.UltipaConfig) (*api.UltipaAPI, error) {
 
 	config.FillDefault()

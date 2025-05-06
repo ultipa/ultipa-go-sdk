@@ -94,6 +94,6 @@ func PrintAny(dataitem *http.DataItem) {
 	//
 	//	PrintArray(arr)
 	default:
-		log.Printf("Printer Got UnHandled Alias %v Type %v \n", dataitem.Alias, dataitem.Type)
+		log.Printf("Printer Got UnHandled Alias %v DBType %v \n", dataitem.Alias, dataitem.Type)
 	}
 }

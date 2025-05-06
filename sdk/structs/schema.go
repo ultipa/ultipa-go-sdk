@@ -21,11 +21,11 @@ type Schema struct {
 	DBType      ultipa.DBType
 	Total       int
 	Id          uint64
-	Pair        []*SchemaPair // only for EdgeSchema
+	Stats       []*SchemaStat // only for EdgeSchema
 }
 
 // only for EdgeSchema
-type SchemaPair struct {
+type SchemaStat struct {
 	FromSchema string
 	ToSchema   string
 	Count      int
@@ -34,7 +34,7 @@ type SchemaPair struct {
 type GraphCount struct {
 	Type   string
 	Schema string
-	SP     *SchemaPair
+	SP     *SchemaStat
 }
 
 func NewSchema(name string) *Schema {
@@ -139,11 +139,11 @@ func (s *Schema) SetTotalByGraphCount(g *GraphCount) {
 	s.Total += g.SP.Count
 
 	if g.Type == "edge" && g.SP.FromSchema != "" && g.SP.ToSchema != "" {
-		p := &SchemaPair{
+		p := &SchemaStat{
 			FromSchema: g.SP.FromSchema,
 			ToSchema:   g.SP.ToSchema,
 			Count:      g.SP.Count,
 		}
-		s.Pair = append(s.Pair, p)
+		s.Stats = append(s.Stats, p)
 	}
 }

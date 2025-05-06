@@ -6,7 +6,7 @@ import (
 )
 
 func TestTop(t *testing.T) {
-	client.SetCurrentGraph("amz")
+	//client.SetCurrentGraph("amz")
 	tops, err := client.Top(nil)
 	if err != nil {
 		t.Fatalf("exec top error, %v", err)

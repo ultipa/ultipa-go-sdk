@@ -36,17 +36,33 @@ func (api *UltipaAPI) backup(uql string, requestConfig *configuration.RequestCon
 			bf := values.Get("backup_infos").(string)
 			err = json.Unmarshal([]byte(bf), &backup)
 			if err != nil {
-				api.Logger.Warn(bf + ": backup_infos Unmarshal error" + err.Error())
+				return nil, err
+				//api.Logger.Warn(bf + ": backup_infos Unmarshal error" + err.Error())
 			}
 		}
 
 		var startTime, endTime string
-		if values.Get("start_time") != nil {
-			startTime = values.Get("start_time").(*utils.UltipaTime).String()
+
+		switch v := values.Get("start_time").(type) {
+		case *utils.UltipaTime:
+			if v != nil {
+				startTime = v.String()
+			}
+		case string:
+			startTime = v
+		default:
+			startTime = ""
 		}
 
-		if values.Get("end_time") != nil {
-			endTime = values.Get("end_time").(*utils.UltipaTime).String()
+		switch v := values.Get("end_time").(type) {
+		case *utils.UltipaTime:
+			if v != nil {
+				endTime = v.String()
+			}
+		case string:
+			endTime = v
+		default:
+			endTime = ""
 		}
 
 		backupinfo := &structs.BackupInfo{

@@ -23,7 +23,7 @@ func TestUQL(t *testing.T) {
 
 		log.Println("Exec : ", c.UQL)
 
-		//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+		//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{Graph: "multi_schema_test"})
 		resp, err := client.Uql(c.UQL, nil)
 
 		if err != nil {
@@ -55,7 +55,7 @@ n({books || vbook || books2}).e({@docs_role || @docs_tree_role}).n({@role.name i
 return docs_path{*}, role_path{*},books`
 	log.Println("Exec : ", uql)
 
-	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{Graph: "multi_schema_test"})
 	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
@@ -75,8 +75,8 @@ return docs_path{*}, role_path{*},books`
 
 func TestUQL2(t *testing.T) {
 	requestConfig := &configuration.RequestConfig{
-		UseMaster: false,
-		GraphName: "ts",
+		//UseMaster: false,
+		Graph: "ts",
 	}
 
 	insertRequestConfig := &configuration.InsertRequestConfig{
@@ -108,7 +108,7 @@ func TestUQL2(t *testing.T) {
 
 	log.Println("Exec : ", uql)
 
-	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{Graph: "multi_schema_test"})
 	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
@@ -129,7 +129,7 @@ func TestUQL3(t *testing.T) {
 
 	log.Println("Exec : ", uql)
 
-	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{Graph: "multi_schema_test"})
 	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
@@ -152,7 +152,7 @@ func TestUQL4(t *testing.T) {
 
 	log.Println("Exec : ", uql)
 
-	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{Graph: "multi_schema_test"})
 	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
@@ -169,7 +169,7 @@ func TestUQL5(t *testing.T) {
 
 	log.Println("Exec : ", uql)
 
-	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{Graph: "multi_schema_test"})
 	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
@@ -235,7 +235,7 @@ func TestUQLCompactWithNotExistGraph(t *testing.T) {
 	//t.Logf("global leader:%s", global.Host)
 
 	_, err := client.Uql(uql, &configuration.RequestConfig{
-		GraphName: "c1",
+		Graph: "c1",
 	})
 	if err != nil {
 		t.Fatalf("fail to compact:%v", err)
@@ -250,7 +250,7 @@ func TestTopUql(t *testing.T) {
 
 	log.Println("Exec : ", uql)
 
-	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{Graph: "multi_schema_test"})
 	resp, err := client.Uql(uql, nil)
 
 	if err != nil {
@@ -402,7 +402,7 @@ func TestUqlFindPointProperty(t *testing.T) {
 
 func TestOnePathAsPaths(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
-	client.SetCurrentGraph("miniCircle")
+	//client.SetCurrentGraph("miniCircle")
 
 	//var uql = "ab().src(51).dest(103).depth(1) as paths return paths{}"
 	//var uql = "n().e()[2].n() as paths return paths{} limit 100"
@@ -543,7 +543,7 @@ func TestInsertReturnNodes(t *testing.T) {
 	var graphName = "cli_test"
 
 	var uql = "insert().into(@`node_schema_a`).nodes([{typeString:'string',name:'name',typeInt32:12,typeInt64:44,typeUint32:0}]) as node return node{*}"
-	res, _ := client.Uql(uql, &configuration.RequestConfig{GraphName: graphName})
+	res, _ := client.Uql(uql, &configuration.RequestConfig{Graph: graphName})
 
 	_, _, err := res.Alias("node").AsNodes()
 	if err != nil {
@@ -641,7 +641,7 @@ func TestKK(t *testing.T) {
 		},
 		Password:     "root",
 		Username:     "root",
-		CurrentGraph: "ldbc_tiger_sf100_ic_fix_type",
+		DefaultGraph: "ldbc_tiger_sf100_ic_fix_type",
 	})
 
 	client, err := sdk.NewUltipa(config)

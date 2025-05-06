@@ -17,7 +17,7 @@ import (
 
 func TestBatchInsertNodes(t *testing.T) {
 	//conn, _ := GetClient(hosts, graph)
-	client.SetCurrentGraph("go_sdk_test")
+	//client.SetCurrentGraph("go_sdk_test")
 	schema := "text_schema"
 	createSchema(t, schema, client)
 	batchInsert(schema, client)
@@ -126,7 +126,7 @@ func checkInsertionResult(t *testing.T, conn *api.UltipaAPI, schema string) {
 
 func TestBatchInsertEdges(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
-	client.SetCurrentGraph("go_sdk_test")
+	//client.SetCurrentGraph("go_sdk_test")
 
 	total := 500
 	finished := 0
@@ -138,19 +138,19 @@ func TestBatchInsertEdges(t *testing.T) {
 	schema := structs.NewSchema("default")
 	//schema.Properties = append(schema.Properties, &structs.Property{
 	//    Name: "e1",
-	//    Type: ultipa.PropertyType_STRING,
+	//    DBType: ultipa.PropertyType_STRING,
 	//}, &structs.Property{
 	//    Name: "e2",
-	//    Type: ultipa.PropertyType_STRING,
+	//    DBType: ultipa.PropertyType_STRING,
 	//}, &structs.Property{
 	//    Name: "e3",
-	//    Type: ultipa.PropertyType_STRING,
+	//    DBType: ultipa.PropertyType_STRING,
 	//}, &structs.Property{
 	//    Name: "e4",
-	//    Type: ultipa.PropertyType_STRING,
+	//    DBType: ultipa.PropertyType_STRING,
 	//}, &structs.Property{
 	//    Name: "e5",
-	//    Type: ultipa.PropertyType_STRING,
+	//    DBType: ultipa.PropertyType_STRING,
 	//})
 
 	start := time.Now()

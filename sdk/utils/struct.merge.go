@@ -24,7 +24,7 @@ func MergeSameStruct(struct1 interface{}, struct2 interface{}) error {
 	s2v := s2p.Elem()
 
 	if s1v.Type() != s2v.Type() {
-		return errors.New("struct1 and struct2 should be same Type")
+		return errors.New("struct1 and struct2 should be same DBType")
 	}
 
 	for i := 0; i < s2v.NumField(); i++ {

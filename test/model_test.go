@@ -21,14 +21,14 @@ func TestCreateModel(t *testing.T) {
 		DBType: ultipa.DBType_DBNODE,
 		Properties: []*structs.Property{
 			{
-				Name: "username",
-				Desc: "user's name",
-				Type: ultipa.PropertyType_STRING,
+				Name:        "username",
+				Description: "user's name",
+				Type:        ultipa.PropertyType_STRING,
 			},
 			{
-				Name: "password",
-				Desc: "user's password",
-				Type: ultipa.PropertyType_STRING,
+				Name:        "password",
+				Description: "user's password",
+				Type:        ultipa.PropertyType_STRING,
 			},
 		},
 	})
@@ -39,14 +39,14 @@ func TestCreateModel(t *testing.T) {
 		DBType: ultipa.DBType_DBNODE,
 		Properties: []*structs.Property{
 			{
-				Name: "name",
-				Desc: "indicator name",
-				Type: ultipa.PropertyType_STRING,
+				Name:        "name",
+				Description: "indicator name",
+				Type:        ultipa.PropertyType_STRING,
 			},
 			{
-				Name: "values",
-				Desc: "json content to save indicator values",
-				Type: ultipa.PropertyType_STRING,
+				Name:        "values",
+				Description: "json content to save indicator values",
+				Type:        ultipa.PropertyType_STRING,
 			},
 		},
 	})
@@ -56,9 +56,9 @@ func TestCreateModel(t *testing.T) {
 		DBType: ultipa.DBType_DBEDGE,
 		Properties: []*structs.Property{
 			{
-				Name: "type",
-				Desc: "type of privilege: r,w, rw",
-				Type: ultipa.PropertyType_STRING,
+				Name:        "type",
+				Description: "type of privilege: r,w, rw",
+				Type:        ultipa.PropertyType_STRING,
 			},
 		},
 	})

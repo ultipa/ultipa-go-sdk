@@ -24,7 +24,7 @@ func (api *UltipaAPI) InitModel(model *models.GraphModel, config *configuration.
 		}
 	}
 
-	err = api.SetCurrentGraph(model.Graph.Name)
+	//err = api.SetCurrentGraph(model.Graph.Name)
 
 	if err != nil {
 		return err

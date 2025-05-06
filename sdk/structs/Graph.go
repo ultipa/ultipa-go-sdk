@@ -18,18 +18,36 @@ func NewGraph() *Graph {
 	}
 }
 
-func (p *Graph) GetNodes(uuid types.UUID) *Node {
-	return p.Nodes[uuid]
-}
+//func (p *Graph) GetNodes(uuid types.UUID) *Node {
+//   return p.Nodes[uuid]
+//}
 
 //func (p *Graph) GetLastNode() *Node {
-//    return p.Nodes[p.GetLength()]
+//   return p.Nodes[p.GetLength()]
 //}
 
-func (p *Graph) GetEdges(uuid types.UUID) *Edge {
-	return p.Edges[uuid]
+//func (p *Graph) GetEdges(uuid types.UUID) *Edge {
+//   return p.Edges[uuid]
+//}
+//
+//func (p *Graph) GetLength() int {
+//   return len(p.Edges)
+//}
+
+func (p *Graph) GetPath() []*Path {
+	return p.Paths
 }
 
-//func (p *Graph) GetLength() int {
-//    return len(p.Edges)
-//}
+func (p *Graph) AddNodes(node *Node) {
+	if node == nil {
+		return
+	}
+	p.Nodes[node.UUID] = node
+}
+
+func (p *Graph) AddEdges(edge *Edge) {
+	if edge == nil {
+		return
+	}
+	p.Edges[edge.UUID] = edge
+}

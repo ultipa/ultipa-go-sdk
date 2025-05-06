@@ -15,9 +15,15 @@ import (
 )
 
 func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EntityTable, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
+	graphName := ""
+	if config.Graph != "" {
+		graphName = config.Graph
+	} else if api.Config.DefaultGraph != "" {
+		graphName = api.Config.DefaultGraph
+	}
 
-	config.UseMaster = true
-	client, conf, err := api.GetClient(config.RequestConfig)
+	//config.UseMaster = true
+	client, _, err := api.GetClient(config.RequestConfig)
 
 	if err != nil {
 		return nil, err
@@ -30,11 +36,11 @@ func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EntityTable, config *config
 	defer cancel()
 
 	resp, err := client.InsertEdges(ctx, &ultipa.InsertEdgesRequest{
-		GraphName:            conf.CurrentGraph,
-		EdgeTable:            table,
-		CreateNodeIfNotExist: config.CreateNodeIfNotExist,
-		InsertType:           config.InsertType,
-		Silent:               config.Silent,
+		GraphName: graphName,
+		EdgeTable: table,
+		//CreateNodeIfNotExist: config.CreateNodeIfNotExist,
+		InsertType: config.InsertType,
+		Silent:     config.Silent,
 	})
 
 	if err != nil {
@@ -49,7 +55,6 @@ func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EntityTable, config *config
 }
 
 func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*structs.Edge, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
-
 	if config == nil {
 		config = &configuration.InsertRequestConfig{}
 	}
@@ -58,8 +63,15 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 		config.RequestConfig = &configuration.RequestConfig{}
 	}
 
-	config.UseMaster = true
-	client, conf, err := api.GetClient(config.RequestConfig)
+	graphName := ""
+	if config.Graph != "" {
+		graphName = config.Graph
+	} else if api.Config.DefaultGraph != "" {
+		graphName = api.Config.DefaultGraph
+	}
+
+	//config.UseMaster = true
+	client, _, err := api.GetClient(config.RequestConfig)
 
 	if err != nil {
 		return nil, err
@@ -100,11 +112,11 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 	}
 	table.EntityRows = edgeRows
 	resp, err := client.InsertEdges(ctx, &ultipa.InsertEdgesRequest{
-		GraphName:            conf.CurrentGraph,
-		EdgeTable:            table,
-		InsertType:           config.InsertType,
-		CreateNodeIfNotExist: config.CreateNodeIfNotExist,
-		Silent:               config.Silent,
+		GraphName:  graphName,
+		EdgeTable:  table,
+		InsertType: config.InsertType,
+		//CreateNodeIfNotExist: config.CreateNodeIfNotExist,
+		Silent: config.Silent,
 	})
 
 	if err != nil {
@@ -206,6 +218,20 @@ func doConvertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edg
 
 // InsertEdgesBatchAuto Nodes interface values should be string
 func (api *UltipaAPI) InsertEdgesBatchAuto(rows []*structs.Edge, config *configuration.InsertRequestConfig) (*http.InsertBatchAutoResponse, error) {
+	if config == nil {
+		config = &configuration.InsertRequestConfig{}
+	}
+
+	if config.RequestConfig == nil {
+		config.RequestConfig = &configuration.RequestConfig{}
+	}
+
+	graphName := ""
+	if config.Graph != "" {
+		graphName = config.Graph
+	} else if api.Config.DefaultGraph != "" {
+		graphName = api.Config.DefaultGraph
+	}
 
 	resps := &http.InsertBatchAutoResponse{
 		Resps:     map[string]*http.InsertResponse{},
@@ -262,16 +288,8 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(rows []*structs.Edge, config *configu
 	for _, batch := range batches {
 		batchSchema := batch.Schema
 
-		if config == nil {
-			config = &configuration.InsertRequestConfig{}
-		}
-
-		if config.RequestConfig == nil {
-			config.RequestConfig = &configuration.RequestConfig{}
-		}
-
-		config.UseMaster = true
-		client, conf, err := api.GetClient(config.RequestConfig)
+		//config.UseMaster = true
+		client, _, err := api.GetClient(config.RequestConfig)
 
 		if err != nil {
 			return nil, err
@@ -310,11 +328,11 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(rows []*structs.Edge, config *configu
 		}
 		table.EntityRows = batch.Edges
 		resp, err := client.InsertEdges(ctx, &ultipa.InsertEdgesRequest{
-			GraphName:            conf.CurrentGraph,
-			EdgeTable:            table,
-			InsertType:           config.InsertType,
-			CreateNodeIfNotExist: config.CreateNodeIfNotExist,
-			Silent:               config.Silent,
+			GraphName:  graphName,
+			EdgeTable:  table,
+			InsertType: config.InsertType,
+			//CreateNodeIfNotExist: config.CreateNodeIfNotExist,
+			Silent: config.Silent,
 		})
 
 		if err != nil {

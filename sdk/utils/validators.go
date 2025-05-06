@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// CheckGraphName check the name is validated，for PropertyName, GraphName, SchemaName
+// CheckGraphName check the name is validated，for PropertyName, Graph, SchemaName
 // deprecated since 4.2.28
 func CheckGraphName(name string) bool {
 	return CheckCustomerName(name)

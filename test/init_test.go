@@ -51,7 +51,7 @@ func GetClient(hosts []string, graphName string) (*api.UltipaAPI, error) {
 		Username:     username,
 		Password:     password,
 		DefaultGraph: graphName,
-		Debug:        DEBUG,
+		//Debug:        DEBUG,
 	})
 	if err != nil {
 		panic(err)

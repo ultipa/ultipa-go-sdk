@@ -1,25 +1,23 @@
 package structs
 
-//type Projection struct {
-//	ProjectName string `json:"project_name"`
+//type HDCGraph struct {
+//	Name string `json:"project_name"`
 //	ProjectType string `json:"project_type"`
 //	FilterType  string `json:"filter_type"`
-//	GraphName   string `json:"graph_name"`
+//	Graph   string `json:"graph_name"`
 //	Status      string `json:"status"`
 //	Stats       string `json:"stats"`
 //	Config      string `json:"config"`
 //}
 
 // HDCGragh
-type Projection struct {
-	ProjectName string `json:"name"`
-	ProjectType string `json:"type"`
-	FilterType  string `json:"filterType"`
-	IsDefault   string `json:"isDefault"`
-	SourceGraph string `json:"sourceGraph"`
-	Status      string `json:"status"`
-	Stats       string `json:"stats"`
-	HDCName     string `json:"HDCName"`
-	HDCStatus   string `json:"HDCStatus"`
-	Config      string `json:"config"`
+type HDCGraph struct {
+	Name            string `json:"name"`
+	GraphName       string `json:"graph_name"`
+	Status          string `json:"status"`
+	Stats           string `json:"stats"`
+	IsDefault       string `json:"is_default"`
+	HDCServerName   string `json:"hdc_server_name"`
+	HDCServerStatus string `json:"hdc_server_status"`
+	Config          string `json:"config"`
 }

@@ -9,7 +9,6 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/connection"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
-	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 )
 
 // Uql, Insert, Export, Download ... API methods
@@ -17,7 +16,7 @@ import (
 type UltipaAPI struct {
 	Pool   *connection.ConnectionPool
 	Config *configuration.UltipaConfig
-	Logger *logger.Logger
+	//Logger *logger.Logger
 }
 
 type ClientType int
@@ -32,7 +31,7 @@ func NewUltipaAPI(conn *connection.ConnectionPool) *UltipaAPI {
 	api := &UltipaAPI{
 		Pool:   conn,
 		Config: conn.Config,
-		Logger: logger.NewLogger(conn.Config.Debug),
+		//Logger: logger.NewLogger(conn.Config.Debug),
 	}
 
 	return api
@@ -77,7 +76,7 @@ func (api *UltipaAPI) GetClient(config *configuration.RequestConfig) (ultipa.Ult
 	}
 
 	client := conn.GetClient()
-	api.Logger.Log(fmt.Sprintf("fetch client,  hit host:[%s], role [%v], graph=[%s]", conn.Host, conn.Role, conf.CurrentGraph))
+	//api.Logger.Log(fmt.Sprintf("fetch client,  hit host:[%s], role [%v], graph=[%s]", conn.Host, conn.Role, conf.CurrentGraph))
 	return client, conf, nil
 }
 
@@ -93,7 +92,7 @@ func (api *UltipaAPI) GetControlClientAndConfig(config *configuration.RequestCon
 		config = &configuration.RequestConfig{}
 	}
 
-	config.UseControl = true
+	//config.UseControl = true
 
 	conn, conf, err := api.GetConn(config)
 
@@ -101,7 +100,7 @@ func (api *UltipaAPI) GetControlClientAndConfig(config *configuration.RequestCon
 		return nil, conf, err
 	}
 	client := conn.GetControlClient()
-	api.Logger.Log(fmt.Sprintf("fetch control client, hit host:[%s], role [%v], graph=[%s]", conn.Host, conn.Role, conf.CurrentGraph))
+	//api.Logger.Log(fmt.Sprintf("fetch control client, hit host:[%s], role [%v], graph=[%s]", conn.Host, conn.Role, conf.CurrentGraph))
 	return client, conf, nil
 }
 
@@ -184,7 +183,7 @@ func (api *UltipaAPI) doExecuteQuery(query string, queryType ultipa.QueryType, c
 		config = &configuration.RequestConfig{}
 	}
 
-	config.Uql = query
+	//config.Uql = query
 	//uqlItem := utils.NewUql(query)
 	//isExtra := uqlItem.IsExtra()
 	var client ultipa.UltipaRpcsClient
@@ -196,7 +195,7 @@ func (api *UltipaAPI) doExecuteQuery(query string, queryType ultipa.QueryType, c
 		return nil, conf, err
 	}
 	//CurrentGraph of conf may be changed by query
-	config.GraphName = conf.CurrentGraph
+	//config.Graph = conf.CurrentGraph
 	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		defer cancel()
@@ -224,14 +223,21 @@ func (api *UltipaAPI) doExecuteQuery(query string, queryType ultipa.QueryType, c
 
 // buildQueryRequest build uqlRequest according to requestConfig and configuration
 func (api *UltipaAPI) buildQueryRequest(query string, queryType ultipa.QueryType, config *configuration.RequestConfig, conf *configuration.UltipaConfig) *ultipa.QueryRequest {
+	graphName := ""
+	if config.Graph != "" {
+		graphName = config.Graph
+	} else if conf.DefaultGraph != "" {
+		graphName = conf.DefaultGraph
+	}
+
 	uqlRequest := &ultipa.QueryRequest{
-		GraphName: conf.CurrentGraph,
+		GraphName: graphName,
 		Timeout:   uint32(conf.Timeout),
 		QueryType: queryType,
 		QueryText: query,
 	}
-	if config.ThreadNum > 0 {
-		uqlRequest.ThreadNum = config.ThreadNum
+	if config.Thread > 0 {
+		uqlRequest.ThreadNum = config.Thread
 	}
 	if config.TimezoneOffset == 0 && config.Timezone == "" {
 		_, offset := time.Now().Zone()
@@ -300,10 +306,10 @@ func (api *UltipaAPI) Test(requestConfig *configuration.RequestConfig) (resp *ht
 //    return true, conn, err
 //}
 
-func (api *UltipaAPI) SetCurrentGraph(graphName string) error {
-	api.Config.CurrentGraph = graphName
-	return nil
-}
+//func (api *UltipaAPI) SetCurrentGraph(graphName string) error {
+//    api.Config.CurrentGraph = graphName
+//    return nil
+//}
 
 func (api *UltipaAPI) Close() error {
 	return api.Pool.Close()

@@ -109,7 +109,7 @@ func TestCompareSchema(t *testing.T) {
 }
 
 func TestShowSchema(t *testing.T) {
-	client.SetCurrentGraph("call")
+	//client.SetCurrentGraph("call")
 	response, _ := client.Uql("show().node_schema()", nil)
 
 	printers.PrintAny(response.Alias(http2.RESP_NODE_SCHEMA_KEY))
@@ -164,7 +164,7 @@ func TestCreateSchema(t *testing.T) {
 
 func TestAlterSchema(t *testing.T) {
 	// create schema with properties
-	client.SetCurrentGraph("test_go_sdk")
+	//client.SetCurrentGraph("test_go_sdk")
 	schema := &structs.Schema{
 		DBType: ultipa.DBType_DBNODE,
 		Name:   `""`,

@@ -137,7 +137,7 @@ func ExampleUltipaAPI_CreateSchemaIfNotExist() {
 
 func ExampleUltipaAPI_CreateNodeProperty() {
 
-	// Create Node Property
+	// CreateTime Node Property
 	newProp := &structs.Property{
 		Name: "name",
 		Type: ultipa.PropertyType_STRING,
@@ -146,7 +146,7 @@ func ExampleUltipaAPI_CreateNodeProperty() {
 	resp, _ := client.CreateProperty(ultipa.DBType_DBNODE, "target_schema", newProp, nil)
 	log.Println(resp.Status.Code)
 
-	// Create Edge Property
+	// CreateTime Edge Property
 	newEdgeProp := &structs.Property{
 		Name: "relation",
 		Type: ultipa.PropertyType_STRING,
@@ -166,13 +166,13 @@ func ExampleUltipaAPI_GetProperty() {
 
 func ExampleUltipaAPI_AlterNodeProperty() {
 	prop := &structs.Property{
-		Name:   "name",
-		Desc:   "name Description",
-		Schema: "user",
+		Name:        "name",
+		Description: "name Description",
+		Schema:      "user",
 	}
 	newProp := &structs.Property{
-		Name: "newName",
-		Desc: "name change to newName",
+		Name:        "newName",
+		Description: "name change to newName",
 	}
 	resp, _ := client.AlterNodeProperty(prop, newProp, nil)
 	log.Println(resp)
@@ -180,13 +180,13 @@ func ExampleUltipaAPI_AlterNodeProperty() {
 
 func ExampleUltipaAPI_AlterEdgeProperty() {
 	prop := &structs.Property{
-		Name:   "name",
-		Desc:   "name Description",
-		Schema: "relation",
+		Name:        "name",
+		Description: "name Description",
+		Schema:      "relation",
 	}
 	newProp := &structs.Property{
-		Name: "newName",
-		Desc: "name change to newName",
+		Name:        "newName",
+		Description: "name change to newName",
 	}
 	resp, _ := client.AlterEdgeProperty(prop, newProp, nil)
 	log.Println(resp)
@@ -281,16 +281,16 @@ func ExampleUltipaAPI_UQL7() {
 	printers.PrintSchema(edgeSchemas)
 }
 
-func ExampleUltipaAPI_UQL8() {
-	resp, _ := client.Uql("show().algos()", nil)
-
-	algos, err := resp.Alias(http.RESP_ALGOS_KEY).AsAlgos()
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-	printers.PrintAlgoList(algos)
-}
+//func ExampleUltipaAPI_UQL8() {
+//	resp, _ := client.Uql("show().algos()", nil)
+//
+//	algos, err := resp.Alias(http.RESP_ALGOS_KEY).AsAlgos()
+//
+//	if err != nil {
+//		log.Fatalln(err)
+//	}
+//	printers.PrintAlgoList(algos)
+//}
 
 func ExampleUltipaAPI_UQL9() {
 

@@ -17,7 +17,7 @@ func TestHeartBeat(t *testing.T) {
 		Username:  username,
 		Password:  password,
 		HeartBeat: 1,
-		Debug:     true,
+		//Debug:     true,
 	})
 	if err != nil {
 		t.Fatal(err)

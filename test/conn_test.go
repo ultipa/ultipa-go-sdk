@@ -156,7 +156,7 @@ func TestConnectionSSL(t *testing.T) {
 		Username:     env["ssl_username"],
 		Password:     env["ssl_password"],
 		DefaultGraph: env["ssl_graph"],
-		Debug:        true,
+		//Debug:        true,
 	})
 	if err != nil {
 		t.Fatal(err)

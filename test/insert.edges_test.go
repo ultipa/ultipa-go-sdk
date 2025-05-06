@@ -11,7 +11,7 @@ import (
 func TestInsertEdge(t *testing.T) {
 	//t.Run("insert node", TestInsertNodes)
 
-	client.SetCurrentGraph("go_sdk_test")
+	//client.SetCurrentGraph("go_sdk_test")
 	schemaName := "default"
 	prop := &structs.Property{
 		Name: "value",

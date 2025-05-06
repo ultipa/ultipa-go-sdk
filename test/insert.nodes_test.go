@@ -223,7 +223,7 @@ func TestInsertNodeWithSetProperty(t *testing.T) {
 }
 
 func TestInsertNodes(t *testing.T) {
-	client.SetCurrentGraph("go_sdk_test")
+	//client.SetCurrentGraph("go_sdk_test")
 	schemaName := "default"
 
 	ty := ultipa.DBType_DBNODE

@@ -24,7 +24,7 @@ import (
 // )
 type Policy struct {
 	Name               string             `json:"-"`
-	GraphPrivileges    GraphPrivileges    `json:"graph_privileges,omitempty" json:"graph_privileges,omitempty"`
+	GraphPrivileges    GraphPrivileges    `json:"graph_privileges,omitempty"`
 	SystemPrivileges   []string           `json:"system_privileges,omitempty"`
 	PropertyPrivileges PropertyPrivileges `json:"property_privileges,omitempty"`
 	Policies           []string           `json:"policies,omitempty"`

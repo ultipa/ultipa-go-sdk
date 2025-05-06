@@ -7,6 +7,8 @@
 
 package structs
 
+import ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+
 type Index struct {
 	Id         int
 	Name       string
@@ -14,5 +16,5 @@ type Index struct {
 	Schema     string
 	Status     string
 	//Size       int
-	Type string
+	DBType ultipa.DBType
 }

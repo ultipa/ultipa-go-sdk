@@ -15,9 +15,14 @@ import (
 )
 
 func (api *UltipaAPI) InsertNodesBatch(table *ultipa.EntityTable, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
-
-	config.UseMaster = true
-	client, conf, err := api.GetClient(config.RequestConfig)
+	graphName := ""
+	if config.Graph != "" {
+		graphName = config.Graph
+	} else if api.Config.DefaultGraph != "" {
+		graphName = api.Config.DefaultGraph
+	}
+	//config.UseMaster = true
+	client, _, err := api.GetClient(config.RequestConfig)
 
 	if err != nil {
 		return nil, err
@@ -30,7 +35,7 @@ func (api *UltipaAPI) InsertNodesBatch(table *ultipa.EntityTable, config *config
 	defer cancel()
 
 	resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
-		GraphName:  conf.CurrentGraph,
+		GraphName:  graphName,
 		NodeTable:  table,
 		InsertType: config.InsertType,
 		Silent:     config.Silent,
@@ -57,8 +62,15 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 		config.RequestConfig = &configuration.RequestConfig{}
 	}
 
-	config.UseMaster = true
-	client, conf, err := api.GetClient(config.RequestConfig)
+	graphName := ""
+	if config.Graph != "" {
+		graphName = config.Graph
+	} else if api.Config.DefaultGraph != "" {
+		graphName = api.Config.DefaultGraph
+	}
+
+	//config.UseMaster = true
+	client, _, err := api.GetClient(config.RequestConfig)
 
 	if err != nil {
 		return nil, err
@@ -100,7 +112,7 @@ func (api *UltipaAPI) InsertNodesBatchBySchema(schema *structs.Schema, rows []*s
 	table.EntityRows = nodeRows
 	//log.Printf("transporter debug UltipaRpcsClient.InsertNodes contexValue graph_name: %v \n", ctx.Value("graph_name"))
 	resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
-		GraphName:  conf.CurrentGraph,
+		GraphName:  graphName,
 		NodeTable:  table,
 		InsertType: config.InsertType,
 		Silent:     config.Silent,
@@ -201,6 +213,20 @@ type Batch struct {
 
 // InsertNodesBatchAuto Nodes interface values should be string
 func (api *UltipaAPI) InsertNodesBatchAuto(rows []*structs.Node, config *configuration.InsertRequestConfig) (*http.InsertBatchAutoResponse, error) {
+	if config == nil {
+		config = &configuration.InsertRequestConfig{}
+	}
+
+	if config.RequestConfig == nil {
+		config.RequestConfig = &configuration.RequestConfig{}
+	}
+
+	graphName := ""
+	if config.Graph != "" {
+		graphName = config.Graph
+	} else if api.Config.DefaultGraph != "" {
+		graphName = api.Config.DefaultGraph
+	}
 
 	resps := &http.InsertBatchAutoResponse{
 		Resps:     map[string]*http.InsertResponse{},
@@ -256,16 +282,8 @@ func (api *UltipaAPI) InsertNodesBatchAuto(rows []*structs.Node, config *configu
 	for _, batch := range batches {
 		batchSchema := batch.Schema
 
-		if config == nil {
-			config = &configuration.InsertRequestConfig{}
-		}
-
-		if config.RequestConfig == nil {
-			config.RequestConfig = &configuration.RequestConfig{}
-		}
-
-		config.UseMaster = true
-		client, conf, err := api.GetClient(config.RequestConfig)
+		//config.UseMaster = true
+		client, _, err := api.GetClient(config.RequestConfig)
 
 		if err != nil {
 			return nil, err
@@ -304,7 +322,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(rows []*structs.Node, config *configu
 		}
 		table.EntityRows = batch.Nodes
 		resp, err := client.InsertNodes(ctx, &ultipa.InsertNodesRequest{
-			GraphName:  conf.CurrentGraph,
+			GraphName:  graphName,
 			NodeTable:  table,
 			InsertType: config.InsertType,
 			Silent:     config.Silent,

@@ -26,7 +26,7 @@ func TestExportAsNodesEdges(t *testing.T) {
 		}}
 	err := client.ExportAsNodesEdges(schema,
 		1000,
-		&configuration.RequestConfig{MaxPkgSize: 1024 * 1024 * 100},
+		&configuration.RequestConfig{},
 		func(nodes []*structs.Node, edges []*structs.Edge) error {
 			//printers.PrintNodes(nodes, map[string]*structs.Schema{schemaName: schema})
 			t.Log(len(nodes))

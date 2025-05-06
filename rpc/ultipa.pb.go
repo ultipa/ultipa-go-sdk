@@ -32,12 +32,12 @@ const (
 var (
 	QueryType_name = map[int32]string{
 		0: "QUERY_UNSET",
-		1: "UQL",
+		1: "Query",
 		2: "GQL",
 	}
 	QueryType_value = map[string]int32{
 		"QUERY_UNSET": 0,
-		"UQL":         1,
+		"Query":       1,
 		"GQL":         2,
 	}
 )

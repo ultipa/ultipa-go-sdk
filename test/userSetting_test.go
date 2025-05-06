@@ -20,7 +20,7 @@ func TestUserSetting(t *testing.T) {
 
 	resp2, err := client.GetUserSetting(&structs.GetUserSetting{
 		UserName: key,
-		//Type:     "int",
+		//DBType:     "int",
 	}, nil)
 	fmt.Println(err)
 

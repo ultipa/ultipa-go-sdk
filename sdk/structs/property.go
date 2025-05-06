@@ -12,17 +12,17 @@ import (
 )
 
 type Property struct {
-	Name     string
-	Desc     string
-	Lte      bool
-	Read     bool
-	Write    bool
-	Schema   string
-	Type     ultipa.PropertyType
-	SubTypes []ultipa.PropertyType
+	Name        string
+	Schema      string
+	Type        ultipa.PropertyType
+	SubTypes    []ultipa.PropertyType
+	Lte         bool
+	Read        bool
+	Write       bool
+	Description string
+	Encrypt     string
 	// extra info for property in json format, e.g. DecimalExtra: precision and scale for decimal type.
-	Extra   string
-	Encrypt string
+	DecimalExtra string
 }
 
 const (
@@ -143,7 +143,7 @@ func (p *Property) SetTypeByString(s string) {
 		p.SubTypes = append(p.SubTypes, GetPropertyTypeByString(subType))
 
 		// 5.0 server not support set type，set type = UNSET
-		//p.Type = ultipa.PropertyType_UNSET
+		//p.DBType = ultipa.PropertyType_UNSET
 		return
 	}
 
@@ -165,9 +165,9 @@ func (p *Property) SetTypeByString(s string) {
 		if err != nil {
 			return
 		}
-		p.Extra = string(extraJson)
+		p.DecimalExtra = string(extraJson)
 
-		//p.Type = ultipa.PropertyType_UNSET
+		//p.DBType = ultipa.PropertyType_UNSET
 		return
 	}
 
@@ -192,7 +192,7 @@ func (p *Property) GetStringType() (string, error) {
 	}
 	if p.Type == ultipa.PropertyType_DECIMAL {
 		var extraData DecimalExtra
-		err := json.Unmarshal([]byte(p.Extra), &extraData)
+		err := json.Unmarshal([]byte(p.DecimalExtra), &extraData)
 		if err != nil {
 			return GetStringByPropertyType(p.Type), nil
 		}

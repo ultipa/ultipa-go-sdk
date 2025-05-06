@@ -45,11 +45,11 @@ func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, requestConfig *config
 	resp, err := api.Uql(fmt.Sprintf(`create().graph("%v", "%v").shards([%v]).partitionByHash('%v',_id)`, graph.Name, graph.Description, strings.Join(graph.Shards, ","), graph.PartitionBy), requestConfig)
 
 	if err != nil {
-		api.Logger.Log("create graph failed : " + graph.Name + " " + err.Error())
+		//api.Logger.Log("create graph failed : " + graph.Name + " " + err.Error())
 		return nil, err
 	}
 
-	api.Logger.Log("Creating Graph Request OK! - " + graph.Name)
+	//api.Logger.Log("Creating Graph Request OK! - " + graph.Name)
 
 	// Try to detect the graph is created, default times is 600
 	//times := 60

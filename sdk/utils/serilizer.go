@@ -22,7 +22,7 @@ var default_nil_string = string([]byte{0x00})
 const SERVER_BOOL_TRUE_VALUE = "1"
 const SERVER_BOOL_FALSE_VALUE = "0"
 
-// Convert Bytes to GoLang Type and return to an interface
+// Convert Bytes to GoLang DBType and return to an interface
 func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType, subTypes []ultipa.PropertyType) (interface{}, error) {
 	if IsNull(t, bs) {
 		return nil, nil

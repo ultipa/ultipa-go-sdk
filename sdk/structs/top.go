@@ -1,8 +1,8 @@
 package structs
 
-type Top struct {
-	ProcessId  string `json:"process_id"`
-	Status     string `json:"status"`
-	ProcessUql string `json:"process_uql"`
-	Duration   string `json:"duration"`
+type Process struct {
+	ProcessId    string `json:"process_id"`
+	Status       string `json:"status"`
+	ProcessQuery string `json:"process_query"`
+	Duration     string `json:"duration"`
 }

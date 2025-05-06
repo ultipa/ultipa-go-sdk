@@ -4,19 +4,19 @@ import (
 	"testing"
 )
 
-func TestShowAlgo(t *testing.T) {
-	//client, _ := GetClient(hosts, graph)
-
-	algos, err := client.ShowAlgo(nil)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(algos) == 0 {
-		t.Log("no algo return")
-	}
-	//printers.PrintAlgoList(algos)
-}
+//func TestShowAlgo(t *testing.T) {
+//	//client, _ := GetClient(hosts, graph)
+//
+//	algos, err := client.ShowAlgo(nil)
+//
+//	if err != nil {
+//		t.Fatal(err)
+//	}
+//	if len(algos) == 0 {
+//		t.Log("no algo return")
+//	}
+//	//printers.PrintAlgoList(algos)
+//}
 
 var (
 	algoName = "lpa"

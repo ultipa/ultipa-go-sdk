@@ -9,7 +9,7 @@ import (
 
 func TestDelete(t *testing.T) {
 	conf := &configuration.InsertRequestConfig{
-		RequestConfig: &configuration.RequestConfig{GraphName: "amz2"},
+		RequestConfig: &configuration.RequestConfig{Graph: "amz2"},
 		Silent:        true,
 	}
 	resp, err := client.DeleteNodes("{_uuid < 200}", conf)

@@ -37,7 +37,7 @@ func NewConnection(host string, config *configuration.UltipaConfig) (*Connection
 
 	// add default mac receive size
 	if config.MaxRecvSize == 0 {
-		config.MaxRecvSize = 1024 * 1024 * 10
+		config.MaxRecvSize = configuration.DefaultRecvSize
 	}
 
 	// Try to get a certificate

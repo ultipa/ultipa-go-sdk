@@ -98,14 +98,14 @@ func TestCreatePropertyWithUql(t *testing.T) {
 }
 
 func TestCreateProperty(t *testing.T) {
-	// Create Node Property
+	// CreateTime Node Property
 	newProp := &structs.Property{
 		Name: `"""`,
 		Type: ultipa.PropertyType_BOOL,
 	}
 
 	resp, err := client.CreateProperty(ultipa.DBType_DBNODE, "default", newProp, &configuration.RequestConfig{
-		GraphName: "go_sdk_test",
+		Graph: "go_sdk_test",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -134,9 +134,9 @@ func TestProperty(t *testing.T) {
 	}
 
 	prop := &structs.Property{
-		Name: "中文Property",
-		Desc: "中文描述",
-		Type: ultipa.PropertyType_STRING,
+		Name:        "中文Property",
+		Description: "中文描述",
+		Type:        ultipa.PropertyType_STRING,
 	}
 	_, err = client.CreateProperty(ultipa.DBType_DBNODE, schema.Name, prop, nil)
 	if err != nil {
@@ -216,9 +216,9 @@ func TestProperty(t *testing.T) {
 
 func TestProperty2(t *testing.T) {
 	prop := &structs.Property{
-		Name: "中文Property2",
-		Desc: "中文描述",
-		Type: ultipa.PropertyType_STRING,
+		Name:        "中文Property2",
+		Description: "中文描述",
+		Type:        ultipa.PropertyType_STRING,
 	}
 	_, _, err := client.CreatePropertyIfNotExist(ultipa.DBType_DBNODE, "default", prop, nil)
 	if err != nil {

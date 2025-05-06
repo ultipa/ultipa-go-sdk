@@ -20,8 +20,8 @@ func PrintSchema(schemas []*structs.Schema) {
 
 		fmt.Println("Description: ", schema.Description)
 		table := simpletable.New()
-		table.Header.Cells = []*simpletable.Cell{{Text: "Name"}, {Text: "Description"}, {Text: "Type"}, {Text: "LTE"}, {Text: "Schema"}}
-		//table.Footer.Cells = []*simpletable.Cell{&simpletable.Cell{Span: 4, Text: fmt.Sprint("[", schema.Type, "]Schema : "+schema.Name, "(", schema.Total, ")")}}
+		table.Header.Cells = []*simpletable.Cell{{Text: "Name"}, {Text: "Description"}, {Text: "DBType"}, {Text: "LTE"}, {Text: "Schema"}}
+		//table.Footer.Cells = []*simpletable.Cell{&simpletable.Cell{Span: 4, Text: fmt.Sprint("[", schema.DBType, "]Schema : "+schema.Name, "(", schema.Total, ")")}}
 
 		for _, prop := range schema.Properties {
 
@@ -32,7 +32,7 @@ func PrintSchema(schemas []*structs.Schema) {
 
 			rowCells := []*simpletable.Cell{
 				{Text: prop.Name},
-				{Text: prop.Desc},
+				{Text: prop.Description},
 				{Text: propertyTypeStr},
 				{Text: strconv.FormatBool(prop.Lte)},
 				{Text: prop.Schema},

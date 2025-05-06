@@ -43,7 +43,7 @@ package http
 //}
 //
 //type ResponseIndex struct {
-//	Type    ultipa.DBType
+//	DBType    ultipa.DBType
 //	Indexes []*structs.Index
 //}
 

@@ -9,6 +9,14 @@ import (
 	"strings"
 )
 
+type HDCSync int32
+
+const (
+	STATIC HDCSync = iota
+	ASYNC
+	SYNC
+)
+
 func (api *UltipaAPI) CreateHDCGraphBySchema(graphName string, nodeSchemas, edgeSchemas []*structs.Schema, update string, hdcName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 	// `hdc.graph.create("social-user-article", {
 	//nodes: {User: ["username"], Article: ["title"] },
@@ -35,11 +43,11 @@ func (api *UltipaAPI) CreateHDCGraphBySchema(graphName string, nodeSchemas, edge
 	resp, err := api.Uql(uql, requestConfig)
 
 	if err != nil {
-		api.Logger.Log("create hdc graph failed : " + graphName + " " + err.Error())
+		//api.Logger.Log("create hdc graph failed : " + graphName + " " + err.Error())
 		return nil, err
 	}
 
-	api.Logger.Log("Creating Graph Request OK! - " + graphName)
+	//api.Logger.Log("Creating Graph Request OK! - " + graphName)
 
 	return resp, err
 }
@@ -73,7 +81,7 @@ func FormatHdcGraphSchemas(schemas []*structs.Schema) string {
 
 }
 
-func (api *UltipaAPI) ShowHDCGraph(requestConfig *configuration.RequestConfig) ([]*structs.Projection, error) {
+func (api *UltipaAPI) ShowHDCGraph(requestConfig *configuration.RequestConfig) ([]*structs.HDCGraph, error) {
 	//if graphName != "" {
 	//	graphName = fmt.Sprintf(`"%s"`, graphName)
 	//}
@@ -86,7 +94,7 @@ func (api *UltipaAPI) ShowHDCGraph(requestConfig *configuration.RequestConfig) (
 		return nil, err
 	}
 
-	projections, err := resp.Alias(http.RESP_PROJECT_KEY).AsProjections()
+	projections, err := resp.Alias(http.RESP_HDCGRAPH_KEY).AsHDCGraphs()
 	if err != nil {
 		return nil, err
 	}

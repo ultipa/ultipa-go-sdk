@@ -200,7 +200,7 @@ func (pool *ConnectionPool) RefreshClusterInfo(graphName string) error {
 }
 
 func (pool *ConnectionPool) doRefreshClusterInfo(graphName string) error {
-	var conn *Connection
+	//var conn *Connection
 
 	var err error
 
@@ -223,9 +223,9 @@ func (pool *ConnectionPool) doRefreshClusterInfo(graphName string) error {
 		//    // After initialization
 		//    conn = pool.GraphMgr.GetLeader(graphName)
 		//}
-		if pool.Config.Debug && conn != nil {
-			logger.PrintDebug(fmt.Sprintf("refresh graph [%s] cluster info with connection to host [%s]", graphName, conn.Host))
-		}
+		//if pool.Config.Debug && conn != nil {
+		//	logger.PrintDebug(fmt.Sprintf("refresh graph [%s] cluster info with connection to host [%s]", graphName, conn.Host))
+		//}
 		//err = pool.resolveClusterInfo(graphName, conn)
 		//if err == nil {
 		//    return nil
@@ -240,7 +240,7 @@ func (pool *ConnectionPool) doRefreshClusterInfo(graphName string) error {
 // resolveClusterInfo resolve graphName cluster info with connection conn
 // func (pool *ConnectionPool) resolveClusterInfo(graphName string, conn *Connection) error {
 //
-//	   ctx, cancel, err := pool.NewContext(&configuration.RequestConfig{GraphName: graphName})
+//	   ctx, cancel, err := pool.NewContext(&configuration.RequestConfig{Graph: graphName})
 //	   defer cancel()
 //	   if err != nil {
 //	       return err

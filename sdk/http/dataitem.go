@@ -234,7 +234,7 @@ func (di *DataItem) AsTable() (table *structs.Table, err error) {
 	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
-		return nil, errors.New("DataItem " + di.Alias + " is not Type Table")
+		return nil, errors.New("DataItem " + di.Alias + " is not DBType Table")
 	}
 
 	// fix top() return nil
@@ -276,12 +276,12 @@ func (di *DataItem) AsTable() (table *structs.Table, err error) {
 //AsArray find().nodes() as nodes group by nodes.year as y return y,collect(nodes._id)
 //func (di *DataItem) AsArray() (arr *structs.Array, err error) {
 //
-//	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+//	if di.DBType == ultipa.ResultType_RESULT_TYPE_UNSET {
 //		return arr, nil
 //	}
 //
-//	if di.Type != ultipa.ResultType_RESULT_TYPE_ARRAY {
-//		return nil, errors.New("DataItem " + di.Alias + " is not Type Array")
+//	if di.DBType != ultipa.ResultType_RESULT_TYPE_ARRAY {
+//		return nil, errors.New("DataItem " + di.Alias + " is not DBType Array")
 //	}
 //
 //	arr = structs.NewArray()
@@ -315,7 +315,7 @@ func (di *DataItem) AsAttr() (*structs.Attr, error) {
 	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
-		return nil, errors.New("DataItem " + di.Alias + " is not Type Attribute list")
+		return nil, errors.New("DataItem " + di.Alias + " is not DBType Attribute list")
 	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
@@ -332,7 +332,7 @@ func (di *DataItem) AsAttr() (*structs.Attr, error) {
 	case ultipa.PropertyType_SET:
 		return midAttr.ListAttrAsAttr()
 	case ultipa.PropertyType_MAP:
-		return nil, errors.New(fmt.Sprintf("DataItem %v is not either Type Attr or LIST Attr, but MAP, not supported yet.", di.Alias))
+		return nil, errors.New(fmt.Sprintf("DataItem %v is not either DBType Attr or LIST Attr, but MAP, not supported yet.", di.Alias))
 	default:
 		return midAttr, nil
 	}
@@ -346,7 +346,7 @@ func (di *DataItem) AsAttrNodes() (*structs.AttrNodes, error) {
 	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
-		return nil, errors.New("DataItem " + di.Alias + " is not Type Attr")
+		return nil, errors.New("DataItem " + di.Alias + " is not DBType Attr")
 	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
@@ -366,7 +366,7 @@ func (di *DataItem) AsAttrEdges() (*structs.AttrEdges, error) {
 	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
-		return nil, errors.New("DataItem " + di.Alias + " is not Type Attr")
+		return nil, errors.New("DataItem " + di.Alias + " is not DBType Attr")
 	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
@@ -386,7 +386,7 @@ func (di *DataItem) AsAttrPaths() (*structs.AttrPaths, error) {
 	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
-		return nil, errors.New("DataItem " + di.Alias + " is not Type Attr")
+		return nil, errors.New("DataItem " + di.Alias + " is not DBType Attr")
 	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
@@ -639,7 +639,7 @@ func (di *DataItem) AsGraphCount() (graphCounts []*structs.GraphCount, err error
 		values := row.GetValues()
 		count, _ := strconv.Atoi(string(values[4]))
 
-		sp := &structs.SchemaPair{
+		sp := &structs.SchemaStat{
 			FromSchema: string(values[2]),
 			ToSchema:   string(values[3]),
 			Count:      count,
@@ -758,11 +758,11 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 				}
 			}
 			p := structs.Property{
-				Name:   prop.Name,
-				Desc:   prop.Description,
-				Lte:    lte,
-				Schema: schema.Name,
-				Extra:  prop.Extra,
+				Name:         prop.Name,
+				Description:  prop.Description,
+				Lte:          lte,
+				Schema:       schema.Name,
+				DecimalExtra: prop.Extra,
 			}
 			p.SetTypeByString(prop.Type)
 			schema.Properties = append(schema.Properties, &p)
@@ -814,14 +814,14 @@ func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 			log.Fatalln(err)
 		}
 		p := structs.Property{
-			Name:    name,
-			Desc:    desc,
-			Lte:     lte,
-			Read:    "1" == read,
-			Write:   "1" == write,
-			Schema:  schema,
-			Extra:   extra,
-			Encrypt: encrypt,
+			Name:         name,
+			Description:  desc,
+			Lte:          lte,
+			Read:         "1" == read,
+			Write:        "1" == write,
+			Schema:       schema,
+			DecimalExtra: extra,
+			Encrypt:      encrypt,
 		}
 		p.SetTypeByString(typeStr)
 		properties = append(properties, &p)
@@ -851,12 +851,12 @@ func (di *DataItem) AsIndexes() (indexes []*structs.Index, err error) {
 	}
 
 	table := di.Data.(*ultipa.Table)
-	indexType := ""
+	var indexType ultipa.DBType
 
 	if table.TableName == RESP_NODE_INDEX_KEY {
-		indexType = "node"
+		indexType = ultipa.DBType_DBNODE
 	} else if table.TableName == RESP_EDGE_INDEX_KEY {
-		indexType = "edge"
+		indexType = ultipa.DBType_DBEDGE
 	} else {
 		return nil, errors.New("DataItem " + di.Alias + " is not a Index list")
 	}
@@ -872,7 +872,7 @@ func (di *DataItem) AsIndexes() (indexes []*structs.Index, err error) {
 			Schema:     string(values[3]),
 			Status:     string(values[4]),
 			//Size:       size,
-			Type: indexType,
+			DBType: indexType,
 		}
 		indexes = append(indexes, &i)
 
@@ -894,13 +894,14 @@ func (di *DataItem) AsFullTexts() (fullTextIndexes []*structs.Index, err error) 
 
 	table := di.Data.(*ultipa.Table)
 
-	indexType := ""
-	if table.TableName == RESP_NODE_FULLTEXT_KEY {
-		indexType = "node"
-	} else if table.TableName == RESP_EDGE_FULLTEXT_KEY {
-		indexType = "edge"
+	var indexType ultipa.DBType
+
+	if table.TableName == RESP_NODE_INDEX_KEY {
+		indexType = ultipa.DBType_DBNODE
+	} else if table.TableName == RESP_EDGE_INDEX_KEY {
+		indexType = ultipa.DBType_DBEDGE
 	} else {
-		return nil, errors.New("DataItem " + di.Alias + " is not a Fulltext Index list")
+		return nil, errors.New("DataItem " + di.Alias + " is not a Index list")
 	}
 
 	for _, row := range table.TableRows {
@@ -912,7 +913,7 @@ func (di *DataItem) AsFullTexts() (fullTextIndexes []*structs.Index, err error) 
 			Properties: string(values[1]),
 			Schema:     string(values[2]),
 			Status:     string(values[3]),
-			Type:       indexType,
+			DBType:     indexType,
 		}
 		fullTextIndexes = append(fullTextIndexes, &i)
 
@@ -921,35 +922,35 @@ func (di *DataItem) AsFullTexts() (fullTextIndexes []*structs.Index, err error) 
 	return fullTextIndexes, err
 }
 
-func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {
-
-	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
-		return nil, errors.New("DataItem " + di.Alias + " should be a table(algo) as pre-condition")
-	}
-
-	table, err := di.AsTable()
-
-	if err != nil {
-		return nil, err
-	}
-
-	var algos []*structs.Algo
-
-	algoDatas := table.ToKV()
-
-	for _, algoData := range algoDatas {
-
-		algo, err := structs.NewAlgo(algoData.Data["name"].(string), algoData.Data["param"].(string))
-
-		if err != nil {
-			return nil, errors.New(fmt.Sprint(err.Error(), algoData))
-		}
-
-		algos = append(algos, algo)
-	}
-
-	return algos, nil
-}
+//func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {
+//
+//	if di.DBType != ultipa.ResultType_RESULT_TYPE_TABLE {
+//		return nil, errors.New("DataItem " + di.Alias + " should be a table(algo) as pre-condition")
+//	}
+//
+//	table, err := di.AsTable()
+//
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	var algos []*structs.Algo
+//
+//	algoDatas := table.ToKV()
+//
+//	for _, algoData := range algoDatas {
+//
+//		algo, err := structs.NewAlgo(algoData.Data["name"].(string), algoData.Data["param"].(string))
+//
+//		if err != nil {
+//			return nil, errors.New(fmt.Sprint(err.Error(), algoData))
+//		}
+//
+//		algos = append(algos, algo)
+//	}
+//
+//	return algos, nil
+//}
 
 // AsGraph convert graphAlias to structs.Graph for uql syntax toGraph(listUnion(collect(n1), collect(n2)), collect(e)) as graph return graph
 func (di *DataItem) AsGraph() (graph *structs.Graph, err error) {
@@ -1171,7 +1172,7 @@ func (di *DataItem) AsTasks() (tasks []*structs.Task, err error) {
 	return tasks, nil
 }
 
-func (di *DataItem) AsTops() (tops []*structs.Top, err error) {
+func (di *DataItem) AsTops() (tops []*structs.Process, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return tops, nil
@@ -1190,11 +1191,11 @@ func (di *DataItem) AsTops() (tops []*structs.Top, err error) {
 	for _, row := range table.TableRows {
 		values := row.GetValues()
 
-		i := structs.Top{
-			ProcessId:  string(values[0]),
-			Status:     string(values[1]),
-			ProcessUql: string(values[2]),
-			Duration:   string(values[3]),
+		i := structs.Process{
+			ProcessId:    string(values[0]),
+			Status:       string(values[1]),
+			ProcessQuery: string(values[2]),
+			Duration:     string(values[3]),
 		}
 		tops = append(tops, &i)
 
@@ -1322,10 +1323,10 @@ func bytesToUser(data [][]byte) (*structs.User, error) {
 	// UserName
 	user.UserName = string(data[0])
 
-	// Create
+	// CreateTime
 	timestamp, _ := strconv.ParseInt(string(data[1]), 10, 64)
 	create := time.Unix(timestamp, 0)
-	user.Create = create.Format("2006-01-02 15:04:05")
+	user.CreateTime = create.Format("2006-01-02 15:04:05")
 
 	// LastLogin
 	//timestamp, _ = strconv.ParseInt(string(data[1]), 10, 64)
@@ -1382,7 +1383,7 @@ func (di *DataItem) AsJobs() (jobs []*structs.Job, err error) {
 			JobID:     string(values[0]),
 			GraphName: string(values[1]),
 			Type:      string(values[2]),
-			UQL:       string(values[3]),
+			Query:     string(values[3]),
 			Status:    string(values[4]),
 			ErrMsg:    string(values[5]),
 			Result:    bytes2result(values[6]),
@@ -1419,7 +1420,7 @@ func bytes2result(data []byte) map[string]string {
 	return finalResult
 }
 
-func (di *DataItem) AsProjections() (projections []*structs.Projection, err error) {
+func (di *DataItem) AsHDCGraphs() (projections []*structs.HDCGraph, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return projections, nil
@@ -1431,7 +1432,7 @@ func (di *DataItem) AsProjections() (projections []*structs.Projection, err erro
 
 	table := di.Data.(*ultipa.Table)
 
-	if table.TableName != RESP_PROJECT_KEY {
+	if table.TableName != RESP_HDCGRAPH_KEY {
 		return nil, errors.New("DataItem " + di.Alias + " is not a Graph list")
 	}
 
@@ -1443,17 +1444,15 @@ func (di *DataItem) AsProjections() (projections []*structs.Projection, err erro
 	values := g.ToKV()
 
 	for _, v := range values {
-		projection := &structs.Projection{
-			ProjectName: v.Get("project_name").(string),
-			ProjectType: v.Get("project_type").(string),
-			FilterType:  v.Get("filter_type").(string),
-			IsDefault:   v.Get("is_default").(string),
-			SourceGraph: v.Get("graph_name").(string),
-			Status:      v.Get("status").(string),
-			Stats:       v.Get("stats").(string),
-			HDCName:     v.Get("hdc_server_name").(string),
-			HDCStatus:   v.Get("hdc_server_status").(string),
-			Config:      v.Get("config").(string),
+		projection := &structs.HDCGraph{
+			Name:            v.Get("name").(string),
+			GraphName:       v.Get("graph_name").(string),
+			Status:          v.Get("status").(string),
+			Stats:           v.Get("stats").(string),
+			IsDefault:       v.Get("is_default").(string),
+			HDCServerName:   v.Get("hdc_server_name").(string),
+			HDCServerStatus: v.Get("hdc_server_status").(string),
+			Config:          v.Get("config").(string),
 		}
 
 		projections = append(projections, projection)

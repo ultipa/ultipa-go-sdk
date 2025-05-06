@@ -45,7 +45,7 @@ func TestCreateIndex(t *testing.T) {
 
 func TestCreateFullIndex(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
-	client.SetCurrentGraph("go_sdk_test")
+	//client.SetCurrentGraph("go_sdk_test")
 	//resp, err := client.CreateIndex(ultipa.DBType_DBNODE, "t1", "name(10)", "name3", nil)
 	//if err != nil {
 	//    t.Fatal(err)
@@ -68,7 +68,7 @@ func TestListIndex(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
 
 	indexes, err := client.ShowIndex(&configuration.RequestConfig{
-		GraphName: "go_sdk_test",
+		Graph: "go_sdk_test",
 	})
 	if err != nil {
 		t.Fatal(err)

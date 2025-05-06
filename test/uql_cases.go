@@ -27,7 +27,7 @@ func InitCases() {
 		//&Case{
 		//	Uql:   "show().schema()",
 		//	Alias: []string{"_nodeSchema", "_edgeSchema"},
-		//	Type:  "schema",
+		//	DBType:  "schema",
 		//},
 		//&Case{
 		//	Uql:   "n().e().n() as paths return paths limit 10;",

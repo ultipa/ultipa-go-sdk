@@ -48,7 +48,7 @@ func FindAliasDataInReply(reply *ultipa.QueryReply, alias string) (data interfac
 		case ultipa.ResultType_RESULT_TYPE_UNSET:
 			t = Alias.ResultType
 		default:
-			errMsg := fmt.Sprintf("FindAliasDataInReply Not Supported Type %v, it usually caused by unsupported server version.", Alias.ResultType)
+			errMsg := fmt.Sprintf("FindAliasDataInReply Not Supported DBType %v, it usually caused by unsupported server version.", Alias.ResultType)
 			panic(errMsg)
 		}
 

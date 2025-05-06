@@ -1,9 +1,8 @@
 package structs
 
-type Process struct {
-	Id       string
-	UQL      string
-	GQL      string
-	Duration int
-	Status   string
-}
+//type Process struct {
+//	ProcessId    string `json:"process_id"`
+//	Status       string `json:"status"`
+//	ProcessQuery string `json:"process_query"`
+//	Duration     string `json:"duration"`
+//}

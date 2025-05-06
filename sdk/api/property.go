@@ -42,15 +42,15 @@ func (api *UltipaAPI) CreateProperty(dbType ultipa.DBType, schemaName string, pr
 		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), prop.Name))
 	}
 
-	api.Logger.Log("Creating Property : @" + schemaName + "." + propertyName)
-	uql := fmt.Sprintf(`create().%v(@%v,%s,"%v","%v")`, params, schemaName, propertyName, propertyTypeStr, prop.Desc)
+	//api.Logger.Log("Creating Property : @" + schemaName + "." + propertyName)
+	uql := fmt.Sprintf(`create().%v(@%v,%s,"%v","%v")`, params, schemaName, propertyName, propertyTypeStr, prop.Description)
 	resp, err = api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
 	}
 
-	api.Logger.Log("Created Property : @" + schemaName + "." + propertyName)
+	//api.Logger.Log("Created Property : @" + schemaName + "." + propertyName)
 	return resp, nil
 }
 
@@ -252,11 +252,11 @@ func (api *UltipaAPI) AlterProperty(dbType ultipa.DBType, property, newProperty 
 		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), property.Name))
 	}
 
-	uql := fmt.Sprintf(`alter().%v(@%v.%v).set({name: "%v", description: "%v"})`, params, schemaName, propertyName, newProperty.Name, newProperty.Desc)
+	uql := fmt.Sprintf(`alter().%v(@%v.%v).set({name: "%v", description: "%v"})`, params, schemaName, propertyName, newProperty.Name, newProperty.Description)
 
 	// Only modify the description of the property
 	if newProperty.Name == "" {
-		uql = fmt.Sprintf(`alter().%v(@%v.%v).set({description: "%v"})`, params, schemaName, propertyName, newProperty.Desc)
+		uql = fmt.Sprintf(`alter().%v(@%v.%v).set({description: "%v"})`, params, schemaName, propertyName, newProperty.Description)
 	}
 
 	resp, err := api.Uql(uql, requestConfig)

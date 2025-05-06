@@ -38,5 +38,6 @@ const (
 	RESP_JOB_KEY           string = "result"
 	RESP_LICENSE_KEY       string = "license"
 	RESP_PROJECT_KEY       string = "_projectList"
+	RESP_HDCGRAPH_KEY      string = "_hdcGraphList"
 	RESP_BACKUP_KEY        string = "_backupList"
 )

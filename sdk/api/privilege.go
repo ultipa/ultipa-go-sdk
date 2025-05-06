@@ -9,6 +9,13 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
+type PrivilegeLevel int32
+
+const (
+	GraphLevel  PrivilegeLevel = iota //Graph privilege type
+	SystemLevel                       // System privilege type
+)
+
 func (api *UltipaAPI) ShowPrivilege(config *configuration.RequestConfig) (privileges []*structs.Privilege, err error) {
 	resp, err := api.Uql("show().privilege()", config)
 

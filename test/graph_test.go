@@ -60,7 +60,7 @@ func TestCreateGraph(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = client.SetCurrentGraph(graphName)
+	//err = client.SetCurrentGraph(graphName)
 	if err != nil {
 		t.Error(err)
 	}

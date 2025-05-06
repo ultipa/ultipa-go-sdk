@@ -111,7 +111,7 @@ func CheckReplaceSchemaPropertyName(name string) (string, error) {
 
 // CheckGraphName Check graph name whether valid
 //
-// Used for GraphName
+// Used for Graph
 func CheckGraphName(name string) error {
 	err := CheckName(name)
 	if err != nil {

@@ -38,7 +38,7 @@ type Job struct {
 	JobID     string            `json:"job_id"`     // "job_id" field
 	GraphName string            `json:"graph_name"` // "graph_name" field
 	Type      string            `json:"type"`       // "type" field
-	UQL       string            `json:"uql"`        // "uql" field
+	Query     string            `json:"query"`      // "uql" field
 	Status    string            `json:"status"`     // "status" field
 	ErrMsg    string            `json:"err_msg"`    // "err_msg" field
 	Result    map[string]string `json:"result"`     // "result" field
