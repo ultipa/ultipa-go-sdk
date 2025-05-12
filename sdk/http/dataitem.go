@@ -1460,3 +1460,44 @@ func (di *DataItem) AsHDCGraphs() (projections []*structs.HDCGraph, err error) {
 
 	return projections, err
 }
+
+func (di *DataItem) AsProjections() (projections []*structs.Projection, err error) {
+
+	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
+		return projections, nil
+	}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
+	}
+
+	table := di.Data.(*ultipa.Table)
+
+	if table.TableName != RESP_PROJECTION_KEY {
+		return nil, errors.New("DataItem " + di.Alias + " is not a Projection list")
+	}
+
+	g, err := di.AsTable()
+	if err != nil {
+		return nil, err
+	}
+
+	values := g.ToKV()
+
+	for _, v := range values {
+		projection := &structs.Projection{
+			Name:      v.Get("name").(string),
+			GraphName: v.Get("graph_name").(string),
+			Status:    v.Get("status").(string),
+			Stats:     v.Get("stats").(string),
+			//IsDefault:       v.Get("is_default").(string),
+			//HDCServerName:   v.Get("hdc_server_name").(string),
+			//HDCServerStatus: v.Get("hdc_server_status").(string),
+			Config: v.Get("config").(string),
+		}
+
+		projections = append(projections, projection)
+	}
+
+	return projections, err
+}

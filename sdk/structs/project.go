@@ -21,3 +21,11 @@ type HDCGraph struct {
 	HDCServerStatus string `json:"hdc_server_status"`
 	Config          string `json:"config"`
 }
+
+type Projection struct {
+	Name      string `json:"name"`
+	GraphName string `json:"graph_name"`
+	Status    string `json:"status"`
+	Stats     string `json:"stats"`
+	Config    string `json:"config"`
+}

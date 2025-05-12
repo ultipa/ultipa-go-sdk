@@ -6,7 +6,7 @@ import (
 )
 
 func TestShowJob(t *testing.T) {
-	jobs, err := client.ShowJob("6", nil)
+	jobs, err := client.ShowJob("", nil)
 	if err != nil {
 		t.Fatalf("show jobs error %v", err)
 	}

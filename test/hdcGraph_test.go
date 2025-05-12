@@ -7,7 +7,8 @@ import (
 )
 
 func TestShowHDCGraph(t *testing.T) {
-	hdcGraph, err := client.ShowHDCGraph(nil)
+	//hdcGraph, err := client.ShowHDCGraph(nil)
+	hdcGraph, err := client.ShowProjection(nil)
 	if err != nil {
 		t.Fatal(err)
 	}
