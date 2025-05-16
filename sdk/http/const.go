@@ -40,4 +40,5 @@ const (
 	RESP_PROJECTION_KEY    string = "_projectionList"
 	RESP_HDCGRAPH_KEY      string = "_hdcGraphList"
 	RESP_BACKUP_KEY        string = "_backupList"
+	RESP_RESULT_KEY        string = "result"
 )

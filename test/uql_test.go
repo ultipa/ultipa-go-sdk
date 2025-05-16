@@ -1,7 +1,6 @@
 package test
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/pieterclaerhout/go-waitgroup"
 	"github.com/ultipa/ultipa-go-sdk/sdk"
@@ -74,29 +73,29 @@ return docs_path{*}, role_path{*},books`
 }
 
 func TestUQL2(t *testing.T) {
-	requestConfig := &configuration.RequestConfig{
-		//UseMaster: false,
-		Graph: "ts",
-	}
-
-	insertRequestConfig := &configuration.InsertRequestConfig{
-		Silent:        false,
-		RequestConfig: requestConfig,
-		InsertType:    ultipa.InsertType_NORMAL,
-	}
-
-	myDeletion, _ := client.DeleteNodes("{_id == 'test_silent'}", insertRequestConfig)
-	println("Operation succeeds:", myDeletion.Status.IsSuccess(), "message: ", myDeletion.Status.Message)
-	nodes, _, _ := myDeletion.Alias("nodes").AsNodes()
-	for _, node := range nodes {
-		jsonData, err := json.Marshal(node)
-		if err != nil {
-			fmt.Println("Error converting to JSON:", err)
-			return
-		}
-
-		fmt.Println(string(jsonData))
-	}
+	//requestConfig := &configuration.RequestConfig{
+	//	//UseMaster: false,
+	//	Graph: "ts",
+	//}
+	//
+	//insertRequestConfig := &configuration.InsertRequestConfig{
+	//	Silent:        false,
+	//	RequestConfig: requestConfig,
+	//	InsertType:    ultipa.InsertType_NORMAL,
+	//}
+	//
+	//myDeletion, _ := client.DeleteNodes("{_id == 'test_silent'}", insertRequestConfig)
+	//println("Operation succeeds:", myDeletion.Status.IsSuccess(), "message: ", myDeletion.Status.Message)
+	//nodes, _, _ := myDeletion.Alias("nodes").AsNodes()
+	//for _, node := range nodes {
+	//	jsonData, err := json.Marshal(node)
+	//	if err != nil {
+	//		fmt.Println("Error converting to JSON:", err)
+	//		return
+	//	}
+	//
+	//	fmt.Println(string(jsonData))
+	//}
 
 	//println("Operation succeeds:", myDeletion.Status.IsSuccess())
 	//client, _ := GetClient(hosts, graph)
@@ -115,7 +114,7 @@ func TestUQL2(t *testing.T) {
 		t.Fatal(err)
 	}
 	printers.PrintAny(resp.Get(0))
-	nodes, _, _ = resp.Get(0).AsNodes()
+	nodes, _, _ := resp.Get(0).AsNodes()
 
 	log.Println(nodes)
 

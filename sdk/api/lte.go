@@ -9,7 +9,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 )
 
-func (api *UltipaAPI) Lte(dbType ultipa.DBType, schemaName, propertyName string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) Lte(dbType ultipa.DBType, schemaName, propertyName string, requestConfig *configuration.RequestConfig) (jobResponse *http.JobResponse, err error) {
 	uql := ""
 
 	if schemaName == "" {
@@ -35,16 +35,16 @@ func (api *UltipaAPI) Lte(dbType ultipa.DBType, schemaName, propertyName string,
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
 
-	resp, err = api.Uql(uql, requestConfig)
+	resp, err := api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return resp, nil
+	return http.GetJobResponseFromUqlResponse(resp)
 }
 
-func (api *UltipaAPI) Ufe(dbType ultipa.DBType, schemaName, propertyName string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) Ufe(dbType ultipa.DBType, schemaName, propertyName string, requestConfig *configuration.RequestConfig) (jobResponse *http.JobResponse, err error) {
 	uql := ""
 	if schemaName == "" {
 		schemaName = "*"
@@ -69,11 +69,11 @@ func (api *UltipaAPI) Ufe(dbType ultipa.DBType, schemaName, propertyName string,
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
 
-	resp, err = api.Uql(uql, requestConfig)
+	resp, err := api.Uql(uql, requestConfig)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return resp, nil
+	return http.GetJobResponseFromUqlResponse(resp)
 }

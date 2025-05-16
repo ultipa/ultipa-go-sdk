@@ -12,16 +12,16 @@ type AlgoParam struct {
 	Desc string
 }
 
-// HDCAlgo  hdc.graph.show()
-type HDCAlgo struct {
-	Name          string
-	Desc          string
-	Type          string
-	SubType       string
-	CanRollback   string
-	ConfigContext string
-	Version       string
-	Params        []*AlgoParam
+// Algo  hdc algo
+type Algo struct {
+	Name             string
+	Version          string
+	Type             string
+	WriteSupportType string
+	CanRollback      string
+	Description      string
+	ConfigContext    string
+	Params           []*AlgoParam
 }
 
 //type Algo struct {
@@ -32,32 +32,32 @@ type HDCAlgo struct {
 //}
 
 //func NewAlgo(name string, paramString string) (*Algo, error) {
-//	algo := &Algo{
-//		Name:   name,
-//		Params: map[string]*AlgoParam{},
-//	}
+//    algo := &Algo{
+//        Name:   name,
+//        Params: map[string]*AlgoParam{},
+//    }
 //
-//	algoJsonStruct := AlgoJsonStruct{
-//		Parameters: map[string]string{},
-//	}
+//    algoJsonStruct := AlgoJsonStruct{
+//        Parameters: map[string]string{},
+//    }
 //
-//	err := json.Unmarshal([]byte(paramString), &algoJsonStruct)
+//    err := json.Unmarshal([]byte(paramString), &algoJsonStruct)
 //
-//	if err != nil {
-//		return nil, err
-//	}
+//    if err != nil {
+//        return nil, err
+//    }
 //
-//	for k, v := range algoJsonStruct.Parameters {
-//		algo.Params[k] = &AlgoParam{
-//			Name: k,
-//			Description: v,
-//		}
-//	}
+//    for k, v := range algoJsonStruct.Parameters {
+//        algo.Params[k] = &AlgoParam{
+//            Name:        k,
+//            Description: v,
+//        }
+//    }
 //
-//	algo.Description = algoJsonStruct.Description
-//	algo.Version = algoJsonStruct.Version
+//    algo.Description = algoJsonStruct.Description
+//    algo.Version = algoJsonStruct.Version
 //
-//	return algo, nil
+//    return algo, nil
 //}
 
 //func (algo *Algo) ParamsToString() string {

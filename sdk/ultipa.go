@@ -20,7 +20,7 @@ func NewUltipa(config *configuration.UltipaConfig) (*api.UltipaAPI, error) {
 	if err != nil {
 		return nil, err
 	}
-	//// set heartbeat for Connection Pool
+	// set heartbeat for Connection Pool
 	//pool.RunHeartBeat()
 	//
 	//if err != nil {

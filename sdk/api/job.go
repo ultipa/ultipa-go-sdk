@@ -8,8 +8,8 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) ShowJob(jobId string, requestConfig *configuration.RequestConfig) (jobs []*structs.Job, err error) {
-	uql := fmt.Sprintf("show().job(%v)", jobId)
+func (api *UltipaAPI) ShowJob(id string, requestConfig *configuration.RequestConfig) (jobs []*structs.Job, err error) {
+	uql := fmt.Sprintf("show().job(%v)", id)
 
 	resp, err := api.Uql(uql, requestConfig)
 
@@ -22,8 +22,8 @@ func (api *UltipaAPI) ShowJob(jobId string, requestConfig *configuration.Request
 	return jobs, err
 }
 
-func (api *UltipaAPI) ClearJob(jobId string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
-	uql := fmt.Sprintf("clear().job(%v)", jobId)
+func (api *UltipaAPI) ClearJob(id string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+	uql := fmt.Sprintf("clear().job(%v)", id)
 
 	resp, err = api.Uql(uql, config)
 
@@ -34,8 +34,8 @@ func (api *UltipaAPI) ClearJob(jobId string, config *configuration.RequestConfig
 	return resp, nil
 }
 
-func (api *UltipaAPI) StopJob(jobId string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
-	uql := fmt.Sprintf("stop().job(%v)", jobId)
+func (api *UltipaAPI) StopJob(id string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+	uql := fmt.Sprintf("stop().job(%v)", id)
 
 	resp, err = api.Uql(uql, config)
 

@@ -4,19 +4,19 @@ import (
 	"testing"
 )
 
-//func TestShowAlgo(t *testing.T) {
-//	//client, _ := GetClient(hosts, graph)
-//
-//	algos, err := client.ShowAlgo(nil)
-//
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	if len(algos) == 0 {
-//		t.Log("no algo return")
-//	}
-//	//printers.PrintAlgoList(algos)
-//}
+func TestShowAlgo(t *testing.T) {
+	//client, _ := GetClient(hosts, graph)
+
+	algos, err := client.ShowHDCAlgo("hdc-server-1", nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(algos) == 0 {
+		t.Log("no algo return")
+	}
+	//printers.PrintAlgoList(algos)
+}
 
 var (
 	algoName = "lpa"
@@ -50,12 +50,12 @@ func TestAlgo(t *testing.T) {
 	//}
 
 	// InstallHDCAlgo
-	_, err := client.InstallHDCAlgos([]string{"./test_algo_lib/libplugin_lpa.so", "./test_algo_lib/lpa.yml"}, hdcName, nil)
+	_, err := client.InstallHDCAlgo([]string{"./test_algo_lib/libplugin_lpa.so", "./test_algo_lib/lpa.yml"}, hdcName, nil)
 	//files := map[string]string{
 	//	"./test_algo_lib/libplugin_lpa.so": "./test_algo_lib/lpa.yml",
 	//	//"./test_algo_lib/libplugin_lpa.so": "./test_algo_lib/lpa.yml",
 	//}
-	//_, err := client.InstallHDCAlgos(files, hdcName, nil)
+	//_, err := client.InstallHDCAlgo(files, hdcName, nil)
 
 	if err != nil {
 		t.Errorf("InstallHDCAlgo error, %v", err)

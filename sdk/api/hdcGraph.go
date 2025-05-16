@@ -82,13 +82,6 @@ func FormatHdcGraphSchemas(schemas []*structs.Schema) string {
 }
 
 func (api *UltipaAPI) ShowHDCGraph(requestConfig *configuration.RequestConfig) ([]*structs.HDCGraph, error) {
-	//if graphName != "" {
-	//	graphName = fmt.Sprintf(`"%s"`, graphName)
-	//}
-	//
-	//uql := fmt.Sprintf(`hdc.graph.show(%s)`, graphName)
-	//
-	//return api.Uql(uql, requestConfig)
 	resp, err := api.Uql("hdc.graph.show()", requestConfig)
 	if err != nil {
 		return nil, err
@@ -102,16 +95,25 @@ func (api *UltipaAPI) ShowHDCGraph(requestConfig *configuration.RequestConfig) (
 	return projections, nil
 }
 
-func (api *UltipaAPI) DropHDCGraph(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
-	uql := fmt.Sprintf(`hdc.graph.drop('%s')`, graphName)
+func (api *UltipaAPI) DropHDCGraph(hdcGraphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+	uql := fmt.Sprintf(`hdc.graph.drop('%s')`, hdcGraphName)
 
 	return api.Uql(uql, requestConfig)
 }
 
-func (api *UltipaAPI) ShowHDCAlgo(algoName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
-	// TODO
-	// get algoList from _algoList_from_hdc ?
+func (api *UltipaAPI) ShowHDCAlgo(hdcServerName string, requestConfig *configuration.RequestConfig) ([]*structs.Algo, error) {
+	if hdcServerName == "" {
+		return nil, fmt.Errorf("hdcServerName is required")
+	}
 
-	uql := fmt.Sprintf(`hdc.server.show('%s')`, algoName)
-	return api.Uql(uql, requestConfig)
+	uql := fmt.Sprintf(`hdc.server.show('%s')`, hdcServerName)
+	resp, err := api.Uql(uql, requestConfig)
+	if err != nil {
+		return nil, err
+	}
+	algo, err := resp.Alias(http.RESP_ALGOS_KEY).AsAlgos()
+	if err != nil {
+		return nil, err
+	}
+	return algo, nil
 }

@@ -234,7 +234,7 @@ func (di *DataItem) AsTable() (table *structs.Table, err error) {
 	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
-		return nil, errors.New("DataItem " + di.Alias + " is not DBType Table")
+		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
 	}
 
 	// fix top() return nil
@@ -315,7 +315,7 @@ func (di *DataItem) AsAttr() (*structs.Attr, error) {
 	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
-		return nil, errors.New("DataItem " + di.Alias + " is not DBType Attribute list")
+		return nil, errors.New("DataItem " + di.Alias + " is not Type Attribute list")
 	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
@@ -332,7 +332,7 @@ func (di *DataItem) AsAttr() (*structs.Attr, error) {
 	case ultipa.PropertyType_SET:
 		return midAttr.ListAttrAsAttr()
 	case ultipa.PropertyType_MAP:
-		return nil, errors.New(fmt.Sprintf("DataItem %v is not either DBType Attr or LIST Attr, but MAP, not supported yet.", di.Alias))
+		return nil, errors.New(fmt.Sprintf("DataItem %v is not either Type Attr or LIST Attr, but MAP, not supported yet.", di.Alias))
 	default:
 		return midAttr, nil
 	}
@@ -346,7 +346,7 @@ func (di *DataItem) AsAttrNodes() (*structs.AttrNodes, error) {
 	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
-		return nil, errors.New("DataItem " + di.Alias + " is not DBType Attr")
+		return nil, errors.New("DataItem " + di.Alias + " is not Type Attr")
 	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
@@ -366,7 +366,7 @@ func (di *DataItem) AsAttrEdges() (*structs.AttrEdges, error) {
 	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
-		return nil, errors.New("DataItem " + di.Alias + " is not DBType Attr")
+		return nil, errors.New("DataItem " + di.Alias + " is not Type Attr")
 	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
@@ -386,7 +386,7 @@ func (di *DataItem) AsAttrPaths() (*structs.AttrPaths, error) {
 	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
-		return nil, errors.New("DataItem " + di.Alias + " is not DBType Attr")
+		return nil, errors.New("DataItem " + di.Alias + " is not Type Attr")
 	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
@@ -922,35 +922,39 @@ func (di *DataItem) AsFullTexts() (fullTextIndexes []*structs.Index, err error) 
 	return fullTextIndexes, err
 }
 
-//func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {
-//
-//	if di.DBType != ultipa.ResultType_RESULT_TYPE_TABLE {
-//		return nil, errors.New("DataItem " + di.Alias + " should be a table(algo) as pre-condition")
-//	}
-//
-//	table, err := di.AsTable()
-//
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	var algos []*structs.Algo
-//
-//	algoDatas := table.ToKV()
-//
-//	for _, algoData := range algoDatas {
-//
-//		algo, err := structs.NewAlgo(algoData.Data["name"].(string), algoData.Data["param"].(string))
-//
-//		if err != nil {
-//			return nil, errors.New(fmt.Sprint(err.Error(), algoData))
-//		}
-//
-//		algos = append(algos, algo)
-//	}
-//
-//	return algos, nil
-//}
+func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
+		return nil, errors.New("DataItem " + di.Alias + " should be a table(algo) as pre-condition")
+	}
+
+	table, err := di.AsTable()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var algos []*structs.Algo
+
+	values := table.ToKV()
+
+	for _, v := range values {
+		algo := &structs.Algo{
+			Name:             v.Get("name").(string),
+			Version:          v.Get("version").(string),
+			Type:             v.Get("type").(string),
+			WriteSupportType: v.Get("write_support_type").(string),
+			CanRollback:      v.Get("can_rollback").(string),
+			Description:      v.Get("description").(string),
+			ConfigContext:    v.Get("config_context").(string),
+			Params:           nil,
+		}
+
+		algos = append(algos, algo)
+	}
+
+	return algos, nil
+}
 
 // AsGraph convert graphAlias to structs.Graph for uql syntax toGraph(listUnion(collect(n1), collect(n2)), collect(e)) as graph return graph
 func (di *DataItem) AsGraph() (graph *structs.Graph, err error) {

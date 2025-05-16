@@ -14,17 +14,17 @@ import (
 func TestShowGraph(t *testing.T) {
 	//InitCases()
 	//client, _ := GetClient(hosts, graph)
-	//graphs, err := client.ShowGraph(nil)
-	//if err != nil {
-	//    t.Fatal(err)
-	//}
+	graphs, err := client.ShowGraph(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 	//
-	//if len(graphs) == 0 {
-	//    t.Fatal("show().graph() no data return")
-	//}
+	if len(graphs) == 0 {
+		t.Fatal("show().graph() no data return")
+	}
 	//
 	//
-	//printers.PrintGraphSet(graphs)
+	printers.PrintGraphSet(graphs)
 
 	//log.Printf(utils.JSONString(res))
 	//printers.PrintGraphSet(graphs)
@@ -183,12 +183,12 @@ func TestUltipaAPI_AlterGraph(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			oldGraph := &structs.GraphSet{Name: tt.args.oldGraphName}
+			//oldGraph := &structs.GraphSet{Name: tt.args.oldGraphName}
 			newGraph := &structs.GraphSet{
 				Name:        tt.args.newGraphName,
 				Description: tt.args.description,
 			}
-			rsp, err := client.AlterGraph(oldGraph, newGraph, tt.args.config)
+			rsp, err := client.AlterGraph(tt.args.oldGraphName, newGraph, tt.args.config)
 			_ = rsp
 			if (tt.wantErr && err == nil) || (!tt.wantErr && err != nil) {
 				t.Errorf("AlterGraph() error = %v, wantErr %v", err, tt.wantErr)

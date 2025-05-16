@@ -3,14 +3,16 @@ package http
 import "fmt"
 
 type JobResponse struct {
-	JobId uint32
+	JobId     uint32
+	Statistic *Statistic
+	Status    *Status
 }
 
 func GetJobResponseFromUqlResponse(response *UQLResponse) (*JobResponse, error) {
 	if response == nil {
 		return nil, fmt.Errorf("cannot convert nil UQLResponse to JobResponse")
 	}
-	table, err := response.Alias(RESP_JOB_KEY).AsTable()
+	table, err := response.Alias(RESP_RESULT_KEY).AsTable()
 	if err != nil {
 		return nil, fmt.Errorf("parse uqlResponse to jobResponse error : %v", err)
 	}
@@ -18,5 +20,5 @@ func GetJobResponseFromUqlResponse(response *UQLResponse) (*JobResponse, error) 
 	values := table.ToKV()
 	jobId := values[0].Get("new_job_id").(uint32)
 
-	return &JobResponse{jobId}, nil
+	return &JobResponse{JobId: jobId, Statistic: response.Statistic, Status: response.Status}, nil
 }

@@ -24,7 +24,7 @@ func TestExportAsNodesEdges(t *testing.T) {
 			{Name: "_id"}, {Name: "_uuid"}, {Name: "typeInt32"}, {Name: "typeFloat"}, {Name: "typeDouble"}, {Name: "typeInt64"}, {Name: "typeUint32"}, {Name: "typeUint64"}, {Name: "typeDatetime"},
 			{Name: "typeString"}, {Name: "typeTimestamp"}, {Name: "typeNotMatch"}, {Name: "typeText"},
 		}}
-	err := client.ExportAsNodesEdges(schema,
+	err := client.Export(schema,
 		1000,
 		&configuration.RequestConfig{},
 		func(nodes []*structs.Node, edges []*structs.Edge) error {

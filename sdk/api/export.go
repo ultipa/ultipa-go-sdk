@@ -10,13 +10,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-type Listener interface {
-	ProcessNodes(nodes []*structs.Node) error
-	ProcessEdges(edges []*structs.Edge) error
-	//OnError(err error)
-}
-
-func (api *UltipaAPI) ExportAsNodesEdges(schema *structs.Schema, limit int, requestConfig *configuration.RequestConfig, cb func(nodes []*structs.Node, edges []*structs.Edge) error) error {
+func (api *UltipaAPI) Export(schema *structs.Schema, limit int, requestConfig *configuration.RequestConfig, cb func(nodes []*structs.Node, edges []*structs.Edge) error) error {
 	var err error
 
 	client, err := api.GetControlClient(requestConfig)

@@ -31,66 +31,35 @@ func (api *UltipaAPI) CreateGraphIfNotExist(graph *structs.GraphSet, requestConf
 	return resp, exist, err
 }
 
-// CreateGraph 5.0 graph Name/Shards/PartitionBy cannot be empty.
-//
-// partitionByHash:Crc32/CityHash64
+// CreateGraph 5.0 partitionByHash:Crc32/CityHash64
 func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 	if graph == nil {
 		return nil, errors.New("graph cannot be nil")
 	}
-	if graph.Name == "" || graph.PartitionBy == "" || len(graph.Shards) == 0 {
-		return nil, errors.New("graph Name/Shards/PartitionBy cannot be empty")
+	//if graph.Name == "" || graph.PartitionBy == "" || len(graph.Shards) == 0 {
+	//	return nil, errors.New("graph Name/Shards/PartitionBy cannot be empty")
+	//}
+
+	if graph.Name == "" {
+		return nil, errors.New("graphSet name is required")
 	}
 
-	resp, err := api.Uql(fmt.Sprintf(`create().graph("%v", "%v").shards([%v]).partitionByHash('%v',_id)`, graph.Name, graph.Description, strings.Join(graph.Shards, ","), graph.PartitionBy), requestConfig)
+	uql := fmt.Sprintf(`create().graph("%v", "%v")`, graph.Name, graph.Description)
+	if len(graph.Shards) != 0 {
+		uql = fmt.Sprintf("%s.shards([%v])", uql, strings.Join(graph.Shards, ","))
+	}
+	if graph.PartitionBy != "" {
+		uql = fmt.Sprintf("%s.partitionByHash('%v',_id)", uql, graph.PartitionBy)
+	}
+
+	resp, err := api.Uql(uql, requestConfig)
 
 	if err != nil {
 		//api.Logger.Log("create graph failed : " + graph.Name + " " + err.Error())
 		return nil, err
 	}
 
-	//api.Logger.Log("Creating Graph Request OK! - " + graph.Name)
-
-	// Try to detect the graph is created, default times is 600
-	//times := 60
-	//for {
-	//    if times < 0 {
-	//        break
-	//    }
-	//
-	//    api.Logger.Log("Detecting New Graph - " + graph.Name + " Leader")
-	//    clusterErr := api.Pool.RefreshClusterInfo(graph.Name)
-	//
-	//    if clusterErr != nil {
-	//        if reflect.TypeOf(clusterErr).Elem().String() != "utils.LeaderNotYetElectedError" {
-	//            api.Logger.Log(fmt.Sprintf("failed to detect New Graph - %s Leader", graph.Name))
-	//            return nil, clusterErr
-	//        }
-	//        continue
-	//    }
-	//
-	//    conn := api.Pool.GraphMgr.GetLeader(graph.Name)
-	//
-	//    if conn != nil {
-	//        api.Logger.Log("Detected New Graph - " + graph.Name + " Leader - OK")
-	//        break
-	//    }
-	//
-	//    time.Sleep(time.Second)
-	//    times--
-	//}
-
 	return resp, err
-}
-
-func (api *UltipaAPI) RebalanceGraph(graph *structs.GraphSet, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
-	if graph == nil {
-		return nil, errors.New("graph cannot be nil")
-	}
-	if graph.Name == "" || graph.PartitionBy == "" || len(graph.Shards) == 0 {
-		return nil, errors.New("graph Name/Shards/PartitionBy cannot be empty")
-	}
-	return api.Uql(fmt.Sprintf(`alter().graph("%v", "%v").shards([%v]).partitionByHash('%v',_id)`, graph.Name, graph.Description, strings.Join(graph.Shards, ","), graph.PartitionBy), requestConfig)
 }
 
 func (api *UltipaAPI) DropGraph(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
@@ -135,11 +104,22 @@ func (api *UltipaAPI) GetGraph(graphName string, requestConfig *configuration.Re
 	return nil, errors.New("graph not found")
 }
 
-func (api *UltipaAPI) AlterGraph(oldGraph, newGraph *structs.GraphSet, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
-	uql := fmt.Sprintf(`alter().graph("%s").set({name: "%s", description: "%s"})`, oldGraph.Name, newGraph.Name, newGraph.Description)
+func (api *UltipaAPI) AlterGraph(graphName string, alterGraphSet *structs.GraphSet, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+	if graphName == "" {
+		return nil, errors.New("graphname is required")
+	}
+	if alterGraphSet == nil {
+		return nil, errors.New("alterGraphSet cannot be nil")
+	}
+
+	if alterGraphSet.Name == "" {
+		return nil, errors.New("alterGraphSet name is required")
+	}
+
+	uql := fmt.Sprintf(`alter().graphName("%s").set({name: "%s", description: "%s"})`, graphName, alterGraphSet.Name, alterGraphSet.Description)
 	// Only modify the description of the graphSet
-	if newGraph.Name == "" {
-		uql = fmt.Sprintf(`alter().graph("%s").set({description: "%s"})`, oldGraph.Name, newGraph.Description)
+	if alterGraphSet.Name == "" {
+		uql = fmt.Sprintf(`alter().graphName("%s").set({description: "%s"})`, graphName, alterGraphSet.Description)
 	}
 
 	resp, err := api.Uql(uql, requestConfig)
@@ -210,6 +190,16 @@ func (api *UltipaAPI) Compact(graphName string, requestConfig *configuration.Req
 
 	return http.GetJobResponseFromUqlResponse(resp)
 }
+
+//func (api *UltipaAPI) RebalanceGraph(graph *structs.GraphSet, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+//    if graph == nil {
+//        return nil, errors.New("graph cannot be nil")
+//    }
+//    if graph.Name == "" || graph.PartitionBy == "" || len(graph.Shards) == 0 {
+//        return nil, errors.New("graph Name/Shards/PartitionBy cannot be empty")
+//    }
+//    return api.Uql(fmt.Sprintf(`alter().graph("%v", "%v").shards([%v]).partitionByHash('%v',_id)`, graph.Name, graph.Description, strings.Join(graph.Shards, ","), graph.PartitionBy), requestConfig)
+//}
 
 //func (api *UltipaAPI) MountGraph(graphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
 //	uql := fmt.Sprintf(`mount().graph("%v")`, graphName)

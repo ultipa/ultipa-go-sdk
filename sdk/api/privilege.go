@@ -1,12 +1,9 @@
 package api
 
 import (
-	"fmt"
-
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
-	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
 type PrivilegeLevel int32
@@ -102,36 +99,36 @@ func (api *UltipaAPI) ShowPrivilege(config *configuration.RequestConfig) (privil
 //	return resp, nil
 //}
 
-func (api *UltipaAPI) GrantPolicy(userName string, graphPrivileges *structs.GraphPrivileges, systemPrivileges []string, propertyPrivileges *structs.PropertyPrivileges, policies []string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
-	uql := fmt.Sprintf(`grant().user("%s").params({
-  graph_privileges: %s, 
-  system_privileges: %s, 
-  property_privileges: %s, 
-  policies: %s
-})`, userName, utils.ToJSONString(graphPrivileges), utils.ToJSONString(systemPrivileges), utils.ToJSONString(propertyPrivileges), utils.ToJSONString(policies))
+//func (api *UltipaAPI) GrantPolicy(userName string, graphPrivileges *structs.GraphPrivileges, systemPrivileges []string, propertyPrivileges *structs.PropertyPrivileges, policies []string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+//	uql := fmt.Sprintf(`grant().user("%s").params({
+//  graph_privileges: %s,
+//  system_privileges: %s,
+//  property_privileges: %s,
+//  policies: %s
+//})`, userName, utils.ToJSONString(graphPrivileges), utils.ToJSONString(systemPrivileges), utils.ToJSONString(propertyPrivileges), utils.ToJSONString(policies))
+//
+//	resp, err = api.Uql(uql, requestConfig)
+//
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return resp, nil
+//}
 
-	resp, err = api.Uql(uql, requestConfig)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
-func (api *UltipaAPI) RevokePolicy(userName string, graphPrivileges *structs.GraphPrivileges, systemPrivileges []string, propertyPrivileges *structs.PropertyPrivileges, policies []string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
-	uql := fmt.Sprintf(`revoke().user("%s").params({
-  graph_privileges: %s, 
-  system_privileges: %s, 
-  property_privileges: %s, 
-  policies: %s
-})`, userName, utils.ToJSONString(graphPrivileges), utils.ToJSONString(systemPrivileges), utils.ToJSONString(propertyPrivileges), utils.ToJSONString(policies))
-
-	resp, err = api.Uql(uql, requestConfig)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
+//func (api *UltipaAPI) RevokePolicy(userName string, graphPrivileges *structs.GraphPrivileges, systemPrivileges []string, propertyPrivileges *structs.PropertyPrivileges, policies []string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+//	uql := fmt.Sprintf(`revoke().user("%s").params({
+//  graph_privileges: %s,
+//  system_privileges: %s,
+//  property_privileges: %s,
+//  policies: %s
+//})`, userName, utils.ToJSONString(graphPrivileges), utils.ToJSONString(systemPrivileges), utils.ToJSONString(propertyPrivileges), utils.ToJSONString(policies))
+//
+//	resp, err = api.Uql(uql, requestConfig)
+//
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return resp, nil
+//}

@@ -29,6 +29,9 @@ func (api *UltipaAPI) GetPolicy(policyName string, requestConfig *configuration.
 	if err != nil {
 		return nil, err
 	}
+	if !resp.Status.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
 
 	policies, err := resp.Alias(http.RESP_POLICY_KEY).AsPolicies()
 	if err != nil {
@@ -42,6 +45,14 @@ func (api *UltipaAPI) GetPolicy(policyName string, requestConfig *configuration.
 }
 
 func (api *UltipaAPI) CreatePolicy(policy *structs.Policy, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+	if policy == nil {
+		return nil, fmt.Errorf("policy cant be null")
+	}
+
+	if policy.Name == "" {
+		return nil, fmt.Errorf("policy name is required")
+	}
+
 	uql := policy.ToCreatePolicyUql()
 	resp, err = api.Uql(uql, requestConfig)
 

@@ -94,7 +94,13 @@ func TestNewConn(t *testing.T) {
 
 func TestUql(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
-	res, _ := client.Uql("n().e().n() as path return path limit 10;", nil)
+	res, _ := client.Uql("find().nodes({@country}) as nodes ORDER by nodes._uuid DESC RETURN nodes.cPoint LIMIT 8", nil)
+	//res, _ := client.Uql("n().e().n() as path return path limit 10;", nil)
+	attr, err := res.Alias("nodes.cPoint").AsAttr()
+	t.Log(attr)
+	if err != nil {
+		return
+	}
 	log.Println(res.AliasList, res.Get(0), res.Status.Code, res.Status.Message)
 }
 

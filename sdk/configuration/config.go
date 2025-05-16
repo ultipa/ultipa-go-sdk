@@ -1,7 +1,6 @@
 package configuration
 
 import (
-	"crypto/md5"
 	"io/ioutil"
 	"math"
 	"strconv"
@@ -35,8 +34,8 @@ var DefaultRecvSize = 1024 * 1024 * 32
 func NewUltipaConfig(config *UltipaConfig) (*UltipaConfig, error) {
 	config.FillDefault()
 
-	h := md5.New()
-	h.Write([]byte(config.Password))
+	//h := md5.New()
+	//h.Write([]byte(config.Password))
 	encryptedPwd, err := Encrypt(config.PasswordEncrypt, config.Password)
 	if err != nil {
 		return config, err

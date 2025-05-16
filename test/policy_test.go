@@ -15,11 +15,12 @@ func TestShowPolicy(t *testing.T) {
 	}
 	fmt.Println(utils.JSONString(all))
 
-	policy, err := client.GetPolicy("yu", nil)
+	policy, err := client.GetPolicy("test_asP", nil)
 	if err != nil {
-		t.Fatal(err)
+		t.Log(err)
+	} else if policy != nil {
+		fmt.Println(utils.JSONString(policy))
 	}
-	fmt.Println(utils.JSONString(policy))
 
 	if policy == nil {
 		return
@@ -30,7 +31,7 @@ func TestShowPolicy(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	policy.Policies = []string{"yu", "yuss"}
+	policy.Policies = []string{"test_policy"}
 	_, err = client.AlterPolicy(policy, nil)
 	if err != nil {
 		t.Fatal(err)

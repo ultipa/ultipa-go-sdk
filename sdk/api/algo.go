@@ -71,8 +71,8 @@ func (api *UltipaAPI) RollbackHDCAlgo(algoName, hdcName string, config *configur
 	return reply, nil
 }
 
-// InstallHDCAlgos  install algos, files : [...so, yml]
-func (api *UltipaAPI) InstallHDCAlgos(files []string, hdcName string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
+// InstallHDCAlgo  install algos, files : [...so, yml]
+func (api *UltipaAPI) InstallHDCAlgo(files []string, hdcName string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
 	if files == nil || len(files) == 0 {
 		return nil, errors.New("empty files")
 	}

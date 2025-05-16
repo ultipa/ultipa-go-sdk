@@ -7,13 +7,11 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 )
 
-func (api *UltipaAPI) Kill(processId string, all bool, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
-	uql := "kill()"
-	if all {
-		uql = `kill("*")`
-	} else {
-		uql = fmt.Sprintf(`kill("%s")`, processId)
+func (api *UltipaAPI) Kill(processId string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+	if processId == "" {
+		return nil, fmt.Errorf("processId can not empty")
 	}
+	uql := fmt.Sprintf(`kill("%s")`, processId)
 
 	resp, err = api.Uql(uql, requestConfig)
 
