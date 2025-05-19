@@ -11,6 +11,6 @@ func (api *UltipaAPI) Gql(gql string, requestConfig *configuration.RequestConfig
 
 }
 
-func (api *UltipaAPI) GQLStream(gql string, requestConfig *configuration.RequestConfig) (*http.UQLResponseStream, error) {
-	return api.queryStream(gql, ultipa.QueryType_GQL, requestConfig)
+func (api *UltipaAPI) GQLStream(gql string, cb func(*http.UQLResponse) error, requestConfig *configuration.RequestConfig) error {
+	return api.queryStream(gql, ultipa.QueryType_GQL, cb, requestConfig)
 }

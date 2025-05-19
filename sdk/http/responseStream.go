@@ -5,9 +5,9 @@
 package http
 
 import (
-	"io"
-
+	"fmt"
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"io"
 )
 
 type UQLResponseStream struct {
@@ -36,59 +36,69 @@ func NewUQLResponseStream(resp ultipa.UltipaRpcs_QueryClient) (response *UQLResp
 	return response, nil
 }
 
-func (r *UQLResponseStream) Recv(fetch bool) (response *UQLResponse, err error) {
-	if !fetch {
-		return nil, r.Resp.CloseSend()
-	}
-	response = &UQLResponse{
-		Status: &Status{},
-		DataItemMap: map[string]struct {
-			DataItem *DataItem
-			Index    int
-		}{},
-	}
-
-	record, err := r.Resp.Recv()
-
-	if err == io.EOF {
+func (r *UQLResponseStream) Recv(cb func(*UQLResponse) error) (err error) {
+	//if !fetch {
+	//	return nil, r.Resp.CloseSend()
+	//}
+	defer func() {
 		_ = r.Resp.CloseSend()
-		return nil, io.EOF
-	} else if err != nil {
-		_ = r.Resp.CloseSend()
-		return nil, err
-	}
+	}()
 
-	if response.Statistic == nil {
-		response.Statistic, err = ParseStatistic(record.Statistics)
-		if err != nil {
-			return nil, err
+	for {
+		response := &UQLResponse{
+			Status: &Status{},
+			DataItemMap: map[string]struct {
+				DataItem *DataItem
+				Index    int
+			}{},
 		}
-	}
 
-	if response.ExplainPlan == nil {
-		response.ExplainPlan, err = ParseExplainPlan(record.ExplainPlan)
-		if err != nil {
-			return nil, err
+		record, err := r.Resp.Recv()
+
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return err
 		}
-	}
 
-	response.Reply = record
-	if record.Status != nil {
-		response.Status.Code = record.Status.ErrorCode
-		response.Status.Message = record.Status.Msg
-		if response.Status.Code != ultipa.ErrorCode_SUCCESS {
-			return response, nil
+		if response.Statistic == nil {
+			response.Statistic, err = ParseStatistic(record.Statistics)
+			if err != nil {
+				return err
+			}
 		}
+
+		if response.ExplainPlan == nil {
+			response.ExplainPlan, err = ParseExplainPlan(record.ExplainPlan)
+			if err != nil {
+				return err
+			}
+		}
+
+		response.Reply = record
+		if record.Status != nil {
+			response.Status.Code = record.Status.ErrorCode
+			response.Status.Message = record.Status.Msg
+			if response.Status.Code != ultipa.ErrorCode_SUCCESS {
+				return fmt.Errorf(response.Status.Message)
+			}
+		}
+
+		var aliasList []string
+
+		for _, alias := range response.Reply.Alias {
+			aliasList = append(aliasList, alias.GetAlias())
+		}
+		response.AliasList = aliasList
+
+		if err := cb(response); err != nil {
+			return err
+		}
+
 	}
 
-	var aliasList []string
+	return nil
 
-	for _, alias := range response.Reply.Alias {
-		aliasList = append(aliasList, alias.GetAlias())
-	}
-	response.AliasList = aliasList
-
-	return response, nil
 }
 
 func (r *UQLResponseStream) NeedRedirect() bool {

@@ -144,36 +144,30 @@ func (api *UltipaAPI) query(query string, queryType ultipa.QueryType, requestCon
 	return uqlResp, nil
 }
 
-func (api *UltipaAPI) queryStream(query string, queryType ultipa.QueryType, requestConfig *configuration.RequestConfig) (*http.UQLResponseStream, error) {
+func (api *UltipaAPI) queryStream(query string, queryType ultipa.QueryType, cb func(*http.UQLResponse) error, requestConfig *configuration.RequestConfig) error {
 	resp, _, err := api.doExecuteQuery(query, queryType, requestConfig)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	uqlResp, err := http.NewUQLResponseStream(resp)
 	if err != nil {
-		return nil, err
+		return err
 	}
+
 	//if uqlResp.Status.Code != ultipa.ErrorCode_SUCCESS {
 	//	return nil, errors.New(uqlResp.Status.Message)
 	//}
 
 	if requestConfig != nil && requestConfig.Host != "" {
-		return uqlResp, err
+		return err
 	}
 
-	//if uqlResp.NeedRedirect() {
-	//    err = api.Pool.RefreshClusterInfo(conf.CurrentGraph)
-	//    if err != nil {
-	//        return nil, err
-	//    }
-	//    return api.UQLStream(query, requestConfig)
-	//}
-	return uqlResp, nil
+	return uqlResp.Recv(cb)
 }
 
-func (api *UltipaAPI) UQLStream(uql string, requestConfig *configuration.RequestConfig) (*http.UQLResponseStream, error) {
-	return api.queryStream(uql, ultipa.QueryType_UQL, requestConfig)
+func (api *UltipaAPI) UQLStream(uql string, cb func(*http.UQLResponse) error, requestConfig *configuration.RequestConfig) error {
+	return api.queryStream(uql, ultipa.QueryType_UQL, cb, requestConfig)
 }
 
 func (api *UltipaAPI) doExecuteQuery(query string, queryType ultipa.QueryType, config *configuration.RequestConfig) (ultipa.UltipaRpcs_QueryClient, *configuration.UltipaConfig, error) {

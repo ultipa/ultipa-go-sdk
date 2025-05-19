@@ -1,8 +1,9 @@
 package test
 
 import (
-	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
-	"io"
+	"fmt"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
+	"log"
 	"testing"
 )
 
@@ -18,34 +19,29 @@ func TestGql(t *testing.T) {
 }
 
 func TestGqlStream(t *testing.T) {
-	stream, err := client.GQLStream("match (n) return n", nil)
+	uql := `match ()-[e]-() return e limit 10000`
+
+	log.Println("Exec : ", uql)
+
+	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{Graph: "multi_schema_test"})
+	cb := func(res *http.UQLResponse) error {
+		edges, _, err := res.Get(0).AsEdges()
+		if err != nil {
+			return err
+		}
+		fmt.Println("edge count ", len(edges))
+		for i, edge := range edges {
+			if i%100 == 0 {
+				fmt.Println(i)
+			}
+			fmt.Print(edge.UUID, " ")
+		}
+		return nil
+	}
+
+	err := client.GQLStream(uql, cb, nil)
 
 	if err != nil {
 		t.Fatal(err)
 	}
-	i := 0
-	for true {
-		resp, err := stream.Recv(true)
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			t.Fatal(err)
-		}
-		i++
-		if resp != nil {
-			printers.PrintStatistics(resp.Statistic)
-			nodes, schema, err := resp.Get(0).AsNodes()
-			if err != nil {
-				t.Fatal(err)
-			}
-			printers.PrintNodes(nodes, schema)
-			if i > 3 {
-				stream.Recv(false)
-				break
-			}
-		} else {
-			break
-		}
-	}
-	stream.Close()
 }
