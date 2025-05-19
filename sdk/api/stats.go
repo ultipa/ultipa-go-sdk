@@ -2,9 +2,10 @@ package api
 
 import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
-	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 )
 
-func (api *UltipaAPI) Stats(requestConfig *configuration.RequestConfig) (stats *structs.License, err error) {
-	return api.license("stats()", requestConfig)
+func (api *UltipaAPI) Stats(requestConfig *configuration.RequestConfig) (stats *http.Response, err error) {
+	//return api.license("stats()", requestConfig)
+	return api.Uql("stats()", nil)
 }

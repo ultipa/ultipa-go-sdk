@@ -24,7 +24,7 @@ func TestGqlStream(t *testing.T) {
 	log.Println("Exec : ", uql)
 
 	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{Graph: "multi_schema_test"})
-	cb := func(res *http.UQLResponse) error {
+	cb := func(res *http.Response) error {
 		edges, _, err := res.Get(0).AsEdges()
 		if err != nil {
 			return err

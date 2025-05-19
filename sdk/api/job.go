@@ -25,7 +25,7 @@ func (api *UltipaAPI) ShowJob(id string, requestConfig *configuration.RequestCon
 	return jobs, err
 }
 
-func (api *UltipaAPI) ClearJob(id string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) ClearJob(id string, config *configuration.RequestConfig) (resp *http.Response, err error) {
 	uql := fmt.Sprintf("clear().job(%v)", id)
 
 	resp, err = api.Uql(uql, config)
@@ -37,7 +37,7 @@ func (api *UltipaAPI) ClearJob(id string, config *configuration.RequestConfig) (
 	return resp, nil
 }
 
-func (api *UltipaAPI) StopJob(id string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) StopJob(id string, config *configuration.RequestConfig) (resp *http.Response, err error) {
 	uql := fmt.Sprintf("stop().job(%v)", id)
 
 	resp, err = api.Uql(uql, config)

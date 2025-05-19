@@ -17,7 +17,7 @@ const (
 	SYNC
 )
 
-func (api *UltipaAPI) CreateHDCGraphBySchema(graphName string, nodeSchemas, edgeSchemas []*structs.Schema, update string, hdcName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) CreateHDCGraphBySchema(graphName string, nodeSchemas, edgeSchemas []*structs.Schema, update string, hdcName string, requestConfig *configuration.RequestConfig) (*http.Response, error) {
 	// `hdc.graph.create("social-user-article", {
 	//nodes: {User: ["username"], Article: ["title"] },
 	//edges: {Post: []},
@@ -102,7 +102,7 @@ func (api *UltipaAPI) ShowHDCGraph(requestConfig *configuration.RequestConfig) (
 	return projections, nil
 }
 
-func (api *UltipaAPI) DropHDCGraph(hdcGraphName string, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) DropHDCGraph(hdcGraphName string, requestConfig *configuration.RequestConfig) (*http.Response, error) {
 	uql := fmt.Sprintf(`hdc.graph.drop('%s')`, hdcGraphName)
 
 	return api.Uql(uql, requestConfig)

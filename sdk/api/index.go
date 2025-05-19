@@ -17,7 +17,7 @@ import (
 )
 
 // Deprecated: 5.0 not support, should use CreateNodeIndex or CreateEdgeIndex
-func (api *UltipaAPI) CreateIndex(dbType ultipa.DBType, schemaName, propertyName string, indexName string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) CreateIndex(dbType ultipa.DBType, schemaName, propertyName string, indexName string, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
 	uql := ""
 	if schemaName == "" {
 		return nil, fmt.Errorf("schemaName can not empty %s", schemaName)
@@ -107,7 +107,7 @@ func (api *UltipaAPI) CreateNodeIndex(source string, indexName string, requestCo
 }
 
 func (api *UltipaAPI) ShowIndex(requestConfig *configuration.RequestConfig) ([]*structs.Index, error) {
-	var resp *http.UQLResponse
+	var resp *http.Response
 	var err error
 
 	resp, err = api.Uql(fmt.Sprintf(`show().index()`), requestConfig)
@@ -134,7 +134,7 @@ func (api *UltipaAPI) ShowIndex(requestConfig *configuration.RequestConfig) ([]*
 }
 
 func (api *UltipaAPI) ShowEdgeIndex(requestConfig *configuration.RequestConfig) ([]*structs.Index, error) {
-	var resp *http.UQLResponse
+	var resp *http.Response
 	var err error
 	var indexes []*structs.Index
 
@@ -152,7 +152,7 @@ func (api *UltipaAPI) ShowEdgeIndex(requestConfig *configuration.RequestConfig) 
 }
 
 func (api *UltipaAPI) ShowNodeIndex(requestConfig *configuration.RequestConfig) ([]*structs.Index, error) {
-	var resp *http.UQLResponse
+	var resp *http.Response
 	var err error
 	var indexes []*structs.Index
 
@@ -169,7 +169,7 @@ func (api *UltipaAPI) ShowNodeIndex(requestConfig *configuration.RequestConfig) 
 	return indexes, err
 }
 
-func (api *UltipaAPI) DropIndex(dbType ultipa.DBType, indexName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) DropIndex(dbType ultipa.DBType, indexName string, config *configuration.RequestConfig) (resp *http.Response, err error) {
 	uql := ""
 	//if schemaName == "" {
 	//	schemaName = "*"
@@ -203,7 +203,7 @@ func (api *UltipaAPI) DropIndex(dbType ultipa.DBType, indexName string, config *
 	return resp, nil
 }
 
-func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyName, fulltextName string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyName, fulltextName string, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
 	uql := ""
 
 	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
@@ -289,7 +289,7 @@ func (api *UltipaAPI) CreateEdgeFullText(schemaName, propertyName, fulltextName 
 }
 
 func (api *UltipaAPI) ShowFullText(requestConfig *configuration.RequestConfig) ([]*structs.Index, error) {
-	var resp *http.UQLResponse
+	var resp *http.Response
 	var err error
 	var indexes []*structs.Index
 
@@ -317,7 +317,7 @@ func (api *UltipaAPI) ShowFullText(requestConfig *configuration.RequestConfig) (
 }
 
 func (api *UltipaAPI) ShowEdgeFullText(requestConfig *configuration.RequestConfig) ([]*structs.Index, error) {
-	var resp *http.UQLResponse
+	var resp *http.Response
 	var err error
 	var indexes []*structs.Index
 
@@ -335,7 +335,7 @@ func (api *UltipaAPI) ShowEdgeFullText(requestConfig *configuration.RequestConfi
 }
 
 func (api *UltipaAPI) ShowNodeFullText(requestConfig *configuration.RequestConfig) ([]*structs.Index, error) {
-	var resp *http.UQLResponse
+	var resp *http.Response
 	var err error
 	var indexes []*structs.Index
 
@@ -352,7 +352,7 @@ func (api *UltipaAPI) ShowNodeFullText(requestConfig *configuration.RequestConfi
 	return indexes, err
 }
 
-func (api *UltipaAPI) DropFullText(fullTextName string, dbType ultipa.DBType, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) DropFullText(fullTextName string, dbType ultipa.DBType, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
 
 	uql := ""
 	switch dbType {

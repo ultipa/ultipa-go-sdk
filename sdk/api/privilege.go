@@ -32,7 +32,7 @@ func (api *UltipaAPI) ShowPrivilege(config *configuration.RequestConfig) (privil
 	return privileges, nil
 }
 
-//func (api *UltipaAPI) GrantPropertyPrivilege(privilegeTypes structs.PrivilegeTypes, graph, schema, property string, targetType structs.PrivilegeTargetType, privilegeName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+//func (api *UltipaAPI) GrantPropertyPrivilege(privilegeTypes structs.PrivilegeTypes, graph, schema, property string, targetType structs.PrivilegeTargetType, privilegeName string, config *configuration.RequestConfig) (resp *http.Response, err error) {
 //	if len(privilegeTypes) == 0 {
 //		return nil, fmt.Errorf("privilegeTypes at least one parameter is required")
 //	}
@@ -54,7 +54,7 @@ func (api *UltipaAPI) ShowPrivilege(config *configuration.RequestConfig) (privil
 //	return resp, nil
 //}
 //
-//func (api *UltipaAPI) GrantSystemPrivilege(systemPrivilegeTypes string, targetType structs.PrivilegeTargetType, privilegeName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+//func (api *UltipaAPI) GrantSystemPrivilege(systemPrivilegeTypes string, targetType structs.PrivilegeTargetType, privilegeName string, config *configuration.RequestConfig) (resp *http.Response, err error) {
 //	uql := fmt.Sprintf(`grant().system().privilege(["%s"]).%s("%s")`, systemPrivilegeTypes, targetType, privilegeName)
 //
 //	resp, err = api.Uql(uql, config)
@@ -69,7 +69,7 @@ func (api *UltipaAPI) ShowPrivilege(config *configuration.RequestConfig) (privil
 //	return resp, nil
 //}
 //
-//func (api *UltipaAPI) RevokePropertyPrivilege(privilegeTypes structs.PrivilegeType, graph, schema, property string, targetType structs.PrivilegeTargetType, privilegeName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+//func (api *UltipaAPI) RevokePropertyPrivilege(privilegeTypes structs.PrivilegeType, graph, schema, property string, targetType structs.PrivilegeTargetType, privilegeName string, config *configuration.RequestConfig) (resp *http.Response, err error) {
 //	uql := fmt.Sprintf(`revoke().privilege(["%s"]).on(
 //  "%s",
 //  @%s,
@@ -88,7 +88,7 @@ func (api *UltipaAPI) ShowPrivilege(config *configuration.RequestConfig) (privil
 //	return resp, nil
 //}
 //
-//func (api *UltipaAPI) RevokeSystemPrivilege(systemPrivilegeTypes string, targetType structs.PrivilegeTargetType, privilegeName string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+//func (api *UltipaAPI) RevokeSystemPrivilege(systemPrivilegeTypes string, targetType structs.PrivilegeTargetType, privilegeName string, config *configuration.RequestConfig) (resp *http.Response, err error) {
 //	uql := fmt.Sprintf(`revoke().system().privilege(["%s"]).%s("%s")`, systemPrivilegeTypes, targetType, privilegeName)
 //
 //	resp, err = api.Uql(uql, config)
@@ -103,7 +103,7 @@ func (api *UltipaAPI) ShowPrivilege(config *configuration.RequestConfig) (privil
 //	return resp, nil
 //}
 
-//func (api *UltipaAPI) GrantPolicy(userName string, graphPrivileges *structs.GraphPrivileges, systemPrivileges []string, propertyPrivileges *structs.PropertyPrivileges, policies []string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+//func (api *UltipaAPI) GrantPolicy(userName string, graphPrivileges *structs.GraphPrivileges, systemPrivileges []string, propertyPrivileges *structs.PropertyPrivileges, policies []string, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
 //	uql := fmt.Sprintf(`grant().user("%s").params({
 //  graph_privileges: %s,
 //  system_privileges: %s,
@@ -120,7 +120,7 @@ func (api *UltipaAPI) ShowPrivilege(config *configuration.RequestConfig) (privil
 //	return resp, nil
 //}
 
-//func (api *UltipaAPI) RevokePolicy(userName string, graphPrivileges *structs.GraphPrivileges, systemPrivileges []string, propertyPrivileges *structs.PropertyPrivileges, policies []string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+//func (api *UltipaAPI) RevokePolicy(userName string, graphPrivileges *structs.GraphPrivileges, systemPrivileges []string, propertyPrivileges *structs.PropertyPrivileges, policies []string, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
 //	uql := fmt.Sprintf(`revoke().user("%s").params({
 //  graph_privileges: %s,
 //  system_privileges: %s,

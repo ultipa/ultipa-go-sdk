@@ -36,7 +36,7 @@ func NewUQLResponseStream(resp ultipa.UltipaRpcs_QueryClient) (response *UQLResp
 	return response, nil
 }
 
-func (r *UQLResponseStream) Recv(cb func(*UQLResponse) error) (err error) {
+func (r *UQLResponseStream) Recv(cb func(*Response) error) (err error) {
 	//if !fetch {
 	//	return nil, r.Resp.CloseSend()
 	//}
@@ -45,7 +45,7 @@ func (r *UQLResponseStream) Recv(cb func(*UQLResponse) error) (err error) {
 	}()
 
 	for {
-		response := &UQLResponse{
+		response := &Response{
 			Status: &Status{},
 			DataItemMap: map[string]struct {
 				DataItem *DataItem

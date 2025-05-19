@@ -36,8 +36,8 @@ func TestMain(m *testing.M) {
 
 func TestPing(t *testing.T) {
 	//client, _ = GetClient(hosts, graph)
-	_, err := client.Test(nil)
-	if err != nil {
+	ok, err := client.Test(nil)
+	if !ok {
 		t.Fatal(err)
 	}
 

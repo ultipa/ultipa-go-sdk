@@ -7,7 +7,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) SetUserSetting(request *structs.SetUserSetting, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) SetUserSetting(request *structs.SetUserSetting, requestConfig *configuration.RequestConfig) (*http.Response, error) {
 	var err error
 
 	client, err := api.GetControlClient(requestConfig)
@@ -36,7 +36,7 @@ func (api *UltipaAPI) SetUserSetting(request *structs.SetUserSetting, requestCon
 	//	Data:  res.Data,
 	//}
 
-	resp := &http.UQLResponse{
+	resp := &http.Response{
 		Status: &http.Status{
 			Message: res.Status.Msg,
 			Code:    res.Status.ErrorCode,
@@ -50,7 +50,7 @@ func (api *UltipaAPI) SetUserSetting(request *structs.SetUserSetting, requestCon
 	return resp, err
 }
 
-func (api *UltipaAPI) GetUserSetting(request *structs.GetUserSetting, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) GetUserSetting(request *structs.GetUserSetting, requestConfig *configuration.RequestConfig) (*http.Response, error) {
 	var err error
 
 	client, err := api.GetControlClient(requestConfig)
@@ -78,7 +78,7 @@ func (api *UltipaAPI) GetUserSetting(request *structs.GetUserSetting, requestCon
 		Data:  res.Data,
 	}
 
-	resp := &http.UQLResponse{
+	resp := &http.Response{
 		Status: &http.Status{
 			Message: res.Status.Msg,
 			Code:    res.Status.ErrorCode,

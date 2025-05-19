@@ -11,7 +11,7 @@ import (
 )
 
 func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) (*structs.Schemas, error) {
-	var resp *http.UQLResponse
+	var resp *http.Response
 	var err error
 	var schemas = &structs.Schemas{}
 
@@ -132,13 +132,13 @@ func (api *UltipaAPI) GetEdgeSchema(schemaName string, requestConfig *configurat
 	return api.GetSchema(schemaName, ultipa.DBType_DBEDGE, requestConfig)
 }
 
-func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bool, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bool, requestConfig *configuration.RequestConfig) (*http.Response, error) {
 	schemaName, err := CheckReplaceSchemaPropertyName(schema.Name)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schema.Name))
 	}
 
-	var resp *http.UQLResponse
+	var resp *http.Response
 
 	//api.Logger.Log("Creating Schema : @" + schemaName)
 
@@ -197,7 +197,7 @@ func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, requestConf
 	return exist, err
 }
 
-func (api *UltipaAPI) DropSchema(schema *structs.Schema, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) DropSchema(schema *structs.Schema, requestConfig *configuration.RequestConfig) (*http.Response, error) {
 	schemaName, err := CheckReplaceSchemaPropertyName(schema.Name)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schema.Name))
@@ -222,7 +222,7 @@ func (api *UltipaAPI) DropSchema(schema *structs.Schema, requestConfig *configur
 	return resp, nil
 }
 
-func (api *UltipaAPI) AlterSchema(schema, newSchema *structs.Schema, requestConfig *configuration.RequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) AlterSchema(schema, newSchema *structs.Schema, requestConfig *configuration.RequestConfig) (*http.Response, error) {
 	schemaName, err := CheckReplaceSchemaPropertyName(schema.Name)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schema.Name))

@@ -34,7 +34,7 @@ func (api *UltipaAPI) ShowTask(algoNameOrId string, status structs.TaskStatus, r
 	return tasks, err
 }
 
-func (api *UltipaAPI) ClearTask(algoNameOrId string, status structs.TaskStatus, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) ClearTask(algoNameOrId string, status structs.TaskStatus, config *configuration.RequestConfig) (resp *http.Response, err error) {
 	uql := ""
 	if len(algoNameOrId) == 0 {
 		uql = `clear().task("*")`
@@ -53,7 +53,7 @@ func (api *UltipaAPI) ClearTask(algoNameOrId string, status structs.TaskStatus, 
 	return resp, nil
 }
 
-func (api *UltipaAPI) StopTask(id string, config *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) StopTask(id string, config *configuration.RequestConfig) (resp *http.Response, err error) {
 	uql := ""
 	if len(id) == 0 || id == "*" {
 		uql = `stop().task("*")`

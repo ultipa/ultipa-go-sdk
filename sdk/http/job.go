@@ -8,9 +8,9 @@ type JobResponse struct {
 	Status    *Status
 }
 
-func GetJobResponseFromUqlResponse(response *UQLResponse) (*JobResponse, error) {
+func GetJobResponseFromUqlResponse(response *Response) (*JobResponse, error) {
 	if response == nil {
-		return nil, fmt.Errorf("cannot convert nil UQLResponse to JobResponse")
+		return nil, fmt.Errorf("cannot convert nil Response to JobResponse")
 	}
 	table, err := response.Alias(RESP_RESULT_KEY).AsTable()
 	if err != nil {

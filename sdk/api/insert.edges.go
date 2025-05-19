@@ -361,7 +361,7 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(rows []*structs.Edge, config *configu
 	return resps, nil
 }
 
-func (api *UltipaAPI) InsertEdges(schemaName string, edges []*structs.Edge, requestConfig *configuration.InsertRequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) InsertEdges(schemaName string, edges []*structs.Edge, requestConfig *configuration.InsertRequestConfig) (*http.Response, error) {
 	params := ""
 	switch requestConfig.InsertType {
 	case ultipa.InsertType_NORMAL:

@@ -12,7 +12,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
-type UQLResponse struct {
+type Response struct {
 	DataItemMap map[string]struct {
 		DataItem *DataItem
 		Index    int
@@ -25,9 +25,9 @@ type UQLResponse struct {
 	Resp        ultipa.UltipaRpcs_QueryClient
 }
 
-func NewUQLResponse(resp ultipa.UltipaRpcs_QueryClient) (response *UQLResponse, err error) {
+func NewUQLResponse(resp ultipa.UltipaRpcs_QueryClient) (response *Response, err error) {
 
-	response = &UQLResponse{
+	response = &Response{
 		Resp:   resp,
 		Status: &Status{},
 		//Reply:  &ultipa.QueryReply{},
@@ -87,11 +87,11 @@ func NewUQLResponse(resp ultipa.UltipaRpcs_QueryClient) (response *UQLResponse, 
 	return response, nil
 }
 
-func (r *UQLResponse) NeedRedirect() bool {
+func (r *Response) NeedRedirect() bool {
 	return r.Status.Code == ultipa.ErrorCode_RAFT_REDIRECT
 }
 
-func (r *UQLResponse) IsSuccess() bool {
+func (r *Response) IsSuccess() bool {
 	if r != nil && r.Status != nil {
 		return r.Status.Code == ultipa.ErrorCode_SUCCESS
 	}
@@ -99,7 +99,7 @@ func (r *UQLResponse) IsSuccess() bool {
 
 }
 
-func (r *UQLResponse) Get(index int) (di *DataItem) {
+func (r *Response) Get(index int) (di *DataItem) {
 	if len(r.AliasList) > index {
 		return r.Alias(r.AliasList[index])
 	}
@@ -109,7 +109,7 @@ func (r *UQLResponse) Get(index int) (di *DataItem) {
 	}
 }
 
-func (r *UQLResponse) Alias(alias string) *DataItem {
+func (r *Response) Alias(alias string) *DataItem {
 
 	data, t := utils.FindAliasDataInReply(r.Reply, alias)
 
@@ -119,7 +119,7 @@ func (r *UQLResponse) Alias(alias string) *DataItem {
 	}
 }
 
-func (r *UQLResponse) GetSingleTable() (*structs.Table, error) {
+func (r *Response) GetSingleTable() (*structs.Table, error) {
 	di := r.Get(0)
 	if di != nil {
 		t, err := di.AsTable()

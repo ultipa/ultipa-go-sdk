@@ -7,7 +7,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 )
 
-func (api *UltipaAPI) Kill(processId string, requestConfig *configuration.RequestConfig) (resp *http.UQLResponse, err error) {
+func (api *UltipaAPI) Kill(processId string, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
 	if processId == "" {
 		return nil, fmt.Errorf("processId can not empty")
 	}

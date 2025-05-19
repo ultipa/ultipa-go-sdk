@@ -355,7 +355,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(rows []*structs.Node, config *configu
 	return resps, nil
 }
 
-func (api *UltipaAPI) InsertNodes(schemaName string, nodes []*structs.Node, requestConfig *configuration.InsertRequestConfig) (*http.UQLResponse, error) {
+func (api *UltipaAPI) InsertNodes(schemaName string, nodes []*structs.Node, requestConfig *configuration.InsertRequestConfig) (*http.Response, error) {
 	params := ""
 	switch requestConfig.InsertType {
 	case ultipa.InsertType_NORMAL:
