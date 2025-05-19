@@ -141,6 +141,9 @@ func (api *UltipaAPI) ShowNodeProperty(schemaName string, requestConfig *configu
 	if err != nil {
 		return nil, err
 	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
 
 	property, err = resp.Alias(http.RESP_NODE_PROPERTY_KEY).AsProperties()
 	return property, nil
@@ -162,6 +165,9 @@ func (api *UltipaAPI) ShowEdgeProperty(schemaName string, requestConfig *configu
 
 	if err != nil {
 		return nil, err
+	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
 	}
 
 	property, err = resp.Alias(http.RESP_EDGE_PROPERTY_KEY).AsProperties()

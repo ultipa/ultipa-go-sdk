@@ -74,6 +74,9 @@ func (api *UltipaAPI) CreateEdgeIndex(source string, indexName string, requestCo
 	if err != nil {
 		return nil, err
 	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
 
 	return http.GetJobResponseFromUqlResponse(resp)
 }
@@ -96,6 +99,9 @@ func (api *UltipaAPI) CreateNodeIndex(source string, indexName string, requestCo
 	if err != nil {
 		return nil, err
 	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
 
 	return http.GetJobResponseFromUqlResponse(resp)
 }
@@ -107,6 +113,9 @@ func (api *UltipaAPI) ShowIndex(requestConfig *configuration.RequestConfig) ([]*
 	resp, err = api.Uql(fmt.Sprintf(`show().index()`), requestConfig)
 	if err != nil {
 		return nil, err
+	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
 	}
 
 	var indexes []*structs.Index
@@ -133,6 +142,9 @@ func (api *UltipaAPI) ShowEdgeIndex(requestConfig *configuration.RequestConfig) 
 	if err != nil {
 		return nil, err
 	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
 
 	indexes, err = resp.Alias(http.RESP_EDGE_INDEX_KEY).AsIndexes()
 
@@ -147,6 +159,9 @@ func (api *UltipaAPI) ShowNodeIndex(requestConfig *configuration.RequestConfig) 
 	resp, err = api.Uql(fmt.Sprintf(`show().node_index()`), requestConfig)
 	if err != nil {
 		return nil, err
+	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
 	}
 
 	indexes, err = resp.Alias(http.RESP_NODE_INDEX_KEY).AsIndexes()
@@ -239,6 +254,9 @@ func (api *UltipaAPI) CreateNodeFullText(schemaName, propertyName, fulltextName 
 	if err != nil {
 		return nil, err
 	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
 
 	return http.GetJobResponseFromUqlResponse(resp)
 }
@@ -263,6 +281,9 @@ func (api *UltipaAPI) CreateEdgeFullText(schemaName, propertyName, fulltextName 
 	if err != nil {
 		return nil, err
 	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
 
 	return http.GetJobResponseFromUqlResponse(resp)
 }
@@ -275,6 +296,9 @@ func (api *UltipaAPI) ShowFullText(requestConfig *configuration.RequestConfig) (
 	resp, err = api.Uql(fmt.Sprintf(`show().fulltext()`), requestConfig)
 	if err != nil {
 		return nil, err
+	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
 	}
 
 	indexes, err = resp.Alias(http.RESP_NODE_FULLTEXT_KEY).AsFullTexts()
@@ -301,6 +325,9 @@ func (api *UltipaAPI) ShowEdgeFullText(requestConfig *configuration.RequestConfi
 	if err != nil {
 		return nil, err
 	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
 
 	indexes, err = resp.Alias(http.RESP_EDGE_FULLTEXT_KEY).AsFullTexts()
 
@@ -315,6 +342,9 @@ func (api *UltipaAPI) ShowNodeFullText(requestConfig *configuration.RequestConfi
 	resp, err = api.Uql(fmt.Sprintf(`show().node_fulltext()`), requestConfig)
 	if err != nil {
 		return nil, err
+	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
 	}
 
 	indexes, err = resp.Alias(http.RESP_NODE_FULLTEXT_KEY).AsFullTexts()

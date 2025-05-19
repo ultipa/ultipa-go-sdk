@@ -16,6 +16,9 @@ func (api *UltipaAPI) ShowJob(id string, requestConfig *configuration.RequestCon
 	if err != nil {
 		return nil, err
 	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
 
 	jobs, err = resp.Alias(http.RESP_JOB_KEY).AsJobs()
 

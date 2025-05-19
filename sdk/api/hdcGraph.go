@@ -47,6 +47,9 @@ func (api *UltipaAPI) CreateHDCGraphBySchema(graphName string, nodeSchemas, edge
 		return nil, err
 	}
 
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
 	//api.Logger.Log("Creating Graph Request OK! - " + graphName)
 
 	return resp, err
@@ -87,6 +90,10 @@ func (api *UltipaAPI) ShowHDCGraph(requestConfig *configuration.RequestConfig) (
 		return nil, err
 	}
 
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
+
 	projections, err := resp.Alias(http.RESP_HDCGRAPH_KEY).AsHDCGraphs()
 	if err != nil {
 		return nil, err
@@ -111,6 +118,11 @@ func (api *UltipaAPI) ShowHDCAlgo(hdcServerName string, requestConfig *configura
 	if err != nil {
 		return nil, err
 	}
+
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
+
 	algo, err := resp.Alias(http.RESP_ALGOS_KEY).AsAlgos()
 	if err != nil {
 		return nil, err

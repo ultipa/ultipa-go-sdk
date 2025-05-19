@@ -25,6 +25,9 @@ func (api *UltipaAPI) ShowTask(algoNameOrId string, status structs.TaskStatus, r
 	if err != nil {
 		return nil, err
 	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
 
 	tasks, err = resp.Alias(http.RESP_TASK_KEY).AsTasks()
 

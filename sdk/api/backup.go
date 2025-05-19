@@ -22,6 +22,10 @@ func (api *UltipaAPI) backup(uql string, requestConfig *configuration.RequestCon
 		return nil, err
 	}
 
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
+
 	table, err := resp.Alias(http.RESP_BACKUP_KEY).AsTable()
 	if err != nil {
 		return nil, err

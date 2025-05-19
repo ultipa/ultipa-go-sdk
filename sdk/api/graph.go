@@ -16,6 +16,10 @@ func (api *UltipaAPI) ShowGraph(requestConfig *configuration.RequestConfig) (gra
 		return nil, err
 	}
 
+	if !res.IsSuccess() {
+		return nil, fmt.Errorf(res.Status.Message)
+	}
+
 	graphSets, err = res.Alias(http.RESP_GRAPH_KEY).AsGraphSets()
 	return graphSets, err
 }
@@ -59,6 +63,10 @@ func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, requestConfig *config
 		return nil, err
 	}
 
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
+
 	return resp, err
 }
 
@@ -67,6 +75,10 @@ func (api *UltipaAPI) DropGraph(graphName string, requestConfig *configuration.R
 
 	if err != nil {
 		return nil, err
+	}
+
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
 	}
 
 	return resp, err
@@ -128,6 +140,10 @@ func (api *UltipaAPI) AlterGraph(graphName string, alterGraphSet *structs.GraphS
 		return nil, err
 	}
 
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
+
 	return resp, nil
 }
 
@@ -176,6 +192,10 @@ func (api *UltipaAPI) Truncate(request *structs.Truncate, requestConfig *configu
 		return nil, err
 	}
 
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
+
 	return resp, nil
 }
 
@@ -186,6 +206,10 @@ func (api *UltipaAPI) Compact(graphName string, requestConfig *configuration.Req
 
 	if err != nil {
 		return nil, err
+	}
+
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
 	}
 
 	return http.GetJobResponseFromUqlResponse(resp)

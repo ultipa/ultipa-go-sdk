@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
@@ -11,6 +12,9 @@ func (api *UltipaAPI) Top(requestConfig *configuration.RequestConfig) (tops []*s
 
 	if err != nil {
 		return nil, err
+	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
 	}
 
 	tops, err = resp.Alias(http.RESP_TOP_KEY).AsTops()

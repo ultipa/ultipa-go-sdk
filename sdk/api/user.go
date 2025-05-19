@@ -14,6 +14,9 @@ func (api *UltipaAPI) ShowUser(requestConfig *configuration.RequestConfig) (user
 	if err != nil {
 		return nil, err
 	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
 
 	users, err = resp.Alias(http.RESP_USER_KEY).AsUsers()
 	if err != nil {
@@ -29,6 +32,9 @@ func (api *UltipaAPI) GetUser(userName string, requestConfig *configuration.Requ
 
 	if err != nil {
 		return nil, err
+	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
 	}
 
 	users, err := resp.Alias(http.RESP_USER_KEY).AsUsers()

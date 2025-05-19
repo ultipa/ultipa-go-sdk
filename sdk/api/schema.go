@@ -19,6 +19,9 @@ func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) (*s
 	if err != nil {
 		return nil, err
 	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
 
 	nodeSchemas, err := resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 	if err != nil {

@@ -13,6 +13,9 @@ func (api *UltipaAPI) ShowPolicy(requestConfig *configuration.RequestConfig) (po
 	if err != nil {
 		return nil, err
 	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
 
 	policies, err = resp.Alias(http.RESP_POLICY_KEY).AsPolicies()
 	if err != nil {

@@ -18,6 +18,9 @@ func (api *UltipaAPI) license(uql string, requestConfig *configuration.RequestCo
 	if err != nil {
 		return nil, err
 	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf(resp.Status.Message)
+	}
 
 	table, err := resp.Alias(http.RESP_LICENSE_KEY).AsTable()
 	if err != nil {
