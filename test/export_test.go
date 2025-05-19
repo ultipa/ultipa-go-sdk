@@ -1,6 +1,7 @@
 package test
 
 import (
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"testing"
 
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
@@ -24,8 +25,19 @@ func TestExportAsNodesEdges(t *testing.T) {
 			{Name: "_id"}, {Name: "_uuid"}, {Name: "typeInt32"}, {Name: "typeFloat"}, {Name: "typeDouble"}, {Name: "typeInt64"}, {Name: "typeUint32"}, {Name: "typeUint64"}, {Name: "typeDatetime"},
 			{Name: "typeString"}, {Name: "typeTimestamp"}, {Name: "typeNotMatch"}, {Name: "typeText"},
 		}}
-	err := client.Export(schema,
-		1000,
+
+	properties := []string{}
+
+	for _, prop := range schema.Properties {
+		properties = append(properties, prop.Name)
+	}
+	exportRequest := &ultipa.ExportRequest{
+		DbType:           ultipa.DBType_DBNODE,
+		Limit:            10000,
+		SelectProperties: properties,
+		Schema:           schema.Name,
+	}
+	err := client.Export(exportRequest,
 		&configuration.RequestConfig{},
 		func(nodes []*structs.Node, edges []*structs.Edge) error {
 			//printers.PrintNodes(nodes, map[string]*structs.Schema{schemaName: schema})

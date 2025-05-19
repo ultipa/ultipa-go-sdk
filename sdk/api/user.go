@@ -27,6 +27,9 @@ func (api *UltipaAPI) ShowUser(requestConfig *configuration.RequestConfig) (user
 }
 
 func (api *UltipaAPI) GetUser(userName string, requestConfig *configuration.RequestConfig) (user *structs.User, err error) {
+	if userName == "" {
+		return nil, fmt.Errorf("userName is required")
+	}
 	uql := fmt.Sprintf(`show().user("%s")`, userName)
 	resp, err := api.Uql(uql, requestConfig)
 

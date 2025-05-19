@@ -26,6 +26,10 @@ func (api *UltipaAPI) ShowPolicy(requestConfig *configuration.RequestConfig) (po
 }
 
 func (api *UltipaAPI) GetPolicy(policyName string, requestConfig *configuration.RequestConfig) (policy *structs.Policy, err error) {
+	if policyName == "" {
+		return nil, fmt.Errorf("policyName is required")
+	}
+
 	uql := fmt.Sprintf(`show().policy("%s")`, policyName)
 	resp, err := api.Uql(uql, requestConfig)
 

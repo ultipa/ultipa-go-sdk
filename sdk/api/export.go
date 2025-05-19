@@ -10,7 +10,105 @@ import (
 	"google.golang.org/grpc"
 )
 
-func (api *UltipaAPI) Export(schema *structs.Schema, limit int, requestConfig *configuration.RequestConfig, cb func(nodes []*structs.Node, edges []*structs.Edge) error) error {
+//func (api *UltipaAPI) ExportBak(schema *structs.Schema, limit int, requestConfig *configuration.RequestConfig, cb func(nodes []*structs.Node, edges []*structs.Edge) error) error {
+//	var err error
+//
+//	client, err := api.GetControlClient(requestConfig)
+//	if err != nil {
+//		return err
+//	}
+//
+//	ctx, cancel, err := api.Pool.NewContext(requestConfig)
+//	if err != nil {
+//		return err
+//	}
+//	defer cancel()
+//
+//	properties := []string{}
+//
+//	for _, prop := range schema.Properties {
+//		properties = append(properties, prop.Name)
+//	}
+//
+//	resp, respErr := client.Export(ctx, &ultipa.ExportRequest{
+//		Schema:           schema.Name,
+//		Limit:            int32(limit),
+//		SelectProperties: properties,
+//		DbType:           schema.DBType,
+//	}, grpc.MaxCallRecvMsgSize(api.Config.MaxRecvSize), grpc.MaxCallSendMsgSize(api.Config.MaxRecvSize))
+//
+//	if respErr != nil {
+//		return respErr
+//	}
+//
+//	for {
+//		record, err := resp.Recv()
+//
+//		if err == io.EOF {
+//			break
+//		} else if err != nil {
+//			return err
+//		}
+//
+//		wg := sync.WaitGroup{}
+//		if record.NodeTable != nil {
+//			wg.Add(len(record.NodeTable.EntityRows))
+//
+//			//record.NodeTable
+//			nodeSchemaMap := structs.NewSchemaMapFromProtoSchema(record.NodeTable.Schemas, ultipa.DBType_DBNODE)
+//			nodes := make([]*structs.Node, len(record.NodeTable.EntityRows))
+//			for index, nodeRow := range record.NodeTable.EntityRows {
+//				var parseErr error
+//				go func(index int, row *ultipa.EntityRow) {
+//					defer wg.Done()
+//					node, err := structs.NewNodeFromNodeRow(nodeSchemaMap[schema.Name], row)
+//					if err != nil {
+//						parseErr = err
+//					}
+//					nodes[index] = node
+//				}(index, nodeRow)
+//				if parseErr != nil {
+//					return parseErr
+//				}
+//			}
+//
+//			wg.Wait()
+//			err = cb(nodes, nil)
+//		}
+//
+//		if record.EdgeTable != nil {
+//			wg.Add(len(record.EdgeTable.EntityRows))
+//			//record.EdgeTable
+//			edgeSchemaMap := structs.NewSchemaMapFromProtoSchema(record.EdgeTable.Schemas, ultipa.DBType_DBEDGE)
+//			edges := make([]*structs.Edge, len(record.EdgeTable.EntityRows))
+//			for index, edgeRow := range record.EdgeTable.EntityRows {
+//				var parseErr error
+//				go func(index int, row *ultipa.EntityRow) {
+//					defer wg.Done()
+//					edge, err := structs.NewEdgeFromEdgeRow(edgeSchemaMap[row.SchemaName], row)
+//					if err != nil {
+//						parseErr = err
+//					}
+//					edges[index] = edge
+//				}(index, edgeRow)
+//				if parseErr != nil {
+//					return parseErr
+//				}
+//			}
+//
+//			wg.Wait()
+//			err = cb(nil, edges)
+//		}
+//
+//		if err != nil {
+//			return err
+//		}
+//	}
+//
+//	return err
+//}
+
+func (api *UltipaAPI) Export(exportRequest *ultipa.ExportRequest, requestConfig *configuration.RequestConfig, cb func(nodes []*structs.Node, edges []*structs.Edge) error) error {
 	var err error
 
 	client, err := api.GetControlClient(requestConfig)
@@ -24,18 +122,7 @@ func (api *UltipaAPI) Export(schema *structs.Schema, limit int, requestConfig *c
 	}
 	defer cancel()
 
-	properties := []string{}
-
-	for _, prop := range schema.Properties {
-		properties = append(properties, prop.Name)
-	}
-
-	resp, respErr := client.Export(ctx, &ultipa.ExportRequest{
-		Schema:           schema.Name,
-		Limit:            int32(limit),
-		SelectProperties: properties,
-		DbType:           schema.DBType,
-	}, grpc.MaxCallRecvMsgSize(api.Config.MaxRecvSize), grpc.MaxCallSendMsgSize(api.Config.MaxRecvSize))
+	resp, respErr := client.Export(ctx, exportRequest, grpc.MaxCallRecvMsgSize(api.Config.MaxRecvSize), grpc.MaxCallSendMsgSize(api.Config.MaxRecvSize))
 
 	if respErr != nil {
 		return respErr
@@ -61,7 +148,7 @@ func (api *UltipaAPI) Export(schema *structs.Schema, limit int, requestConfig *c
 				var parseErr error
 				go func(index int, row *ultipa.EntityRow) {
 					defer wg.Done()
-					node, err := structs.NewNodeFromNodeRow(nodeSchemaMap[schema.Name], row)
+					node, err := structs.NewNodeFromNodeRow(nodeSchemaMap[exportRequest.Schema], row)
 					if err != nil {
 						parseErr = err
 					}

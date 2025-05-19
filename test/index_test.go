@@ -9,7 +9,6 @@ package test
 
 import (
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
-	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"log"
 	"testing"
 
@@ -67,9 +66,7 @@ func TestCreateFullIndex(t *testing.T) {
 func TestListIndex(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
 
-	indexes, err := client.ShowIndex(&configuration.RequestConfig{
-		Graph: "go_sdk_test",
-	})
+	indexes, err := client.ShowIndex(nil)
 	if err != nil {
 		t.Fatal(err)
 	}

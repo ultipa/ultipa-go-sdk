@@ -47,7 +47,7 @@ func (api *UltipaAPI) Lte(dbType ultipa.DBType, schemaName, propertyName string,
 	return http.GetJobResponseFromUqlResponse(resp)
 }
 
-func (api *UltipaAPI) Ufe(dbType ultipa.DBType, schemaName, propertyName string, requestConfig *configuration.RequestConfig) (jobResponse *http.JobResponse, err error) {
+func (api *UltipaAPI) Ufe(dbType ultipa.DBType, schemaName, propertyName string, requestConfig *configuration.RequestConfig) (jobResponse *http.Response, err error) {
 	uql := ""
 	if schemaName == "" {
 		schemaName = "*"
@@ -81,5 +81,5 @@ func (api *UltipaAPI) Ufe(dbType ultipa.DBType, schemaName, propertyName string,
 		return nil, fmt.Errorf(resp.Status.Message)
 	}
 
-	return http.GetJobResponseFromUqlResponse(resp)
+	return resp, nil
 }
