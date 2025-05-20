@@ -139,23 +139,25 @@ func ExampleUltipaAPI_CreateNodeProperty() {
 
 	// CreateTime Node Property
 	newProp := &structs.Property{
-		Name: "name",
-		Type: ultipa.PropertyType_STRING,
+		Schema: "target_schema",
+		Name:   "name",
+		Type:   ultipa.PropertyType_STRING,
 	}
 
-	resp, _ := client.CreateProperty(ultipa.DBType_DBNODE, "target_schema", newProp, nil)
+	resp, _ := client.CreateProperty(ultipa.DBType_DBNODE, newProp, nil)
 	log.Println(resp.Status.Code)
 
 	// CreateTime Edge Property
 	newEdgeProp := &structs.Property{
-		Name: "relation",
-		Type: ultipa.PropertyType_STRING,
+		Schema: "target_schema",
+		Name:   "relation",
+		Type:   ultipa.PropertyType_STRING,
 	}
 
-	resp2, _ := client.CreateProperty(ultipa.DBType_DBEDGE, "target_schema", newEdgeProp, nil)
+	resp2, _ := client.CreateProperty(ultipa.DBType_DBEDGE, newEdgeProp, nil)
 	log.Println(resp2.Status.Code)
 
-	exist, _, _ := client.CreatePropertyIfNotExist(ultipa.DBType_DBEDGE, "target_schema", newEdgeProp, nil)
+	exist, _, _ := client.CreatePropertyIfNotExist(ultipa.DBType_DBEDGE, newEdgeProp, nil)
 	log.Println(exist)
 }
 

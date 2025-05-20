@@ -166,7 +166,7 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 				continue
 			}
 
-			resp, err := api.CreateProperty(schema.DBType, schema.Name, prop, requestConfig)
+			resp, err := api.CreateProperty(schema.DBType, prop, requestConfig)
 
 			if err != nil {
 				return nil, err

@@ -25,7 +25,7 @@ func TestShowProperty(t *testing.T) {
 	}
 	printers.PrintProperty([]*structs.Property{pro3})
 
-	nodeProp, edgeProp, err := client.ShowProperty(12, "", nil)
+	nodeProp, edgeProp, err := client.ShowProperty(ultipa.DBType_DBNODE, "", nil)
 
 	if err != nil {
 		t.Fatal(err)
@@ -100,11 +100,12 @@ func TestCreatePropertyWithUql(t *testing.T) {
 func TestCreateProperty(t *testing.T) {
 	// CreateTime Node Property
 	newProp := &structs.Property{
-		Name: `"""`,
-		Type: ultipa.PropertyType_BOOL,
+		Schema: "default",
+		Name:   `"""`,
+		Type:   ultipa.PropertyType_BOOL,
 	}
 
-	resp, err := client.CreateProperty(ultipa.DBType_DBNODE, "default", newProp, &configuration.RequestConfig{
+	resp, err := client.CreateProperty(ultipa.DBType_DBNODE, newProp, &configuration.RequestConfig{
 		Graph: "go_sdk_test",
 	})
 	if err != nil {
@@ -134,22 +135,23 @@ func TestProperty(t *testing.T) {
 	}
 
 	prop := &structs.Property{
+		Schema:      schema.Name,
 		Name:        "中文Property",
 		Description: "中文描述",
 		Type:        ultipa.PropertyType_STRING,
 	}
-	_, err = client.CreateProperty(ultipa.DBType_DBNODE, schema.Name, prop, nil)
+	_, err = client.CreateProperty(ultipa.DBType_DBNODE, prop, nil)
 	if err != nil {
 		log.Println(err)
 	}
 
 	prop.Name = "中文Property1"
-	_, err = client.CreateNodeProperty(schema.Name, prop, nil)
+	_, err = client.CreateNodeProperty(prop, nil)
 	if err != nil {
 		log.Println(err)
 	}
 
-	_, err = client.CreateEdgeProperty(schema.Name, prop, nil)
+	_, err = client.CreateEdgeProperty(prop, nil)
 	if err != nil {
 		log.Println(err)
 	}
@@ -216,11 +218,12 @@ func TestProperty(t *testing.T) {
 
 func TestProperty2(t *testing.T) {
 	prop := &structs.Property{
+		Schema:      "default",
 		Name:        "中文Property2",
 		Description: "中文描述",
 		Type:        ultipa.PropertyType_STRING,
 	}
-	_, _, err := client.CreatePropertyIfNotExist(ultipa.DBType_DBNODE, "default", prop, nil)
+	_, _, err := client.CreatePropertyIfNotExist(ultipa.DBType_DBNODE, prop, nil)
 	if err != nil {
 		log.Println(err)
 	}

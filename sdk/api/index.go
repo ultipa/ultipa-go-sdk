@@ -16,44 +16,15 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-// Deprecated: 5.0 not support, should use CreateNodeIndex or CreateEdgeIndex
-func (api *UltipaAPI) CreateIndex(dbType ultipa.DBType, schemaName, propertyName string, indexName string, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
-	uql := ""
-	if schemaName == "" {
-		return nil, fmt.Errorf("schemaName can not empty %s", schemaName)
-	}
-
-	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
-	}
-
-	propertyName, err = CheckReplaceSchemaPropertyName(propertyName)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), propertyName))
-	}
-
-	indexName, err = CheckReplaceSchemaPropertyName(indexName)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), indexName))
-	}
-
+func (api *UltipaAPI) CreateIndex(dbType ultipa.DBType, source string, indexName string, requestConfig *configuration.RequestConfig) (jobResponse *http.JobResponse, err error) {
 	switch dbType {
 	case ultipa.DBType_DBNODE:
-		uql = fmt.Sprintf(`create().node_index(@%v.%v, %s)`, schemaName, propertyName, indexName)
+		return api.CreateNodeIndex(source, indexName, requestConfig)
 	case ultipa.DBType_DBEDGE:
-		uql = fmt.Sprintf(`create().edge_index(@%v.%v, %s)`, schemaName, propertyName, indexName)
+		return api.CreateEdgeIndex(source, indexName, requestConfig)
 	default:
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
-
-	resp, err = api.Uql(uql, requestConfig)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
 }
 
 func (api *UltipaAPI) CreateEdgeIndex(source string, indexName string, requestConfig *configuration.RequestConfig) (jobResponse *http.JobResponse, err error) {
@@ -171,20 +142,6 @@ func (api *UltipaAPI) ShowNodeIndex(requestConfig *configuration.RequestConfig) 
 
 func (api *UltipaAPI) DropIndex(dbType ultipa.DBType, indexName string, config *configuration.RequestConfig) (resp *http.Response, err error) {
 	uql := ""
-	//if schemaName == "" {
-	//	schemaName = "*"
-	//}
-	//
-	//schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
-	//if err != nil {
-	//	return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
-	//}
-	//
-	//propertyName, err = CheckReplaceSchemaPropertyName(propertyName)
-	//if err != nil {
-	//	return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), propertyName))
-	//}
-
 	switch dbType {
 	case ultipa.DBType_DBNODE:
 		uql = fmt.Sprintf(`drop().node_index("%v")`, indexName)
@@ -201,6 +158,14 @@ func (api *UltipaAPI) DropIndex(dbType ultipa.DBType, indexName string, config *
 	}
 
 	return resp, nil
+}
+
+func (api *UltipaAPI) DropNodeIndex(indexName string, config *configuration.RequestConfig) (resp *http.Response, err error) {
+	return api.DropIndex(ultipa.DBType_DBNODE, indexName, config)
+}
+
+func (api *UltipaAPI) DropEdgeIndex(indexName string, config *configuration.RequestConfig) (resp *http.Response, err error) {
+	return api.DropIndex(ultipa.DBType_DBEDGE, indexName, config)
 }
 
 func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyName, indexName string, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {

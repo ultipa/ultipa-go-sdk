@@ -14,10 +14,11 @@ func TestInsertEdge(t *testing.T) {
 	//client.SetCurrentGraph("go_sdk_test")
 	schemaName := "default"
 	prop := &structs.Property{
-		Name: "value",
-		Type: ultipa.PropertyType_DOUBLE,
+		Schema: schemaName,
+		Name:   "value",
+		Type:   ultipa.PropertyType_DOUBLE,
 	}
-	client.CreateEdgeProperty(schemaName, prop, nil)
+	client.CreateEdgeProperty(prop, nil)
 
 	var edges []*structs.Edge
 	edge1 := structs.NewEdge()

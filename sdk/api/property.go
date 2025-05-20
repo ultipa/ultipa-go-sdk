@@ -10,8 +10,12 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-// CreateProperty create property for schema, schemaName maybe escaped if schemaName contains some special characters.
-func (api *UltipaAPI) CreateProperty(dbType ultipa.DBType, schemaName string, prop *structs.Property, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
+// CreateProperty property.Schema is required
+func (api *UltipaAPI) CreateProperty(dbType ultipa.DBType, property *structs.Property, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
+	if property.Schema == "" {
+		return nil, fmt.Errorf("property.Schema can not empty")
+	}
+
 	params := ""
 	switch dbType {
 	case ultipa.DBType_DBNODE:
@@ -23,27 +27,27 @@ func (api *UltipaAPI) CreateProperty(dbType ultipa.DBType, schemaName string, pr
 		return nil, errors.New(errStr)
 	}
 
-	if prop.Type == structs.PropertyType_IGNORE {
+	if property.Type == structs.PropertyType_IGNORE {
 		return nil, err
 	}
 
-	propertyTypeStr, err := prop.GetStringType()
+	propertyTypeStr, err := property.GetStringType()
 	if err != nil {
 		return nil, err
 	}
 
-	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
+	schemaName, err := CheckReplaceSchemaPropertyName(property.Schema)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
 	}
 
-	propertyName, err := CheckReplaceSchemaPropertyName(prop.Name)
+	propertyName, err := CheckReplaceSchemaPropertyName(property.Name)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), prop.Name))
+		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), property.Name))
 	}
 
 	//api.Logger.Log("Creating Property : @" + schemaName + "." + propertyName)
-	uql := fmt.Sprintf(`create().%v(@%v,%s,"%v","%v")`, params, schemaName, propertyName, propertyTypeStr, prop.Description)
+	uql := fmt.Sprintf(`create().%v(@%v,%s,"%v","%v")`, params, schemaName, propertyName, propertyTypeStr, property.Description)
 	resp, err = api.Uql(uql, requestConfig)
 
 	if err != nil {
@@ -54,15 +58,15 @@ func (api *UltipaAPI) CreateProperty(dbType ultipa.DBType, schemaName string, pr
 	return resp, nil
 }
 
-func (api *UltipaAPI) CreatePropertyIfNotExist(dbType ultipa.DBType, schemaName string, prop *structs.Property, requestConfig *configuration.RequestConfig) (exist bool, resp *http.Response, err error) {
-	property, err := api.GetProperty(dbType, schemaName, prop.Name, requestConfig)
+func (api *UltipaAPI) CreatePropertyIfNotExist(dbType ultipa.DBType, prop *structs.Property, requestConfig *configuration.RequestConfig) (exist bool, resp *http.Response, err error) {
+	property, err := api.GetProperty(dbType, prop.Schema, prop.Name, requestConfig)
 
 	if err != nil {
 		return false, nil, err
 	}
 
 	if property == nil {
-		resp, err = api.CreateProperty(dbType, schemaName, prop, requestConfig)
+		resp, err = api.CreateProperty(dbType, prop, requestConfig)
 		if err != nil {
 			return false, resp, err
 		}
@@ -182,20 +186,20 @@ func (api *UltipaAPI) GetEdgeProperty(schemaName string, propertyName string, re
 	return api.GetProperty(ultipa.DBType_DBEDGE, schemaName, propertyName, requestConfig)
 }
 
-func (api *UltipaAPI) CreateNodeProperty(schemaName string, prop *structs.Property, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
-	return api.CreateProperty(ultipa.DBType_DBNODE, schemaName, prop, requestConfig)
+func (api *UltipaAPI) CreateNodeProperty(property *structs.Property, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
+	return api.CreateProperty(ultipa.DBType_DBNODE, property, requestConfig)
 }
 
-func (api *UltipaAPI) CreateEdgeProperty(schemaName string, prop *structs.Property, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
-	return api.CreateProperty(ultipa.DBType_DBEDGE, schemaName, prop, requestConfig)
+func (api *UltipaAPI) CreateEdgeProperty(property *structs.Property, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
+	return api.CreateProperty(ultipa.DBType_DBEDGE, property, requestConfig)
 }
 
-func (api *UltipaAPI) AlterNodeProperty(property, newProperty *structs.Property, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
-	return api.AlterProperty(ultipa.DBType_DBNODE, property, newProperty, requestConfig)
+func (api *UltipaAPI) AlterNodeProperty(originProp, newProp *structs.Property, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
+	return api.AlterProperty(ultipa.DBType_DBNODE, originProp, newProp, requestConfig)
 }
 
-func (api *UltipaAPI) AlterEdgeProperty(property, newProperty *structs.Property, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
-	return api.AlterProperty(ultipa.DBType_DBEDGE, property, newProperty, requestConfig)
+func (api *UltipaAPI) AlterEdgeProperty(originProp, newProp *structs.Property, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
+	return api.AlterProperty(ultipa.DBType_DBEDGE, originProp, newProp, requestConfig)
 }
 
 func (api *UltipaAPI) DropNodeProperty(schemaName, propertyName string, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
@@ -236,7 +240,7 @@ func (api *UltipaAPI) DropProperty(dbType ultipa.DBType, schemaName, propertyNam
 	return resp, nil
 }
 
-func (api *UltipaAPI) AlterProperty(dbType ultipa.DBType, property, newProperty *structs.Property, requestConfig *configuration.RequestConfig) (*http.Response, error) {
+func (api *UltipaAPI) AlterProperty(dbType ultipa.DBType, originProp, newProp *structs.Property, requestConfig *configuration.RequestConfig) (*http.Response, error) {
 	params := ""
 
 	switch dbType {
@@ -245,24 +249,24 @@ func (api *UltipaAPI) AlterProperty(dbType ultipa.DBType, property, newProperty 
 	case ultipa.DBType_DBEDGE:
 		params = "edge_property"
 	default:
-		return nil, errors.New("alter property: unknown db type")
+		return nil, errors.New("alter originProp: unknown db type")
 	}
 
-	schemaName, err := CheckReplaceSchemaPropertyName(property.Schema)
+	schemaName, err := CheckReplaceSchemaPropertyName(originProp.Schema)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), property.Schema))
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), originProp.Schema))
 	}
 
-	propertyName, err := CheckReplaceSchemaPropertyName(property.Name)
+	propertyName, err := CheckReplaceSchemaPropertyName(originProp.Name)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), property.Name))
+		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), originProp.Name))
 	}
 
-	uql := fmt.Sprintf(`alter().%v(@%v.%v).set({name: "%v", description: "%v"})`, params, schemaName, propertyName, newProperty.Name, newProperty.Description)
+	uql := fmt.Sprintf(`alter().%v(@%v.%v).set({name: "%v", description: "%v"})`, params, schemaName, propertyName, newProp.Name, newProp.Description)
 
-	// Only modify the description of the property
-	if newProperty.Name == "" {
-		uql = fmt.Sprintf(`alter().%v(@%v.%v).set({description: "%v"})`, params, schemaName, propertyName, newProperty.Description)
+	// Only modify the description of the originProp
+	if newProp.Name == "" {
+		uql = fmt.Sprintf(`alter().%v(@%v.%v).set({description: "%v"})`, params, schemaName, propertyName, newProp.Description)
 	}
 
 	resp, err := api.Uql(uql, requestConfig)

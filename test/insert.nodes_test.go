@@ -234,15 +234,17 @@ func TestInsertNodes(t *testing.T) {
 	}, nil)
 
 	prop := &structs.Property{
-		Name: "name",
-		Type: ultipa.PropertyType_STRING,
+		Schema: schemaName,
+		Name:   "name",
+		Type:   ultipa.PropertyType_STRING,
 	}
-	client.CreateNodeProperty(schemaName, prop, nil)
+	client.CreateNodeProperty(prop, nil)
 	prop = &structs.Property{
-		Name: "salary",
-		Type: ultipa.PropertyType_DOUBLE,
+		Schema: schemaName,
+		Name:   "salary",
+		Type:   ultipa.PropertyType_DOUBLE,
 	}
-	client.CreateNodeProperty(schemaName, prop, nil)
+	client.CreateNodeProperty(prop, nil)
 
 	var nodes []*structs.Node
 	node1 := structs.NewNode()
