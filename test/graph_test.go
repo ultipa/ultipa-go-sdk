@@ -200,7 +200,7 @@ func TestUltipaAPI_AlterGraph(t *testing.T) {
 
 func TestTruncate(t *testing.T) {
 	tr := &structs.Truncate{
-		GraphName: "test",
+		GraphName: "testaaa",
 		DBType:    nil,
 		Schema:    "*",
 	}

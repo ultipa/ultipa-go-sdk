@@ -1,7 +1,7 @@
 package api
 
 import (
-	"errors"
+	"encoding/json"
 	"fmt"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
@@ -9,36 +9,77 @@ import (
 	"strings"
 )
 
-type HDCSync int32
+type HDCSyncType string
+type HDCDirection string
+
+type HDCBuilder struct {
+	SyncType      HDCSyncType         `json:"update,omitempty"`
+	HDCGraphName  string              `json:"-"`
+	HDCServerName string              `json:"-"`
+	NodeSchema    map[string][]string `json:"nodes,omitempty"`
+	EdgeSchema    map[string][]string `json:"edges,omitempty"`
+	Direction     HDCDirection        `json:"direction,omitempty"`
+	LoadId        bool                `json:"load_id,omitempty"`
+	IsDefault     bool                `json:"default,omitempty"`
+}
 
 const (
-	STATIC HDCSync = iota
-	ASYNC
-	SYNC
+	STATIC              HDCSyncType  = "static"
+	ASYNC               HDCSyncType  = "async"
+	SYNC                HDCSyncType  = "sync"
+	DirectionIN         HDCDirection = "in"
+	DirectionOUT        HDCDirection = "out"
+	DirectionUNDIRECTED HDCDirection = "undirected"
 )
 
-func (api *UltipaAPI) CreateHDCGraphBySchema(graphName string, nodeSchemas, edgeSchemas []*structs.Schema, update string, hdcName string, requestConfig *configuration.RequestConfig) (*http.Response, error) {
-	// `hdc.graph.create("social-user-article", {
-	//nodes: {User: ["username"], Article: ["title"] },
-	//edges: {Post: []},
-	//update: "async"
-	//}).to("computation-1")`
-
-	nodeSchema := FormatHdcGraphSchemas(nodeSchemas)
-	edgeSchema := FormatHdcGraphSchemas(edgeSchemas)
-	if nodeSchema == "" || edgeSchema == "" {
-		return nil, errors.New("schema name cannot be empth")
-
+func (b *HDCBuilder) BuildUQL() (string, error) {
+	if b.HDCGraphName == "" {
+		return "", fmt.Errorf("HDCGraphName is required")
 	}
 
-	uql := fmt.Sprintf(`hdc.graph.create("%s", {
-	nodes: {%s},
-	edges: {%s},
-	update: "%s",
-	query: "query",
-    type: "Graph",
-    default: true
-	}).to("%s")`, graphName, nodeSchema, edgeSchema, update, hdcName)
+	if b.HDCServerName == "" {
+		return "", fmt.Errorf("HDCServerName is required")
+	}
+
+	type uqlBody struct {
+		SyncType   HDCSyncType         `json:"update,omitempty"`
+		NodeSchema map[string][]string `json:"nodes,omitempty"`
+		EdgeSchema map[string][]string `json:"edges,omitempty"`
+		Direction  HDCDirection        `json:"direction,omitempty"`
+		LoadId     bool                `json:"load_id,omitempty"`
+		IsDefault  bool                `json:"default,omitempty"`
+		Query      string              `json:"query"`
+		//Type       string              `json:"type"`
+	}
+
+	body := uqlBody{
+		SyncType:   b.SyncType,
+		NodeSchema: b.NodeSchema,
+		EdgeSchema: b.EdgeSchema,
+		Direction:  b.Direction,
+		LoadId:     b.LoadId,
+		IsDefault:  b.IsDefault,
+		Query:      "query", // 强制字段
+		//Type:       "Graph", // 强制字段
+	}
+
+	bodyJson, err := json.Marshal(body)
+	if err != nil {
+		return "", err
+	}
+
+	bodyStr := strings.Trim(string(bodyJson), "{}")
+
+	uql := fmt.Sprintf(`hdc.graph.create("%s", {%s}).to("%s")`, b.HDCGraphName, bodyStr, b.HDCServerName)
+
+	return uql, nil
+}
+
+func (api *UltipaAPI) CreateHDCGraphBySchema(builder HDCBuilder, requestConfig *configuration.RequestConfig) (*http.JobResponse, error) {
+	uql, err := builder.BuildUQL()
+	if err != nil {
+		return nil, err
+	}
 
 	resp, err := api.Uql(uql, requestConfig)
 
@@ -52,37 +93,37 @@ func (api *UltipaAPI) CreateHDCGraphBySchema(graphName string, nodeSchemas, edge
 	}
 	//api.Logger.Log("Creating Graph Request OK! - " + graphName)
 
-	return resp, err
+	return http.GetJobResponseFromUqlResponse(resp)
 }
 
-func FormatHdcGraphSchemas(schemas []*structs.Schema) string {
-	if len(schemas) == 0 {
-		return `"*": ["*"]`
-	}
-
-	var result []string
-
-	for _, schema := range schemas {
-		if schema.Name == "" {
-			return ""
-		}
-
-		if len(schema.Properties) == 0 {
-			// if Properties is null
-			result = append(result, fmt.Sprintf(`%s: ["*"]`, schema.Name))
-		} else {
-			// join Property.Name
-			var propertyNames []string
-			for _, prop := range schema.Properties {
-				propertyNames = append(propertyNames, prop.Name)
-			}
-			result = append(result, fmt.Sprintf(`%s: ["%s"]`, schema.Name, strings.Join(propertyNames, `", "`)))
-		}
-	}
-
-	return strings.Join(result, ", ")
-
-}
+//func FormatHdcGraphSchemas(schemas []*structs.Schema) string {
+//    if len(schemas) == 0 {
+//        return `"*": ["*"]`
+//    }
+//
+//    var result []string
+//
+//    for _, schema := range schemas {
+//        if schema.Name == "" {
+//            return ""
+//        }
+//
+//        if len(schema.Properties) == 0 {
+//            // if Properties is null
+//            result = append(result, fmt.Sprintf(`%s: ["*"]`, schema.Name))
+//        } else {
+//            // join Property.Name
+//            var propertyNames []string
+//            for _, prop := range schema.Properties {
+//                propertyNames = append(propertyNames, prop.Name)
+//            }
+//            result = append(result, fmt.Sprintf(`%s: ["%s"]`, schema.Name, strings.Join(propertyNames, `", "`)))
+//        }
+//    }
+//
+//    return strings.Join(result, ", ")
+//
+//}
 
 func (api *UltipaAPI) ShowHDCGraph(requestConfig *configuration.RequestConfig) ([]*structs.HDCGraph, error) {
 	resp, err := api.Uql("hdc.graph.show()", requestConfig)

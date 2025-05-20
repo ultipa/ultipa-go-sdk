@@ -6,13 +6,14 @@ import (
 	"github.com/codingsince1985/checksum"
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"io"
 	"os"
 	"path"
 )
 
 // UninstallHDCAlgo uninstall algo
-func (api *UltipaAPI) UninstallHDCAlgo(algoName, hdcName string, config *configuration.RequestConfig) (*ultipa.UninstallAlgoReply, error) {
+func (api *UltipaAPI) UninstallHDCAlgo(algoName, hdcServerName string, config *configuration.RequestConfig) (*http.Response, error) {
 
 	client, err := api.GetControlClient(config)
 	if err != nil {
@@ -27,7 +28,7 @@ func (api *UltipaAPI) UninstallHDCAlgo(algoName, hdcName string, config *configu
 
 	reply, err := client.UninstallAlgo(ctx, &ultipa.UninstallAlgoRequest{
 		AlgoName:   algoName,
-		WithServer: &ultipa.WithServer{HdcServerName: hdcName},
+		WithServer: &ultipa.WithServer{HdcServerName: hdcServerName},
 	})
 
 	if err != nil {
@@ -38,11 +39,14 @@ func (api *UltipaAPI) UninstallHDCAlgo(algoName, hdcName string, config *configu
 		return nil, errors.New(reply.Status.Msg)
 	}
 
-	return reply, nil
+	return &http.Response{Status: &http.Status{
+		Message: reply.Status.Msg,
+		Code:    reply.Status.ErrorCode,
+	}}, nil
 }
 
 // RollbackHDCAlgo Rollback HDC Algo
-func (api *UltipaAPI) RollbackHDCAlgo(algoName, hdcName string, config *configuration.RequestConfig) (*ultipa.RollbackAlgoReply, error) {
+func (api *UltipaAPI) RollbackHDCAlgo(algoName, hdcServerName string, config *configuration.RequestConfig) (*http.Response, error) {
 
 	client, err := api.GetControlClient(config)
 	if err != nil {
@@ -57,7 +61,7 @@ func (api *UltipaAPI) RollbackHDCAlgo(algoName, hdcName string, config *configur
 
 	reply, err := client.RollbackAlgo(ctx, &ultipa.RollbackAlgoRequest{
 		AlgoName:   algoName,
-		WithServer: &ultipa.WithServer{HdcServerName: hdcName},
+		WithServer: &ultipa.WithServer{HdcServerName: hdcServerName},
 	})
 
 	if err != nil {
@@ -68,11 +72,14 @@ func (api *UltipaAPI) RollbackHDCAlgo(algoName, hdcName string, config *configur
 		return nil, errors.New(reply.Status.Msg)
 	}
 
-	return reply, nil
+	return &http.Response{Status: &http.Status{
+		Message: reply.Status.Msg,
+		Code:    reply.Status.ErrorCode,
+	}}, nil
 }
 
 // InstallHDCAlgo  install algos, files : [...so, yml]
-func (api *UltipaAPI) InstallHDCAlgo(files []string, hdcName string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
+func (api *UltipaAPI) InstallHDCAlgo(files []string, hdcServerName string, config *configuration.RequestConfig) (*http.Response, error) {
 	if files == nil || len(files) == 0 {
 		return nil, errors.New("empty files")
 	}
@@ -110,7 +117,7 @@ func (api *UltipaAPI) InstallHDCAlgo(files []string, hdcName string, config *con
 		isYml := i == len(files)-1
 
 		// Send  file in chunks
-		if err := sendFileChunks(algoFileReader, streamClient, path.Base(algoFile.Name()), algoFileMD5, hdcName, isYml); err != nil {
+		if err := sendFileChunks(algoFileReader, streamClient, path.Base(algoFile.Name()), algoFileMD5, hdcServerName, isYml); err != nil {
 			return nil, err
 		}
 	}
@@ -122,14 +129,17 @@ func (api *UltipaAPI) InstallHDCAlgo(files []string, hdcName string, config *con
 
 	// Reply status check, handle empty reply
 	if reply.Status == nil {
-		return reply, nil
+		return nil, nil
 	}
 
 	if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
 		return nil, errors.New(reply.Status.Msg)
 	}
 
-	return reply, nil
+	return &http.Response{Status: &http.Status{
+		Message: reply.Status.Msg,
+		Code:    reply.Status.ErrorCode,
+	}}, nil
 }
 
 // sendFileChunks sends the file in chunks to the server
