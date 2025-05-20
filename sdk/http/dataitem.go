@@ -45,6 +45,7 @@ func NodeTableToNodes(nt *ultipa.EntityTable, alias string) ([]*structs.Node, ma
 		var node *structs.Node
 		if oNode.IsNull {
 			node = nil
+			continue
 		} else {
 			node = &structs.Node{
 				//Name:   alias,
@@ -105,6 +106,7 @@ func EdgeTableToEdges(et *ultipa.EntityTable, alias string) ([]*structs.Edge, ma
 	for _, oEdge := range et.EntityRows {
 		if oEdge.IsNull {
 			edge = nil
+			continue
 		} else {
 			edge = &structs.Edge{
 				//Name:     alias,
@@ -248,9 +250,9 @@ func (di *DataItem) AsTable() (table *structs.Table, err error) {
 	table.Name = oTable.TableName
 
 	for _, header := range oTable.Headers {
-		h := &structs.Property{
-			Name: header.PropertyName,
-			Type: header.PropertyType,
+		h := &structs.Header{
+			Name:         header.PropertyName,
+			PropertyType: header.PropertyType,
 		}
 		table.Headers = append(table.Headers, h)
 	}
@@ -260,7 +262,7 @@ func (di *DataItem) AsTable() (table *structs.Table, err error) {
 		r := structs.Value{}
 
 		for index, field := range row.Values {
-			value, err := utils.ConvertBytesToInterface(field, table.Headers[index].Type, table.Headers[index].SubTypes)
+			value, err := utils.ConvertBytesToInterface(field, table.Headers[index].PropertyType, nil)
 			if err != nil {
 				return nil, err
 			}
@@ -647,7 +649,7 @@ func (di *DataItem) AsGraphCount() (graphCounts []*structs.GraphCount, err error
 		i := &structs.GraphCount{
 			Type:   string(values[0]),
 			Schema: string(values[1]),
-			SP:     sp,
+			Stat:   sp,
 		}
 		graphCounts = append(graphCounts, i)
 	}

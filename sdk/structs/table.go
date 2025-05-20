@@ -1,8 +1,15 @@
 package structs
 
+import ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+
+type Header struct {
+	Name         string
+	PropertyType ultipa.PropertyType
+}
+
 type Table struct {
 	Name    string
-	Headers []*Property
+	Headers []*Header
 	Rows    []*Value
 }
 
@@ -10,12 +17,12 @@ type Value []interface{}
 
 func NewTable() *Table {
 	return &Table{
-		Headers: []*Property{},
+		Headers: []*Header{},
 		Rows:    []*Value{},
 	}
 }
 
-func (t *Table) GetHeaders() []*Property {
+func (t *Table) GetHeaders() []*Header {
 	return t.Headers
 }
 

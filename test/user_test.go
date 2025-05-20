@@ -43,7 +43,7 @@ func TestUserUql(t *testing.T) {
 	//    },
 	//}
 
-	p := structs.CreateUser{
+	p := structs.User{
 		UserName: "gosdk",
 		PassWord: "gosdk1212",
 		//GraphPrivileges:  structs.GraphPrivileges{},
@@ -55,7 +55,7 @@ func TestUserUql(t *testing.T) {
 
 	fmt.Println(p.ToCreateUserUql())
 
-	p1 := structs.AlterUser(p)
+	p1 := p
 	fmt.Println(p1.ToAlterUserUql())
 
 	_, err := client.DropUser(p.UserName, nil)

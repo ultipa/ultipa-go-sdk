@@ -32,7 +32,7 @@ func (api *UltipaAPI) InitModel(model *models.GraphModel, config *configuration.
 
 	for _, schema := range model.Schemas {
 
-		exist, err := api.CreateSchemaIfNotExist(schema, config)
+		exist, err := api.CreateSchemaIfNotExist(schema, false, config)
 
 		if err != nil {
 			return err

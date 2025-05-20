@@ -102,7 +102,7 @@ func createSchema(t *testing.T, schema string, conn *api.UltipaAPI) {
 		},
 	}
 
-	_, err := conn.CreateSchemaIfNotExist(newSchemaWithProperties, nil)
+	_, err := conn.CreateSchemaIfNotExist(newSchemaWithProperties, false, nil)
 	if err != nil {
 		t.Error("failed to create schema", err)
 	}

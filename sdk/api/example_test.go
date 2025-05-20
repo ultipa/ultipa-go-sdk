@@ -131,7 +131,7 @@ func ExampleUltipaAPI_CreateSchemaIfNotExist() {
 		Name: "new_schema",
 	}
 
-	resp, _ := client.CreateSchemaIfNotExist(&schema, nil)
+	resp, _ := client.CreateSchemaIfNotExist(&schema, false, nil)
 	log.Println(resp)
 }
 

@@ -33,23 +33,23 @@ type User struct {
 	PropertyPrivileges PropertyPrivileges `json:"property_privileges,omitempty"`
 }
 
-type CreateUser struct {
-	UserName         string          `json:"-"`
-	PassWord         string          `json:"password,omitempty"`
-	GraphPrivileges  GraphPrivileges `json:"graph_privileges,omitempty"`
-	SystemPrivileges []string        `json:"system_privileges,omitempty"`
-	Policies         []string        `json:"policies,omitempty"`
-	//PropertyPrivileges PropertyPrivileges `json:"property_privileges,omitempty"`
-}
-
-type AlterUser struct {
-	UserName         string          `json:"-"`
-	PassWord         string          `json:"password,omitempty"`
-	GraphPrivileges  GraphPrivileges `json:"graph_privileges,omitempty"`
-	SystemPrivileges []string        `json:"system_privileges,omitempty"`
-	Policies         []string        `json:"policies,omitempty"`
-	//PropertyPrivileges PropertyPrivileges `json:"property_privileges,omitempty"`
-}
+//type CreateUser struct {
+//	UserName         string          `json:"-"`
+//	PassWord         string          `json:"password,omitempty"`
+//	GraphPrivileges  GraphPrivileges `json:"graph_privileges,omitempty"`
+//	SystemPrivileges []string        `json:"system_privileges,omitempty"`
+//	Policies         []string        `json:"policies,omitempty"`
+//	//PropertyPrivileges PropertyPrivileges `json:"property_privileges,omitempty"`
+//}
+//
+//type AlterUser struct {
+//	UserName         string          `json:"-"`
+//	PassWord         string          `json:"password,omitempty"`
+//	GraphPrivileges  GraphPrivileges `json:"graph_privileges,omitempty"`
+//	SystemPrivileges []string        `json:"system_privileges,omitempty"`
+//	Policies         []string        `json:"policies,omitempty"`
+//	//PropertyPrivileges PropertyPrivileges `json:"property_privileges,omitempty"`
+//}
 
 //func (p *User) ToCreateUserUql() string {
 //	return fmt.Sprintf("create().user(\"%s\",\"%s\",\n%s,\n%s,\n%s,\n%s\n)", p.UserName, p.PassWord, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.AsPolicies), utils.ToJSONString(p.PropertyPrivileges))
@@ -59,7 +59,7 @@ type AlterUser struct {
 //	return fmt.Sprintf("alter().user(\"%s\").set({\npassword: \"%s\",\ngraph_privileges: %s,\nsystem_privileges: %s,\npolicies: %s,\nproperty_privileges: %s\n})", p.UserName, p.PassWord, utils.ToJSONString(p.GraphPrivileges), utils.ToJSONString(p.SystemPrivileges), utils.ToJSONString(p.AsPolicies), utils.ToJSONString(p.PropertyPrivileges))
 //}
 
-func (u *CreateUser) ToCreateUserUql() string {
+func (u *User) ToCreateUserUql() string {
 	uql := fmt.Sprintf("create().user(\"%s\",\n\"%s\",\n", u.UserName, u.PassWord)
 
 	s := ""
@@ -104,7 +104,7 @@ func (u *CreateUser) ToCreateUserUql() string {
 //	return fmt.Sprintf("alter().user(\"%s\").set(%s)", u.UserName, utils.ToJSONString(u))
 //}
 
-func (u *AlterUser) ToAlterUserUql() string {
+func (u *User) ToAlterUserUql() string {
 	uql := fmt.Sprintf("alter().user(\"%s\").set({\n", u.UserName)
 
 	s := ""

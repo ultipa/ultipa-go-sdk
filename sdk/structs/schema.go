@@ -24,7 +24,7 @@ type Schema struct {
 	Stats       []*SchemaStat // only for EdgeSchema
 }
 
-// only for EdgeSchema
+// SchemaStat only for EdgeSchema
 type SchemaStat struct {
 	FromSchema string
 	ToSchema   string
@@ -34,7 +34,7 @@ type SchemaStat struct {
 type GraphCount struct {
 	Type   string
 	Schema string
-	SP     *SchemaStat
+	Stat   *SchemaStat
 }
 
 func NewSchema(name string) *Schema {
@@ -136,13 +136,13 @@ func CompareSchemas(schema1 *Schema, schema2 *Schema, fit bool) (error, []*Prope
 
 // SetTotalByGraphCount for type = node edge
 func (s *Schema) SetTotalByGraphCount(g *GraphCount) {
-	s.Total += g.SP.Count
+	s.Total += g.Stat.Count
 
-	if g.Type == "edge" && g.SP.FromSchema != "" && g.SP.ToSchema != "" {
+	if g.Type == "edge" && g.Stat.FromSchema != "" && g.Stat.ToSchema != "" {
 		p := &SchemaStat{
-			FromSchema: g.SP.FromSchema,
-			ToSchema:   g.SP.ToSchema,
-			Count:      g.SP.Count,
+			FromSchema: g.Stat.FromSchema,
+			ToSchema:   g.Stat.ToSchema,
+			Count:      g.Stat.Count,
 		}
 		s.Stats = append(s.Stats, p)
 	}

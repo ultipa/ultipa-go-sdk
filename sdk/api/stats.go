@@ -7,5 +7,5 @@ import (
 
 func (api *UltipaAPI) Stats(requestConfig *configuration.RequestConfig) (stats *http.Response, err error) {
 	//return api.license("stats()", requestConfig)
-	return api.Uql("stats()", nil)
+	return api.Uql("stats()", requestConfig)
 }

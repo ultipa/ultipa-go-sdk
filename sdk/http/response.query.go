@@ -62,6 +62,11 @@ func NewUQLResponse(resp ultipa.UltipaRpcs_QueryClient) (response *Response, err
 
 		if response.Reply == nil {
 			response.Reply = record
+			//for _, alias := range record.Alias {
+			//	if alias.GetResultType() == ultipa.ResultType_RESULT_TYPE_UNSET {
+			//		response.Reply = utils.MergeUQLReply(response.Reply, record)
+			//	}
+			//}
 		} else {
 			response.Reply = utils.MergeUQLReply(response.Reply, record)
 		}

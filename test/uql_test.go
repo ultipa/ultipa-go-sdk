@@ -102,7 +102,7 @@ func TestUQL2(t *testing.T) {
 
 	//uql := `n({@user && _uuid == 1}).e({@relation.relation_type == 'has'}).n({@projects} as project).re({@relation.relation_type == 'has'}).n({@etl} as etl) group by project skip 0 return table(project._id,project._uuid,count(etl)) as t limit 15 order by project.created_at desc`
 	//uql := `find().nodes() return nodes limit 10`
-	uql := `find().nodes({uuid in [10009, 1]}) as n return n.year`
+	uql := `find().nodes({uuid in [10009, 1]}) as n return n`
 	//uql := `find().nodes({@movie}) as nodes return nodes{*} limit 10`
 
 	log.Println("Exec : ", uql)
@@ -416,9 +416,9 @@ func TestOnePathAsPaths(t *testing.T) {
 }
 func TestDateTime(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
-	var uql = "find().nodes({@`nodeSchema3`}) as nodes return table(nodes.typeListDatetime[0])"
+	var uql = "find().nodes({@account}) as e return table(e.stringList) limit 10"
 	resp, _ := client.Uql(uql, nil)
-	table, _ := resp.Alias("table(nodes.typeListDatetime[0])").AsTable()
+	table, _ := resp.Alias("table(e.stringList)").AsTable()
 	printers.PrintTable(table)
 }
 
@@ -446,8 +446,8 @@ func TestUqlBool(t *testing.T) {
 	//client, _ := GetClient([]string{"10.132.3.136:62061"}, "test")
 	//uql := `find().nodes({@insertNode2}) as nodes return nodes{*} limit 10`
 
-	client, _ := GetClient([]string{"192.168.1.85:61099"}, "sdk_test")
-	uql := `find().nodes({@People}) as nodes return nodes{*} limit 10`
+	//client, _ := GetClient([]string{"192.168.1.85:61099"}, "sdk_test")
+	uql := `find().nodes({year >2022}) as nodes  RETURN nodes.cPoint LIMIT 8`
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
@@ -455,11 +455,11 @@ func TestUqlBool(t *testing.T) {
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 		t.Fatal(resp.Status.Message)
 	}
-	nodes, schemas, err := resp.Alias("nodes").AsNodes()
+	nodes, err := resp.Alias("nodes.cPoint").AsAttr()
 	if err != nil {
 		t.Fatal(err)
 	}
-	printers.PrintNodes(nodes, schemas)
+	printers.PrintAttr(nodes)
 }
 
 func TestUqlFindWithDecimalProperty(t *testing.T) {

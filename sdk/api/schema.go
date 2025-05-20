@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) (*structs.Schemas, error) {
+func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) ([]*structs.Schema, error) {
 	var resp *http.Response
 	var err error
 	var schemas = &structs.Schemas{}
@@ -39,14 +39,14 @@ func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) (*s
 		return nil, err
 	}
 	if graphCount == nil {
-		return schemas, nil
+		return schemas.Schemas, nil
 	}
 	for _, g := range graphCount {
 		switch g.Type {
 		case "total_nodes":
-			schemas.TotalNodes = g.SP.Count
+			schemas.TotalNodes = g.Stat.Count
 		case "total_edges":
-			schemas.TotalEdges = g.SP.Count
+			schemas.TotalEdges = g.Stat.Count
 		case "node", "edge":
 			for _, schema := range schemas.Schemas {
 				if schema.Name == g.Schema && schema.Type == g.Type {
@@ -61,7 +61,7 @@ func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) (*s
 		return nil, fmt.Errorf("no data return")
 	}
 
-	return schemas, err
+	return schemas.Schemas, err
 }
 
 func (api *UltipaAPI) ShowNodeSchema(requestConfig *configuration.RequestConfig) ([]*structs.Schema, error) {
@@ -71,7 +71,7 @@ func (api *UltipaAPI) ShowNodeSchema(requestConfig *configuration.RequestConfig)
 		return nil, err
 	}
 
-	for _, schema := range schemas.Schemas {
+	for _, schema := range schemas {
 		if schema.DBType == ultipa.DBType_DBNODE {
 			nodeSchemas = append(nodeSchemas, schema)
 		}
@@ -91,7 +91,7 @@ func (api *UltipaAPI) ShowEdgeSchema(requestConfig *configuration.RequestConfig)
 		return nil, err
 	}
 
-	for _, schema := range schemas.Schemas {
+	for _, schema := range schemas {
 		if schema.DBType == ultipa.DBType_DBEDGE {
 			nodeSchemas = append(nodeSchemas, schema)
 		}
@@ -114,7 +114,7 @@ func (api *UltipaAPI) GetSchema(schemaName string, dbType ultipa.DBType, request
 		return nil, err
 	}
 
-	for _, schema := range schemas.Schemas {
+	for _, schema := range schemas {
 		if schemaName == schema.Name && schema.DBType == dbType {
 			return schema, nil
 		}
@@ -182,7 +182,7 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 	return resp, err
 }
 
-func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, requestConfig *configuration.RequestConfig) (exist bool, err error) {
+func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, isCreateProperties bool, requestConfig *configuration.RequestConfig) (exist bool, err error) {
 	s, err := api.GetSchema(schema.Name, schema.DBType, requestConfig)
 	if err != nil {
 		return false, fmt.Errorf("GetSchema error, %v", err)
@@ -190,7 +190,7 @@ func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, requestConf
 
 	exist = true
 	if s == nil {
-		_, err = api.CreateSchema(schema, false, requestConfig)
+		_, err = api.CreateSchema(schema, isCreateProperties, requestConfig)
 		exist = false
 	}
 
@@ -222,10 +222,10 @@ func (api *UltipaAPI) DropSchema(schema *structs.Schema, requestConfig *configur
 	return resp, nil
 }
 
-func (api *UltipaAPI) AlterSchema(schema, newSchema *structs.Schema, requestConfig *configuration.RequestConfig) (*http.Response, error) {
-	schemaName, err := CheckReplaceSchemaPropertyName(schema.Name)
+func (api *UltipaAPI) AlterSchema(originalSchema, newSchema *structs.Schema, requestConfig *configuration.RequestConfig) (*http.Response, error) {
+	schemaName, err := CheckReplaceSchemaPropertyName(originalSchema.Name)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schema.Name))
+		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), originalSchema.Name))
 	}
 
 	err = CheckName(newSchema.Name)
@@ -234,7 +234,7 @@ func (api *UltipaAPI) AlterSchema(schema, newSchema *structs.Schema, requestConf
 	}
 
 	parms := ""
-	switch schema.DBType {
+	switch originalSchema.DBType {
 	case ultipa.DBType_DBNODE:
 		parms = "node_schema"
 	case ultipa.DBType_DBEDGE:
@@ -245,7 +245,7 @@ func (api *UltipaAPI) AlterSchema(schema, newSchema *structs.Schema, requestConf
 
 	uql := fmt.Sprintf(`alter().%s(@%s).set({name: "%s", description: "%s"})`, parms, schemaName, strings.ReplaceAll(newSchema.Name, `"`, `\"`), newSchema.Description)
 
-	// Only modify the description of the schema
+	// Only modify the description of the originalSchema
 	if newSchema.Name == "" {
 		uql = fmt.Sprintf(`alter().%s(@%s).set({description: "%s"})`, parms, schemaName, newSchema.Description)
 	}

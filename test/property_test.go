@@ -122,13 +122,13 @@ func TestProperty(t *testing.T) {
 		DBType: ultipa.DBType_DBNODE,
 	}
 
-	_, err := client.CreateSchemaIfNotExist(schema, nil)
+	_, err := client.CreateSchemaIfNotExist(schema, false, nil)
 	if err != nil {
 		log.Println(err)
 	}
 
 	schema.DBType = ultipa.DBType_DBEDGE
-	_, err = client.CreateSchemaIfNotExist(schema, nil)
+	_, err = client.CreateSchemaIfNotExist(schema, false, nil)
 	if err != nil {
 		log.Println(err)
 	}

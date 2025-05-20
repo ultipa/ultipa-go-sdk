@@ -203,7 +203,7 @@ func (api *UltipaAPI) DropIndex(dbType ultipa.DBType, indexName string, config *
 	return resp, nil
 }
 
-func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyName, fulltextName string, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
+func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyName, indexName string, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
 	uql := ""
 
 	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
@@ -218,9 +218,9 @@ func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyN
 
 	switch dbType {
 	case ultipa.DBType_DBNODE:
-		uql = fmt.Sprintf(`create().node_fulltext(@%v.%v, "%v")`, schemaName, propertyName, fulltextName)
+		uql = fmt.Sprintf(`create().node_fulltext(@%v.%v, "%v")`, schemaName, propertyName, indexName)
 	case ultipa.DBType_DBEDGE:
-		uql = fmt.Sprintf(`create().edge_fulltext(@%v.%v, "%v")`, schemaName, propertyName, fulltextName)
+		uql = fmt.Sprintf(`create().edge_fulltext(@%v.%v, "%v")`, schemaName, propertyName, indexName)
 	default:
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
@@ -234,7 +234,7 @@ func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyN
 	return resp, nil
 }
 
-func (api *UltipaAPI) CreateNodeFullText(schemaName, propertyName, fulltextName string, requestConfig *configuration.RequestConfig) (jobResponse *http.JobResponse, err error) {
+func (api *UltipaAPI) CreateNodeFullText(schemaName, propertyName, indexName string, requestConfig *configuration.RequestConfig) (jobResponse *http.JobResponse, err error) {
 	uql := ""
 
 	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
@@ -247,7 +247,7 @@ func (api *UltipaAPI) CreateNodeFullText(schemaName, propertyName, fulltextName 
 		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), propertyName))
 	}
 
-	uql = fmt.Sprintf(`create().node_fulltext(@%v.%v, "%v")`, schemaName, propertyName, fulltextName)
+	uql = fmt.Sprintf(`create().node_fulltext(@%v.%v, "%v")`, schemaName, propertyName, indexName)
 
 	resp, err := api.Uql(uql, requestConfig)
 
@@ -261,7 +261,7 @@ func (api *UltipaAPI) CreateNodeFullText(schemaName, propertyName, fulltextName 
 	return http.GetJobResponseFromUqlResponse(resp)
 }
 
-func (api *UltipaAPI) CreateEdgeFullText(schemaName, propertyName, fulltextName string, requestConfig *configuration.RequestConfig) (jobResponse *http.JobResponse, err error) {
+func (api *UltipaAPI) CreateEdgeFullText(schemaName, propertyName, indexName string, requestConfig *configuration.RequestConfig) (jobResponse *http.JobResponse, err error) {
 	uql := ""
 
 	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
@@ -274,7 +274,7 @@ func (api *UltipaAPI) CreateEdgeFullText(schemaName, propertyName, fulltextName 
 		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), propertyName))
 	}
 
-	uql = fmt.Sprintf(`create().edge_fulltext(@%v.%v, "%v")`, schemaName, propertyName, fulltextName)
+	uql = fmt.Sprintf(`create().edge_fulltext(@%v.%v, "%v")`, schemaName, propertyName, indexName)
 
 	resp, err := api.Uql(uql, requestConfig)
 
