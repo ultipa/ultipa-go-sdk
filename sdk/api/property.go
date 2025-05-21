@@ -58,15 +58,15 @@ func (api *UltipaAPI) CreateProperty(dbType ultipa.DBType, property *structs.Pro
 	return resp, nil
 }
 
-func (api *UltipaAPI) CreatePropertyIfNotExist(dbType ultipa.DBType, prop *structs.Property, requestConfig *configuration.RequestConfig) (exist bool, resp *http.Response, err error) {
-	property, err := api.GetProperty(dbType, prop.Schema, prop.Name, requestConfig)
+func (api *UltipaAPI) CreatePropertyIfNotExist(dbType ultipa.DBType, property *structs.Property, requestConfig *configuration.RequestConfig) (exist bool, resp *http.Response, err error) {
+	prop, err := api.GetProperty(dbType, property.Schema, property.Name, requestConfig)
 
 	if err != nil {
 		return false, nil, err
 	}
 
-	if property == nil {
-		resp, err = api.CreateProperty(dbType, prop, requestConfig)
+	if prop == nil {
+		resp, err = api.CreateProperty(dbType, property, requestConfig)
 		if err != nil {
 			return false, resp, err
 		}
