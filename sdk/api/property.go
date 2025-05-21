@@ -202,21 +202,27 @@ func (api *UltipaAPI) AlterEdgeProperty(originProp, newProp *structs.Property, c
 	return api.AlterProperty(ultipa.DBType_DBEDGE, originProp, newProp, config)
 }
 
-func (api *UltipaAPI) DropNodeProperty(schemaName, propertyName string, config *configuration.RequestConfig) (resp *http.Response, err error) {
-	return api.DropProperty(ultipa.DBType_DBNODE, schemaName, propertyName, config)
+func (api *UltipaAPI) DropNodeProperty(property *structs.Property, config *configuration.RequestConfig) (resp *http.Response, err error) {
+	return api.DropProperty(ultipa.DBType_DBNODE, property, config)
 }
 
-func (api *UltipaAPI) DropEdgeProperty(schemaName, propertyName string, config *configuration.RequestConfig) (resp *http.Response, err error) {
-	return api.DropProperty(ultipa.DBType_DBEDGE, schemaName, propertyName, config)
+func (api *UltipaAPI) DropEdgeProperty(property *structs.Property, config *configuration.RequestConfig) (resp *http.Response, err error) {
+	return api.DropProperty(ultipa.DBType_DBEDGE, property, config)
 }
 
-func (api *UltipaAPI) DropProperty(dbType ultipa.DBType, schemaName, propertyName string, config *configuration.RequestConfig) (resp *http.Response, err error) {
-	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
+func (api *UltipaAPI) DropProperty(dbType ultipa.DBType, property *structs.Property, config *configuration.RequestConfig) (resp *http.Response, err error) {
+	if property.Schema == "" {
+		return nil, fmt.Errorf("property.Schema can not empty")
+	}
+	if property.Name == "" {
+		return nil, fmt.Errorf("property.Name can not empty")
+	}
+	schemaName, err := CheckReplaceSchemaPropertyName(property.Schema)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
 	}
 
-	propertyName, err = CheckReplaceSchemaPropertyName(propertyName)
+	propertyName, err := CheckReplaceSchemaPropertyName(property.Name)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), propertyName))
 	}

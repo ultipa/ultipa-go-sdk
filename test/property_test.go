@@ -199,17 +199,17 @@ func TestProperty(t *testing.T) {
 		log.Println(err)
 	}
 
-	_, err = client.DropProperty(ultipa.DBType_DBNODE, schema.Name, prop1.Name, nil)
+	_, err = client.DropProperty(ultipa.DBType_DBNODE, prop1, nil)
 	if err != nil {
 		log.Println(err)
 	}
 
-	_, err = client.DropNodeProperty(schema.Name, "中文Property1", nil)
+	_, err = client.DropNodeProperty(prop1, nil)
 	if err != nil {
 		log.Println(err)
 	}
 
-	_, err = client.DropEdgeProperty(schema.Name, prop.Name, nil)
+	_, err = client.DropEdgeProperty(prop, nil)
 	if err != nil {
 		log.Println(err)
 	}

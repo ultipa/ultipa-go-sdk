@@ -195,12 +195,20 @@ func ExampleUltipaAPI_AlterEdgeProperty() {
 }
 
 func ExampleUltipaAPI_DropNodeProperty() {
-	resp, _ := client.DropNodeProperty("user", "name", nil)
+	prop := &structs.Property{
+		Name:   "name",
+		Schema: "user",
+	}
+	resp, _ := client.DropNodeProperty(prop, nil)
 	log.Println(resp)
 }
 
 func ExampleUltipaAPI_DropEdgeProperty() {
-	resp, _ := client.DropNodeProperty("user", "name", nil)
+	prop := &structs.Property{
+		Name:   "name",
+		Schema: "user",
+	}
+	resp, _ := client.DropNodeProperty(prop, nil)
 	log.Println(resp)
 }
 
