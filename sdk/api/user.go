@@ -51,8 +51,8 @@ func (api *UltipaAPI) GetUser(userName string, config *configuration.RequestConf
 	return user, nil
 }
 
-func (api *UltipaAPI) CreateUser(request *structs.User, config *configuration.RequestConfig) (resp *http.Response, err error) {
-	uql := request.ToCreateUserUql()
+func (api *UltipaAPI) CreateUser(user *structs.User, config *configuration.RequestConfig) (resp *http.Response, err error) {
+	uql := user.ToCreateUserUql()
 	resp, err = api.Uql(uql, config)
 
 	if err != nil {
@@ -62,8 +62,8 @@ func (api *UltipaAPI) CreateUser(request *structs.User, config *configuration.Re
 	return resp, nil
 }
 
-func (api *UltipaAPI) AlterUser(request *structs.User, config *configuration.RequestConfig) (resp *http.Response, err error) {
-	uql := request.ToAlterUserUql()
+func (api *UltipaAPI) AlterUser(user *structs.User, config *configuration.RequestConfig) (resp *http.Response, err error) {
+	uql := user.ToAlterUserUql()
 	resp, err = api.Uql(uql, config)
 
 	if err != nil {
