@@ -266,7 +266,7 @@ func TestInsertNodes(t *testing.T) {
 	uql := structs.NodesToInsertUql(nodes)
 	t.Log(uql)
 
-	requestConfig := &configuration.InsertRequestConfig{
+	config := &configuration.InsertRequestConfig{
 		RequestConfig: &configuration.RequestConfig{},
 		Silent:        true,
 	}
@@ -284,7 +284,7 @@ func TestInsertNodes(t *testing.T) {
 	uql = structs.NodesToInsertUql(nodes)
 	t.Log(uql)
 
-	requestConfig = &configuration.InsertRequestConfig{
+	config = &configuration.InsertRequestConfig{
 		InsertType: ultipa.InsertType_OVERWRITE,
 		Silent:     true,
 	}
@@ -302,7 +302,7 @@ func TestInsertNodes(t *testing.T) {
 	uql = structs.NodesToInsertUql(nodes)
 	log.Println(uql)
 
-	requestConfig = &configuration.InsertRequestConfig{
+	config = &configuration.InsertRequestConfig{
 		InsertType: ultipa.InsertType_UPSERT,
 		Silent:     true,
 	}

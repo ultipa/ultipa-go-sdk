@@ -43,7 +43,7 @@ func TestInsertEdge(t *testing.T) {
 	uql := structs.EdgesToInsertUql(edges)
 	t.Log(uql)
 
-	requestConfig := &configuration.InsertRequestConfig{
+	config := &configuration.InsertRequestConfig{
 		Silent: true,
 	}
 
@@ -55,7 +55,7 @@ func TestInsertEdge(t *testing.T) {
 	// overwrite
 	delete(edge1.Values.Data, "value")
 
-	requestConfig = &configuration.InsertRequestConfig{
+	config = &configuration.InsertRequestConfig{
 		InsertType: ultipa.InsertType_OVERWRITE,
 		Silent:     true,
 	}
@@ -70,7 +70,7 @@ func TestInsertEdge(t *testing.T) {
 	// upsert
 	edge2.Set("value", 12.12)
 
-	requestConfig = &configuration.InsertRequestConfig{
+	config = &configuration.InsertRequestConfig{
 		InsertType: ultipa.InsertType_UPSERT,
 		Silent:     true,
 	}
