@@ -107,13 +107,13 @@ func (api *UltipaAPI) GetControlClientAndConfig(config *configuration.RequestCon
 // Uql send a uql string to ultipa graph, and return a http Uql Response
 // get Alias from Uql Response and convert to any type you need by asNodes, asEdges, asPaths, asTable, as asArray...
 // Check DataItem to learn more about Uql Response
-func (api *UltipaAPI) Uql(uql string, requestConfig *configuration.RequestConfig) (*http.Response, error) {
-	return api.query(uql, ultipa.QueryType_UQL, requestConfig)
+func (api *UltipaAPI) Uql(uql string, config *configuration.RequestConfig) (*http.Response, error) {
+	return api.query(uql, ultipa.QueryType_UQL, config)
 }
 
-func (api *UltipaAPI) query(query string, queryType ultipa.QueryType, requestConfig *configuration.RequestConfig) (*http.Response, error) {
+func (api *UltipaAPI) query(query string, queryType ultipa.QueryType, config *configuration.RequestConfig) (*http.Response, error) {
 
-	resp, _, err := api.doExecuteQuery(query, queryType, requestConfig)
+	resp, _, err := api.doExecuteQuery(query, queryType, config)
 	//log.Println(query)
 	if err != nil {
 		return nil, err
@@ -129,7 +129,7 @@ func (api *UltipaAPI) query(query string, queryType ultipa.QueryType, requestCon
 	//	return nil, errors.New(uqlResp.Status.Message)
 	//}
 
-	if requestConfig != nil && requestConfig.Host != "" {
+	if config != nil && config.Host != "" {
 		return uqlResp, err
 	}
 
@@ -138,14 +138,14 @@ func (api *UltipaAPI) query(query string, queryType ultipa.QueryType, requestCon
 	//    if err != nil {
 	//        return nil, err
 	//    }
-	//    return api.Uql(query, requestConfig)
+	//    return api.Uql(query,config)
 	//}
 
 	return uqlResp, nil
 }
 
-func (api *UltipaAPI) queryStream(query string, queryType ultipa.QueryType, cb func(*http.Response) error, requestConfig *configuration.RequestConfig) error {
-	resp, _, err := api.doExecuteQuery(query, queryType, requestConfig)
+func (api *UltipaAPI) queryStream(query string, queryType ultipa.QueryType, cb func(*http.Response) error, config *configuration.RequestConfig) error {
+	resp, _, err := api.doExecuteQuery(query, queryType, config)
 	if err != nil {
 		return err
 	}
@@ -159,15 +159,15 @@ func (api *UltipaAPI) queryStream(query string, queryType ultipa.QueryType, cb f
 	//	return nil, errors.New(uqlResp.Status.Message)
 	//}
 
-	if requestConfig != nil && requestConfig.Host != "" {
+	if config != nil && config.Host != "" {
 		return err
 	}
 
 	return uqlResp.Recv(cb)
 }
 
-func (api *UltipaAPI) UQLStream(uql string, cb func(*http.Response) error, requestConfig *configuration.RequestConfig) error {
-	return api.queryStream(uql, ultipa.QueryType_UQL, cb, requestConfig)
+func (api *UltipaAPI) UQLStream(uql string, cb func(*http.Response) error, config *configuration.RequestConfig) error {
+	return api.queryStream(uql, ultipa.QueryType_UQL, cb, config)
 }
 
 func (api *UltipaAPI) doExecuteQuery(query string, queryType ultipa.QueryType, config *configuration.RequestConfig) (ultipa.UltipaRpcs_QueryClient, *configuration.UltipaConfig, error) {
@@ -245,14 +245,14 @@ func (api *UltipaAPI) buildQueryRequest(query string, queryType ultipa.QueryType
 }
 
 // Test connection test
-func (api *UltipaAPI) Test(requestConfig *configuration.RequestConfig) (bool, error) {
+func (api *UltipaAPI) Test(config *configuration.RequestConfig) (bool, error) {
 	conn, err := api.Pool.GetConn(nil)
 
 	if err != nil {
 		return false, err
 	}
 	client := conn.GetClient()
-	ctx, cancel, err := api.Pool.NewContext(requestConfig)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return false, err
 	}

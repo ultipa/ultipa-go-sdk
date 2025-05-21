@@ -23,7 +23,7 @@ package api
 //    "github.com/ultipa/ultipa-go-sdk/sdk/structs"
 //)
 //
-//func (api *UltipaAPI) InstallExta(soFilePath string, infoFilePath string, requestConfig *configuration.RequestConfig) (*ultipa.InstallExtaReply, error) {
+//func (api *UltipaAPI) InstallExta(soFilePath string, infoFilePath string, config *configuration.RequestConfig) (*ultipa.InstallExtaReply, error) {
 //
 //    chunkSize := 1024 * 1024 * 1 // 2MB
 //
@@ -132,7 +132,7 @@ package api
 //
 //}
 //
-//func (api *UltipaAPI) UninstallExta(extaName string, requestConfig *configuration.RequestConfig) (*ultipa.UninstallExtaReply, error) {
+//func (api *UltipaAPI) UninstallExta(extaName string, config *configuration.RequestConfig) (*ultipa.UninstallExtaReply, error) {
 //
 //    client, err := api.GetControlClient(requestConfig)
 //

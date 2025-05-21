@@ -9,14 +9,14 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
-func (api *UltipaAPI) ShowBacukup(requestConfig *configuration.RequestConfig) (backupinfo []*structs.BackupInfo, err error) {
+func (api *UltipaAPI) ShowBacukup(config *configuration.RequestConfig) (backupinfo []*structs.BackupInfo, err error) {
 	uql := fmt.Sprintf("db.backup.show()")
 
-	return api.backup(uql, requestConfig)
+	return api.backup(uql, config)
 }
 
-func (api *UltipaAPI) backup(uql string, requestConfig *configuration.RequestConfig) (backupinfos []*structs.BackupInfo, err error) {
-	resp, err := api.Uql(uql, requestConfig)
+func (api *UltipaAPI) backup(uql string, config *configuration.RequestConfig) (backupinfos []*structs.BackupInfo, err error) {
+	resp, err := api.Uql(uql, config)
 
 	if err != nil {
 		return nil, err

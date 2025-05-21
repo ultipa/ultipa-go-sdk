@@ -47,7 +47,7 @@ func TestInsertEdge(t *testing.T) {
 		Silent: true,
 	}
 
-	response, err := client.InsertEdges(schemaName, edges, requestConfig)
+	response, err := client.InsertEdges(schemaName, edges, config)
 	if err != nil {
 		t.Error(err)
 	}
@@ -60,7 +60,7 @@ func TestInsertEdge(t *testing.T) {
 		Silent:     true,
 	}
 
-	response, err = client.InsertEdges(schemaName, edges, requestConfig)
+	response, err = client.InsertEdges(schemaName, edges, config)
 	if err != nil {
 		t.Error(err)
 	}
@@ -75,7 +75,7 @@ func TestInsertEdge(t *testing.T) {
 		Silent:     true,
 	}
 
-	response, err = client.InsertEdges(schemaName, edges, requestConfig)
+	response, err = client.InsertEdges(schemaName, edges, config)
 	if err != nil {
 		t.Error(err)
 	}

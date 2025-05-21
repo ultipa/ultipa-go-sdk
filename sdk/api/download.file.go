@@ -12,10 +12,10 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 )
 
-func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, jobId string, requestConfig *configuration.RequestConfig, receive func(data []byte) error) error {
+func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, jobId string, config *configuration.RequestConfig, receive func(data []byte) error) error {
 	var err error
 
-	err, files := api.getFilesByJobId(jobId, requestConfig)
+	err, files := api.getFilesByJobId(jobId, config)
 	if err != nil {
 		return err
 	}
@@ -25,12 +25,12 @@ func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, jobId string, requ
 		}
 	}
 
-	client, err := api.GetControlClient(requestConfig)
+	client, err := api.GetControlClient(config)
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(requestConfig)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return err
 	}
@@ -62,21 +62,21 @@ func (api *UltipaAPI) DownloadAlgoResultFile(fileName string, jobId string, requ
 	return err
 }
 
-func (api *UltipaAPI) DownloadAllAlgoResultFile(jobId string, requestConfig *configuration.RequestConfig, receive func(data []byte, fileName string) error) error {
+func (api *UltipaAPI) DownloadAllAlgoResultFile(jobId string, config *configuration.RequestConfig, receive func(data []byte, fileName string) error) error {
 	var err error
 
-	client, err := api.GetControlClient(requestConfig)
+	client, err := api.GetControlClient(config)
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(requestConfig)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return err
 	}
 	defer cancel()
 
-	err, files := api.getFilesByJobId(jobId, requestConfig)
+	err, files := api.getFilesByJobId(jobId, config)
 	if err != nil {
 		return err
 	}
@@ -112,9 +112,9 @@ func (api *UltipaAPI) DownloadAllAlgoResultFile(jobId string, requestConfig *con
 	return err
 }
 
-func (api *UltipaAPI) getFilesByJobId(jobId string, requestConfig *configuration.RequestConfig) (error, []string) {
+func (api *UltipaAPI) getFilesByJobId(jobId string, config *configuration.RequestConfig) (error, []string) {
 	var files []string
-	jobs, err := api.ShowJob(jobId, requestConfig)
+	jobs, err := api.ShowJob(jobId, config)
 	if err != nil {
 		return fmt.Errorf("show job error: %v", err), files
 	}

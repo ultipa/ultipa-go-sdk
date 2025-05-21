@@ -10,7 +10,7 @@ import (
 )
 
 // Deprecated: 5.0 not support, should use ShowJob
-func (api *UltipaAPI) ShowTask(algoNameOrId string, status structs.TaskStatus, requestConfig *configuration.RequestConfig) (tasks []*structs.Task, err error) {
+func (api *UltipaAPI) ShowTask(algoNameOrId string, status structs.TaskStatus, config *configuration.RequestConfig) (tasks []*structs.Task, err error) {
 	uql := ""
 	if len(algoNameOrId) == 0 {
 		uql = "show().task()"
@@ -20,7 +20,7 @@ func (api *UltipaAPI) ShowTask(algoNameOrId string, status structs.TaskStatus, r
 		uql = fmt.Sprintf(`show().task("%v","%v")`, algoNameOrId, status.String())
 	}
 
-	resp, err := api.Uql(uql, requestConfig)
+	resp, err := api.Uql(uql, config)
 
 	if err != nil {
 		return nil, err

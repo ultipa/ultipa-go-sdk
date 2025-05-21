@@ -103,7 +103,7 @@ func (api *UltipaAPI) ShowPrivilege(config *configuration.RequestConfig) (privil
 //	return resp, nil
 //}
 
-//func (api *UltipaAPI) GrantPolicy(userName string, graphPrivileges *structs.GraphPrivileges, systemPrivileges []string, propertyPrivileges *structs.PropertyPrivileges, policies []string, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
+//func (api *UltipaAPI) GrantPolicy(userName string, graphPrivileges *structs.GraphPrivileges, systemPrivileges []string, propertyPrivileges *structs.PropertyPrivileges, policies []string, config *configuration.RequestConfig) (resp *http.Response, err error) {
 //	uql := fmt.Sprintf(`grant().user("%s").params({
 //  graph_privileges: %s,
 //  system_privileges: %s,
@@ -111,7 +111,7 @@ func (api *UltipaAPI) ShowPrivilege(config *configuration.RequestConfig) (privil
 //  policies: %s
 //})`, userName, utils.ToJSONString(graphPrivileges), utils.ToJSONString(systemPrivileges), utils.ToJSONString(propertyPrivileges), utils.ToJSONString(policies))
 //
-//	resp, err = api.Uql(uql, requestConfig)
+//	resp, err = api.Uql(uql, config)
 //
 //	if err != nil {
 //		return nil, err
@@ -120,7 +120,7 @@ func (api *UltipaAPI) ShowPrivilege(config *configuration.RequestConfig) (privil
 //	return resp, nil
 //}
 
-//func (api *UltipaAPI) RevokePolicy(userName string, graphPrivileges *structs.GraphPrivileges, systemPrivileges []string, propertyPrivileges *structs.PropertyPrivileges, policies []string, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
+//func (api *UltipaAPI) RevokePolicy(userName string, graphPrivileges *structs.GraphPrivileges, systemPrivileges []string, propertyPrivileges *structs.PropertyPrivileges, policies []string, config *configuration.RequestConfig) (resp *http.Response, err error) {
 //	uql := fmt.Sprintf(`revoke().user("%s").params({
 //  graph_privileges: %s,
 //  system_privileges: %s,
@@ -128,7 +128,7 @@ func (api *UltipaAPI) ShowPrivilege(config *configuration.RequestConfig) (privil
 //  policies: %s
 //})`, userName, utils.ToJSONString(graphPrivileges), utils.ToJSONString(systemPrivileges), utils.ToJSONString(propertyPrivileges), utils.ToJSONString(policies))
 //
-//	resp, err = api.Uql(uql, requestConfig)
+//	resp, err = api.Uql(uql, config)
 //
 //	if err != nil {
 //		return nil, err

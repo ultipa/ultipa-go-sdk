@@ -271,7 +271,7 @@ func TestInsertNodes(t *testing.T) {
 		Silent:        true,
 	}
 
-	response, err := client.InsertNodes(schemaName, nodes, requestConfig)
+	response, err := client.InsertNodes(schemaName, nodes, config)
 	if err != nil {
 		t.Error(err)
 	}
@@ -289,7 +289,7 @@ func TestInsertNodes(t *testing.T) {
 		Silent:     true,
 	}
 
-	response, err = client.InsertNodes(schemaName, nodes, requestConfig)
+	response, err = client.InsertNodes(schemaName, nodes, config)
 	if err != nil {
 		t.Error(err)
 	}
@@ -307,7 +307,7 @@ func TestInsertNodes(t *testing.T) {
 		Silent:     true,
 	}
 
-	response, err = client.InsertNodes(schemaName, nodes, requestConfig)
+	response, err = client.InsertNodes(schemaName, nodes, config)
 	if err != nil {
 		t.Error(err)
 	}

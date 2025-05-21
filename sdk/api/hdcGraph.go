@@ -75,13 +75,13 @@ func (b *HDCBuilder) BuildUQL() (string, error) {
 	return uql, nil
 }
 
-func (api *UltipaAPI) CreateHDCGraphBySchema(builder HDCBuilder, requestConfig *configuration.RequestConfig) (*http.JobResponse, error) {
+func (api *UltipaAPI) CreateHDCGraphBySchema(builder HDCBuilder, config *configuration.RequestConfig) (*http.JobResponse, error) {
 	uql, err := builder.BuildUQL()
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := api.Uql(uql, requestConfig)
+	resp, err := api.Uql(uql, config)
 
 	if err != nil {
 		//api.Logger.Log("create hdc graph failed : " + graphName + " " + err.Error())
@@ -125,8 +125,8 @@ func (api *UltipaAPI) CreateHDCGraphBySchema(builder HDCBuilder, requestConfig *
 //
 //}
 
-func (api *UltipaAPI) ShowHDCGraph(requestConfig *configuration.RequestConfig) ([]*structs.HDCGraph, error) {
-	resp, err := api.Uql("hdc.graph.show()", requestConfig)
+func (api *UltipaAPI) ShowHDCGraph(config *configuration.RequestConfig) ([]*structs.HDCGraph, error) {
+	resp, err := api.Uql("hdc.graph.show()", config)
 	if err != nil {
 		return nil, err
 	}
@@ -143,19 +143,19 @@ func (api *UltipaAPI) ShowHDCGraph(requestConfig *configuration.RequestConfig) (
 	return projections, nil
 }
 
-func (api *UltipaAPI) DropHDCGraph(hdcGraphName string, requestConfig *configuration.RequestConfig) (*http.Response, error) {
+func (api *UltipaAPI) DropHDCGraph(hdcGraphName string, config *configuration.RequestConfig) (*http.Response, error) {
 	uql := fmt.Sprintf(`hdc.graph.drop('%s')`, hdcGraphName)
 
-	return api.Uql(uql, requestConfig)
+	return api.Uql(uql, config)
 }
 
-func (api *UltipaAPI) ShowHDCAlgo(hdcServerName string, requestConfig *configuration.RequestConfig) ([]*structs.Algo, error) {
+func (api *UltipaAPI) ShowHDCAlgo(hdcServerName string, config *configuration.RequestConfig) ([]*structs.Algo, error) {
 	if hdcServerName == "" {
 		return nil, fmt.Errorf("hdcServerName is required")
 	}
 
 	uql := fmt.Sprintf(`hdc.server.show('%s')`, hdcServerName)
-	resp, err := api.Uql(uql, requestConfig)
+	resp, err := api.Uql(uql, config)
 	if err != nil {
 		return nil, err
 	}

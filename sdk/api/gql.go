@@ -6,11 +6,11 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 )
 
-func (api *UltipaAPI) Gql(gql string, requestConfig *configuration.RequestConfig) (*http.Response, error) {
-	return api.query(gql, ultipa.QueryType_GQL, requestConfig)
+func (api *UltipaAPI) Gql(gql string, config *configuration.RequestConfig) (*http.Response, error) {
+	return api.query(gql, ultipa.QueryType_GQL, config)
 
 }
 
-func (api *UltipaAPI) GQLStream(gql string, cb func(*http.Response) error, requestConfig *configuration.RequestConfig) error {
-	return api.queryStream(gql, ultipa.QueryType_GQL, cb, requestConfig)
+func (api *UltipaAPI) GQLStream(gql string, cb func(*http.Response) error, config *configuration.RequestConfig) error {
+	return api.queryStream(gql, ultipa.QueryType_GQL, cb, config)
 }

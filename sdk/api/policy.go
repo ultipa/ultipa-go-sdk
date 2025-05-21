@@ -8,8 +8,8 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) ShowPolicy(requestConfig *configuration.RequestConfig) (policies []*structs.Policy, err error) {
-	resp, err := api.Uql("show().policy()", requestConfig)
+func (api *UltipaAPI) ShowPolicy(config *configuration.RequestConfig) (policies []*structs.Policy, err error) {
+	resp, err := api.Uql("show().policy()", config)
 	if err != nil {
 		return nil, err
 	}
@@ -25,13 +25,13 @@ func (api *UltipaAPI) ShowPolicy(requestConfig *configuration.RequestConfig) (po
 	return
 }
 
-func (api *UltipaAPI) GetPolicy(policyName string, requestConfig *configuration.RequestConfig) (policy *structs.Policy, err error) {
+func (api *UltipaAPI) GetPolicy(policyName string, config *configuration.RequestConfig) (policy *structs.Policy, err error) {
 	if policyName == "" {
 		return nil, fmt.Errorf("policyName is required")
 	}
 
 	uql := fmt.Sprintf(`show().policy("%s")`, policyName)
-	resp, err := api.Uql(uql, requestConfig)
+	resp, err := api.Uql(uql, config)
 
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (api *UltipaAPI) GetPolicy(policyName string, requestConfig *configuration.
 	return
 }
 
-func (api *UltipaAPI) CreatePolicy(policy *structs.Policy, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
+func (api *UltipaAPI) CreatePolicy(policy *structs.Policy, config *configuration.RequestConfig) (resp *http.Response, err error) {
 	if policy == nil {
 		return nil, fmt.Errorf("policy cant be null")
 	}
@@ -61,7 +61,7 @@ func (api *UltipaAPI) CreatePolicy(policy *structs.Policy, requestConfig *config
 	}
 
 	uql := policy.ToCreatePolicyUql()
-	resp, err = api.Uql(uql, requestConfig)
+	resp, err = api.Uql(uql, config)
 
 	if err != nil {
 		return nil, err
@@ -70,9 +70,9 @@ func (api *UltipaAPI) CreatePolicy(policy *structs.Policy, requestConfig *config
 	return resp, nil
 }
 
-func (api *UltipaAPI) AlterPolicy(policy *structs.Policy, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
+func (api *UltipaAPI) AlterPolicy(policy *structs.Policy, config *configuration.RequestConfig) (resp *http.Response, err error) {
 	uql := policy.ToAlterPolicyUql()
-	resp, err = api.Uql(uql, requestConfig)
+	resp, err = api.Uql(uql, config)
 
 	if err != nil {
 		return nil, err
@@ -81,9 +81,9 @@ func (api *UltipaAPI) AlterPolicy(policy *structs.Policy, requestConfig *configu
 	return resp, nil
 }
 
-func (api *UltipaAPI) DropPolicy(policyName string, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
+func (api *UltipaAPI) DropPolicy(policyName string, config *configuration.RequestConfig) (resp *http.Response, err error) {
 	uql := fmt.Sprintf(`drop().policy("%s")`, policyName)
-	resp, err = api.Uql(uql, requestConfig)
+	resp, err = api.Uql(uql, config)
 
 	if err != nil {
 		return nil, err

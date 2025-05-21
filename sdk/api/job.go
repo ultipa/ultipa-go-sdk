@@ -8,10 +8,10 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) ShowJob(id string, requestConfig *configuration.RequestConfig) (jobs []*structs.Job, err error) {
+func (api *UltipaAPI) ShowJob(id string, config *configuration.RequestConfig) (jobs []*structs.Job, err error) {
 	uql := fmt.Sprintf("show().job(%v)", id)
 
-	resp, err := api.Uql(uql, requestConfig)
+	resp, err := api.Uql(uql, config)
 
 	if err != nil {
 		return nil, err

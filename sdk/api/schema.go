@@ -10,12 +10,12 @@ import (
 	"strings"
 )
 
-func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) ([]*structs.Schema, error) {
+func (api *UltipaAPI) ShowSchema(config *configuration.RequestConfig) ([]*structs.Schema, error) {
 	var resp *http.Response
 	var err error
 	var schemas = &structs.Schemas{}
 
-	resp, err = api.Uql(fmt.Sprintf(`show().schema()`), requestConfig)
+	resp, err = api.Uql(fmt.Sprintf(`show().schema()`), config)
 	if err != nil {
 		return nil, err
 	}
@@ -64,9 +64,9 @@ func (api *UltipaAPI) ShowSchema(requestConfig *configuration.RequestConfig) ([]
 	return schemas.Schemas, err
 }
 
-func (api *UltipaAPI) ShowNodeSchema(requestConfig *configuration.RequestConfig) ([]*structs.Schema, error) {
+func (api *UltipaAPI) ShowNodeSchema(config *configuration.RequestConfig) ([]*structs.Schema, error) {
 	var nodeSchemas []*structs.Schema
-	schemas, err := api.ShowSchema(requestConfig)
+	schemas, err := api.ShowSchema(config)
 	if err != nil {
 		return nil, err
 	}
@@ -84,9 +84,9 @@ func (api *UltipaAPI) ShowNodeSchema(requestConfig *configuration.RequestConfig)
 	return nodeSchemas, err
 }
 
-func (api *UltipaAPI) ShowEdgeSchema(requestConfig *configuration.RequestConfig) ([]*structs.Schema, error) {
+func (api *UltipaAPI) ShowEdgeSchema(config *configuration.RequestConfig) ([]*structs.Schema, error) {
 	var nodeSchemas []*structs.Schema
-	schemas, err := api.ShowSchema(requestConfig)
+	schemas, err := api.ShowSchema(config)
 	if err != nil {
 		return nil, err
 	}
@@ -104,12 +104,12 @@ func (api *UltipaAPI) ShowEdgeSchema(requestConfig *configuration.RequestConfig)
 	return nodeSchemas, err
 }
 
-func (api *UltipaAPI) GetSchema(schemaName string, dbType ultipa.DBType, requestConfig *configuration.RequestConfig) (*structs.Schema, error) {
+func (api *UltipaAPI) GetSchema(schemaName string, dbType ultipa.DBType, config *configuration.RequestConfig) (*structs.Schema, error) {
 	if !(dbType == ultipa.DBType_DBNODE || dbType == ultipa.DBType_DBEDGE) {
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
 
-	schemas, err := api.ShowSchema(requestConfig)
+	schemas, err := api.ShowSchema(config)
 	if err != nil {
 		return nil, err
 	}
@@ -124,15 +124,15 @@ func (api *UltipaAPI) GetSchema(schemaName string, dbType ultipa.DBType, request
 	return nil, nil
 }
 
-func (api *UltipaAPI) GetNodeSchema(schemaName string, requestConfig *configuration.RequestConfig) (*structs.Schema, error) {
-	return api.GetSchema(schemaName, ultipa.DBType_DBNODE, requestConfig)
+func (api *UltipaAPI) GetNodeSchema(schemaName string, config *configuration.RequestConfig) (*structs.Schema, error) {
+	return api.GetSchema(schemaName, ultipa.DBType_DBNODE, config)
 }
 
-func (api *UltipaAPI) GetEdgeSchema(schemaName string, requestConfig *configuration.RequestConfig) (*structs.Schema, error) {
-	return api.GetSchema(schemaName, ultipa.DBType_DBEDGE, requestConfig)
+func (api *UltipaAPI) GetEdgeSchema(schemaName string, config *configuration.RequestConfig) (*structs.Schema, error) {
+	return api.GetSchema(schemaName, ultipa.DBType_DBEDGE, config)
 }
 
-func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bool, requestConfig *configuration.RequestConfig) (*http.Response, error) {
+func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bool, config *configuration.RequestConfig) (*http.Response, error) {
 	schemaName, err := CheckReplaceSchemaPropertyName(schema.Name)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schema.Name))
@@ -151,7 +151,7 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
 
-	resp, err = api.Uql(uql, requestConfig)
+	resp, err = api.Uql(uql, config)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +166,7 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 				continue
 			}
 
-			resp, err := api.CreateProperty(schema.DBType, prop, requestConfig)
+			resp, err := api.CreateProperty(schema.DBType, prop, config)
 
 			if err != nil {
 				return nil, err
@@ -182,22 +182,22 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 	return resp, err
 }
 
-func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, isCreateProperties bool, requestConfig *configuration.RequestConfig) (exist bool, err error) {
-	s, err := api.GetSchema(schema.Name, schema.DBType, requestConfig)
+func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, isCreateProperties bool, config *configuration.RequestConfig) (exist bool, err error) {
+	s, err := api.GetSchema(schema.Name, schema.DBType, config)
 	if err != nil {
 		return false, fmt.Errorf("GetSchema error, %v", err)
 	}
 
 	exist = true
 	if s == nil {
-		_, err = api.CreateSchema(schema, isCreateProperties, requestConfig)
+		_, err = api.CreateSchema(schema, isCreateProperties, config)
 		exist = false
 	}
 
 	return exist, err
 }
 
-func (api *UltipaAPI) DropSchema(schema *structs.Schema, requestConfig *configuration.RequestConfig) (*http.Response, error) {
+func (api *UltipaAPI) DropSchema(schema *structs.Schema, config *configuration.RequestConfig) (*http.Response, error) {
 	schemaName, err := CheckReplaceSchemaPropertyName(schema.Name)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schema.Name))
@@ -213,7 +213,7 @@ func (api *UltipaAPI) DropSchema(schema *structs.Schema, requestConfig *configur
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
 
-	resp, err := api.Uql(uql, requestConfig)
+	resp, err := api.Uql(uql, config)
 
 	if err != nil {
 		return nil, err
@@ -222,7 +222,7 @@ func (api *UltipaAPI) DropSchema(schema *structs.Schema, requestConfig *configur
 	return resp, nil
 }
 
-func (api *UltipaAPI) AlterSchema(originalSchema, newSchema *structs.Schema, requestConfig *configuration.RequestConfig) (*http.Response, error) {
+func (api *UltipaAPI) AlterSchema(originalSchema, newSchema *structs.Schema, config *configuration.RequestConfig) (*http.Response, error) {
 	schemaName, err := CheckReplaceSchemaPropertyName(originalSchema.Name)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), originalSchema.Name))
@@ -250,7 +250,7 @@ func (api *UltipaAPI) AlterSchema(originalSchema, newSchema *structs.Schema, req
 		uql = fmt.Sprintf(`alter().%s(@%s).set({description: "%s"})`, parms, schemaName, newSchema.Description)
 	}
 
-	resp, err := api.Uql(uql, requestConfig)
+	resp, err := api.Uql(uql, config)
 
 	if err != nil {
 		return nil, err

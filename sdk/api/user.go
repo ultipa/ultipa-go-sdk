@@ -8,8 +8,8 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) ShowUser(requestConfig *configuration.RequestConfig) (users []*structs.User, err error) {
-	resp, err := api.Uql("show().user()", requestConfig)
+func (api *UltipaAPI) ShowUser(config *configuration.RequestConfig) (users []*structs.User, err error) {
+	resp, err := api.Uql("show().user()", config)
 
 	if err != nil {
 		return nil, err
@@ -26,12 +26,12 @@ func (api *UltipaAPI) ShowUser(requestConfig *configuration.RequestConfig) (user
 	return users, nil
 }
 
-func (api *UltipaAPI) GetUser(userName string, requestConfig *configuration.RequestConfig) (user *structs.User, err error) {
+func (api *UltipaAPI) GetUser(userName string, config *configuration.RequestConfig) (user *structs.User, err error) {
 	if userName == "" {
 		return nil, fmt.Errorf("userName is required")
 	}
 	uql := fmt.Sprintf(`show().user("%s")`, userName)
-	resp, err := api.Uql(uql, requestConfig)
+	resp, err := api.Uql(uql, config)
 
 	if err != nil {
 		return nil, err
@@ -51,9 +51,9 @@ func (api *UltipaAPI) GetUser(userName string, requestConfig *configuration.Requ
 	return user, nil
 }
 
-func (api *UltipaAPI) CreateUser(request *structs.User, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
+func (api *UltipaAPI) CreateUser(request *structs.User, config *configuration.RequestConfig) (resp *http.Response, err error) {
 	uql := request.ToCreateUserUql()
-	resp, err = api.Uql(uql, requestConfig)
+	resp, err = api.Uql(uql, config)
 
 	if err != nil {
 		return nil, err
@@ -62,9 +62,9 @@ func (api *UltipaAPI) CreateUser(request *structs.User, requestConfig *configura
 	return resp, nil
 }
 
-func (api *UltipaAPI) AlterUser(request *structs.User, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
+func (api *UltipaAPI) AlterUser(request *structs.User, config *configuration.RequestConfig) (resp *http.Response, err error) {
 	uql := request.ToAlterUserUql()
-	resp, err = api.Uql(uql, requestConfig)
+	resp, err = api.Uql(uql, config)
 
 	if err != nil {
 		return nil, err
@@ -73,9 +73,9 @@ func (api *UltipaAPI) AlterUser(request *structs.User, requestConfig *configurat
 	return resp, nil
 }
 
-func (api *UltipaAPI) DropUser(userName string, requestConfig *configuration.RequestConfig) (resp *http.Response, err error) {
+func (api *UltipaAPI) DropUser(userName string, config *configuration.RequestConfig) (resp *http.Response, err error) {
 	uql := fmt.Sprintf(`drop().user("%s")`, userName)
-	resp, err = api.Uql(uql, requestConfig)
+	resp, err = api.Uql(uql, config)
 
 	if err != nil {
 		return nil, err

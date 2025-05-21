@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-//func (api *UltipaAPI) ExportBak(schema *structs.Schema, limit int, requestConfig *configuration.RequestConfig, cb func(nodes []*structs.Node, edges []*structs.Edge) error) error {
+//func (api *UltipaAPI) ExportBak(schema *structs.Schema, limit int, config *configuration.RequestConfig, cb func(nodes []*structs.Node, edges []*structs.Edge) error) error {
 //	var err error
 //
 //	client, err := api.GetControlClient(requestConfig)
@@ -108,15 +108,15 @@ import (
 //	return err
 //}
 
-func (api *UltipaAPI) Export(exportRequest *ultipa.ExportRequest, requestConfig *configuration.RequestConfig, cb func(nodes []*structs.Node, edges []*structs.Edge) error) error {
+func (api *UltipaAPI) Export(exportRequest *ultipa.ExportRequest, config *configuration.RequestConfig, cb func(nodes []*structs.Node, edges []*structs.Edge) error) error {
 	var err error
 
-	client, err := api.GetControlClient(requestConfig)
+	client, err := api.GetControlClient(config)
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(requestConfig)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return err
 	}

@@ -7,15 +7,15 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) SetUserSetting(request *structs.SetUserSetting, requestConfig *configuration.RequestConfig) (*http.Response, error) {
+func (api *UltipaAPI) SetUserSetting(request *structs.SetUserSetting, config *configuration.RequestConfig) (*http.Response, error) {
 	var err error
 
-	client, err := api.GetControlClient(requestConfig)
+	client, err := api.GetControlClient(config)
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(requestConfig)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return nil, err
 	}
@@ -50,15 +50,15 @@ func (api *UltipaAPI) SetUserSetting(request *structs.SetUserSetting, requestCon
 	return resp, err
 }
 
-func (api *UltipaAPI) GetUserSetting(request *structs.GetUserSetting, requestConfig *configuration.RequestConfig) (*http.Response, error) {
+func (api *UltipaAPI) GetUserSetting(request *structs.GetUserSetting, config *configuration.RequestConfig) (*http.Response, error) {
 	var err error
 
-	client, err := api.GetControlClient(requestConfig)
+	client, err := api.GetControlClient(config)
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(requestConfig)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return nil, err
 	}
