@@ -10,13 +10,11 @@ import (
 )
 
 type InsertResponse struct {
-	Status    *Status
+	UUIDs     []types.UUID
+	IDs       []types.ID
+	ErrorItem map[int]int // index : error code
 	Statistic *Statistic
-	Data      struct {
-		UUIDs     []types.UUID
-		IDs       []types.ID
-		ErrorItem map[int]int // index : error code
-	}
+	Status    *Status
 }
 
 var InsertErrorCodeMsgMap = map[int]string{
@@ -68,15 +66,8 @@ func NewNodesInsertResponse(reply *ultipa.InsertNodesReply) (response *InsertRes
 			TotalCost:  int(reply.TimeCost),
 			EngineCost: int(reply.EngineTimeCost),
 		},
-		Data: struct {
-			UUIDs     []types.UUID
-			IDs       []types.ID
-			ErrorItem map[int]int
-		}{
-			UUIDs:     reply.Uuids,
-			IDs:       reply.Ids,
-			ErrorItem: map[int]int{},
-		},
+		UUIDs: reply.Uuids,
+		IDs:   reply.Ids,
 	}
 
 	if len(reply.IgnoreIndexes) != len(reply.IgnoreErrorCode) {
@@ -86,7 +77,7 @@ func NewNodesInsertResponse(reply *ultipa.InsertNodesReply) (response *InsertRes
 	for index := range reply.IgnoreIndexes {
 		v := int(reply.IgnoreIndexes[index])
 		code := reply.IgnoreErrorCode[index]
-		response.Data.ErrorItem[v] = int(code)
+		response.ErrorItem[v] = int(code)
 	}
 
 	return response, nil
@@ -103,20 +94,14 @@ func NewEdgesInsertResponse(reply *ultipa.InsertEdgesReply) (response *InsertRes
 			TotalCost:  int(reply.TimeCost),
 			EngineCost: int(reply.EngineTimeCost),
 		},
-		Data: struct {
-			UUIDs     []types.UUID
-			IDs       []types.ID
-			ErrorItem map[int]int
-		}{
-			UUIDs:     reply.Uuids,
-			ErrorItem: map[int]int{},
-		},
+		UUIDs:     reply.Uuids,
+		ErrorItem: map[int]int{},
 	}
 
 	for index := range reply.IgnoreIndexes {
 		v := int(reply.IgnoreIndexes[index])
 		code := reply.IgnoreErrorCode[index]
-		response.Data.ErrorItem[v] = int(code)
+		response.ErrorItem[v] = int(code)
 	}
 
 	return response, nil

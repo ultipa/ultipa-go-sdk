@@ -342,7 +342,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(rows []*structs.Node, config *configu
 		response, err := http.NewNodesInsertResponse(resp)
 		resps.Resps[batchSchema.Name] = response
 
-		for k, v := range response.Data.ErrorItem {
+		for k, v := range response.ErrorItem {
 			m3 := m[batchSchema.Name]
 			vl := m3[k]
 			resps.ErrorItem[vl] = v
