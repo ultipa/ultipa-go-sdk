@@ -1178,7 +1178,7 @@ func (di *DataItem) AsTasks() (tasks []*structs.Task, err error) {
 	return tasks, nil
 }
 
-func (di *DataItem) AsTops() (tops []*structs.Process, err error) {
+func (di *DataItem) AsProcesses() (tops []*structs.Process, err error) {
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return tops, nil

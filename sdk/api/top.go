@@ -21,7 +21,7 @@ func (api *UltipaAPI) Top(config *configuration.RequestConfig) (tops []*structs.
 	if di.Data == nil {
 		return nil, fmt.Errorf("no data return")
 	}
-	tops, err = di.AsTops()
+	tops, err = di.AsProcesses()
 
 	return tops, err
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) ShowProjection(config *configuration.RequestConfig) (projecctions []*structs.Projection, err error) {
+func (api *UltipaAPI) ShowProjection(config *configuration.RequestConfig) (projections []*structs.Projection, err error) {
 	resp, err := api.Uql("show().projection()", config)
 
 	if err != nil {
@@ -17,7 +17,7 @@ func (api *UltipaAPI) ShowProjection(config *configuration.RequestConfig) (proje
 		return nil, fmt.Errorf(resp.Status.Message)
 	}
 
-	projecctions, err = resp.Alias(http.RESP_PROJECTION_KEY).AsProjections()
+	projections, err = resp.Alias(http.RESP_PROJECTION_KEY).AsProjections()
 
-	return projecctions, err
+	return projections, err
 }
