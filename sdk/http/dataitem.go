@@ -1304,6 +1304,43 @@ func (di *DataItem) AsUsers() (users []*structs.User, err error) {
 		return nil, errors.New("DataItem " + di.Alias + " is not a user list")
 	}
 
+	g, err := di.AsTable()
+	if err != nil {
+		return nil, err
+	}
+
+	values := g.ToKV()
+
+	for _, v := range values {
+		user := &structs.User{
+			UserName:   v.Get("username").(string),
+			CreateTime: v.Get("create").(*utils.UltipaTime).String(),
+		}
+
+		if err := json.Unmarshal([]byte(v.Get("graphPrivileges").(string)), &user.GraphPrivileges); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal GraphPrivileges: %w", err)
+		}
+
+		// SystemPrivileges
+		if err := json.Unmarshal([]byte(v.Get("systemPrivileges").(string)), &user.SystemPrivileges); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal SystemPrivileges: %w", err)
+		}
+
+		// propertyPrivileges
+		if err := json.Unmarshal([]byte(v.Get("propertyPrivileges").(string)), &user.PropertyPrivileges); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal PropertyPrivileges: %w", err)
+		}
+
+		// AsPolicies
+		if err := json.Unmarshal([]byte(v.Get("policies").(string)), &user.Policies); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal Policies: %w", err)
+		}
+
+		users = append(users, user)
+	}
+
+	return users, err
+
 	for _, row := range table.TableRows {
 		values := row.GetValues()
 
@@ -1358,11 +1395,6 @@ func bytesToUser(data [][]byte) (*structs.User, error) {
 	if err := json.Unmarshal(data[5], &user.Policies); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal Policies: %w", err)
 	}
-
-	//// PropertyPrivileges
-	//if err := json.Unmarshal(data[5], &user.PropertyPrivileges); err != nil {
-	//	return nil, fmt.Errorf("failed to unmarshal AsPolicies: %w", err)
-	//}
 
 	return &user, nil
 }

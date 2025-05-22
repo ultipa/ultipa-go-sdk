@@ -8,10 +8,10 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/types"
 )
 
-type Truncate struct {
+type TruncateParams struct {
 	GraphName string
-	DBType    *ultipa.DBType
 	Schema    string
+	DBType    *ultipa.DBType
 }
 
 type GraphSet struct {

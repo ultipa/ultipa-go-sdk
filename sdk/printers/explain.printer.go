@@ -8,18 +8,18 @@ import (
 )
 
 type TreeNode struct {
-	Explain    *structs.Explain
+	Explain    *structs.PlanNode
 	ChildNodes []*TreeNode
 }
 
 var leveledList pterm.LeveledList
 
-func PrintExplain(graphs []*structs.Explain) {
+func PrintExplain(graphs []*structs.PlanNode) {
 	if graphs == nil || len(graphs) == 0 {
 		return
 	}
 
-	explainChan := make(chan *structs.Explain, len(graphs))
+	explainChan := make(chan *structs.PlanNode, len(graphs))
 	for _, explain := range graphs {
 		explainChan <- explain
 	}
@@ -32,7 +32,7 @@ func PrintExplain(graphs []*structs.Explain) {
 	//pterm.DefaultTree.WithIndent(3).WithRoot(root).Render()
 }
 
-func buildTree(graphs chan *structs.Explain) *TreeNode {
+func buildTree(graphs chan *structs.PlanNode) *TreeNode {
 	if graphs == nil || len(graphs) == 0 {
 		return nil
 	}

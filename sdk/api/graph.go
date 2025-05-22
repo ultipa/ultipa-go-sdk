@@ -24,42 +24,42 @@ func (api *UltipaAPI) ShowGraph(config *configuration.RequestConfig) (graphSets 
 	return graphSets, err
 }
 
-func (api *UltipaAPI) CreateGraphIfNotExist(graph *structs.GraphSet, config *configuration.RequestConfig) (resp *http.Response, exist bool, err error) {
-	exist, err = api.HasGraph(graph.Name, config)
+func (api *UltipaAPI) CreateGraphIfNotExist(graphSet *structs.GraphSet, config *configuration.RequestConfig) (resp *http.Response, exist bool, err error) {
+	exist, err = api.HasGraph(graphSet.Name, config)
 
 	if exist {
 		return nil, exist, err
 	}
 
-	resp, err = api.CreateGraph(graph, config)
+	resp, err = api.CreateGraph(graphSet, config)
 	return resp, exist, err
 }
 
 // CreateGraph 5.0 partitionByHash:Crc32/CityHash64
-func (api *UltipaAPI) CreateGraph(graph *structs.GraphSet, config *configuration.RequestConfig) (*http.Response, error) {
-	if graph == nil {
-		return nil, errors.New("graph cannot be nil")
+func (api *UltipaAPI) CreateGraph(graphSet *structs.GraphSet, config *configuration.RequestConfig) (*http.Response, error) {
+	if graphSet == nil {
+		return nil, errors.New("graphSet cannot be nil")
 	}
-	//if graph.Name == "" || graph.PartitionBy == "" || len(graph.Shards) == 0 {
-	//	return nil, errors.New("graph Name/Shards/PartitionBy cannot be empty")
+	//if graphSet.Name == "" || graphSet.PartitionBy == "" || len(graphSet.Shards) == 0 {
+	//	return nil, errors.New("graphSet Name/Shards/PartitionBy cannot be empty")
 	//}
 
-	if graph.Name == "" {
+	if graphSet.Name == "" {
 		return nil, errors.New("graphSet name is required")
 	}
 
-	uql := fmt.Sprintf(`create().graph("%v", "%v")`, graph.Name, graph.Description)
-	if len(graph.Shards) != 0 {
-		uql = fmt.Sprintf("%s.shards([%v])", uql, strings.Join(graph.Shards, ","))
+	uql := fmt.Sprintf(`create().graph("%v", "%v")`, graphSet.Name, graphSet.Description)
+	if len(graphSet.Shards) != 0 {
+		uql = fmt.Sprintf("%s.shards([%v])", uql, strings.Join(graphSet.Shards, ","))
 	}
-	if graph.PartitionBy != "" {
-		uql = fmt.Sprintf("%s.partitionByHash('%v',_id)", uql, graph.PartitionBy)
+	if graphSet.PartitionBy != "" {
+		uql = fmt.Sprintf("%s.partitionByHash('%v',_id)", uql, graphSet.PartitionBy)
 	}
 
 	resp, err := api.Uql(uql, config)
 
 	if err != nil {
-		//api.Logger.Log("create graph failed : " + graph.Name + " " + err.Error())
+		//api.Logger.Log("create graphSet failed : " + graphSet.Name + " " + err.Error())
 		return nil, err
 	}
 
@@ -118,7 +118,7 @@ func (api *UltipaAPI) GetGraph(graphName string, config *configuration.RequestCo
 
 func (api *UltipaAPI) AlterGraph(graphName string, alterGraphSet *structs.GraphSet, config *configuration.RequestConfig) (*http.Response, error) {
 	if graphName == "" {
-		return nil, errors.New("graphname is required")
+		return nil, errors.New("graphName is required")
 	}
 	if alterGraphSet == nil {
 		return nil, errors.New("alterGraphSet cannot be nil")
@@ -147,43 +147,43 @@ func (api *UltipaAPI) AlterGraph(graphName string, alterGraphSet *structs.GraphS
 	return resp, nil
 }
 
-func (api *UltipaAPI) Truncate(request *structs.Truncate, config *configuration.RequestConfig) (*http.Response, error) {
+func (api *UltipaAPI) Truncate(params *structs.TruncateParams, config *configuration.RequestConfig) (*http.Response, error) {
 	uql := ""
-	if request.DBType == nil {
+	if params.DBType == nil {
 		t := ultipa.DBType_DBGLOBAL
-		request.DBType = &t
+		params.DBType = &t
 	}
 
-	schemaName, err := CheckReplaceSchemaPropertyName(request.Schema)
+	schemaName, err := CheckReplaceSchemaPropertyName(params.Schema)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, graphName = %s", err.Error(), request.GraphName))
+		return nil, errors.New(fmt.Sprintf("%s, graphName = %s", err.Error(), params.GraphName))
 	}
 
-	if request.Schema != "" {
-		if !(*request.DBType == ultipa.DBType_DBNODE || *request.DBType == ultipa.DBType_DBEDGE) {
+	if params.Schema != "" {
+		if !(*params.DBType == ultipa.DBType_DBNODE || *params.DBType == ultipa.DBType_DBEDGE) {
 			//return nil, fmt.Errorf("to truncate schema, dbType must be DBType_DBNODE or DBType_DBEDGE")
 			return nil, fmt.Errorf("to truncate schema, DBType is required in the parameters")
 		}
 
-		if request.Schema == "*" {
-			request.Schema = `"*"`
+		if params.Schema == "*" {
+			params.Schema = `"*"`
 		} else {
-			request.Schema = "@" + schemaName
+			params.Schema = "@" + schemaName
 		}
 
 	} else {
-		if !(*request.DBType == ultipa.DBType_DBGLOBAL) {
+		if !(*params.DBType == ultipa.DBType_DBGLOBAL) {
 			return nil, fmt.Errorf("to truncate graph, dbType must be DBType_DBGLOBAL or nil")
 		}
 	}
 
-	switch *request.DBType {
+	switch *params.DBType {
 	case ultipa.DBType_DBNODE:
-		uql = fmt.Sprintf(`truncate().graph("%v").nodes(%v)`, request.GraphName, request.Schema)
+		uql = fmt.Sprintf(`truncate().graph("%v").nodes(%v)`, params.GraphName, params.Schema)
 	case ultipa.DBType_DBEDGE:
-		uql = fmt.Sprintf(`truncate().graph("%v").edges(%v)`, request.GraphName, request.Schema)
+		uql = fmt.Sprintf(`truncate().graph("%v").edges(%v)`, params.GraphName, params.Schema)
 	default:
-		uql = fmt.Sprintf(`truncate().graph("%v")`, request.GraphName)
+		uql = fmt.Sprintf(`truncate().graph("%v")`, params.GraphName)
 	}
 
 	resp, err := api.Uql(uql, config)

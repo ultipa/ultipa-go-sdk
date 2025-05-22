@@ -1,6 +1,6 @@
 package structs
 
-type Explain struct {
+type PlanNode struct {
 	//DBType        ultipa.PlanNodeType
 	Alias       string
 	ChildrenNum uint32

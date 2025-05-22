@@ -6,12 +6,12 @@ import (
 )
 
 type ExplainPlan struct {
-	Explain []*structs.Explain
+	PlanNodes []*structs.PlanNode
 }
 
 func ParseExplainPlan(ex *ultipa.ExplainPlan) (*ExplainPlan, error) {
 	explainPlan := ExplainPlan{
-		Explain: []*structs.Explain{},
+		PlanNodes: []*structs.PlanNode{},
 	}
 
 	if ex == nil {
@@ -19,14 +19,14 @@ func ParseExplainPlan(ex *ultipa.ExplainPlan) (*ExplainPlan, error) {
 	}
 
 	for _, planNode := range ex.PlanNodes {
-		explain := structs.Explain{
+		explain := structs.PlanNode{
 			//DBType:        planNode.GetType(),
 			Alias:       planNode.GetAlias(),
 			ChildrenNum: planNode.GetChildrenNum(),
 			Uql:         planNode.GetQueryText(),
 			Infos:       planNode.GetInfos(),
 		}
-		explainPlan.Explain = append(explainPlan.Explain, &explain)
+		explainPlan.PlanNodes = append(explainPlan.PlanNodes, &explain)
 	}
 
 	return &explainPlan, nil

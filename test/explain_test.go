@@ -33,28 +33,28 @@ func TestExplain(t *testing.T) {
 	}
 
 	//log.Println(resp)
-	explain := resp.ExplainPlan.Explain
+	explain := resp.ExplainPlan.PlanNodes
 	printers.PrintExplain(explain)
 
 }
 
 func TestExplain1(t *testing.T) {
 
-	var Explain []*structs.Explain
-	Explain = append(Explain, &structs.Explain{ChildrenNum: 1, Alias: "1"})
-	Explain = append(Explain, &structs.Explain{ChildrenNum: 2, Alias: "2"})
-	Explain = append(Explain, &structs.Explain{ChildrenNum: 2, Alias: "3"})
-	Explain = append(Explain, &structs.Explain{ChildrenNum: 0, Alias: "4"})
-	Explain = append(Explain, &structs.Explain{ChildrenNum: 0, Alias: "5"})
-	Explain = append(Explain, &structs.Explain{ChildrenNum: 0, Alias: "6"})
-	//Explain = append(Explain, &structs.Explain{ChildrenNum: 0})
+	var Explain []*structs.PlanNode
+	Explain = append(Explain, &structs.PlanNode{ChildrenNum: 1, Alias: "1"})
+	Explain = append(Explain, &structs.PlanNode{ChildrenNum: 2, Alias: "2"})
+	Explain = append(Explain, &structs.PlanNode{ChildrenNum: 2, Alias: "3"})
+	Explain = append(Explain, &structs.PlanNode{ChildrenNum: 0, Alias: "4"})
+	Explain = append(Explain, &structs.PlanNode{ChildrenNum: 0, Alias: "5"})
+	Explain = append(Explain, &structs.PlanNode{ChildrenNum: 0, Alias: "6"})
+	//PlanNode = append(PlanNode, &structs.PlanNode{ChildrenNum: 0})
 
 	//root := &printers.TreeNode{
-	//	Explain: Explain[0],
+	//	PlanNode: PlanNode[0],
 	//}
 	//parent = root
-	//appendTreeNode(root, Explain[1:])
-	explainChan := make(chan *structs.Explain, len(Explain))
+	//appendTreeNode(root, PlanNode[1:])
+	explainChan := make(chan *structs.PlanNode, len(Explain))
 	for _, explain := range Explain {
 		explainChan <- explain
 	}
@@ -72,7 +72,7 @@ func TestExplain1(t *testing.T) {
 var leveledList = pterm.LeveledList{}
 var parent = &printers.TreeNode{}
 
-func appendTreeNode(root *printers.TreeNode, graphs []*structs.Explain) {
+func appendTreeNode(root *printers.TreeNode, graphs []*structs.PlanNode) {
 	if graphs == nil || len(graphs) == 0 {
 		return
 	}
@@ -93,7 +93,7 @@ func appendTreeNode(root *printers.TreeNode, graphs []*structs.Explain) {
 		appendTreeNode(root, explains)
 
 	} else {
-		var nextExplain *structs.Explain
+		var nextExplain *structs.PlanNode
 		if len(graphs) > 1 {
 			nextExplain = graphs[1]
 		}
@@ -110,7 +110,7 @@ func appendTreeNode(root *printers.TreeNode, graphs []*structs.Explain) {
 	return
 }
 
-func buildTreeNode(graphs chan *structs.Explain) *printers.TreeNode {
+func buildTreeNode(graphs chan *structs.PlanNode) *printers.TreeNode {
 	if graphs == nil || len(graphs) == 0 {
 		return nil
 	}
