@@ -35,7 +35,7 @@ package structs
 
 // Job represents the job data structure
 type Job struct {
-	JobID     string            `json:"job_id"`     // "job_id" field
+	Id        string            `json:"job_id"`     // "job_id" field
 	GraphName string            `json:"graph_name"` // "graph_name" field
 	Type      string            `json:"type"`       // "type" field
 	Query     string            `json:"query"`      // "uql" field

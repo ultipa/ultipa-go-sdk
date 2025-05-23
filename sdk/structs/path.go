@@ -24,13 +24,13 @@ func (p *Path) GetNodes() []types.UUID {
 }
 
 func (p *Path) GetLastNode() types.UUID {
-	return p.NodeUUIDs[p.GetLength()]
+	return p.NodeUUIDs[len(p.NodeUUIDs)-1]
 }
 
 func (p *Path) GetEdges() []types.UUID {
 	return p.EdgeUUIDs
 }
 
-func (p *Path) GetLength() int {
+func (p *Path) Length() int {
 	return len(p.EdgeUUIDs)
 }

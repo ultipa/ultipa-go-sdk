@@ -1418,7 +1418,7 @@ func (di *DataItem) AsJobs() (jobs []*structs.Job, err error) {
 		values := row.GetValues()
 
 		job := structs.Job{
-			JobID:     string(values[0]),
+			Id:        string(values[0]),
 			GraphName: string(values[1]),
 			Type:      string(values[2]),
 			Query:     string(values[3]),

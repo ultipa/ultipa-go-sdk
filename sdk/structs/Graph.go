@@ -23,14 +23,14 @@ func NewGraph() *Graph {
 //}
 
 //func (p *Graph) GetLastNode() *Node {
-//   return p.Nodes[p.GetLength()]
+//   return p.Nodes[p.Length()]
 //}
 
 //func (p *Graph) GetEdges(uuid types.UUID) *Edge {
 //   return p.Edges[uuid]
 //}
 //
-//func (p *Graph) GetLength() int {
+//func (p *Graph) Length() int {
 //   return len(p.Edges)
 //}
 
