@@ -154,21 +154,21 @@ func (api *UltipaAPI) Truncate(params *structs.TruncateParams, config *configura
 		params.DBType = &t
 	}
 
-	schemaName, err := CheckReplaceSchemaPropertyName(params.Schema)
+	schemaName, err := CheckReplaceSchemaPropertyName(params.SchemaName)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("%s, graphName = %s", err.Error(), params.GraphName))
 	}
 
-	if params.Schema != "" {
+	if params.SchemaName != "" {
 		if !(*params.DBType == ultipa.DBType_DBNODE || *params.DBType == ultipa.DBType_DBEDGE) {
 			//return nil, fmt.Errorf("to truncate schema, dbType must be DBType_DBNODE or DBType_DBEDGE")
 			return nil, fmt.Errorf("to truncate schema, DBType is required in the parameters")
 		}
 
-		if params.Schema == "*" {
-			params.Schema = `"*"`
+		if params.SchemaName == "*" {
+			params.SchemaName = `"*"`
 		} else {
-			params.Schema = "@" + schemaName
+			params.SchemaName = "@" + schemaName
 		}
 
 	} else {
@@ -179,9 +179,9 @@ func (api *UltipaAPI) Truncate(params *structs.TruncateParams, config *configura
 
 	switch *params.DBType {
 	case ultipa.DBType_DBNODE:
-		uql = fmt.Sprintf(`truncate().graph("%v").nodes(%v)`, params.GraphName, params.Schema)
+		uql = fmt.Sprintf(`truncate().graph("%v").nodes(%v)`, params.GraphName, params.SchemaName)
 	case ultipa.DBType_DBEDGE:
-		uql = fmt.Sprintf(`truncate().graph("%v").edges(%v)`, params.GraphName, params.Schema)
+		uql = fmt.Sprintf(`truncate().graph("%v").edges(%v)`, params.GraphName, params.SchemaName)
 	default:
 		uql = fmt.Sprintf(`truncate().graph("%v")`, params.GraphName)
 	}

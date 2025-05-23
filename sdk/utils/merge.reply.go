@@ -336,11 +336,11 @@ func MergeUQLReply(reply1 *ultipa.QueryReply, reply2 *ultipa.QueryReply) *ultipa
 			//		graph1.Graph.NodeTable.EntityRows = append(graph1.Graph.NodeTable.EntityRows, graph2.Graph.NodeTable.EntityRows...)
 			//		nodeSchemaMap := map[string]*ultipa.Schema{}
 			//		for _, graph1Schema := range graph1.Graph.NodeTable.Schemas {
-			//			nodeSchemaMap[graph1Schema.SchemaName] = graph1Schema
+			//			nodeSchemaMap[graph1Schema.Schema] = graph1Schema
 			//		}
 			//		for _, graph2Schema := range graph2.Graph.NodeTable.Schemas {
-			//			if _, ok := nodeSchemaMap[graph2Schema.SchemaName]; !ok {
-			//				nodeSchemaMap[graph2Schema.SchemaName] = graph2Schema
+			//			if _, ok := nodeSchemaMap[graph2Schema.Schema]; !ok {
+			//				nodeSchemaMap[graph2Schema.Schema] = graph2Schema
 			//				graph1.Graph.NodeTable.Schemas = append(graph1.Graph.NodeTable.Schemas, graph2Schema)
 			//			}
 			//		}
@@ -348,11 +348,11 @@ func MergeUQLReply(reply1 *ultipa.QueryReply, reply2 *ultipa.QueryReply) *ultipa
 			//		graph1.Graph.EdgeTable.EntityRows = append(graph1.Graph.EdgeTable.EntityRows, graph2.Graph.EdgeTable.EntityRows...)
 			//		edgeSchemaMap := map[string]*ultipa.Schema{}
 			//		for _, graph1Schema := range graph1.Graph.EdgeTable.Schemas {
-			//			edgeSchemaMap[graph1Schema.SchemaName] = graph1Schema
+			//			edgeSchemaMap[graph1Schema.Schema] = graph1Schema
 			//		}
 			//		for _, graph2Schema := range graph2.Graph.EdgeTable.Schemas {
-			//			if _, ok := edgeSchemaMap[graph2Schema.SchemaName]; !ok {
-			//				edgeSchemaMap[graph2Schema.SchemaName] = graph2Schema
+			//			if _, ok := edgeSchemaMap[graph2Schema.Schema]; !ok {
+			//				edgeSchemaMap[graph2Schema.Schema] = graph2Schema
 			//				graph1.Graph.EdgeTable.Schemas = append(graph1.Graph.EdgeTable.Schemas, graph2Schema)
 			//			}
 			//		}

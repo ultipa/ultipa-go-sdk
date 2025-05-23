@@ -200,9 +200,9 @@ func TestUltipaAPI_AlterGraph(t *testing.T) {
 
 func TestTruncate(t *testing.T) {
 	tr := &structs.TruncateParams{
-		GraphName: "testaaa",
-		DBType:    nil,
-		Schema:    "*",
+		GraphName:  "testaaa",
+		DBType:     nil,
+		SchemaName: "*",
 	}
 	response, err := client.Truncate(tr, nil)
 	if err != nil {
@@ -220,7 +220,7 @@ func TestTruncate(t *testing.T) {
 
 	db = ultipa.DBType_DBEDGE
 	tr.DBType = &db
-	tr.Schema = "中文"
+	tr.SchemaName = "中文"
 	response, err = client.Truncate(tr, nil)
 	if err != nil {
 		log.Println(err)
@@ -228,7 +228,7 @@ func TestTruncate(t *testing.T) {
 	log.Println(response)
 
 	tr.DBType = nil
-	tr.Schema = ""
+	tr.SchemaName = ""
 	response, err = client.Truncate(tr, nil)
 	if err != nil {
 		log.Println(err)

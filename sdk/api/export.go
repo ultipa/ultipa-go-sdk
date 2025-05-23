@@ -85,7 +85,7 @@ import (
 //				var parseErr error
 //				go func(index int, row *ultipa.EntityRow) {
 //					defer wg.Done()
-//					edge, err := structs.NewEdgeFromEdgeRow(edgeSchemaMap[row.SchemaName], row)
+//					edge, err := structs.NewEdgeFromEdgeRow(edgeSchemaMap[row.Schema], row)
 //					if err != nil {
 //						parseErr = err
 //					}

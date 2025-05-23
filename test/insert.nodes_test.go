@@ -228,9 +228,9 @@ func TestInsertNodes(t *testing.T) {
 
 	ty := ultipa.DBType_DBNODE
 	client.Truncate(&structs.TruncateParams{
-		GraphName: graph,
-		DBType:    &ty,
-		Schema:    schemaName,
+		GraphName:  graph,
+		DBType:     &ty,
+		SchemaName: schemaName,
 	}, nil)
 
 	prop := &structs.Property{

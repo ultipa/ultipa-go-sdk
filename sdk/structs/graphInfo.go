@@ -9,9 +9,9 @@ import (
 )
 
 type TruncateParams struct {
-	GraphName string
-	Schema    string
-	DBType    *ultipa.DBType
+	GraphName  string
+	SchemaName string
+	DBType     *ultipa.DBType
 }
 
 type GraphSet struct {
