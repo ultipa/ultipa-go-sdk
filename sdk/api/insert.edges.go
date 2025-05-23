@@ -361,9 +361,9 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(rows []*structs.Edge, config *configu
 	return resps, nil
 }
 
-func (api *UltipaAPI) InsertEdges(schemaName string, edges []*structs.Edge, requestConfig *configuration.InsertRequestConfig) (*http.Response, error) {
+func (api *UltipaAPI) InsertEdges(schemaName string, edges []*structs.Edge, config *configuration.InsertRequestConfig) (*http.Response, error) {
 	params := ""
-	switch requestConfig.InsertType {
+	switch config.InsertType {
 	case ultipa.InsertType_NORMAL:
 		params = "insert()"
 	case ultipa.InsertType_OVERWRITE:
@@ -371,14 +371,14 @@ func (api *UltipaAPI) InsertEdges(schemaName string, edges []*structs.Edge, requ
 	case ultipa.InsertType_UPSERT:
 		params = "upsert()"
 	default:
-		return nil, fmt.Errorf("InsertEdges error, unknown InsertType: %d", requestConfig.InsertType)
+		return nil, fmt.Errorf("InsertEdges error, unknown InsertType: %d", config.InsertType)
 	}
 
 	uql := fmt.Sprintf(`%s.into(@%s).edges([%s])`, params, schemaName, structs.EdgesToInsertUql(edges))
-	if !requestConfig.Silent {
+	if !config.Silent {
 		uql = uql + " as edges return edges{*}"
 	}
-	resp, err := api.Uql(uql, requestConfig.RequestConfig)
+	resp, err := api.Uql(uql, config.RequestConfig)
 
 	if err != nil {
 		return nil, err
