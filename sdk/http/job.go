@@ -1,9 +1,12 @@
 package http
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type JobResponse struct {
-	JobId     uint32
+	JobId     string
 	Statistic *Statistic
 	Status    *Status
 }
@@ -18,7 +21,7 @@ func GetJobResponseFromUqlResponse(response *Response) (*JobResponse, error) {
 	}
 
 	values := table.ToKV()
-	jobId := values[0].Get("new_job_id").(uint32)
+	jobId := strconv.Itoa(int(values[0].Get("new_job_id").(uint32)))
 
 	return &JobResponse{JobId: jobId, Statistic: response.Statistic, Status: response.Status}, nil
 }
