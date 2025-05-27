@@ -133,6 +133,10 @@ func (api *UltipaAPI) GetEdgeSchema(schemaName string, config *configuration.Req
 }
 
 func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bool, config *configuration.RequestConfig) (*http.Response, error) {
+	if schema.Name == "" {
+		return nil, fmt.Errorf("schemaName can not empty %s", schema.Name)
+	}
+
 	schemaName, err := CheckReplaceSchemaPropertyName(schema.Name)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schema.Name))
