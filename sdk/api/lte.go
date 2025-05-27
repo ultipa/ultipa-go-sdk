@@ -15,6 +15,9 @@ func (api *UltipaAPI) Lte(dbType ultipa.DBType, schemaName, propertyName string,
 	if schemaName == "" {
 		schemaName = "*"
 	}
+	if propertyName == "" {
+		return nil, errors.New("lte: propertyName can not be empty")
+	}
 
 	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
 	if err != nil {
@@ -51,6 +54,9 @@ func (api *UltipaAPI) Ufe(dbType ultipa.DBType, schemaName, propertyName string,
 	uql := ""
 	if schemaName == "" {
 		schemaName = "*"
+	}
+	if propertyName == "" {
+		return nil, errors.New("ufe: propertyName can not be empty")
 	}
 
 	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
