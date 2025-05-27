@@ -23,7 +23,7 @@ func (api *UltipaAPI) CreateProperty(dbType ultipa.DBType, property *structs.Pro
 	case ultipa.DBType_DBEDGE:
 		params = "edge_property"
 	default:
-		errStr := fmt.Sprintf("create property: unknown db type, %v", dbType.String())
+		errStr := fmt.Sprintf("DBType must be DBType_DBNODE or DBType_DBEDGE")
 		return nil, errors.New(errStr)
 	}
 
@@ -243,7 +243,7 @@ func (api *UltipaAPI) DropProperty(dbType ultipa.DBType, property *structs.Prope
 	case ultipa.DBType_DBEDGE:
 		uql = fmt.Sprintf(`drop().edge_property(@%v.%v)`, schemaName, propertyName)
 	default:
-		return nil, errors.New("drop property: unknown db type")
+		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
 
 	resp, err = api.Uql(uql, config)
@@ -278,7 +278,7 @@ func (api *UltipaAPI) AlterProperty(dbType ultipa.DBType, originProp, newProp *s
 	case ultipa.DBType_DBEDGE:
 		params = "edge_property"
 	default:
-		return nil, errors.New("alter property: unknown db type")
+		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
 
 	schemaName, err := CheckReplaceSchemaPropertyName(originProp.Schema)
