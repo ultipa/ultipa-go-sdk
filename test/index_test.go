@@ -126,13 +126,13 @@ func TestListEdgeFullText(t *testing.T) {
 func TestCreateFullText(t *testing.T) {
 	//client, _ := GetClient(hosts, graph)
 
-	resp, err := client.CreateFullText(ultipa.DBType_DBNODE, "account", "中文名", "full", nil)
+	jresp, err := client.CreateFullText(ultipa.DBType_DBNODE, "account", "中文名", "full", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Printf(resp.Status.Code.String())
+	log.Printf(jresp.Status.Code.String())
 
-	resp, err = client.DropFullText("full", ultipa.DBType_DBNODE, nil)
+	resp, err := client.DropFullText("full", ultipa.DBType_DBNODE, nil)
 	resp, err = client.DropFullText("full", ultipa.DBType_DBNODE, nil)
 	if err != nil {
 		t.Fatal(err)

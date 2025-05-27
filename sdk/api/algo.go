@@ -68,9 +68,9 @@ func (api *UltipaAPI) RollbackHDCAlgo(algoName, hdcServerName string, config *co
 		return nil, err
 	}
 
-	if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(reply.Status.Msg)
-	}
+	//if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+	//	return nil, errors.New(reply.Status.Msg)
+	//}
 
 	return &http.Response{Status: &http.Status{
 		Message: reply.Status.Msg,
@@ -132,9 +132,9 @@ func (api *UltipaAPI) InstallHDCAlgo(files []string, hdcServerName string, confi
 		return nil, nil
 	}
 
-	if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
-		return nil, errors.New(reply.Status.Msg)
-	}
+	//if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+	//	return nil, errors.New(reply.Status.Msg)
+	//}
 
 	return &http.Response{Status: &http.Status{
 		Message: reply.Status.Msg,

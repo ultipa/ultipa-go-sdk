@@ -67,8 +67,8 @@ const (
 //}
 
 func CheckName(name string) error {
-	if len(name) < 2 || len(name) > 64 {
-		return errors.New("name bytes length should be between 2 and 64")
+	if len(name) < 2 || len(name) > 127 {
+		return errors.New("name bytes length should be between 2 and 127")
 	}
 
 	if strings.Contains(name, "`") {

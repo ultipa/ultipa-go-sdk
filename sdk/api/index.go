@@ -28,6 +28,10 @@ func (api *UltipaAPI) CreateIndex(dbType ultipa.DBType, source string, indexName
 }
 
 func (api *UltipaAPI) CreateEdgeIndex(source string, indexName string, config *configuration.RequestConfig) (jobResponse *http.JobResponse, err error) {
+	if indexName == "" {
+		return nil, fmt.Errorf("indexName can not empty %s", indexName)
+	}
+
 	uql := ""
 	if source == "" {
 		return nil, fmt.Errorf("source can not empty %s", source)
@@ -53,6 +57,9 @@ func (api *UltipaAPI) CreateEdgeIndex(source string, indexName string, config *c
 }
 
 func (api *UltipaAPI) CreateNodeIndex(source string, indexName string, config *configuration.RequestConfig) (jobResponse *http.JobResponse, err error) {
+	if indexName == "" {
+		return nil, fmt.Errorf("indexName can not empty %s", indexName)
+	}
 	uql := ""
 	if source == "" {
 		return nil, fmt.Errorf("source can not empty %s", source)
@@ -168,10 +175,20 @@ func (api *UltipaAPI) DropEdgeIndex(indexName string, config *configuration.Requ
 	return api.DropIndex(ultipa.DBType_DBEDGE, indexName, config)
 }
 
-func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyName, indexName string, config *configuration.RequestConfig) (resp *http.Response, err error) {
+func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyName, indexName string, config *configuration.RequestConfig) (*http.JobResponse, error) {
+	if schemaName == "" {
+		return nil, fmt.Errorf(" schemaName can not empty %s", schemaName)
+	}
+	if propertyName == "" {
+		return nil, fmt.Errorf("propertyName can not empty %s", propertyName)
+	}
+	if indexName == "" {
+		return nil, fmt.Errorf("indexName can not empty %s", indexName)
+	}
+
 	uql := ""
 
-	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
+	schemaName, err := CheckReplaceSchemaPropertyName(schemaName)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
 	}
@@ -190,67 +207,21 @@ func (api *UltipaAPI) CreateFullText(dbType ultipa.DBType, schemaName, propertyN
 		return nil, errors.New("DBType must be DBType_DBNODE or DBType_DBEDGE")
 	}
 
-	resp, err = api.Uql(uql, config)
+	resp, err := api.Uql(uql, config)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return resp, nil
+	return http.GetJobResponseFromUqlResponse(resp)
 }
 
 func (api *UltipaAPI) CreateNodeFullText(schemaName, propertyName, indexName string, config *configuration.RequestConfig) (jobResponse *http.JobResponse, err error) {
-	uql := ""
-
-	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
-	}
-
-	propertyName, err = CheckReplaceSchemaPropertyName(propertyName)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), propertyName))
-	}
-
-	uql = fmt.Sprintf(`create().node_fulltext(@%v.%v, "%v")`, schemaName, propertyName, indexName)
-
-	resp, err := api.Uql(uql, config)
-
-	if err != nil {
-		return nil, err
-	}
-	if !resp.IsSuccess() {
-		return nil, fmt.Errorf(resp.Status.Message)
-	}
-
-	return http.GetJobResponseFromUqlResponse(resp)
+	return api.CreateFullText(ultipa.DBType_DBNODE, schemaName, propertyName, indexName, config)
 }
 
 func (api *UltipaAPI) CreateEdgeFullText(schemaName, propertyName, indexName string, config *configuration.RequestConfig) (jobResponse *http.JobResponse, err error) {
-	uql := ""
-
-	schemaName, err = CheckReplaceSchemaPropertyName(schemaName)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schemaName))
-	}
-
-	propertyName, err = CheckReplaceSchemaPropertyName(propertyName)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s, propertyName = %s", err.Error(), propertyName))
-	}
-
-	uql = fmt.Sprintf(`create().edge_fulltext(@%v.%v, "%v")`, schemaName, propertyName, indexName)
-
-	resp, err := api.Uql(uql, config)
-
-	if err != nil {
-		return nil, err
-	}
-	if !resp.IsSuccess() {
-		return nil, fmt.Errorf(resp.Status.Message)
-	}
-
-	return http.GetJobResponseFromUqlResponse(resp)
+	return api.CreateFullText(ultipa.DBType_DBEDGE, schemaName, propertyName, indexName, config)
 }
 
 func (api *UltipaAPI) ShowFullText(config *configuration.RequestConfig) ([]*structs.Index, error) {
