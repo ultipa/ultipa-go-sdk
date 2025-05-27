@@ -254,6 +254,14 @@ func (api *UltipaAPI) AlterProperty(dbType ultipa.DBType, originProp, newProp *s
 		return nil, errors.New("alter property: newProp can not be nil")
 	}
 
+	if originProp.Schema == "" || originProp.Name == "" {
+		return nil, errors.New("alter property: originProp Schema/Name can not be empty")
+	}
+
+	if !(newProp.Name == "" || newProp.Description == "") {
+		return nil, errors.New("alter property: newProp Name/Description cannot be empty at the same time")
+	}
+
 	params := ""
 	switch dbType {
 	case ultipa.DBType_DBNODE:
@@ -276,7 +284,9 @@ func (api *UltipaAPI) AlterProperty(dbType ultipa.DBType, originProp, newProp *s
 
 	uql := fmt.Sprintf(`alter().%v(@%v.%v).set({name: "%v", description: "%v"})`, params, schemaName, propertyName, newProp.Name, newProp.Description)
 
-	// Only modify the description of the originProp
+	if newProp.Description == "" {
+		uql = fmt.Sprintf(`alter().%v(@%v.%v).set({name: "%v"})`, params, schemaName, propertyName, newProp.Name)
+	}
 	if newProp.Name == "" {
 		uql = fmt.Sprintf(`alter().%v(@%v.%v).set({description: "%v"})`, params, schemaName, propertyName, newProp.Description)
 	}
