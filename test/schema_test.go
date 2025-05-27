@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	http2 "github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"log"
 	"testing"
@@ -153,13 +154,13 @@ func TestCreateSchemaWithProperties(t *testing.T) {
 
 func TestCreateSchema(t *testing.T) {
 	// create schema with properties
-	newSchemaWithoutProperties := &structs.Schema{
-		Name:        "People",
-		Description: "People",
+	schema, err := client.GetSchema("account", ultipa.DBType_DBNODE, nil)
+	if err != nil {
+		t.Log(err)
 	}
 
-	resp2, _ := client.CreateSchema(newSchemaWithoutProperties, false, nil)
-	log.Println(resp2)
+	resp2, _ := client.CreateSchema(schema, true, &configuration.RequestConfig{Graph: "g1"})
+	log.Println(resp2.Status)
 }
 
 func TestAlterSchema(t *testing.T) {
