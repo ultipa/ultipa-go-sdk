@@ -124,14 +124,16 @@ func (api *UltipaAPI) AlterGraph(graphName string, alterGraphSet *structs.GraphS
 		return nil, errors.New("alterGraphSet cannot be nil")
 	}
 
-	if alterGraphSet.Name == "" {
-		return nil, errors.New("alterGraphSet name is required")
+	if !(alterGraphSet.Name == "" && alterGraphSet.Description == "") {
+		return nil, errors.New("alterGraphSet name/description cannot be empty at the same time")
 	}
 
-	uql := fmt.Sprintf(`alter().graphName("%s").set({name: "%s", description: "%s"})`, graphName, alterGraphSet.Name, alterGraphSet.Description)
+	uql := fmt.Sprintf(`alter().graph("%s").set({name: "%s", description: "%s"})`, graphName, alterGraphSet.Name, alterGraphSet.Description)
 	// Only modify the description of the graphSet
 	if alterGraphSet.Description == "" {
-		uql = fmt.Sprintf(`alter().graphName("%s").set({name: "%s"})`, graphName, alterGraphSet.Name)
+		uql = fmt.Sprintf(`alter().graph("%s").set({name: "%s"})`, graphName, alterGraphSet.Name)
+	} else if alterGraphSet.Name == "" {
+		uql = fmt.Sprintf(`alter().graph("%s").set({description: "%s"})`, graphName, alterGraphSet.Description)
 	}
 
 	resp, err := api.Uql(uql, config)
