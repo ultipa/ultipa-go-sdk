@@ -26,6 +26,9 @@ func (api *UltipaAPI) ShowJob(id string, config *configuration.RequestConfig) (j
 }
 
 func (api *UltipaAPI) ClearJob(id string, config *configuration.RequestConfig) (resp *http.Response, err error) {
+	if id == "*" {
+		id = `"*"`
+	}
 	uql := fmt.Sprintf("clear().job(%v)", id)
 
 	resp, err = api.Uql(uql, config)
