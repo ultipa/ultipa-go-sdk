@@ -6,11 +6,11 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 )
 
-type Schemas struct {
-	Schemas    []*Schema
-	TotalNodes int
-	TotalEdges int
-}
+//type Schemas struct {
+//	Schemas    []*Schema
+//	TotalNodes int
+//	TotalEdges int
+//}
 
 type Schema struct {
 	Name        string
@@ -134,16 +134,18 @@ func CompareSchemas(schema1 *Schema, schema2 *Schema, fit bool) (error, []*Prope
 	return nil, NotExistProperties
 }
 
-// SetTotalByGraphCount for type = node edge
-func (s *Schema) SetTotalByGraphCount(g *GraphCount) {
-	s.Total += g.Stat.Count
-
-	if g.Type == "edge" && g.Stat.FromSchema != "" && g.Stat.ToSchema != "" {
-		p := &SchemaStat{
-			FromSchema: g.Stat.FromSchema,
-			ToSchema:   g.Stat.ToSchema,
-			Count:      g.Stat.Count,
+// SetStatsByGraphCount for type = node edge
+func (s *Schema) SetStatsByGraphCount(g []*GraphCount) {
+	for _, gc := range g {
+		if !(gc.Schema == s.Name && gc.Type == s.Type) {
+			continue
 		}
-		s.Stats = append(s.Stats, p)
+
+		s.Stats = append(s.Stats, &SchemaStat{
+			FromSchema: gc.Stat.FromSchema,
+			ToSchema:   gc.Stat.ToSchema,
+			Count:      gc.Stat.Count,
+		})
+		s.Total += gc.Stat.Count
 	}
 }

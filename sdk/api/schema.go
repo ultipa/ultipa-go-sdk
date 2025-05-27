@@ -10,10 +10,8 @@ import (
 	"strings"
 )
 
-func (api *UltipaAPI) ShowSchema(config *configuration.RequestConfig) ([]*structs.Schema, error) {
+func (api *UltipaAPI) ShowSchema(config *configuration.RequestConfig) (schemas []*structs.Schema, err error) {
 	var resp *http.Response
-	var err error
-	var schemas = &structs.Schemas{}
 
 	resp, err = api.Uql(fmt.Sprintf(`show().schema()`), config)
 	if err != nil {
@@ -32,36 +30,24 @@ func (api *UltipaAPI) ShowSchema(config *configuration.RequestConfig) ([]*struct
 		return nil, err
 	}
 
-	schemas.Schemas = append(nodeSchemas, edgesSchemas...)
+	schemas = append(nodeSchemas, edgesSchemas...)
 
 	graphCount, err := resp.Alias(http.RESP_GRAPH_COUNT_KEY).AsGraphCount()
 	if err != nil {
 		return nil, err
 	}
 	if graphCount == nil {
-		return schemas.Schemas, nil
+		return schemas, nil
 	}
-	for _, g := range graphCount {
-		switch g.Type {
-		case "total_nodes":
-			schemas.TotalNodes = g.Stat.Count
-		case "total_edges":
-			schemas.TotalEdges = g.Stat.Count
-		case "node", "edge":
-			for _, schema := range schemas.Schemas {
-				if schema.Name == g.Schema && schema.Type == g.Type {
-					schema.SetTotalByGraphCount(g)
-				}
-			}
-		}
-
+	for _, schema := range schemas {
+		schema.SetStatsByGraphCount(graphCount)
 	}
 
-	if len(schemas.Schemas) == 0 {
+	if len(schemas) == 0 {
 		return nil, fmt.Errorf("no data return")
 	}
 
-	return schemas.Schemas, err
+	return schemas, err
 }
 
 func (api *UltipaAPI) ShowNodeSchema(config *configuration.RequestConfig) ([]*structs.Schema, error) {
