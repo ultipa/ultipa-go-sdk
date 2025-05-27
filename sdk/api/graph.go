@@ -130,8 +130,8 @@ func (api *UltipaAPI) AlterGraph(graphName string, alterGraphSet *structs.GraphS
 
 	uql := fmt.Sprintf(`alter().graphName("%s").set({name: "%s", description: "%s"})`, graphName, alterGraphSet.Name, alterGraphSet.Description)
 	// Only modify the description of the graphSet
-	if alterGraphSet.Name == "" {
-		uql = fmt.Sprintf(`alter().graphName("%s").set({description: "%s"})`, graphName, alterGraphSet.Description)
+	if alterGraphSet.Description == "" {
+		uql = fmt.Sprintf(`alter().graphName("%s").set({name: "%s"})`, graphName, alterGraphSet.Name)
 	}
 
 	resp, err := api.Uql(uql, config)
