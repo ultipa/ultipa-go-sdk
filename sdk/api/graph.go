@@ -63,9 +63,9 @@ func (api *UltipaAPI) CreateGraph(graphSet *structs.GraphSet, config *configurat
 		return nil, err
 	}
 
-	if !resp.IsSuccess() {
-		return nil, fmt.Errorf(resp.Status.Message)
-	}
+	//if !resp.IsSuccess() {
+	//	return nil, fmt.Errorf(resp.Status.Message)
+	//}
 
 	return resp, err
 }
