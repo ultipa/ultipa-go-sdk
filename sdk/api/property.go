@@ -247,15 +247,21 @@ func (api *UltipaAPI) DropProperty(dbType ultipa.DBType, property *structs.Prope
 }
 
 func (api *UltipaAPI) AlterProperty(dbType ultipa.DBType, originProp, newProp *structs.Property, config *configuration.RequestConfig) (*http.Response, error) {
-	params := ""
+	if originProp == nil {
+		return nil, errors.New("alter property: originProp can not be nil")
+	}
+	if newProp == nil {
+		return nil, errors.New("alter property: newProp can not be nil")
+	}
 
+	params := ""
 	switch dbType {
 	case ultipa.DBType_DBNODE:
 		params = "node_property"
 	case ultipa.DBType_DBEDGE:
 		params = "edge_property"
 	default:
-		return nil, errors.New("alter originProp: unknown db type")
+		return nil, errors.New("alter property: unknown db type")
 	}
 
 	schemaName, err := CheckReplaceSchemaPropertyName(originProp.Schema)
