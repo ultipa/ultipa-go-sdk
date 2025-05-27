@@ -48,6 +48,15 @@ func (api *UltipaAPI) CreateProperty(dbType ultipa.DBType, property *structs.Pro
 
 	//api.Logger.Log("Creating Property : @" + schemaName + "." + propertyName)
 	uql := fmt.Sprintf(`create().%v(@%v,%s,"%v","%v")`, params, schemaName, propertyName, propertyTypeStr, property.Description)
+
+	switch property.Encrypt {
+	case "AES128", "AES256", "RSA", "ECC":
+		uql = fmt.Sprintf(`%s.encrypt("%s")`, uql, property.Encrypt)
+	case "":
+	default:
+		return nil, errors.New(fmt.Sprintf("invalid property encrypt: %s", property.Encrypt))
+	}
+
 	resp, err = api.Uql(uql, config)
 
 	if err != nil {
