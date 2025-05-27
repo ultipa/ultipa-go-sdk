@@ -898,12 +898,12 @@ func (di *DataItem) AsFullTexts() (fullTextIndexes []*structs.Index, err error) 
 
 	var indexType ultipa.DBType
 
-	if table.TableName == RESP_NODE_INDEX_KEY {
+	if table.TableName == RESP_NODE_FULLTEXT_KEY {
 		indexType = ultipa.DBType_DBNODE
-	} else if table.TableName == RESP_EDGE_INDEX_KEY {
+	} else if table.TableName == RESP_EDGE_FULLTEXT_KEY {
 		indexType = ultipa.DBType_DBEDGE
 	} else {
-		return nil, errors.New("DataItem " + di.Alias + " is not a Index list")
+		return nil, errors.New("DataItem " + di.Alias + " is not a fullText list")
 	}
 
 	for _, row := range table.TableRows {
