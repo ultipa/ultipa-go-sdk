@@ -12,8 +12,16 @@ import (
 
 // CreateProperty property.Schema is required
 func (api *UltipaAPI) CreateProperty(dbType ultipa.DBType, property *structs.Property, config *configuration.RequestConfig) (resp *http.Response, err error) {
+	if property == nil {
+		return nil, errors.New("create property: property can not be nil")
+	}
+
 	if property.Schema == "" {
 		return nil, fmt.Errorf("property.Schema can not empty")
+	}
+
+	if property.Type == ultipa.PropertyType_UNSET {
+		return nil, fmt.Errorf("property.Type unset")
 	}
 
 	params := ""
