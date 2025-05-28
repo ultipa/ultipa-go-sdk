@@ -40,8 +40,8 @@ func (node *Node) GetValues() *Values {
 }
 
 // get a value by key
-func (node *Node) Get(key string) interface{} {
-	return node.Values.Get(key)
+func (node *Node) Get(propName string) interface{} {
+	return node.Values.Get(propName)
 }
 
 // get a value by key
@@ -57,10 +57,10 @@ func (node *Node) GetBytesSafe(key string, t ultipa.PropertyType, subTypes []ult
 }
 
 // set a value by key
-func (node *Node) Set(key string, value interface{}) error {
+func (node *Node) Set(propName string, value interface{}) error {
 
 	//todo: check value type
-	node.Values.Set(key, value)
+	node.Values.Set(propName, value)
 	return nil
 }
 

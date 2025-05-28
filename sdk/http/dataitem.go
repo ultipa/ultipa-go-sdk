@@ -584,7 +584,6 @@ func (di *DataItem) AsGraphSets() (graphSets []*structs.GraphSet, err error) {
 		status := v.Get("status").(string)
 		description := v.Get("description").(string)
 		shards := v.Get("shards").(string)
-		slotNum := v.Get("slot_num").(string)
 		//replicaNum := v.Get("replica_num").(string)
 		partitionBy := v.Get("partition_by").(string)
 
@@ -596,6 +595,10 @@ func (di *DataItem) AsGraphSets() (graphSets []*structs.GraphSet, err error) {
 		var totalEdges uint64 = 0
 		if v := v.Get("total_edges"); v != nil {
 			totalEdges, err = strconv.ParseUint(v.(string), 10, 64)
+		}
+		var slotNum int
+		if v := v.Get("slot_num"); v != nil {
+			slotNum, err = strconv.Atoi(v.(string))
 		}
 
 		graphSets = append(graphSets, &structs.GraphSet{
@@ -675,21 +678,24 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 	}
 
 	// node | edge
-	Type := ""
+	//Type := ""
+	dbType := ultipa.DBType_DBNODE
 	// store index to get total number
 	TotalIndex := 0
 	switch table.TableName {
 	case RESP_NODE_SCHEMA_KEY:
-		Type = "node"
+		dbType = ultipa.DBType_DBNODE
+		//Type = "node"
 		TotalIndex = 3
 	case RESP_EDGE_SCHEMA_KEY:
-		Type = "edge"
+		//Type = "edge"
+		dbType = ultipa.DBType_DBEDGE
 		TotalIndex = 3
 	}
 
 	var IdIndex = 0
 	var NameIndex = 1
-	var StatusIndex = 2
+	//var StatusIndex = 2
 	var DescIndex = 3
 	var PropertyIndex = 4
 
@@ -700,7 +706,7 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		case "name":
 			NameIndex = index
 		case "status":
-			StatusIndex = index
+			//StatusIndex = index
 		case "description":
 			DescIndex = index
 		case "properties":
@@ -726,16 +732,12 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		values := row.GetValues()
 		schema := structs.NewSchema(string(values[NameIndex]))
 		schema.Description = string(values[DescIndex])
-		schema.Type = Type
-		schema.Status = string(values[StatusIndex])
+		//schema.Type = Type
+		//schema.Status = string(values[StatusIndex])
 		propertyJson := values[PropertyIndex]
 		schema.Total, _ = strconv.Atoi(utils.AsString(values[TotalIndex]))
-		schema.Id, _ = strconv.ParseUint(utils.AsString(values[IdIndex]), 10, 64)
-		schema.DBType, err = structs.GetDBTypeByString(schema.Type)
-
-		if err != nil {
-			return nil, err
-		}
+		schema.Id = string(values[IdIndex])
+		schema.DBType = dbType
 
 		var props []*struct {
 			Name        string

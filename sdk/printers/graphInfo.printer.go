@@ -31,7 +31,7 @@ func PrintGraphSet(graphs []*structs.GraphSet) {
 			{Text: fmt.Sprint(graph.TotalNodes)},
 			{Text: fmt.Sprint(graph.TotalEdges)},
 			{Text: "[" + strings.Join(graph.Shards, ",") + "]"}, // add Shards
-			{Text: graph.SlotNum},                               // add SlotNum
+			{Text: fmt.Sprint(graph.SlotNum)},                   // add SlotNum
 			//{Text: graph.ReplicaNum},                            // add ReplicaNum
 		})
 	}

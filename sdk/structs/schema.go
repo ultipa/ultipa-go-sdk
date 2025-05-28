@@ -16,16 +16,18 @@ type Schema struct {
 	Name        string
 	Description string
 	Properties  []*Property
-	Status      string
-	Type        string
-	DBType      ultipa.DBType
-	Total       int
-	Id          uint64
-	Stats       []*SchemaStat // only for EdgeSchema
+	//Status      string
+	//Type   string
+	DBType ultipa.DBType
+	Total  int
+	Id     string
+	Stats  []*SchemaStat // only for EdgeSchema
 }
 
 // SchemaStat only for EdgeSchema
 type SchemaStat struct {
+	DBType     ultipa.DBType
+	Schema     string
 	FromSchema string
 	ToSchema   string
 	Count      int
@@ -137,11 +139,14 @@ func CompareSchemas(schema1 *Schema, schema2 *Schema, fit bool) (error, []*Prope
 // SetStatsByGraphCount for type = node edge
 func (s *Schema) SetStatsByGraphCount(g []*GraphCount) {
 	for _, gc := range g {
-		if !(gc.Schema == s.Name && gc.Type == s.Type) {
+		dbType, _ := GetDBTypeByString(gc.Type)
+		if !(gc.Schema == s.Name && dbType == s.DBType) {
 			continue
 		}
 
 		s.Stats = append(s.Stats, &SchemaStat{
+			Schema:     gc.Schema,
+			DBType:     dbType,
 			FromSchema: gc.Stat.FromSchema,
 			ToSchema:   gc.Stat.ToSchema,
 			Count:      gc.Stat.Count,

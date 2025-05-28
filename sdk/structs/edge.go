@@ -81,8 +81,8 @@ func (edge *Edge) GetValues() *Values {
 }
 
 // get a value by key
-func (edge *Edge) Get(key string) interface{} {
-	return edge.Values.Get(key)
+func (edge *Edge) Get(propName string) interface{} {
+	return edge.Values.Get(propName)
 }
 
 // get a value by key
@@ -98,9 +98,9 @@ func (edge *Edge) GetBytesSafe(key string, t ultipa.PropertyType, subTypes []ult
 }
 
 // set a value by key
-func (edge *Edge) Set(key string, value interface{}) error {
+func (edge *Edge) Set(propName string, value interface{}) error {
 
-	edge.Values.Set(key, value)
+	edge.Values.Set(propName, value)
 	return nil
 }
 

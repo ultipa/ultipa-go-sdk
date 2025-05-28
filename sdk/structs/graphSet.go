@@ -22,7 +22,7 @@ type GraphSet struct {
 	Description string
 	Status      string
 	Shards      []string
-	SlotNum     string
+	SlotNum     int
 	//ReplicaNum  string
 	PartitionBy string
 }
