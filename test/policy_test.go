@@ -49,15 +49,15 @@ func TestPolicyUql(t *testing.T) {
 	//	"amz":     []string{"UPDATE"},
 	//}
 	pp := structs.PropertyPrivileges{
-		"node": {
-			"read":  {},
-			"write": {{"default", "*", "*"}, {"amz", "nodx", "age"}},
-			"deny":  {},
+		Node: structs.PropertyPrivilegeElement{
+			Read:  [][]string{},
+			Write: [][]string{{"default", "*", "*"}, {"amz", "nodx", "age"}},
+			Deny:  [][]string{},
 		},
-		"edge": {
-			"read":  {},
-			"write": {{"default", "*", "*"}},
-			"deny":  {},
+		Edge: structs.PropertyPrivilegeElement{
+			Read:  [][]string{},
+			Write: [][]string{{"default", "*", "*"}},
+			Deny:  [][]string{},
 		},
 	}
 

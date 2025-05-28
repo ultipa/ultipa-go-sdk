@@ -49,7 +49,17 @@ type Policy struct {
 	  }
 	}
 */
-type PropertyPrivileges map[string]map[string][][]string
+//type PropertyPrivileges map[string]map[string][][]string
+type PropertyPrivileges struct {
+	Node PropertyPrivilegeElement `json:"node"`
+	Edge PropertyPrivilegeElement `json:"edge"`
+}
+
+type PropertyPrivilegeElement struct {
+	Read  [][]string `json:"read"`
+	Write [][]string `json:"write"`
+	Deny  [][]string `json:"deny"`
+}
 
 type GraphPrivileges map[string][]string
 
@@ -79,11 +89,12 @@ func (p *Policy) ToCreatePolicyUql() string {
 	}
 	uql += s
 
-	if p.PropertyPrivileges != nil {
-		s = utils.ToJSONString(p.PropertyPrivileges) + "\n"
-	} else {
-		s = "{}\n"
-	}
+	s = utils.ToJSONString(p.PropertyPrivileges) + "\n"
+	//if p.PropertyPrivileges != nil {
+	//	s = utils.ToJSONString(p.PropertyPrivileges) + "\n"
+	//} else {
+	//	s = "{}\n"
+	//}
 
 	uql += s
 
