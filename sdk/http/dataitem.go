@@ -319,6 +319,9 @@ func (di *DataItem) AsAttr() (*structs.Attr, error) {
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Attribute list")
 	}
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
 	oAttr := attrAlias.Attr
@@ -350,6 +353,9 @@ func (di *DataItem) AsAttrNodes() (*structs.AttrNodes, error) {
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Attr")
 	}
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
 	oAttr := attrAlias.Attr
@@ -370,6 +376,9 @@ func (di *DataItem) AsAttrEdges() (*structs.AttrEdges, error) {
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Attr")
 	}
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
 	oAttr := attrAlias.Attr
@@ -389,6 +398,9 @@ func (di *DataItem) AsAttrPaths() (*structs.AttrPaths, error) {
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Attr")
+	}
+	if di.Data == nil {
+		return nil, nil
 	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
