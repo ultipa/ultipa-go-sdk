@@ -66,8 +66,9 @@ func NewNodesInsertResponse(reply *ultipa.InsertNodesReply) (response *InsertRes
 			TotalCost:  int(reply.TimeCost),
 			EngineCost: int(reply.EngineTimeCost),
 		},
-		UUIDs: reply.Uuids,
-		IDs:   reply.Ids,
+		UUIDs:     reply.Uuids,
+		IDs:       reply.Ids,
+		ErrorItem: make(map[int]int),
 	}
 
 	if len(reply.IgnoreIndexes) != len(reply.IgnoreErrorCode) {
@@ -95,7 +96,7 @@ func NewEdgesInsertResponse(reply *ultipa.InsertEdgesReply) (response *InsertRes
 			EngineCost: int(reply.EngineTimeCost),
 		},
 		UUIDs:     reply.Uuids,
-		ErrorItem: map[int]int{},
+		ErrorItem: make(map[int]int),
 	}
 
 	for index := range reply.IgnoreIndexes {
