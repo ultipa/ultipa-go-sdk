@@ -19,17 +19,17 @@ type HDCBuilder struct {
 	NodeSchema    map[string][]string `json:"nodes,omitempty"`
 	EdgeSchema    map[string][]string `json:"edges,omitempty"`
 	Direction     HDCDirection        `json:"direction,omitempty"`
-	LoadId        bool                `json:"load_id,omitempty"`
-	IsDefault     bool                `json:"default,omitempty"`
+	LoadId        bool                `json:"load_id"`
+	IsDefault     bool                `json:"default"`
 }
 
 const (
-	STATIC              HDCSyncType  = "static"
-	ASYNC               HDCSyncType  = "async"
-	SYNC                HDCSyncType  = "sync"
-	DirectionIN         HDCDirection = "in"
-	DirectionOUT        HDCDirection = "out"
-	DirectionUNDIRECTED HDCDirection = "undirected"
+	STATIC     HDCSyncType  = "static"
+	ASYNC      HDCSyncType  = "async"
+	SYNC       HDCSyncType  = "sync"
+	IN         HDCDirection = "in"
+	OUT        HDCDirection = "out"
+	UNDIRECTED HDCDirection = "undirected"
 )
 
 func (b *HDCBuilder) BuildUQL() (string, error) {
@@ -46,8 +46,8 @@ func (b *HDCBuilder) BuildUQL() (string, error) {
 		NodeSchema map[string][]string `json:"nodes,omitempty"`
 		EdgeSchema map[string][]string `json:"edges,omitempty"`
 		Direction  HDCDirection        `json:"direction,omitempty"`
-		LoadId     bool                `json:"load_id,omitempty"`
-		IsDefault  bool                `json:"default,omitempty"`
+		LoadId     bool                `json:"load_id"`
+		IsDefault  bool                `json:"default"`
 		Query      string              `json:"query"`
 		//Type       string              `json:"type"`
 	}
