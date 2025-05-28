@@ -13,13 +13,22 @@ func PrintProperty(properties []*structs.Property) {
 	table := simpletable.New()
 	table.Header.Cells = []*simpletable.Cell{{Text: "Name"}, {Text: "Description"},
 		{Text: "DBType"}, {Text: "LTE"},
-		//{Text: "READ"}, {Text: "WRITE"},
+		{Text: "READ"}, {Text: "WRITE"},
 		{Text: "Schema"}, {Text: "DecimalExtra"},
 		{Text: "Encrypt"},
 	}
 
 	for _, prop := range properties {
+		if prop == nil {
+			continue
+		}
 		propertyTypeStr, err := prop.GetStringType()
+		if err != nil {
+			log.Panic(err)
+		}
+
+		var exta = &prop.DecimalExtra
+		extaStr, err := structs.MarshalDecimalExtra(exta)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -32,7 +41,7 @@ func PrintProperty(properties []*structs.Property) {
 			{Text: strconv.FormatBool(prop.Read)},
 			{Text: strconv.FormatBool(prop.Write)},
 			{Text: prop.Schema},
-			{Text: prop.DecimalExtra},
+			{Text: string(extaStr)},
 			{Text: prop.Encrypt},
 		}
 		table.Body.Cells = append(table.Body.Cells, cells)

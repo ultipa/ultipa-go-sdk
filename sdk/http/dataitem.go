@@ -759,12 +759,18 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 					log.Fatalln(err)
 				}
 			}
+
+			var exta structs.DecimalExtra
+			if err := structs.UnmarshalDecimalExtra([]byte(prop.Extra), &exta); err != nil {
+				log.Fatalln(err)
+			}
+
 			p := structs.Property{
 				Name:         prop.Name,
 				Description:  prop.Description,
 				Lte:          lte,
 				Schema:       schema.Name,
-				DecimalExtra: prop.Extra,
+				DecimalExtra: exta,
 			}
 			p.SetTypeByString(prop.Type)
 			schema.Properties = append(schema.Properties, &p)
@@ -815,6 +821,12 @@ func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 		if err != nil {
 			log.Fatalln(err)
 		}
+
+		var exta structs.DecimalExtra
+		if err := structs.UnmarshalDecimalExtra([]byte(extra), &exta); err != nil {
+			log.Fatalln(err)
+		}
+
 		p := structs.Property{
 			Name:         name,
 			Description:  desc,
@@ -822,7 +834,7 @@ func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 			Read:         "1" == read,
 			Write:        "1" == write,
 			Schema:       schema,
-			DecimalExtra: extra,
+			DecimalExtra: exta,
 			Encrypt:      encrypt,
 		}
 		p.SetTypeByString(typeStr)

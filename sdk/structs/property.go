@@ -1,6 +1,7 @@
 package structs
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -22,7 +23,7 @@ type Property struct {
 	Description string
 	Encrypt     string
 	// extra info for property in json format, e.g. DecimalExtra: precision and scale for decimal type.
-	DecimalExtra string
+	DecimalExtra DecimalExtra
 }
 
 const (
@@ -88,6 +89,21 @@ var PropertyReverseMap = map[ultipa.PropertyType]string{
 type DecimalExtra struct {
 	Precision int `json:"precision"`
 	Scale     int `json:"scale"`
+}
+
+func MarshalDecimalExtra(d *DecimalExtra) ([]byte, error) {
+	if d == nil || (d.Precision == 0 && d.Scale == 0) {
+		return []byte(""), nil
+	}
+
+	return json.Marshal(d)
+}
+
+func UnmarshalDecimalExtra(data []byte, d *DecimalExtra) error {
+	if bytes.Equal(data, []byte("")) {
+		return nil
+	}
+	return json.Unmarshal(data, d)
 }
 
 func (p *Property) IsIDType() bool {
@@ -161,11 +177,11 @@ func (p *Property) SetTypeByString(s string) {
 			Precision: precision,
 			Scale:     scale,
 		}
-		extraJson, err := json.Marshal(extraData)
-		if err != nil {
-			return
-		}
-		p.DecimalExtra = string(extraJson)
+		//extraJson, err := json.Marshal(extraData)
+		//if err != nil {
+		//	return
+		//}
+		p.DecimalExtra = extraData
 
 		//p.DBType = ultipa.PropertyType_UNSET
 		return
@@ -191,12 +207,12 @@ func (p *Property) GetStringType() (string, error) {
 		return fmt.Sprintf("set(%s)", GetStringByPropertyType(p.SubTypes[0])), nil
 	}
 	if p.Type == ultipa.PropertyType_DECIMAL {
-		var extraData DecimalExtra
-		err := json.Unmarshal([]byte(p.DecimalExtra), &extraData)
-		if err != nil {
-			return GetStringByPropertyType(p.Type), nil
-		}
-		extraString := fmt.Sprintf("(%d,%d)", extraData.Precision, extraData.Scale)
+		//var extraData DecimalExtra
+		//err := json.Unmarshal([]byte(p.DecimalExtra), &extraData)
+		//if err != nil {
+		//	return GetStringByPropertyType(p.Type), nil
+		//}
+		extraString := fmt.Sprintf("(%d,%d)", p.DecimalExtra.Precision, p.DecimalExtra.Scale)
 		return GetStringByPropertyType(p.Type) + extraString, nil
 	}
 	return GetStringByPropertyType(p.Type), nil
