@@ -15,7 +15,14 @@ const (
 	PrivilegeToPolicy PrivilegeTargetType = "policy"
 )
 
+type PrivilegeLevel int
+
+const (
+	GraphPrivilege PrivilegeLevel = iota
+	SystemPrivilege
+)
+
 type Privilege struct {
-	GraphPrivileges  []string
-	SystemPrivileges []string
+	Name  string
+	Level PrivilegeLevel
 }

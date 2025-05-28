@@ -1291,12 +1291,20 @@ func (di *DataItem) AsPrivileges() (privileges []*structs.Privilege, err error) 
 		if err != nil {
 			return nil, errors.New("systemPrivileges Unmarshal failed" + err.Error())
 		}
-
-		i := structs.Privilege{
-			GraphPrivileges:  graphPrivileges,
-			SystemPrivileges: systemPrivileges,
+		for _, gp := range graphPrivileges {
+			p := structs.Privilege{
+				Name:  gp,
+				Level: structs.GraphPrivilege,
+			}
+			privileges = append(privileges, &p)
 		}
-		privileges = append(privileges, &i)
+		for _, gp := range systemPrivileges {
+			p := structs.Privilege{
+				Name:  gp,
+				Level: structs.SystemPrivilege,
+			}
+			privileges = append(privileges, &p)
+		}
 
 	}
 
