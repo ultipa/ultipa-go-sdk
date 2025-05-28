@@ -15,6 +15,10 @@ func GetJobResponseFromUqlResponse(response *Response) (*JobResponse, error) {
 	if response == nil {
 		return nil, fmt.Errorf("cannot convert nil Response to JobResponse")
 	}
+	if !response.IsSuccess() {
+		return &JobResponse{Statistic: response.Statistic, Status: response.Status}, nil
+	}
+
 	table, err := response.Alias(RESP_RESULT_KEY).AsTable()
 	if err != nil {
 		return nil, fmt.Errorf("parse uqlResponse to jobResponse error : %v", err)

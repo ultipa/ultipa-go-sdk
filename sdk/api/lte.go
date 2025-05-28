@@ -43,9 +43,6 @@ func (api *UltipaAPI) Lte(dbType ultipa.DBType, schemaName, propertyName string,
 	if err != nil {
 		return nil, err
 	}
-	if !resp.IsSuccess() {
-		return nil, fmt.Errorf(resp.Status.Message)
-	}
 
 	return http.GetJobResponseFromUqlResponse(resp)
 }

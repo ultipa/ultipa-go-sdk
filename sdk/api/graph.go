@@ -129,7 +129,7 @@ func (api *UltipaAPI) AlterGraph(graphName string, alterGraphSet *structs.GraphS
 	}
 
 	uql := fmt.Sprintf(`alter().graph("%s").set({name: "%s", description: "%s"})`, graphName, alterGraphSet.Name, alterGraphSet.Description)
-	// Only modify the description of the graphSet
+
 	if alterGraphSet.Description == "" {
 		uql = fmt.Sprintf(`alter().graph("%s").set({name: "%s"})`, graphName, alterGraphSet.Name)
 	} else if alterGraphSet.Name == "" {
@@ -194,9 +194,9 @@ func (api *UltipaAPI) Truncate(params *structs.TruncateParams, config *configura
 		return nil, err
 	}
 
-	if !resp.IsSuccess() {
-		return nil, fmt.Errorf(resp.Status.Message)
-	}
+	//if !resp.IsSuccess() {
+	//	return nil, fmt.Errorf(resp.Status.Message)
+	//}
 
 	return resp, nil
 }
@@ -208,10 +208,6 @@ func (api *UltipaAPI) Compact(graphName string, config *configuration.RequestCon
 
 	if err != nil {
 		return nil, err
-	}
-
-	if !resp.IsSuccess() {
-		return nil, fmt.Errorf(resp.Status.Message)
 	}
 
 	return http.GetJobResponseFromUqlResponse(resp)

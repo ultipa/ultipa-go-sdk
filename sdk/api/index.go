@@ -49,9 +49,6 @@ func (api *UltipaAPI) CreateEdgeIndex(source string, indexName string, config *c
 	if err != nil {
 		return nil, err
 	}
-	if !resp.IsSuccess() {
-		return nil, fmt.Errorf(resp.Status.Message)
-	}
 
 	return http.GetJobResponseFromUqlResponse(resp)
 }
@@ -76,9 +73,6 @@ func (api *UltipaAPI) CreateNodeIndex(source string, indexName string, config *c
 
 	if err != nil {
 		return nil, err
-	}
-	if !resp.IsSuccess() {
-		return nil, fmt.Errorf(resp.Status.Message)
 	}
 
 	return http.GetJobResponseFromUqlResponse(resp)

@@ -88,9 +88,6 @@ func (api *UltipaAPI) CreateHDCGraphBySchema(builder HDCBuilder, config *configu
 		return nil, err
 	}
 
-	if !resp.IsSuccess() {
-		return nil, fmt.Errorf(resp.Status.Message)
-	}
 	//api.Logger.Log("Creating Graph Request OK! - " + graphName)
 
 	return http.GetJobResponseFromUqlResponse(resp)

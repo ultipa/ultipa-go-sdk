@@ -200,9 +200,9 @@ func TestUltipaAPI_AlterGraph(t *testing.T) {
 
 func TestTruncate(t *testing.T) {
 	tr := &structs.TruncateParams{
-		GraphName:  "testaaa",
-		DBType:     nil,
-		SchemaName: "*",
+		GraphName: "testaaa",
+		DBType:    nil,
+		//SchemaName: "*",
 	}
 	response, err := client.Truncate(tr, nil)
 	if err != nil {
@@ -247,7 +247,7 @@ func TestGetGraph(t *testing.T) {
 }
 
 func TestCompact(t *testing.T) {
-	job, err := client.Compact("go_sdk_test", nil)
+	job, err := client.Compact("go_sdk_test11", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
