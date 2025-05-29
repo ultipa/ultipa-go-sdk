@@ -31,6 +31,7 @@ var DefaultTimeout int32 = math.MaxInt32
 var DefaultGraph = "default"
 var DefaultRecvSize = 1024 * 1024 * 32
 
+// Deprecated: Should use NewUltipa directly
 func NewUltipaConfig(config *UltipaConfig) (*UltipaConfig, error) {
 	config.FillDefault()
 
@@ -128,9 +129,10 @@ func LoadConfigFromYAML(file string) (*UltipaConfig, error) {
 		return nil, err
 	}
 
-	config, err = NewUltipaConfig(config)
-	if err != nil {
-		return nil, err
-	}
+	//config, err = NewUltipaConfig(config)
+	//if err != nil {
+	//	return nil, err
+	//}
+
 	return config, nil
 }

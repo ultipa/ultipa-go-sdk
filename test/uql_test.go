@@ -640,14 +640,14 @@ func TestUqlKhop2(t *testing.T) {
 
 func TestKK(t *testing.T) {
 
-	config, _ := configuration.NewUltipaConfig(&configuration.UltipaConfig{
+	config := &configuration.UltipaConfig{
 		Hosts: []string{
 			"192.168.1.88:63801",
 		},
 		Password:     "root",
 		Username:     "root",
 		DefaultGraph: "ldbc_tiger_sf100_ic_fix_type",
-	})
+	}
 
 	client, err := sdk.NewUltipa(config)
 	if err != nil {

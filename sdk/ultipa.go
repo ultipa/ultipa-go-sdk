@@ -10,10 +10,16 @@ import (
 // Version represents the current version of the SDK.
 const Version = "v5.0.0-new"
 
-// NewUltipa CreateTime an Ultipa Client
+// NewUltipa Create an Ultipa Client
 func NewUltipa(config *configuration.UltipaConfig) (*api.UltipaAPI, error) {
 
 	config.FillDefault()
+
+	encryptedPwd, err := configuration.Encrypt(config.PasswordEncrypt, config.Password)
+	if err != nil {
+		return nil, err
+	}
+	config.Password = encryptedPwd
 
 	// set connection pool
 	pool, err := connection.NewConnectionPool(config)

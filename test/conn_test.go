@@ -151,22 +151,20 @@ func TestUqlWithSpecialHost(t *testing.T) {
 
 func TestConnectionSSL(t *testing.T) {
 
-	if env["ssl_host"] == "" {
-		t.Skip("no ssl host found")
-		return
-	}
+	//if env["ssl_host"] == "" {
+	//	t.Skip("no ssl host found")
+	//	return
+	//}
 
 	var err error
-	config, err := configuration.NewUltipaConfig(&configuration.UltipaConfig{
+	config := &configuration.UltipaConfig{
 		Hosts:        []string{env["ssl_host"]},
 		Username:     env["ssl_username"],
 		Password:     env["ssl_password"],
 		DefaultGraph: env["ssl_graph"],
 		//Debug:        true,
-	})
-	if err != nil {
-		t.Fatal(err)
 	}
+
 	client, err = sdk.NewUltipa(config)
 
 	if err != nil {

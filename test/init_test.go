@@ -46,16 +46,14 @@ func TestPing(t *testing.T) {
 func GetClient(hosts []string, graphName string) (*api.UltipaAPI, error) {
 	var err error
 	//DEBUG = true // open if you need
-	config, err := configuration.NewUltipaConfig(&configuration.UltipaConfig{
+	config := &configuration.UltipaConfig{
 		Hosts:        hosts,
 		Username:     username,
 		Password:     password,
 		DefaultGraph: graphName,
 		//Debug:        DEBUG,
-	})
-	if err != nil {
-		panic(err)
 	}
+
 	client, err = sdk.NewUltipa(config)
 
 	if err != nil {

@@ -12,16 +12,14 @@ import (
 func TestHeartBeat(t *testing.T) {
 
 	var err error
-	config, err := configuration.NewUltipaConfig(&configuration.UltipaConfig{
+	config := &configuration.UltipaConfig{
 		Hosts:     hosts,
 		Username:  username,
 		Password:  password,
 		HeartBeat: 1,
 		//Debug:     true,
-	})
-	if err != nil {
-		t.Fatal(err)
 	}
+
 	client, err = sdk.NewUltipa(config)
 
 	if err != nil {
