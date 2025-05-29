@@ -12,5 +12,5 @@ type InsertBatchAutoResponse struct {
 	Msg       string
 	Statistic *Statistic
 	Resps     map[string]*InsertResponse
-	ErrorItem map[int]int
+	ErrorItem map[int]string
 }

@@ -235,7 +235,7 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(rows []*structs.Edge, config *configu
 
 	resps := &http.InsertBatchAutoResponse{
 		Resps:     map[string]*http.InsertResponse{},
-		ErrorItem: map[int]int{},
+		ErrorItem: map[int]string{},
 		Statistic: &http.Statistic{},
 	}
 

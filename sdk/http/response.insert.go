@@ -12,7 +12,7 @@ import (
 type InsertResponse struct {
 	UUIDs     []types.UUID
 	IDs       []types.ID
-	ErrorItem map[int]int // index : error code
+	ErrorItem map[int]string // index : error code
 	Statistic *Statistic
 	Status    *Status
 }
@@ -55,6 +55,40 @@ var InsertErrorCodeMsgMap = map[int]string{
 	19999: "OTHERS: other error",
 }
 
+var InsertErrorCodeMsgMap2 = map[int]string{
+	10001: "ID_NOT_MATCH_UUID",
+	10002: "ID_UUID_NOT_MATCH_SCHEMA",
+	10003: "FROM_ID_NOT_EXISTED",
+	10004: "TO_ID_NOT_EXISTED",
+	10005: "ID_LEN",
+	10006: "NOT_NULL",
+	10007: "UNIQUCHECK",
+	10008: "ID_EMPTY",
+	10009: "FROM_ID_EMPTY",
+	10010: "TO_ID_EMPTY",
+	10011: "DUPLICATE_ID",
+	10012: "KEY_CONSTRAINT_VIOLATED",
+	11001: "OK_BUT_ID_EXISTED",
+	19999: "OTHERS",
+}
+
+var InsertErrorCodeMsgMap3 = map[string]int{
+	"ID_NOT_MATCH_UUID":        10001,
+	"ID_UUID_NOT_MATCH_SCHEMA": 10002,
+	"FROM_ID_NOT_EXISTED":      10003,
+	"TO_ID_NOT_EXISTED":        10004,
+	"ID_LEN":                   10005,
+	"NOT_NULL":                 10006,
+	"UNIQUCHECK":               10007,
+	"ID_EMPTY":                 10008,
+	"FROM_ID_EMPTY":            10009,
+	"TO_ID_EMPTY":              10010,
+	"DUPLICATE_ID":             10011,
+	"KEY_CONSTRAINT_VIOLATED":  10012,
+	"OK_BUT_ID_EXISTED":        11001,
+	"OTHERS":                   19999,
+}
+
 func NewNodesInsertResponse(reply *ultipa.InsertNodesReply) (response *InsertResponse, err error) {
 
 	response = &InsertResponse{
@@ -68,7 +102,7 @@ func NewNodesInsertResponse(reply *ultipa.InsertNodesReply) (response *InsertRes
 		},
 		UUIDs:     reply.Uuids,
 		IDs:       reply.Ids,
-		ErrorItem: make(map[int]int),
+		ErrorItem: make(map[int]string),
 	}
 
 	if len(reply.IgnoreIndexes) != len(reply.IgnoreErrorCode) {
@@ -78,7 +112,7 @@ func NewNodesInsertResponse(reply *ultipa.InsertNodesReply) (response *InsertRes
 	for index := range reply.IgnoreIndexes {
 		v := int(reply.IgnoreIndexes[index])
 		code := reply.IgnoreErrorCode[index]
-		response.ErrorItem[v] = int(code)
+		response.ErrorItem[v] = InsertErrorCodeMsgMap2[int(code)]
 	}
 
 	return response, nil
@@ -96,13 +130,13 @@ func NewEdgesInsertResponse(reply *ultipa.InsertEdgesReply) (response *InsertRes
 			EngineCost: int(reply.EngineTimeCost),
 		},
 		UUIDs:     reply.Uuids,
-		ErrorItem: make(map[int]int),
+		ErrorItem: make(map[int]string),
 	}
 
 	for index := range reply.IgnoreIndexes {
 		v := int(reply.IgnoreIndexes[index])
 		code := reply.IgnoreErrorCode[index]
-		response.ErrorItem[v] = int(code)
+		response.ErrorItem[v] = InsertErrorCodeMsgMap2[int(code)]
 	}
 
 	return response, nil
