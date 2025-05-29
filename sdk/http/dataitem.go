@@ -778,8 +778,8 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 				}
 			}
 
-			var exta structs.DecimalExtra
-			if err := structs.UnmarshalDecimalExtra([]byte(prop.Extra), &exta); err != nil {
+			var exta *structs.DecimalExtra
+			if err := structs.UnmarshalDecimalExtra([]byte(prop.Extra), exta); err != nil {
 				log.Fatalln(err)
 			}
 
@@ -840,8 +840,8 @@ func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
 			log.Fatalln(err)
 		}
 
-		var exta structs.DecimalExtra
-		if err := structs.UnmarshalDecimalExtra([]byte(extra), &exta); err != nil {
+		var exta *structs.DecimalExtra
+		if err := structs.UnmarshalDecimalExtra([]byte(extra), exta); err != nil {
 			log.Fatalln(err)
 		}
 

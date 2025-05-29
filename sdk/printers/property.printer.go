@@ -27,7 +27,7 @@ func PrintProperty(properties []*structs.Property) {
 			log.Panic(err)
 		}
 
-		var exta = &prop.DecimalExtra
+		var exta = prop.DecimalExtra
 		extaStr, err := structs.MarshalDecimalExtra(exta)
 		if err != nil {
 			log.Panic(err)

@@ -23,7 +23,7 @@ type Property struct {
 	Description string
 	Encrypt     string
 	// extra info for property in json format, e.g. DecimalExtra: precision and scale for decimal type.
-	DecimalExtra DecimalExtra
+	DecimalExtra *DecimalExtra
 }
 
 const (
@@ -173,7 +173,7 @@ func (p *Property) SetTypeByString(s string) {
 		if err != nil {
 			return
 		}
-		extraData := DecimalExtra{
+		extraData := &DecimalExtra{
 			Precision: precision,
 			Scale:     scale,
 		}
