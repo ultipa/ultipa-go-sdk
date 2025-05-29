@@ -1005,12 +1005,12 @@ func (di *DataItem) AsGraph() (graph *structs.Graph, err error) {
 	if err != nil {
 		return nil, err
 	}
-	for _, path := range paths {
-		path.Nodes = nil
-		path.Edges = nil
-		graph.Paths = append(graph.Paths, path)
-	}
-	//graph.Paths = paths
+	//for _, path := range paths {
+	//	path.Nodes = nil
+	//	path.Edges = nil
+	//	graph.Paths = append(graph.Paths, path)
+	//}
+	graph.Paths = paths
 
 	return graph, nil
 }
