@@ -1351,8 +1351,8 @@ func (di *DataItem) AsUsers() (users []*structs.User, err error) {
 
 	for _, v := range values {
 		user := &structs.User{
-			UserName:   v.Get("username").(string),
-			CreateTime: v.Get("create").(*utils.UltipaTime).String(),
+			UserName:    v.Get("username").(string),
+			CreatedTime: v.Get("create").(*utils.UltipaTime).String(),
 		}
 
 		if err := json.Unmarshal([]byte(v.Get("graphPrivileges").(string)), &user.GraphPrivileges); err != nil {
@@ -1407,7 +1407,7 @@ func bytesToUser(data [][]byte) (*structs.User, error) {
 	// CreateTime
 	timestamp, _ := strconv.ParseInt(string(data[1]), 10, 64)
 	create := time.Unix(timestamp, 0)
-	user.CreateTime = create.Format("2006-01-02 15:04:05")
+	user.CreatedTime = create.Format("2006-01-02 15:04:05")
 
 	// LastLogin
 	//timestamp, _ = strconv.ParseInt(string(data[1]), 10, 64)
