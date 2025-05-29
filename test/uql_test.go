@@ -405,13 +405,17 @@ func TestOnePathAsPaths(t *testing.T) {
 
 	//var uql = "ab().src(51).dest(103).depth(1) as paths return paths{}"
 	//var uql = "n().e()[2].n() as paths return paths{} limit 100"
-	var uql = "n().re().n() as p return p"
+	var uql = "find().nodes() as p return p{*}"
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	paths, _ := resp.Alias("p").AsGraph()
+	paths, err := resp.Alias("p").AsGraph()
 	//printers.PrintPaths(paths)
+	if err != nil {
+		t.Log(err)
+	}
+
 	t.Log(paths)
 }
 func TestDateTime(t *testing.T) {

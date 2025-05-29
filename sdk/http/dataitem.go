@@ -188,8 +188,12 @@ func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
 		return paths, nil
 	}
 
-	if di.Type != ultipa.ResultType_RESULT_TYPE_PATH && di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
-		return nil, errors.New(fmt.Sprintf("dataItem %s is not either Path type or LIST Path type", di.Alias))
+	//if di.Type != ultipa.ResultType_RESULT_TYPE_PATH && di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
+	//    return nil, errors.New(fmt.Sprintf("dataItem %s is not either Path type or LIST Path type", di.Alias))
+	//}
+
+	if di.Type != ultipa.ResultType_RESULT_TYPE_PATH {
+		return nil, errors.New(fmt.Sprintf("dataItem %s is not either Path type ", di.Alias))
 	}
 
 	if di.Data == nil {
