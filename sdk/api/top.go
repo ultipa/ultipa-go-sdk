@@ -17,11 +17,5 @@ func (api *UltipaAPI) Top(config *configuration.RequestConfig) (tops []*structs.
 		return nil, fmt.Errorf(resp.Status.Message)
 	}
 
-	di := resp.Alias(http.RESP_TOP_KEY)
-	if di.Data == nil {
-		return nil, fmt.Errorf("no data return")
-	}
-	tops, err = di.AsProcesses()
-
-	return tops, err
+	return resp.Alias(http.RESP_TOP_KEY).AsProcesses()
 }
