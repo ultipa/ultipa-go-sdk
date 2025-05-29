@@ -21,7 +21,7 @@ func ExampleNewUltipaAPI() {
 		Username: "root",
 		Password: "root",
 	}
-	client, err := sdk.NewUltipa(config)
+	client, err := sdk.NewUltipaDriver(config)
 
 	if err != nil {
 		log.Fatalln(err)

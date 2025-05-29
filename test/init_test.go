@@ -54,7 +54,7 @@ func GetClient(hosts []string, graphName string) (*api.UltipaAPI, error) {
 		//Debug:        DEBUG,
 	}
 
-	client, err = sdk.NewUltipa(config)
+	client, err = sdk.NewUltipaDriver(config)
 
 	if err != nil {
 		panic(err)

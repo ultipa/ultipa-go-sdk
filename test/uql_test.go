@@ -649,7 +649,7 @@ func TestKK(t *testing.T) {
 		DefaultGraph: "ldbc_tiger_sf100_ic_fix_type",
 	}
 
-	client, err := sdk.NewUltipa(config)
+	client, err := sdk.NewUltipaDriver(config)
 	if err != nil {
 		t.Error("connect failed,", err)
 	}

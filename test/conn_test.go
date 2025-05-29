@@ -165,7 +165,7 @@ func TestConnectionSSL(t *testing.T) {
 		//Debug:        true,
 	}
 
-	client, err = sdk.NewUltipa(config)
+	client, err = sdk.NewUltipaDriver(config)
 
 	if err != nil {
 		t.Fatal(err)
