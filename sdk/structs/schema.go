@@ -19,7 +19,7 @@ type Schema struct {
 	//Status      string
 	//Type   string
 	DBType ultipa.DBType
-	Total  int
+	Total  uint64
 	Id     string
 	Stats  []*SchemaStat // only for EdgeSchema
 }
@@ -30,7 +30,7 @@ type SchemaStat struct {
 	Schema     string
 	FromSchema string
 	ToSchema   string
-	Count      int
+	Count      uint64
 }
 
 type GraphCount struct {

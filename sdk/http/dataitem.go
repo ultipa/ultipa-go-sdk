@@ -658,7 +658,7 @@ func (di *DataItem) AsGraphCount() (graphCounts []*structs.GraphCount, err error
 
 		//0:type, 1: schema, 2: from_schema,3:to_schema, 4:count
 		values := row.GetValues()
-		count, _ := strconv.Atoi(string(values[4]))
+		count, _ := strconv.ParseUint(string(values[4]), 10, 64)
 
 		sp := &structs.SchemaStat{
 			FromSchema: string(values[2]),
@@ -751,7 +751,7 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 		//schema.Type = Type
 		//schema.Status = string(values[StatusIndex])
 		propertyJson := values[PropertyIndex]
-		schema.Total, _ = strconv.Atoi(utils.AsString(values[TotalIndex]))
+		schema.Total, _ = strconv.ParseUint(utils.AsString(values[TotalIndex]), 10, 64)
 		schema.Id = string(values[IdIndex])
 		schema.DBType = dbType
 
