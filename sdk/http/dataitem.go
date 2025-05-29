@@ -139,6 +139,9 @@ func EdgeTableToEdges(et *ultipa.EntityTable, alias string) ([]*structs.Edge, ma
 }
 
 func (di *DataItem) AsNodes() (nodes []*structs.Node, schemas map[string]*structs.Schema, err error) {
+	if di.Data == nil {
+		return nil, nil, nil
+	}
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nodes, schemas, nil
@@ -147,9 +150,7 @@ func (di *DataItem) AsNodes() (nodes []*structs.Node, schemas map[string]*struct
 	if di.Type != ultipa.ResultType_RESULT_TYPE_NODE && di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
 		return nil, schemas, errors.New(fmt.Sprintf("dataItem %s is not either Node type or LIST Node type", di.Alias))
 	}
-	if di.Data == nil {
-		return nil, nil, nil
-	}
+
 	oNodes := di.Data.(*ultipa.NodeAlias)
 
 	nodes, _, schemas, err = NodeTableToNodes(oNodes.NodeTable, oNodes.Alias)
@@ -160,6 +161,9 @@ func (di *DataItem) AsNodes() (nodes []*structs.Node, schemas map[string]*struct
 }
 
 func (di *DataItem) AsEdges() (edges []*structs.Edge, schemas map[string]*structs.Schema, err error) {
+	if di.Data == nil {
+		return nil, nil, nil
+	}
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return edges, schemas, nil
@@ -167,10 +171,6 @@ func (di *DataItem) AsEdges() (edges []*structs.Edge, schemas map[string]*struct
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_EDGE && di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
 		return nil, schemas, errors.New(fmt.Sprintf("dataItem %s is not either Edge type or LIST Edge type", di.Alias))
-	}
-
-	if di.Data == nil {
-		return nil, nil, nil
 	}
 
 	oEdges := di.Data.(*ultipa.EdgeAlias)
@@ -183,6 +183,9 @@ func (di *DataItem) AsEdges() (edges []*structs.Edge, schemas map[string]*struct
 }
 
 func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return paths, nil
@@ -196,9 +199,6 @@ func (di *DataItem) AsPaths() (paths []*structs.Path, err error) {
 		return nil, errors.New(fmt.Sprintf("dataItem %s is not either Path type ", di.Alias))
 	}
 
-	if di.Data == nil {
-		return nil, nil
-	}
 	pathAlias := di.Data.(*ultipa.PathAlias)
 
 	//return parsePaths(pathAlias.Paths, pathAlias.Alias)
@@ -234,6 +234,9 @@ func parsePaths(oPaths []*ultipa.Path) (paths []*structs.Path, err error) {
 }
 
 func (di *DataItem) AsTable() (table *structs.Table, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return table, nil
@@ -241,11 +244,6 @@ func (di *DataItem) AsTable() (table *structs.Table, err error) {
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
 		return nil, errors.New("DataItem " + di.Alias + " should be a table as pre-condition")
-	}
-
-	// fix top() return nil
-	if di.Data == nil {
-		return nil, errors.New(di.Type.String() + ": No Return Data")
 	}
 
 	oTable := di.Data.(*ultipa.Table)
@@ -315,6 +313,9 @@ func (di *DataItem) AsTable() (table *structs.Table, err error) {
 //}
 
 func (di *DataItem) AsAttr() (*structs.Attr, error) {
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
@@ -322,9 +323,6 @@ func (di *DataItem) AsAttr() (*structs.Attr, error) {
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Attribute list")
-	}
-	if di.Data == nil {
-		return nil, nil
 	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
@@ -350,15 +348,16 @@ func (di *DataItem) AsAttr() (*structs.Attr, error) {
 
 // AsAttrEdges parse DataItem as Attr with Values that is List<List<Node>>
 func (di *DataItem) AsAttrNodes() (*structs.AttrNodes, error) {
+	if di.Data == nil {
+		return nil, nil
+	}
+
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
 	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Attr")
-	}
-	if di.Data == nil {
-		return nil, nil
 	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
@@ -373,15 +372,16 @@ func (di *DataItem) AsAttrNodes() (*structs.AttrNodes, error) {
 
 // AsAttrEdges parse DataItem as Attr with Values that is List<List<Edge>>
 func (di *DataItem) AsAttrEdges() (*structs.AttrEdges, error) {
+	if di.Data == nil {
+		return nil, nil
+	}
+
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
 	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Attr")
-	}
-	if di.Data == nil {
-		return nil, nil
 	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
@@ -396,15 +396,16 @@ func (di *DataItem) AsAttrEdges() (*structs.AttrEdges, error) {
 
 // AsAttrPaths parse DataItem as Attr with Values that is List<List<Path>>
 func (di *DataItem) AsAttrPaths() (*structs.AttrPaths, error) {
+	if di.Data == nil {
+		return nil, nil
+	}
+
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
 	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_ATTR {
 		return nil, errors.New("DataItem " + di.Alias + " is not Type Attr")
-	}
-	if di.Data == nil {
-		return nil, nil
 	}
 
 	attrAlias := di.Data.(*ultipa.AttrAlias)
@@ -573,6 +574,9 @@ func parseAttrMap(oAttr *ultipa.Attr) ([]*structs.AttrMapData, error) {
 
 // AsGraphSets the types will be tables and alias is nodeSchema and edgeSchema
 func (di *DataItem) AsGraphSets() (graphSets []*structs.GraphSet, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return graphSets, nil
@@ -636,6 +640,9 @@ func (di *DataItem) AsGraphSets() (graphSets []*structs.GraphSet, err error) {
 }
 
 func (di *DataItem) AsGraphCount() (graphCounts []*structs.GraphCount, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return graphCounts, nil
@@ -678,6 +685,9 @@ func (di *DataItem) AsGraphCount() (graphCounts []*structs.GraphCount, err error
 
 // AsSchemas the types will be tables and alias is nodeSchema and edgeSchema
 func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return schemas, nil
@@ -802,6 +812,9 @@ func (di *DataItem) AsSchemas() (schemas []*structs.Schema, err error) {
 
 // AsProperties the types will be tables and alias is nodeProperty and edgeProperty
 func (di *DataItem) AsProperties() (properties []*structs.Property, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return properties, nil
@@ -873,6 +886,9 @@ func getOrDefault(name string, defaultValue string, container map[string][]byte)
 
 // AsIndexes the types will be tables and alias is nodeIndex and edgeIndex
 func (di *DataItem) AsIndexes() (indexes []*structs.Index, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return indexes, nil
@@ -915,6 +931,9 @@ func (di *DataItem) AsIndexes() (indexes []*structs.Index, err error) {
 
 // AsFullTexts the types will be tables and alias is node fulltext Index and edge fulltext Index
 func (di *DataItem) AsFullTexts() (fullTextIndexes []*structs.Index, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return fullTextIndexes, nil
@@ -955,6 +974,9 @@ func (di *DataItem) AsFullTexts() (fullTextIndexes []*structs.Index, err error) 
 }
 
 func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	if di.Type != ultipa.ResultType_RESULT_TYPE_TABLE {
 		return nil, errors.New("DataItem " + di.Alias + " should be a table(algo) as pre-condition")
@@ -990,6 +1012,10 @@ func (di *DataItem) AsAlgos() ([]*structs.Algo, error) {
 
 // AsGraph convert graphAlias to structs.Graph for uql syntax toGraph(listUnion(collect(n1), collect(n2)), collect(e)) as graph return graph
 func (di *DataItem) AsGraph() (graph *structs.Graph, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
+
 	paths, err := di.AsPaths()
 	if err != nil {
 		return nil, err
@@ -1065,6 +1091,10 @@ func (di *DataItem) AsAny() (interface{}, error) {
 }
 
 func (di *DataItem) AsPolicies() (policies []*structs.Policy, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
+
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, errors.New("RESULT_TYPE_UNSET")
 	}
@@ -1128,6 +1158,10 @@ func bytesToPolicy(data [][]byte) (*structs.Policy, error) {
 }
 
 func (di *DataItem) AsExtas() (extas []*structs.Exta, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
+
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
 	}
@@ -1159,6 +1193,10 @@ func (di *DataItem) AsExtas() (extas []*structs.Exta, err error) {
 }
 
 func (di *DataItem) AsTasks() (tasks []*structs.Task, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
+
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
 	}
@@ -1244,6 +1282,9 @@ func (di *DataItem) AsProcesses() (tops []*structs.Process, err error) {
 }
 
 func (di *DataItem) AsStats() (stat *structs.Stats, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, errors.New("ResultType_RESULT_TYPE_UNSET")
@@ -1284,6 +1325,10 @@ func (di *DataItem) AsStats() (stat *structs.Stats, err error) {
 }
 
 func (di *DataItem) AsPrivileges() (privileges []*structs.Privilege, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
+
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
 	}
@@ -1331,6 +1376,10 @@ func (di *DataItem) AsPrivileges() (privileges []*structs.Privilege, err error) 
 }
 
 func (di *DataItem) AsUsers() (users []*structs.User, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
+
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
 	}
@@ -1441,6 +1490,10 @@ func bytesToUser(data [][]byte) (*structs.User, error) {
 }
 
 func (di *DataItem) AsJobs() (jobs []*structs.Job, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
+
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return nil, nil
 	}
@@ -1500,6 +1553,9 @@ func bytes2result(data []byte) map[string]string {
 }
 
 func (di *DataItem) AsHDCGraphs() (projections []*structs.HDCGraph, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return projections, nil
@@ -1541,6 +1597,9 @@ func (di *DataItem) AsHDCGraphs() (projections []*structs.HDCGraph, err error) {
 }
 
 func (di *DataItem) AsProjections() (projections []*structs.Projection, err error) {
+	if di.Data == nil {
+		return nil, nil
+	}
 
 	if di.Type == ultipa.ResultType_RESULT_TYPE_UNSET {
 		return projections, nil
