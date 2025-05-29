@@ -32,18 +32,18 @@ var DefaultGraph = "default"
 var DefaultRecvSize = 1024 * 1024 * 32
 
 // Deprecated: Should use NewUltipa directly
-func NewUltipaConfig(config *UltipaConfig) (*UltipaConfig, error) {
-	config.FillDefault()
-
-	//h := md5.New()
-	//h.Write([]byte(config.Password))
-	encryptedPwd, err := Encrypt(config.PasswordEncrypt, config.Password)
-	if err != nil {
-		return config, err
-	}
-	config.Password = encryptedPwd
-	return config, nil
-}
+//func NewUltipaConfig(config *UltipaConfig) (*UltipaConfig, error) {
+//	config.FillDefault()
+//
+//	//h := md5.New()
+//	//h.Write([]byte(config.Password))
+//	encryptedPwd, err := Encrypt(config.PasswordEncrypt, config.Password)
+//	if err != nil {
+//		return config, err
+//	}
+//	config.Password = encryptedPwd
+//	return config, nil
+//}
 
 func (config *UltipaConfig) FillDefault() {
 	if config.MaxRecvSize == 0 {
