@@ -82,6 +82,7 @@ func (attr *Attr) ListAttrAsAttrPaths() (*AttrPaths, error) {
 		return nil, errors.New(fmt.Sprintf("value of this %v is not a LIST Path type", attr.Name))
 	}
 	result.PathsList = [][]*Path{}
+	result.ResultType = attr.ResultType
 	for _, row := range attr.Values {
 		attrListData := row.(*AttrListData)
 		result.PathsList = append(result.PathsList, attrListData.Paths)

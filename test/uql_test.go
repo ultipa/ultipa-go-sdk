@@ -451,7 +451,9 @@ func TestUqlBool(t *testing.T) {
 	//uql := `find().nodes({@insertNode2}) as nodes return nodes{*} limit 10`
 
 	//client, _ := GetClient([]string{"192.168.1.85:61099"}, "sdk_test")
-	uql := `find().nodes({year >2022}) as nodes  RETURN nodes.cPoint LIMIT 8`
+	//uql := `find().nodes({year >2022}) as nodes  RETURN nodes.cPoint LIMIT 8`
+	//uql := `find().nodes({@country}) as nodes ORDER by nodes._uuid DESC RETURN nodes.cPoint LIMIT 8`
+	uql := `n().e().n() as p limit 1 return collect(p)`
 	resp, err := client.Uql(uql, nil)
 	if err != nil {
 		log.Fatalln(err)
@@ -459,7 +461,7 @@ func TestUqlBool(t *testing.T) {
 	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
 		t.Fatal(resp.Status.Message)
 	}
-	nodes, err := resp.Alias("nodes.cPoint").AsAttr()
+	nodes, err := resp.Alias("collect(p)").AsAttr()
 	if err != nil {
 		t.Fatal(err)
 	}
