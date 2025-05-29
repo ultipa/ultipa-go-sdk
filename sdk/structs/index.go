@@ -10,7 +10,7 @@ package structs
 import ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 
 type Index struct {
-	Id         int
+	Id         string
 	Name       string
 	Properties string
 	Schema     string

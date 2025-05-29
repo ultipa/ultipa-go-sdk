@@ -896,7 +896,7 @@ func (di *DataItem) AsIndexes() (indexes []*structs.Index, err error) {
 	for _, row := range table.TableRows {
 		//0：id 1:name, 2: properties, 3: schema, 4: status
 		values := row.GetValues()
-		id, _ := strconv.Atoi(string(values[0]))
+		id := string(values[0])
 		i := structs.Index{
 			Id:         id,
 			Name:       string(values[1]),
