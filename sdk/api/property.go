@@ -20,6 +20,10 @@ func (api *UltipaAPI) CreateProperty(dbType ultipa.DBType, property *structs.Pro
 		return nil, fmt.Errorf("property.Schema can not empty")
 	}
 
+	if property.Name == "" {
+		return nil, fmt.Errorf("property.Name can not empty")
+	}
+
 	if property.Type == ultipa.PropertyType_UNSET {
 		return nil, fmt.Errorf("property.Type unset")
 	}
