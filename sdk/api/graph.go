@@ -24,15 +24,15 @@ func (api *UltipaAPI) ShowGraph(config *configuration.RequestConfig) (graphSets 
 	return graphSets, err
 }
 
-func (api *UltipaAPI) CreateGraphIfNotExist(graphSet *structs.GraphSet, config *configuration.RequestConfig) (resp *http.Response, exist bool, err error) {
-	exist, err = api.HasGraph(graphSet.Name, config)
+func (api *UltipaAPI) CreateGraphIfNotExist(graphSet *structs.GraphSet, config *configuration.RequestConfig) (rwc *http.ResponseWithExistCheck, err error) {
+	rwc.Exist, err = api.HasGraph(graphSet.Name, config)
 
-	if exist {
-		return nil, exist, err
+	if rwc.Exist {
+		return rwc, err
 	}
 
-	resp, err = api.CreateGraph(graphSet, config)
-	return resp, exist, err
+	rwc.Response, err = api.CreateGraph(graphSet, config)
+	return rwc, err
 }
 
 // CreateGraph 5.0 partitionByHash:Crc32/CityHash64

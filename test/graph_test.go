@@ -70,8 +70,8 @@ func TestCreateGraph(t *testing.T) {
 		t.Error(err)
 	}
 
-	_, exist, err := client.CreateGraphIfNotExist(graphSet, nil)
-	if exist {
+	rwc, err := client.CreateGraphIfNotExist(graphSet, nil)
+	if rwc.Exist {
 		t.Logf("graph %s exist", graphSet.Name)
 	}
 	if err != nil {
@@ -114,7 +114,7 @@ func TestCreateGraphIfNotExist(t *testing.T) {
 	//	t.Fatalf("failed to connect to server %v", err)
 	//}
 
-	_, _, err := client.CreateGraphIfNotExist(&structs.GraphSet{
+	_, err := client.CreateGraphIfNotExist(&structs.GraphSet{
 		Name:        "test1123231",
 		Shards:      []string{"1,2"},
 		PartitionBy: "Crc32",

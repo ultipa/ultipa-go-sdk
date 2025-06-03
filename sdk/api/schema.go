@@ -177,19 +177,19 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 	return resp, err
 }
 
-func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, isCreateProperties bool, config *configuration.RequestConfig) (exist bool, err error) {
+func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, isCreateProperties bool, config *configuration.RequestConfig) (rwc *http.ResponseWithExistCheck, err error) {
 	s, err := api.GetSchema(schema.Name, schema.DBType, config)
 	if err != nil {
-		return false, fmt.Errorf("GetSchema error, %v", err)
+		return rwc, fmt.Errorf("GetSchema error, %v", err)
 	}
 
-	exist = true
 	if s == nil {
 		_, err = api.CreateSchema(schema, isCreateProperties, config)
-		exist = false
+	} else {
+		rwc.Exist = true
 	}
 
-	return exist, err
+	return rwc, err
 }
 
 func (api *UltipaAPI) DropSchema(schema *structs.Schema, config *configuration.RequestConfig) (*http.Response, error) {

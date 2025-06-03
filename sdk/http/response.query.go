@@ -25,6 +25,11 @@ type Response struct {
 	Resp        ultipa.UltipaRpcs_QueryClient
 }
 
+type ResponseWithExistCheck struct {
+	Exist    bool
+	Response *Response
+}
+
 func NewUQLResponse(resp ultipa.UltipaRpcs_QueryClient) (response *Response, err error) {
 
 	response = &Response{
