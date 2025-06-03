@@ -24,7 +24,7 @@ func (api *UltipaAPI) ShowGraph(config *configuration.RequestConfig) (graphSets 
 	return graphSets, err
 }
 
-func (api *UltipaAPI) CreateGraphIfNotExist(graphSet *structs.GraphSet, config *configuration.RequestConfig) (rwc *http.ResponseWithExistCheck, err error) {
+func (api *UltipaAPI) CreateGraphIfNotExist(graphSet *structs.GraphSet, config *configuration.RequestConfig) (rwc http.ResponseWithExistCheck, err error) {
 	rwc.Exist, err = api.HasGraph(graphSet.Name, config)
 
 	if rwc.Exist {

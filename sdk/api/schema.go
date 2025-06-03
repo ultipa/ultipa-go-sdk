@@ -180,7 +180,7 @@ func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bo
 	return resp, err
 }
 
-func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, isCreateProperties bool, config *configuration.RequestConfig) (rwc *http.ResponseWithExistCheck, err error) {
+func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, isCreateProperties bool, config *configuration.RequestConfig) (rwc http.ResponseWithExistCheck, err error) {
 	s, err := api.GetSchema(schema.Name, schema.DBType, config)
 	if err != nil {
 		return rwc, fmt.Errorf("GetSchema error, %v", err)

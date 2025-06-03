@@ -38,7 +38,7 @@ func TestShowGraph(t *testing.T) {
 
 func TestCreateGraph(t *testing.T) {
 	//client, err := GetClient(hosts, graph)
-	graphName := "go_sdk_test"
+	graphName := "miniCircle"
 	exit, err := client.HasGraph(graphName, nil)
 	if err != nil {
 		return
@@ -252,4 +252,22 @@ func TestCompact(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Log(job)
+}
+
+func TestCreateGraphIfNotExist1(t *testing.T) {
+
+	testData := []struct {
+		graph  *structs.GraphSet
+		result bool
+		code   ultipa.ErrorCode
+		errMsg string
+	}{
+		{graph: &structs.GraphSet{Name: "testCreateGraph1", Shards: []string{"1", "2", "3"}, PartitionBy: "CityHash64"}, result: true, errMsg: ""},
+		{graph: &structs.GraphSet{Name: "testGraphIFNot", Shards: []string{"1", "2", "3"}, PartitionBy: "CityHash64"}, result: false, code: ultipa.ErrorCode_SUCCESS, errMsg: ""},
+		{graph: &structs.GraphSet{Name: ""}, result: false, code: ultipa.ErrorCode_SUCCESS, errMsg: "graphSet name is required"},
+	}
+	for _, data := range testData {
+		res, err := client.CreateGraphIfNotExist(data.graph, nil)
+		t.Log(res, err)
+	}
 }
