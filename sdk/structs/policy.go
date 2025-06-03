@@ -109,9 +109,6 @@ func (p *Policy) ToCreatePolicyUql() string {
 	if p.PropertyPrivileges.Edge.Deny == nil {
 		p.PropertyPrivileges.Edge.Deny = [][]string{}
 	}
-	if p.PropertyPrivileges.Node.Read == nil {
-
-	}
 
 	s = utils.ToJSONString(p.PropertyPrivileges) + "\n"
 	//if p.PropertyPrivileges != nil {
