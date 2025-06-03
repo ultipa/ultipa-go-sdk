@@ -195,7 +195,7 @@ func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, isCreatePro
 	return rwc, err
 }
 
-func (api *UltipaAPI) DropSchema(schema *structs.Schema, config *configuration.RequestConfig) (*http.Response, error) {
+func (api *UltipaAPI) DropSchema(schema *structs.Schema, config *configuration.RequestConfig) (*http.JobResponse, error) {
 	if schema == nil {
 		return nil, errors.New("drop schema: schema can not be nil")
 	}
@@ -225,7 +225,7 @@ func (api *UltipaAPI) DropSchema(schema *structs.Schema, config *configuration.R
 		return nil, err
 	}
 
-	return resp, nil
+	return http.GetJobResponseFromUqlResponse(resp)
 }
 
 func (api *UltipaAPI) AlterSchema(originalSchema, newSchema *structs.Schema, config *configuration.RequestConfig) (*http.Response, error) {
