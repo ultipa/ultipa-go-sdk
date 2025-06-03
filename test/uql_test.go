@@ -567,10 +567,8 @@ func TestUqlKhop(t *testing.T) {
 	totalRequests := 10000
 	concurrency := 200
 
-	// 创建 WaitGroup 来等待所有请求完成
 	var wg sync.WaitGroup
 
-	// 使用有缓冲的通道来限制最大并发数
 	sem := make(chan struct{}, concurrency)
 	log.Println("start")
 	start := time.Now()
@@ -580,10 +578,8 @@ func TestUqlKhop(t *testing.T) {
 		go func(i int) {
 			defer wg.Done()
 
-			// 控制并发数
 			sem <- struct{}{}
 
-			// 发送请求
 			_, _ = client.Uql(uql, nil)
 
 			//_, _, err := res.Alias("node").AsNodes()
@@ -594,15 +590,12 @@ func TestUqlKhop(t *testing.T) {
 			//
 			//}
 
-			// 打印每次请求的结果或其他处理
 			//fmt.Printf("Request #%d completed\n", i)
 
-			// 释放信号量
 			<-sem
 		}(i)
 	}
 
-	// 等待所有请求完成
 	wg.Wait()
 	log.Println("All requests completed, cost time:", time.Since(start).Seconds())
 }
@@ -613,10 +606,8 @@ func TestUqlKhop2(t *testing.T) {
 	totalRequests := 10000
 	//concurrency := 200
 
-	// 使用 WaitGroup 来等待所有 Goroutine 完成
 	var wg sync.WaitGroup
 
-	// 使用有缓冲的通道来控制并发
 	//sem := make(chan struct{}, concurrency)
 	log.Println("start")
 	start := time.Now()
@@ -630,7 +621,6 @@ func TestUqlKhop2(t *testing.T) {
 		}()
 	}
 
-	// 等待所有请求完成
 	wg.Wait()
 	log.Println("All requests completed, cost time:", time.Since(start).Seconds())
 }

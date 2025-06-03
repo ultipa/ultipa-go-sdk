@@ -59,8 +59,8 @@ func (b *HDCBuilder) BuildUQL() (string, error) {
 		Direction:  b.Direction,
 		LoadId:     b.LoadId,
 		IsDefault:  b.IsDefault,
-		Query:      "query", // 强制字段
-		//Type:       "Graph", // 强制字段
+		Query:      "query", // default
+		//Type:       "Graph", // default
 	}
 
 	bodyJson, err := json.Marshal(body)

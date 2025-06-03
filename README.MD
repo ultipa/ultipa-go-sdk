@@ -23,12 +23,12 @@ import (
     "github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 )
 
-config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
+config := &configuration.UltipaConfig{
     Hosts: []string{"127.0.0.1:60061"},
     Username: "root",
     Password: "root",
     DefaultGraph: "default",
-})
+}
 
 client, err = sdk.NewUltipa(config)
 ```
