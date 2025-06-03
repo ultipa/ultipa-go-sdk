@@ -193,6 +193,14 @@ func (api *UltipaAPI) CreateSchemaIfNotExist(schema *structs.Schema, isCreatePro
 }
 
 func (api *UltipaAPI) DropSchema(schema *structs.Schema, config *configuration.RequestConfig) (*http.Response, error) {
+	if schema == nil {
+		return nil, errors.New("drop schema: schema can not be nil")
+	}
+
+	if schema.Name == "" {
+		return nil, errors.New("drop schema: schema name can not be empty")
+	}
+
 	schemaName, err := CheckReplaceSchemaPropertyName(schema.Name)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("%s, schemaName = %s", err.Error(), schema.Name))
