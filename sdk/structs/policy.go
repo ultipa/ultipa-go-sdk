@@ -89,6 +89,30 @@ func (p *Policy) ToCreatePolicyUql() string {
 	}
 	uql += s
 
+	// PropertyPrivileges nil check
+	if p.PropertyPrivileges.Node.Read == nil {
+		p.PropertyPrivileges.Node.Read = [][]string{}
+	}
+	if p.PropertyPrivileges.Node.Write == nil {
+		p.PropertyPrivileges.Node.Write = [][]string{}
+	}
+	if p.PropertyPrivileges.Node.Deny == nil {
+		p.PropertyPrivileges.Node.Deny = [][]string{}
+	}
+
+	if p.PropertyPrivileges.Edge.Read == nil {
+		p.PropertyPrivileges.Edge.Read = [][]string{}
+	}
+	if p.PropertyPrivileges.Edge.Write == nil {
+		p.PropertyPrivileges.Edge.Write = [][]string{}
+	}
+	if p.PropertyPrivileges.Edge.Deny == nil {
+		p.PropertyPrivileges.Edge.Deny = [][]string{}
+	}
+	if p.PropertyPrivileges.Node.Read == nil {
+
+	}
+
 	s = utils.ToJSONString(p.PropertyPrivileges) + "\n"
 	//if p.PropertyPrivileges != nil {
 	//	s = utils.ToJSONString(p.PropertyPrivileges) + "\n"
