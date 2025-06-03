@@ -124,7 +124,7 @@ func (api *UltipaAPI) AlterGraph(graphName string, alterGraphSet *structs.GraphS
 		return nil, errors.New("alterGraphSet cannot be nil")
 	}
 
-	if !(alterGraphSet.Name == "" && alterGraphSet.Description == "") {
+	if alterGraphSet.Name == "" && alterGraphSet.Description == "" {
 		return nil, errors.New("alterGraphSet name/description cannot be empty at the same time")
 	}
 

@@ -275,7 +275,7 @@ func (api *UltipaAPI) AlterProperty(dbType ultipa.DBType, originProp, newProp *s
 		return nil, errors.New("alter property: originProp Schema/Name can not be empty")
 	}
 
-	if !(newProp.Name == "" && newProp.Description == "") {
+	if newProp.Name == "" && newProp.Description == "" {
 		return nil, errors.New("alter property: newProp Name/Description cannot be empty at the same time")
 	}
 
