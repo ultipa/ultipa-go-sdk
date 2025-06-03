@@ -212,7 +212,7 @@ type Batch struct {
 }
 
 // InsertNodesBatchAuto Nodes interface values should be string
-func (api *UltipaAPI) InsertNodesBatchAuto(rows []*structs.Node, config *configuration.InsertRequestConfig) (*http.InsertBatchAutoResponse, error) {
+func (api *UltipaAPI) InsertNodesBatchAuto(rows []*structs.Node, config *configuration.InsertRequestConfig) (map[string]*http.InsertResponse, error) {
 	if config == nil {
 		config = &configuration.InsertRequestConfig{}
 	}
@@ -352,7 +352,7 @@ func (api *UltipaAPI) InsertNodesBatchAuto(rows []*structs.Node, config *configu
 
 	}
 
-	return resps, nil
+	return resps.Resps, nil
 }
 
 func (api *UltipaAPI) InsertNodes(schemaName string, nodes []*structs.Node, config *configuration.InsertRequestConfig) (*http.Response, error) {

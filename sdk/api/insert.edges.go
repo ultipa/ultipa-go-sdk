@@ -217,7 +217,7 @@ func doConvertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edg
 }
 
 // InsertEdgesBatchAuto Nodes interface values should be string
-func (api *UltipaAPI) InsertEdgesBatchAuto(rows []*structs.Edge, config *configuration.InsertRequestConfig) (*http.InsertBatchAutoResponse, error) {
+func (api *UltipaAPI) InsertEdgesBatchAuto(rows []*structs.Edge, config *configuration.InsertRequestConfig) (map[string]*http.InsertResponse, error) {
 	if config == nil {
 		config = &configuration.InsertRequestConfig{}
 	}
@@ -358,7 +358,7 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(rows []*structs.Edge, config *configu
 		resps.Statistic.EngineCost += response.Statistic.EngineCost
 	}
 
-	return resps, nil
+	return resps.Resps, nil
 }
 
 func (api *UltipaAPI) InsertEdges(schemaName string, edges []*structs.Edge, config *configuration.InsertRequestConfig) (*http.Response, error) {
