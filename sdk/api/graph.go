@@ -49,6 +49,10 @@ func (api *UltipaAPI) CreateGraph(graphSet *structs.GraphSet, config *configurat
 	}
 
 	uql := fmt.Sprintf(`create().graph("%v", "%v")`, graphSet.Name, graphSet.Description)
+	if graphSet.Description == "" {
+		uql = fmt.Sprintf(`create().graph("%v")`, graphSet.Name)
+	}
+
 	if len(graphSet.Shards) != 0 {
 		uql = fmt.Sprintf("%s.shards([%v])", uql, strings.Join(graphSet.Shards, ","))
 	}
