@@ -119,6 +119,9 @@ func (api *UltipaAPI) GetEdgeSchema(schemaName string, config *configuration.Req
 }
 
 func (api *UltipaAPI) CreateSchema(schema *structs.Schema, isCreateProperties bool, config *configuration.RequestConfig) (*http.Response, error) {
+	if schema == nil {
+		return nil, fmt.Errorf("CreateSchema: schema can not nil")
+	}
 	if schema.Name == "" {
 		return nil, fmt.Errorf("schemaName can not empty %s", schema.Name)
 	}
