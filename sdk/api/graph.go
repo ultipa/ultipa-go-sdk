@@ -54,10 +54,10 @@ func (api *UltipaAPI) CreateGraph(graphSet *structs.GraphSet, config *configurat
 	}
 
 	if len(graphSet.Shards) != 0 {
-		uql = fmt.Sprintf("%s.shards([%v])", uql, strings.Join(graphSet.Shards, ","))
+		uql = fmt.Sprintf("%s.shards([%s])", uql, strings.Join(graphSet.Shards, ","))
 	}
 	if graphSet.PartitionBy != "" {
-		uql = fmt.Sprintf("%s.partitionByHash('%v',_id)", uql, graphSet.PartitionBy)
+		uql = fmt.Sprintf("%s.partitionByHash(%s,_id)", uql, graphSet.PartitionBy)
 	}
 
 	resp, err := api.Uql(uql, config)
@@ -81,9 +81,9 @@ func (api *UltipaAPI) DropGraph(graphName string, config *configuration.RequestC
 		return nil, err
 	}
 
-	if !resp.IsSuccess() {
-		return nil, fmt.Errorf(resp.Status.Message)
-	}
+	//if !resp.IsSuccess() {
+	//	return nil, fmt.Errorf(resp.Status.Message)
+	//}
 
 	return resp, err
 }
@@ -146,9 +146,9 @@ func (api *UltipaAPI) AlterGraph(graphName string, alterGraphSet *structs.GraphS
 		return nil, err
 	}
 
-	if !resp.IsSuccess() {
-		return nil, fmt.Errorf(resp.Status.Message)
-	}
+	//if !resp.IsSuccess() {
+	//	return nil, fmt.Errorf(resp.Status.Message)
+	//}
 
 	return resp, nil
 }
