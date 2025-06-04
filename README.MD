@@ -1,3 +1,6 @@
+[![Deprecated](https://img.shields.io/badge/status-deprecated-red.svg)]()
+
+
 # Ultipa GO SDK
 
 ## Installation
