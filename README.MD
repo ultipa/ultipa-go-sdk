@@ -1,3 +1,5 @@
+[![Deprecated](https://img.shields.io/badge/status-deprecated-red.svg)]()
+
 ##⚠️ Project Deprecation Notice
 
 > **This repository has been deprecated. Please visit the new repository:**  
