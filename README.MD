@@ -30,7 +30,7 @@ config := &configuration.UltipaConfig{
     DefaultGraph: "default",
 }
 
-client, err = sdk.NewUltipa(config)
+client, err = sdk.NewUltipaDriver(config)
 ```
 
 ## Send UQL and get result
