@@ -1,3 +1,11 @@
+##⚠️ Project Deprecation Notice
+
+> **This repository has been deprecated. Please visit the new repository:**  
+> 👉 [ultipa-go-driver](https://github.com/ultipa/ultipa-go-driver)
+
+Legacy versions are maintained up to `v5.1.0`.  
+Development continues from `v5.1.0` in the new repository.
+
 # Ultipa GO SDK
 
 ## Installation
