@@ -5,17 +5,17 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 )
 
-func (api *UltipaAPI) Authenticate(authenticateType ultipa.AuthenticateType, uql string, requestConfig *configuration.RequestConfig) (*ultipa.AuthenticateReply, error) {
+func (api *UltipaAPI) Authenticate(authenticateType ultipa.AuthenticateType, uql string, config *configuration.RequestConfig) (*ultipa.AuthenticateReply, error) {
 
 	var err error
 
-	client, err := api.GetControlClient(requestConfig)
+	client, err := api.GetControlClient(config)
 
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(requestConfig)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return nil, err
 	}

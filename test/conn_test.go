@@ -4,15 +4,16 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"log"
+	"strings"
+	"testing"
+	"time"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-	"log"
-	"strings"
-	"testing"
-	"time"
 )
 
 func TestNewConn(t *testing.T) {
@@ -65,13 +66,13 @@ func TestNewConn(t *testing.T) {
 }
 
 func TestUql(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
-	res, _ := client.UQL("n().e().n() as path return path limit 10;", nil)
+	//client, _ := GetClient(hosts, graph)
+	res, _ := client.Uql("n().e().n() as path return path limit 10;", nil)
 	log.Println(res.AliasList, res.Get(0), res.Status.Code, res.Status.Message)
 }
 
 func TestUqlWithSpecialHost(t *testing.T) {
-	res, err := client.UQL("show().graph()", &configuration.RequestConfig{
+	res, err := client.Uql("show().graph()", &configuration.RequestConfig{
 		Host: "localhost:3000",
 	})
 
@@ -83,7 +84,7 @@ func TestUqlWithSpecialHost(t *testing.T) {
 }
 
 func TestRefreshPool(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 	for i := 0; i < 1000; i++ {
 		err := client.Pool.RefreshActivesWithSeconds(1)
 		if err != nil {
@@ -95,7 +96,7 @@ func TestRefreshPool(t *testing.T) {
 
 func TestGetConnByUQL(t *testing.T) {
 
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
 	uql := "show().schema()"
 	_, leader, followers, global, err := client.GetConnByUQL(uql, graph)
@@ -121,20 +122,22 @@ func TestConnectionSSL(t *testing.T) {
 	}
 
 	var err error
-	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
+	config, err := configuration.NewUltipaConfig(&configuration.UltipaConfig{
 		Hosts:        []string{env["ssl_host"]},
 		Username:     env["ssl_username"],
 		Password:     env["ssl_password"],
 		DefaultGraph: env["ssl_graph"],
 		Debug:        true,
 	})
-
+	if err != nil {
+		log.Fatalln(err)
+	}
 	client, err = sdk.NewUltipa(config)
 
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	uql, err := client.UQL("show().schema()", nil)
+	uql, err := client.Uql("show().schema()", nil)
 	log.Println(uql)
 }

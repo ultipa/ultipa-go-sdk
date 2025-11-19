@@ -1,13 +1,15 @@
 package test
 
 import (
+	"fmt"
+	"log"
+	"strings"
+	"testing"
+
 	"github.com/joho/godotenv"
 	"github.com/ultipa/ultipa-go-sdk/sdk"
 	"github.com/ultipa/ultipa-go-sdk/sdk/api"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
-	"log"
-	"strings"
-	"testing"
 )
 
 var env map[string]string
@@ -18,11 +20,50 @@ var password string
 var graph string
 
 func TestMain(m *testing.M) {
+	setup()
+
+	m.Run()
+
+	teardown()
+}
+
+func TestPing(t *testing.T) {
+	client, _ = GetClient(hosts, graph)
+	resp, err := client.Test(nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println(resp.Status.Message)
+}
+
+func GetClient(hosts []string, graphName string) (*api.UltipaAPI, error) {
+	var err error
+	config, err := configuration.NewUltipaConfig(&configuration.UltipaConfig{
+		Hosts:        hosts,
+		Username:     username,
+		Password:     password,
+		DefaultGraph: graphName,
+		Debug:        true,
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	client, err = sdk.NewUltipa(config)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return client, err
+}
+
+func setup() {
+	log.Println("Setting up the test environment")
 	var err error
 	env, err = godotenv.Read(".env")
 
 	if err != nil {
-		log.Fatalln(err)
+		panic("Get env error, " + err.Error())
 	}
 
 	hosts = strings.Split(env["hosts"], ",")
@@ -31,32 +72,10 @@ func TestMain(m *testing.M) {
 	client, err = GetClient(hosts, graph)
 
 	if err != nil {
-		log.Fatalln(err)
+		panic("GetClient error, " + err.Error())
 	}
-
-	m.Run()
 }
 
-func TestPing(t *testing.T) {
-	client, _ = GetClient(hosts, graph)
-	client.Test()
-}
-
-func GetClient(hosts []string, graphName string) (*api.UltipaAPI, error) {
-	var err error
-	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
-		Hosts:        hosts,
-		Username:     username,
-		Password:     password,
-		DefaultGraph: graphName,
-		Debug:        true,
-	})
-
-	client, err = sdk.NewUltipa(config)
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	return client, err
+func teardown() {
+	log.Println("Tearing down the test environment")
 }

@@ -9,21 +9,26 @@ package api
 
 import (
 	"bufio"
-	"github.com/codingsince1985/checksum"
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
-	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path"
+
+	"github.com/codingsince1985/checksum"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) InstallExta(extaFilePath string, extaInfoFilePath string, req *configuration.RequestConfig) (*ultipa.InstallExtaReply, error) {
+func (api *UltipaAPI) InstallExta(soFilePath string, infoFilePath string, requestConfig *configuration.RequestConfig) (*ultipa.InstallExtaReply, error) {
 
 	chunkSize := 1024 * 1024 * 1 // 2MB
 
 	// check file status
 
-	extaFile, err := os.OpenFile(extaFilePath, os.O_RDONLY, 0644)
+	extaFile, err := os.OpenFile(soFilePath, os.O_RDONLY, 0644)
 
 	if err != nil {
 		return nil, err
@@ -31,9 +36,9 @@ func (api *UltipaAPI) InstallExta(extaFilePath string, extaInfoFilePath string, 
 
 	extaFileReader := bufio.NewReader(extaFile)
 
-	extaFileMD5, _ := checksum.MD5sum(extaFilePath)
+	extaFileMD5, _ := checksum.MD5sum(soFilePath)
 
-	extaInfoFile, err := os.OpenFile(extaInfoFilePath, os.O_RDONLY, 0644)
+	extaInfoFile, err := os.OpenFile(infoFilePath, os.O_RDONLY, 0644)
 
 	if err != nil {
 		return nil, err
@@ -41,15 +46,15 @@ func (api *UltipaAPI) InstallExta(extaFilePath string, extaInfoFilePath string, 
 
 	extaInfoFileReader := bufio.NewReader(extaInfoFile)
 
-	extaInfoFileMD5, _ := checksum.MD5sum(extaInfoFilePath)
+	extaInfoFileMD5, _ := checksum.MD5sum(infoFilePath)
 
-	client, err := api.GetControlClient(req)
+	client, err := api.GetControlClient(requestConfig)
 
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(req)
+	ctx, cancel, err := api.Pool.NewContext(requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -118,19 +123,23 @@ func (api *UltipaAPI) InstallExta(extaFilePath string, extaInfoFilePath string, 
 		return nil, err
 	}
 
+	if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(reply.Status.Msg)
+	}
+
 	return reply, nil
 
 }
 
-func (api *UltipaAPI) UninstallExta(extaName string, req *configuration.RequestConfig) (*ultipa.UninstallExtaReply, error) {
+func (api *UltipaAPI) UninstallExta(extaName string, requestConfig *configuration.RequestConfig) (*ultipa.UninstallExtaReply, error) {
 
-	client, err := api.GetControlClient(req)
+	client, err := api.GetControlClient(requestConfig)
 
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(req)
+	ctx, cancel, err := api.Pool.NewContext(requestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -144,5 +153,31 @@ func (api *UltipaAPI) UninstallExta(extaName string, req *configuration.RequestC
 		return nil, err
 	}
 
+	if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(reply.Status.Msg)
+	}
+
 	return reply, nil
+}
+
+func (api *UltipaAPI) ShowExta(config *configuration.RequestConfig) ([]*structs.Exta, error) {
+	var resp *http.UQLResponse
+	var err error
+	var extas []*structs.Exta
+
+	resp, err = api.Uql(fmt.Sprintf(`show().exta()`), config)
+	if err != nil {
+		return nil, err
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
+	}
+
+	extas, err = resp.Alias(http.RESP_EXTAS_KEY).AsExtas()
+
+	if len(extas) == 0 {
+		return nil, err
+	}
+
+	return extas, err
 }

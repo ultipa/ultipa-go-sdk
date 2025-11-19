@@ -5,15 +5,16 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
-	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
-	"github.com/ultipa/ultipa-go-sdk/sdk/types"
-	"google.golang.org/protobuf/proto"
 	"math"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/types"
+	"google.golang.org/protobuf/proto"
 )
 
 var default_nil_string = string([]byte{0x00})
@@ -61,12 +62,15 @@ func ConvertBytesToInterface(bs []byte, t ultipa.PropertyType, subTypes []ultipa
 		str := AsString(bs)
 		return types.PointFromStr(str)
 		//TODO
-	//case ultipa.PropertyType_DECIMAL:
-	//TODO
+	case ultipa.PropertyType_DECIMAL:
+		if len(bs) == 0 {
+			return nil, nil
+		}
+		return AsString(bs), nil
 	case ultipa.PropertyType_LIST:
 		return deserializeList(bs, subTypes)
-	//	//TODO
-	//case ultipa.PropertyType_SET:
+	case ultipa.PropertyType_SET:
+		return deserializeSet(bs, subTypes)
 	//	//TODO
 	//case ultipa.PropertyType_MAP:
 	//	//TODO
@@ -99,16 +103,34 @@ func deserializeList(bs []byte, subTypes []ultipa.PropertyType) (interface{}, er
 	return list, nil
 }
 
+// deserializeSet deserialize bs to set
+func deserializeSet(bs []byte, subTypes []ultipa.PropertyType) (interface{}, error) {
+	setData := &ultipa.SetData{}
+	if err := proto.Unmarshal(bs, setData); err != nil {
+		return nil, err
+	}
+	var list []interface{}
+	if setData.IsNull {
+		return list, nil
+	}
+	if setData.Values != nil {
+		for _, value := range setData.Values {
+			element, err := ConvertBytesToInterface(value, subTypes[0], nil)
+			if err != nil {
+				return nil, err
+			}
+			list = append(list, element)
+		}
+	}
+	return list, nil
+}
+
 // ConvertInterfaceToBytesSafe convert value to []byte, if value is nil, will set default value according to PropertyType t
 func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTypes []ultipa.PropertyType, req *configuration.RequestConfig) ([]byte, error) {
 	toConvertValue := value
 	if toConvertValue == nil {
 		switch t {
-		case ultipa.PropertyType_SET:
-			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 		case ultipa.PropertyType_MAP:
-			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
-		case ultipa.PropertyType_DECIMAL:
 			return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
 		default:
 			return GetNullBytes(t), nil
@@ -136,7 +158,7 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 		}
 
 	case ultipa.PropertyType_DECIMAL:
-		return nil, errors.New(fmt.Sprintf("unsuppoted ultipa.PropertyType [%s]", t))
+		return serializeDecimal(value)
 	case ultipa.PropertyType_SET:
 		return SerializeSetData(value, subTypes, req)
 	case ultipa.PropertyType_MAP:
@@ -175,6 +197,42 @@ func ConvertInterfaceToBytesSafe(value interface{}, t ultipa.PropertyType, subTy
 		}
 	default:
 		return ConvertInterfaceToBytes(toConvertValue)
+	}
+}
+
+// serializeDecimal serialize value to bytes for decimal property type.
+func serializeDecimal(value interface{}) ([]byte, error) {
+
+	switch t := value.(type) {
+	case int32:
+		v := value.(int32)
+		str := strconv.Itoa(int(v))
+		return []byte(str), nil
+	case int:
+		str := strconv.Itoa(value.(int))
+		return []byte(str), nil
+	case string:
+		return []byte(value.(string)), nil
+	case int64:
+		v := value.(int64)
+		str := strconv.Itoa(int(v))
+		return []byte(str), nil
+	case uint32:
+		v := value.(uint32)
+		str := strconv.FormatUint(uint64(v), 10)
+		return []byte(str), nil
+	case uint64:
+		str := strconv.FormatUint(value.(uint64), 10)
+		return []byte(str), nil
+	case float32:
+		v := value.(float32)
+		str := strconv.FormatFloat(float64(v), 'f', -1, 32)
+		return []byte(str), nil
+	case float64:
+		str := strconv.FormatFloat(value.(float64), 'f', -1, 64)
+		return []byte(str), nil
+	default:
+		return nil, errors.New(fmt.Sprint("not supported ultipa type : ", t))
 	}
 }
 
@@ -275,7 +333,7 @@ func ConvertInterfaceToBytes(value interface{}) ([]byte, error) {
 		binary.BigEndian.PutUint32(v, uint32(value.(int32)))
 	case int:
 		v = make([]byte, 4)
-		binary.BigEndian.PutUint32(v, uint32(value.(int32)))
+		binary.BigEndian.PutUint32(v, uint32(value.(int)))
 	case string:
 		v = []byte(value.(string))
 	case int64:
@@ -293,8 +351,10 @@ func ConvertInterfaceToBytes(value interface{}) ([]byte, error) {
 	case float64:
 		v = make([]byte, 8)
 		binary.BigEndian.PutUint64(v, math.Float64bits(value.(float64)))
+	case []byte:
+		v = value.([]byte)
 	default:
-		return nil, errors.New(fmt.Sprint("not supported ultipa type : ", t))
+		return nil, errors.New(fmt.Sprint("not supported ultipa type for value: ", t))
 	}
 
 	return v, nil

@@ -8,15 +8,16 @@
 package test
 
 import (
-	"github.com/ultipa/ultipa-go-sdk/utils"
 	"log"
 	"testing"
+
+	"github.com/ultipa/ultipa-go-sdk/utils"
 )
 
 func TestListIndex(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
-	indexes, err := client.ListIndex(nil)
+	indexes, err := client.ShowIndex(nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -24,9 +25,9 @@ func TestListIndex(t *testing.T) {
 }
 
 func TestListNodeIndex(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
-	indexes, err := client.ListNodeIndex(nil)
+	indexes, err := client.ShowNodeIndex(nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -34,9 +35,9 @@ func TestListNodeIndex(t *testing.T) {
 }
 
 func TestListEdgeIndex(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
-	indexes, err := client.ListEdgeIndex(nil)
+	indexes, err := client.ShowEdgeIndex(nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -44,9 +45,9 @@ func TestListEdgeIndex(t *testing.T) {
 }
 
 func TestListFullText(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
-	indexes, err := client.ListFullText(nil)
+	indexes, err := client.ShowFullText(nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -54,9 +55,9 @@ func TestListFullText(t *testing.T) {
 }
 
 func TestListNodeFullText(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
-	indexes, err := client.ListNodeFullText(nil)
+	indexes, err := client.ShowNodeFullText(nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -64,9 +65,9 @@ func TestListNodeFullText(t *testing.T) {
 }
 
 func TestListEdgeFullText(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
-	indexes, err := client.ListEdgeFullText(nil)
+	indexes, err := client.ShowEdgeFullText(nil)
 	if err != nil {
 		log.Fatalln(err)
 	}

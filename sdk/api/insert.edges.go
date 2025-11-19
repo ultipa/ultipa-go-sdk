@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
-	"sync"
 )
 
 func (api *UltipaAPI) InsertEdgesBatch(table *ultipa.EntityTable, config *configuration.InsertRequestConfig) (*http.InsertResponse, error) {
@@ -104,9 +105,7 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 		EdgeTable:            table,
 		InsertType:           config.InsertType,
 		CreateNodeIfNotExist: config.CreateNodeIfNotExist,
-		//TODO 暂时先设置为false，批量插入不返回ids，后续调整再定
-		//Silent:     config.Silent,
-		Silent: false,
+		Silent:               config.Silent,
 	})
 
 	if err != nil {
@@ -120,7 +119,7 @@ func (api *UltipaAPI) InsertEdgesBatchBySchema(schema *structs.Schema, rows []*s
 	return http.NewEdgesInsertResponse(resp)
 }
 
-func setPropertiesToEdgeRow(schema *structs.Schema, rows []*structs.Edge, req *configuration.RequestConfig) (error, []*ultipa.EntityRow) {
+func setPropertiesToEdgeRow(schema *structs.Schema, rows []*structs.Edge, config *configuration.RequestConfig) (error, []*ultipa.EntityRow) {
 	wg := sync.WaitGroup{}
 	var err error
 	ctx, cancel := context.WithCancel(context.Background())
@@ -138,7 +137,7 @@ func setPropertiesToEdgeRow(schema *structs.Schema, rows []*structs.Edge, req *c
 		go func(index int, row *structs.Edge) {
 			defer wg.Done()
 			var newEdge *ultipa.EntityRow
-			newEdge, err = doConvertSdkEdgeRowToUltipaEdgeRow(schema, row, index, req)
+			newEdge, err = doConvertSdkEdgeRowToUltipaEdgeRow(schema, row, index, config)
 			if err != nil {
 				cancel()
 				return
@@ -166,15 +165,15 @@ func checkEdgeProperties(schema *structs.Schema, row *structs.Edge, index int) e
 	return nil
 }
 
-func convertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edge, index int, req *configuration.RequestConfig) (*ultipa.EntityRow, error) {
+func convertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edge, index int, config *configuration.RequestConfig) (*ultipa.EntityRow, error) {
 	err := checkEdgeProperties(schema, row, index)
 	if err != nil {
 		return nil, err
 	}
-	return doConvertSdkEdgeRowToUltipaEdgeRow(schema, row, index, req)
+	return doConvertSdkEdgeRowToUltipaEdgeRow(schema, row, index, config)
 }
 
-func doConvertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edge, index int, req *configuration.RequestConfig) (*ultipa.EntityRow, error) {
+func doConvertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edge, index int, config *configuration.RequestConfig) (*ultipa.EntityRow, error) {
 	newEdge := &ultipa.EntityRow{
 		FromId:     row.From,
 		FromUuid:   row.FromUUID,
@@ -193,7 +192,7 @@ func doConvertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edg
 			return nil, errors.New(fmt.Sprintf("edge row [%d] error: values doesn't contain property [%s]", index, prop.Name))
 		}
 
-		bs, err := row.GetBytesSafe(prop.Name, prop.Type, prop.SubTypes, req)
+		bs, err := row.GetBytesSafe(prop.Name, prop.Type, prop.SubTypes, config)
 
 		if err != nil {
 			logger.PrintError("Get row bytes value failed " + prop.Name + " " + err.Error())
@@ -207,7 +206,7 @@ func doConvertSdkEdgeRowToUltipaEdgeRow(schema *structs.Schema, row *structs.Edg
 }
 
 // InsertEdgesBatchAuto Nodes interface values should be string
-func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *configuration.InsertRequestConfig) (*http.InsertBatchAutoResponse, error) {
+func (api *UltipaAPI) InsertEdgesBatchAuto(rows []*structs.Edge, config *configuration.InsertRequestConfig) (*http.InsertBatchAutoResponse, error) {
 
 	resps := &http.InsertBatchAutoResponse{
 		Resps:     map[string]*http.InsertResponse{},
@@ -215,9 +214,9 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 		Statistic: &http.Statistic{},
 	}
 
-	// collect schema and edge index in edges
+	// collect schema and edge index in rows
 	m := map[string]map[int]int{}
-	schemas, err := api.ListSchema(ultipa.DBType_DBEDGE, config.RequestConfig)
+	schemas, err := api.ShowEdgeSchema(config.RequestConfig)
 
 	if err != nil {
 		return nil, err
@@ -225,7 +224,7 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 
 	batches := map[string]*Batch{}
 
-	for index, edge := range edges {
+	for index, edge := range rows {
 
 		if _, ok := m[edge.Schema]; !ok {
 			m[edge.Schema] = map[int]int{}
@@ -248,7 +247,7 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 		}
 
 		batch := batches[edge.Schema]
-		// add edges
+		// add rows
 		row, err := convertSdkEdgeRowToUltipaEdgeRow(batch.Schema, edge, index, config.RequestConfig)
 		if err != nil {
 			return nil, err
@@ -344,4 +343,21 @@ func (api *UltipaAPI) InsertEdgesBatchAuto(edges []*structs.Edge, config *config
 	}
 
 	return resps, nil
+}
+
+func (api *UltipaAPI) InsertEdges(schemaName string, edges []*structs.Edge, requestConfig *configuration.InsertRequestConfig) (*http.UQLResponse, error) {
+	uql := fmt.Sprintf(`insert().into(@%s).edges([%s])`, schemaName, structs.EdgesToInsertUql(edges))
+	if requestConfig.Silent {
+		uql = uql + " as edges return edges{*}"
+	}
+	resp, err := api.Uql(uql, requestConfig.RequestConfig)
+
+	if err != nil {
+		return nil, err
+	}
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
+	}
+
+	return resp, nil
 }

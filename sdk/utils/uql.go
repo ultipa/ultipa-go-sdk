@@ -5,10 +5,7 @@ import (
 	"strings"
 )
 
-/**
-check if uql has update delete or insert operations
-*/
-
+// UqlItem Determine the role node to which the request should be sent based on the UQL type.
 type UqlItem struct {
 	Uql []byte
 }
@@ -22,6 +19,7 @@ var WriteUqlCommandKeys = []string{
 	"clear", "stop", "pause", "resume",
 	"top", "kill",
 	`mount\(\).graph`, `unmount\(\).graph`,
+	`db\.backup`,
 }
 
 var GlobalUqlCommandKeys = []string{
@@ -31,6 +29,10 @@ var GlobalUqlCommandKeys = []string{
 	`delete\(\).user`,
 	`drop\(\).user`,
 	`grant\(\).user`,
+	`grant\(\).system`,
+	`grant\(\).privilege`,
+	`grant\(\).node_privilege`,
+	`grant\(\).edge_privilege`,
 	`revoke\(\).user`,
 	`alter\(\).user`,
 	`show\(\).policy`,
@@ -48,6 +50,7 @@ var GlobalUqlCommandKeys = []string{
 	`drop\(\).graph`,
 	`kill\(\)`,
 	`^\s*top\(\)`,
+	`db\.backup`,
 }
 
 var ExtraUqlCommandKeys = map[string]struct{}{
@@ -98,13 +101,13 @@ func (t *UqlItem) HasExecTask() bool {
 	return matcher.Match(t.Uql)
 }
 
-//IsGlobal check the uql needs global graphset
+// IsGlobal check the uql needs global graphset
 func (t *UqlItem) IsGlobal() bool {
 	matcher := GetUqlRegExpMatcher(GlobalUqlCommandKeys)
 	return matcher.Match(t.Uql)
 }
 
-//IsExtra check whether the uql is extra, if yes, then it should be sent to uqlEx via ControlClient
+// IsExtra check whether the uql is extra, if yes, then it should be sent to uqlEx via ControlClient
 func (t *UqlItem) IsExtra() bool {
 	matcher := regexp.MustCompile(`(?P<first>[a-z_A-Z]*)(?:\((?P<param>[^\(|^\)]*)\))?(?:[.]*(?P<second>[a-z_A-Z]*))*`)
 	result := matcher.FindStringSubmatch(strings.TrimSpace(string(t.Uql)))
@@ -145,7 +148,7 @@ func (t *UqlItem) IsExtra() bool {
 	return false
 }
 
-//ParseGraph check whether fetch graph name from uql or not
+// ParseGraph check whether fetch graph name from uql or not
 func (t *UqlItem) ParseGraph() (bool, string) {
 	matcher := regexp.MustCompile(ParseGraphCommandKeys)
 	result := matcher.FindSubmatch(t.Uql)

@@ -1,8 +1,9 @@
 package test
 
 import (
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"testing"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 )
 
 func TestAuthenticate(t *testing.T) {

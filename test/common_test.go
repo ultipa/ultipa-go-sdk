@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"log"
 	"math"
 	"strconv"
 	"sync"
 	"testing"
 	"time"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 )
 
 func TestSlice(t *testing.T) {
@@ -64,30 +65,30 @@ type strToTimeParam struct {
 
 func TestStrToTime(t *testing.T) {
 	testParam := []*strToTimeParam{
-		&strToTimeParam{"2006-1-2 15:04", "2020-1-1 7:14", false},
-		&strToTimeParam{"2006-1-2 15:04", "2020-01-01 7:14", false},
-		&strToTimeParam{"2006-1-2 15:04", "2020-1-18 7:14", false},
-		&strToTimeParam{"2006-1-2 15:04", "2020-01-18 7:14", false},
-		&strToTimeParam{"2006-1-2 15:04", "2020-10-11 7:14", false},
-		&strToTimeParam{"2006-01-02 15:04", "2020-10-11 7:14", false},
-		&strToTimeParam{"2006-01-02 15:04", "2020-01-01 7:14", false},
-		&strToTimeParam{"2006-01-02 15:04", "2020-1-1 7:14", true}, //error
+		{"2006-1-2 15:04", "2020-1-1 7:14", false},
+		{"2006-1-2 15:04", "2020-01-01 7:14", false},
+		{"2006-1-2 15:04", "2020-1-18 7:14", false},
+		{"2006-1-2 15:04", "2020-01-18 7:14", false},
+		{"2006-1-2 15:04", "2020-10-11 7:14", false},
+		{"2006-01-02 15:04", "2020-10-11 7:14", false},
+		{"2006-01-02 15:04", "2020-01-01 7:14", false},
+		{"2006-01-02 15:04", "2020-1-1 7:14", true}, //error
 
-		&strToTimeParam{"2006/1/2 15:04", "2020/1/1 7:14", false},
-		&strToTimeParam{"2006/1/2 15:04", "2020/01/01 7:14", false},
-		&strToTimeParam{"2006/1/2 15:04", "2020/10/11 7:14", false},
+		{"2006/1/2 15:04", "2020/1/1 7:14", false},
+		{"2006/1/2 15:04", "2020/01/01 7:14", false},
+		{"2006/1/2 15:04", "2020/10/11 7:14", false},
 
-		&strToTimeParam{"2006/01/02 15:04", "2020/10/11 7:14", false},
-		&strToTimeParam{"2006/01/02 15:04", "2020/01/01 7:14", false},
-		&strToTimeParam{"2006/01/02 15:04", "2020/1/1 7:14", true}, //error
+		{"2006/01/02 15:04", "2020/10/11 7:14", false},
+		{"2006/01/02 15:04", "2020/01/01 7:14", false},
+		{"2006/01/02 15:04", "2020/1/1 7:14", true}, //error
 
-		&strToTimeParam{"2006-1-2T15:04:05Z07:00", "2022-05-19T12:00:00Z", false},
-		&strToTimeParam{"2006-1-2T15:04:05Z07:00", "2022-10-1T12:00:00Z", false},
-		&strToTimeParam{"2006-1-2T15:04:05Z07:00", "2022-10-10T12:00:00Z", false},
-		&strToTimeParam{"2006/1/2T15:04:05Z07:00", "2022/01/1T12:00:00Z", false},
-		&strToTimeParam{"2006/1/2T15:04:05Z07:00", "2022/01/10T12:00:00Z", false},
-		&strToTimeParam{"2006/1/2T15:04:05Z07:00", "2022/10/10T12:00:00Z", false},
-		&strToTimeParam{"2006-1-2T15:04:05Z07:00", "2020/1/1 7:14", true}, //error
+		{"2006-1-2T15:04:05Z07:00", "2022-05-19T12:00:00Z", false},
+		{"2006-1-2T15:04:05Z07:00", "2022-10-1T12:00:00Z", false},
+		{"2006-1-2T15:04:05Z07:00", "2022-10-10T12:00:00Z", false},
+		{"2006/1/2T15:04:05Z07:00", "2022/01/1T12:00:00Z", false},
+		{"2006/1/2T15:04:05Z07:00", "2022/01/10T12:00:00Z", false},
+		{"2006/1/2T15:04:05Z07:00", "2022/10/10T12:00:00Z", false},
+		{"2006-1-2T15:04:05Z07:00", "2020/1/1 7:14", true}, //error
 	}
 
 	for i, param := range testParam {

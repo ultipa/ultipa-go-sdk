@@ -1,18 +1,27 @@
 package test
 
 import (
+	"log"
+	"testing"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"github.com/ultipa/ultipa-go-sdk/utils"
-	"log"
-	"testing"
 )
+
+func TestShowSchemas(t *testing.T) {
+	res, err := client.ShowSchema(nil)
+	if err != nil {
+		log.Panic(err)
+	}
+	log.Printf(utils.JSONString(res))
+}
 
 func TestListSchema(t *testing.T) {
 	InitCases()
-	res, err := client.ListNodeSchema(nil)
+	res, err := client.ShowNodeSchema(nil)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -100,7 +109,7 @@ func TestCompareSchema(t *testing.T) {
 }
 
 func TestShowSchema(t *testing.T) {
-	resp, _ := client.UQL("show().schema()", nil)
+	resp, _ := client.Uql("show().schema()", nil)
 
 	nodeSchemas, err := resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 	if err != nil {
@@ -116,7 +125,7 @@ func TestShowSchema(t *testing.T) {
 }
 
 func TestCreateSchemaWithProperties(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 	// create schema with properties
 	newSchemaWithProperties := &structs.Schema{
 		Name: "_abc _acd",
@@ -148,5 +157,21 @@ func TestCreateSchema(t *testing.T) {
 	}
 
 	resp2, _ := client.CreateSchema(newSchemaWithoutProperties, false, nil)
+	log.Println(resp2)
+}
+
+func TestAlterSchema(t *testing.T) {
+	// create schema with properties
+	schema := &structs.Schema{
+		DBType: ultipa.DBType_DBNODE,
+		Name:   "People",
+		//Desc:   "People",
+	}
+	newSchema := &structs.Schema{
+		Name: "People2",
+		Desc: "People2",
+	}
+
+	resp2, _ := client.AlterSchema(schema, newSchema, nil)
 	log.Println(resp2)
 }

@@ -1,6 +1,8 @@
 package api_test
 
 import (
+	"log"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk"
 	"github.com/ultipa/ultipa-go-sdk/sdk/api"
@@ -8,28 +10,29 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/http"
 	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
-	"log"
 )
 
 var client *api.UltipaAPI
 
 func ExampleNewUltipaAPI() {
 
-	config := configuration.NewUltipaConfig(&configuration.UltipaConfig{
+	config, err := configuration.NewUltipaConfig(&configuration.UltipaConfig{
 		Hosts:    []string{"10.0.0.1:60061", "10.0.0.2:60061", "10.0.0.3:60061"},
 		Username: "root",
 		Password: "root",
 	})
-
+	if err != nil {
+		log.Fatalln(err)
+	}
 	client, err := sdk.NewUltipa(config)
 
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	graph, _ := client.ListGraph(nil)
+	graph, _ := client.ShowGraph(nil)
 
-	log.Println(graph.Graphs)
+	log.Println(graph)
 }
 
 func ExampleUltipaAPI_UQL_Nodes_Edges() {
@@ -37,13 +40,13 @@ func ExampleUltipaAPI_UQL_Nodes_Edges() {
 	rConfig := &configuration.RequestConfig{
 		Timeout: 20,
 	}
-	resp, err := client.UQL("find().nodes() return nodes limit 1", rConfig)
+	resp, err := client.Uql("find().nodes() return nodes limit 1", rConfig)
 
 	nodes, schemas, err := resp.Alias("nodes").AsNodes()
 
 	log.Println(nodes, schemas, err)
 
-	respEdges, err := client.UQL("find().edges() return edges limit 1", nil)
+	respEdges, err := client.Uql("find().edges() return edges limit 1", nil)
 
 	edges, edgeSchemas, err := respEdges.Alias("edges").AsEdges()
 
@@ -52,7 +55,7 @@ func ExampleUltipaAPI_UQL_Nodes_Edges() {
 
 func ExampleUltipaAPI_CreateGraph() {
 
-	graph := &structs.Graph{
+	graph := &structs.GraphSet{
 		Name:        "new_graph",
 		Description: "my new graph",
 	}
@@ -74,7 +77,7 @@ func ExampleUltipaAPI_HasGraph() {
 }
 
 func ExampleUltipaAPI_ListSchema() {
-	nodeSchemas, _ := client.ListSchema(ultipa.DBType_DBNODE, nil)
+	nodeSchemas, _ := client.ShowSchema(nil)
 	log.Println(nodeSchemas)
 
 	// or
@@ -140,7 +143,7 @@ func ExampleUltipaAPI_CreateNodeProperty() {
 		Type: ultipa.PropertyType_STRING,
 	}
 
-	resp, _ := client.CreateProperty("target_schema", ultipa.DBType_DBNODE, newProp, nil)
+	resp, _ := client.CreateProperty(ultipa.DBType_DBNODE, "target_schema", newProp, nil)
 	log.Println(resp.Status.Code)
 
 	// Create Edge Property
@@ -149,49 +152,59 @@ func ExampleUltipaAPI_CreateNodeProperty() {
 		Type: ultipa.PropertyType_STRING,
 	}
 
-	resp2, _ := client.CreateProperty("target_schema", ultipa.DBType_DBEDGE, newEdgeProp, nil)
+	resp2, _ := client.CreateProperty(ultipa.DBType_DBEDGE, "target_schema", newEdgeProp, nil)
 	log.Println(resp2.Status.Code)
 
-	exist, _ := client.CreatePropertyIfNotExist("target_schema", ultipa.DBType_DBEDGE, newEdgeProp, nil)
+	exist, _ := client.CreatePropertyIfNotExist(ultipa.DBType_DBEDGE, "target_schema", newEdgeProp, nil)
 	log.Println(exist)
 }
 
 func ExampleUltipaAPI_GetProperty() {
-	prop, _ := client.GetProperty("user", "name", ultipa.DBType_DBNODE, nil)
+	prop, _ := client.GetProperty(ultipa.DBType_DBNODE, "user", "name", nil)
 	log.Println(prop)
 }
 
 func ExampleUltipaAPI_AlterNodeProperty() {
 	prop := &structs.Property{
-		Name: "username",
-		Desc: "name change to username",
+		Name:   "name",
+		Desc:   "name Desc",
+		Schema: "user",
 	}
-	resp, _ := client.AlterNodeProperty("@user.name", prop, nil)
+	newProp := &structs.Property{
+		Name: "newName",
+		Desc: "name change to newName",
+	}
+	resp, _ := client.AlterNodeProperty(prop, newProp, nil)
 	log.Println(resp)
 }
 
 func ExampleUltipaAPI_AlterEdgeProperty() {
 	prop := &structs.Property{
-		Name: "name",
-		Desc: "change name to type",
+		Name:   "name",
+		Desc:   "name Desc",
+		Schema: "relation",
 	}
-	resp, _ := client.AlterEdgeProperty("@relation.name", prop, nil)
+	newProp := &structs.Property{
+		Name: "newName",
+		Desc: "name change to newName",
+	}
+	resp, _ := client.AlterEdgeProperty(prop, newProp, nil)
 	log.Println(resp)
 }
 
 func ExampleUltipaAPI_DropNodeProperty() {
-	resp, _ := client.DropNodeProperty("@user.name", nil)
+	resp, _ := client.DropNodeProperty("user", "name", nil)
 	log.Println(resp)
 }
 
 func ExampleUltipaAPI_DropEdgeProperty() {
-	resp, _ := client.DropNodeProperty("@user.name", nil)
+	resp, _ := client.DropNodeProperty("user", "name", nil)
 	log.Println(resp)
 }
 
 func ExampleUltipaAPI_UQL() {
 
-	resp, _ := client.UQL("find().nodes() as nodes return nodes limit 10", nil)
+	resp, _ := client.Uql("find().nodes() as nodes return nodes limit 10", nil)
 	nodes, schemas, err := resp.Alias("nodes").AsNodes()
 
 	if err != nil {
@@ -202,7 +215,7 @@ func ExampleUltipaAPI_UQL() {
 }
 
 func ExampleUltipaAPI_UQL2() {
-	resp, _ := client.UQL("find().edges() as edges return edges limit 10", nil)
+	resp, _ := client.Uql("find().edges() as edges return edges limit 10", nil)
 	edges, schemas, err := resp.Alias("nodes").AsEdges()
 
 	if err != nil {
@@ -214,7 +227,7 @@ func ExampleUltipaAPI_UQL2() {
 
 func ExampleUltipaAPI_UQL3() {
 
-	resp, _ := client.UQL("n().e()[2].n() as paths return paths{*} limit 1", nil)
+	resp, _ := client.Uql("n().e()[2].n() as paths return paths{*} limit 1", nil)
 	paths, err := resp.Get(0).AsPaths()
 
 	if err != nil {
@@ -224,7 +237,7 @@ func ExampleUltipaAPI_UQL3() {
 }
 
 func ExampleUltipaAPI_UQL4() {
-	resp, _ := client.UQL("n(as start).e()[2].n(as end) return table(start._id, end._id) as pairs limit 10", nil)
+	resp, _ := client.Uql("n(as start).e()[2].n(as end) return table(start._id, end._id) as pairs limit 10", nil)
 	table, err := resp.Get(0).AsTable()
 
 	if err != nil {
@@ -234,7 +247,7 @@ func ExampleUltipaAPI_UQL4() {
 }
 
 func ExampleUltipaAPI_UQL5() {
-	resp, _ := client.UQL(`n({_id == "ULTIPA"}).e().n(as friends) return collect(friends.name) as names`, nil)
+	resp, _ := client.Uql(`n({_id == "ULTIPA"}).e().n(as friends) return collect(friends.name) as names`, nil)
 	names, err := resp.Get(0).AsAttr()
 
 	if err != nil {
@@ -244,17 +257,17 @@ func ExampleUltipaAPI_UQL5() {
 }
 
 func ExampleUltipaAPI_UQL6() {
-	resp, _ := client.UQL("show().graph()", nil)
-	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphs()
+	resp, _ := client.Uql("show().graph()", nil)
+	graphs, err := resp.Alias(http.RESP_GRAPH_KEY).AsGraphSets()
 
 	if err != nil {
 		log.Fatalln(err)
 	}
-	printers.PrintGraph(graphs)
+	printers.PrintGraphSet(graphs)
 }
 
 func ExampleUltipaAPI_UQL7() {
-	resp, _ := client.UQL("show().schemas()", nil)
+	resp, _ := client.Uql("show().schemas()", nil)
 
 	nodeSchemas, err := resp.Alias(http.RESP_NODE_SCHEMA_KEY).AsSchemas()
 	if err != nil {
@@ -270,7 +283,7 @@ func ExampleUltipaAPI_UQL7() {
 }
 
 func ExampleUltipaAPI_UQL8() {
-	resp, _ := client.UQL("show().algos()", nil)
+	resp, _ := client.Uql("show().algos()", nil)
 
 	algos, err := resp.Alias(http.RESP_ALGOS_KEY).AsAlgos()
 
@@ -282,7 +295,7 @@ func ExampleUltipaAPI_UQL8() {
 
 func ExampleUltipaAPI_UQL9() {
 
-	resp, _ := client.UQL("stats()", nil)
+	resp, _ := client.Uql("stats()", nil)
 
 	dataitem := resp.Alias(http.RESP_STATISTIC_KEY)
 
@@ -292,7 +305,7 @@ func ExampleUltipaAPI_UQL9() {
 func ExampleUltipaAPI_InsertNodesBatchBySchema() {
 	// insert 10000 nodes to a schema
 	schema := &structs.Schema{
-		Name: "User",
+		Name: "PrivilegeToUser",
 		Properties: []*structs.Property{
 			{
 				Name: "name",

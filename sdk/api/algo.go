@@ -2,24 +2,32 @@ package api
 
 import (
 	"bufio"
-	"github.com/codingsince1985/checksum"
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
-	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
-	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
+	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path"
+
+	"github.com/codingsince1985/checksum"
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
+	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
+	"github.com/ultipa/ultipa-go-sdk/sdk/http"
+	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 )
 
-func (api *UltipaAPI) ShowAlgo(req *configuration.RequestConfig) ([]*structs.Algo, error) {
-
-	resp, err := api.UQL("show().algo()", req)
+// ShowAlgo get all algo
+func (api *UltipaAPI) ShowAlgo(config *configuration.RequestConfig) ([]*structs.Algo, error) {
+	resp, err := api.Uql("show().algo()", config)
 
 	if err != nil {
 		return nil, err
 	}
 
-	algos, err := resp.Get(0).AsAlgos()
+	if resp.Status.Code != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(resp.Status.Message)
+	}
+
+	algos, err := resp.Alias(http.RESP_ALGOS_KEY).AsAlgos()
 
 	if err != nil {
 		return nil, err
@@ -28,13 +36,14 @@ func (api *UltipaAPI) ShowAlgo(req *configuration.RequestConfig) ([]*structs.Alg
 	return algos, nil
 }
 
-func (api *UltipaAPI) InstallAlgo(algoFilePath string, algoInfoFilePath string, req *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
+// InstallAlgo install algo
+func (api *UltipaAPI) InstallAlgo(soFilePath string, infoFilePath string, config *configuration.RequestConfig) (*ultipa.InstallAlgoReply, error) {
 
 	chunkSize := 1024 * 1024 * 1 // 2MB
 
 	// check file status
 
-	algoFile, err := os.OpenFile(algoFilePath, os.O_RDONLY, 0644)
+	algoFile, err := os.OpenFile(soFilePath, os.O_RDONLY, 0644)
 
 	if err != nil {
 		return nil, err
@@ -42,9 +51,9 @@ func (api *UltipaAPI) InstallAlgo(algoFilePath string, algoInfoFilePath string, 
 
 	algoFileReader := bufio.NewReader(algoFile)
 
-	algoFileMD5, _ := checksum.MD5sum(algoFilePath)
+	algoFileMD5, _ := checksum.MD5sum(soFilePath)
 
-	algoInfoFile, err := os.OpenFile(algoInfoFilePath, os.O_RDONLY, 0644)
+	algoInfoFile, err := os.OpenFile(infoFilePath, os.O_RDONLY, 0644)
 
 	if err != nil {
 		return nil, err
@@ -52,15 +61,15 @@ func (api *UltipaAPI) InstallAlgo(algoFilePath string, algoInfoFilePath string, 
 
 	algoInfoFileReader := bufio.NewReader(algoInfoFile)
 
-	algoInfoFileMD5, _ := checksum.MD5sum(algoInfoFilePath)
+	algoInfoFileMD5, _ := checksum.MD5sum(infoFilePath)
 
-	client, err := api.GetControlClient(req)
+	client, err := api.GetControlClient(config)
 
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(req)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return nil, err
 	}
@@ -129,19 +138,24 @@ func (api *UltipaAPI) InstallAlgo(algoFilePath string, algoInfoFilePath string, 
 		return nil, err
 	}
 
+	if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(reply.Status.Msg)
+	}
+
 	return reply, nil
 
 }
 
-func (api *UltipaAPI) UninstallAlgo(algoName string, req *configuration.RequestConfig) (*ultipa.UninstallAlgoReply, error) {
+// UninstallAlgo uninstall algo
+func (api *UltipaAPI) UninstallAlgo(algoName string, config *configuration.RequestConfig) (*ultipa.UninstallAlgoReply, error) {
 
-	client, err := api.GetControlClient(req)
+	client, err := api.GetControlClient(config)
 
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel, err := api.Pool.NewContext(req)
+	ctx, cancel, err := api.Pool.NewContext(config)
 	if err != nil {
 		return nil, err
 	}
@@ -155,5 +169,24 @@ func (api *UltipaAPI) UninstallAlgo(algoName string, req *configuration.RequestC
 		return nil, err
 	}
 
+	if reply.Status.ErrorCode != ultipa.ErrorCode_SUCCESS {
+		return nil, errors.New(reply.Status.Msg)
+	}
+
 	return reply, nil
+}
+
+// GetAlgo get a specific algorithm by name
+func (api *UltipaAPI) GetAlgo(algoName string, config *configuration.RequestConfig) (*structs.Algo, error) {
+	algos, err := api.ShowAlgo(config)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, algo := range algos {
+		if algo.Name == algoName {
+			return algo, nil
+		}
+	}
+	return nil, fmt.Errorf("algo %v not found", algoName)
 }

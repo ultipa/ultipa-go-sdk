@@ -35,3 +35,8 @@ type InsertRequestConfig struct {
 func (rc *RequestConfig) SetRequestTypeByUql(uql string) {
 
 }
+
+type DeleteRequestConfig struct {
+	*RequestConfig
+	Silent bool // if returns new ids
+}

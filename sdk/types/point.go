@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-//point represents of a geographic Point.
+// point represents of a geographic Point.
 type Point struct {
 	//Geographic latitude:-90 ~ 90
 	Latitude float64

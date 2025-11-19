@@ -2,6 +2,11 @@ package test
 
 import (
 	"fmt"
+	"log"
+	"math/rand"
+	"testing"
+	"time"
+
 	"github.com/pieterclaerhout/go-waitgroup"
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/api"
@@ -9,10 +14,6 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
-	"log"
-	"math/rand"
-	"testing"
-	"time"
 )
 
 func TestBatchInsertNodes(t *testing.T) {
@@ -114,7 +115,7 @@ func createSchema(t *testing.T, schema string, conn *api.UltipaAPI) {
 func checkInsertionResult(t *testing.T, conn *api.UltipaAPI, schema string) {
 	// wait for data saved
 	time.Sleep(time.Duration(2) * time.Second)
-	resp3, err := conn.UQL(fmt.Sprintf("find().nodes({@%s}) as nodes return nodes{*}", schema), nil)
+	resp3, err := conn.Uql(fmt.Sprintf("find().nodes({@%s}) as nodes return nodes{*}", schema), nil)
 	if err != nil {
 		t.Errorf("failed to query insertion result. %v", err)
 	}
@@ -130,7 +131,7 @@ func TestBatchInsertEdges(t *testing.T) {
 
 	//client, _ := GetClient([]string{"192.168.1.85:60041"}, "zjstest")
 	//client, _ := GetClient([]string{"192.168.1.71:60061"}, "default")
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
 	total := 500
 	finished := 0
@@ -207,7 +208,7 @@ func TestBatchInsertEdges(t *testing.T) {
 }
 
 func TestCheckPropAndValueAutoData(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 	timestamp1, _ := utils.NewTimestampFromString("2018-08-17T09:57:33+08:00", nil)
 	timestamp2, _ := utils.NewTimestampFromString("2018-08-17 09:57:33", nil)
 	node1 := structs.Node{
@@ -261,7 +262,7 @@ func TestCheckPropAndValueAutoData(t *testing.T) {
 }
 
 func TestBatchInsert2(t *testing.T) {
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 	node1 := structs.Node{
 		Values: &structs.Values{
 			Data: map[string]interface {

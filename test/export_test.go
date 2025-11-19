@@ -1,9 +1,10 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
-	"testing"
 )
 
 func TestExportAsNodesEdges(t *testing.T) {
@@ -19,7 +20,7 @@ func TestExportAsNodesEdges(t *testing.T) {
 	//	}}
 
 	schemaName := "nodeSchema"
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
 	schema := &structs.Schema{
 		Name: schemaName,

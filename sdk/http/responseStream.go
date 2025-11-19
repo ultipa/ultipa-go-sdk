@@ -1,12 +1,13 @@
 /**
- * Return a Stream to return UQL results
+ * Return a Stream to return Uql results
  */
 
 package http
 
 import (
-	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"io"
+
+	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 )
 
 type UQLResponseStream struct {

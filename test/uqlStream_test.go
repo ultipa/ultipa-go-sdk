@@ -1,22 +1,23 @@
 package test
 
 import (
-	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
 	"log"
 	"testing"
+
+	"github.com/ultipa/ultipa-go-sdk/sdk/printers"
 )
 
 func TestUQLStream(t *testing.T) {
 
 	//client, _ := GetClient([]string{"210.13.32.146:40101"}, "default")
 	//client, _ := GetClient([]string{"192.168.1.94:60061"}, "default")
-	client, _ := GetClient(hosts, graph)
+	//client, _ := GetClient(hosts, graph)
 
 	uql := `find().nodes({@nodx}) limit 1000000 return nodes{*} `
 
 	log.Println("Exec : ", uql)
 
-	//resp, err := client.UQL(c.UQL, &configuration.RequestConfig{GraphName: "multi_schema_test"})
+	//resp, err := client.Uql(c.Uql, &configuration.RequestConfig{GraphName: "multi_schema_test"})
 	stream, err := client.UQLStream(uql, nil)
 
 	if err != nil {

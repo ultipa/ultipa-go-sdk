@@ -4,8 +4,9 @@
 .idea/*
 .vscode
 .vscode/*
-.idea/*
 coverage
 vendor
 .env
 /.ultipa_cli_history
+./test/data
+./test/data/*

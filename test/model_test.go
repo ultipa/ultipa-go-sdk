@@ -1,11 +1,12 @@
 package test
 
 import (
+	"log"
+	"testing"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/models"
 	"github.com/ultipa/ultipa-go-sdk/sdk/structs"
-	"log"
-	"testing"
 )
 
 func TestCreateModel(t *testing.T) {
@@ -18,13 +19,13 @@ func TestCreateModel(t *testing.T) {
 	}
 
 	log.Println("[Test] Creating Graph Model")
-	model := models.NewGraphModel(&structs.Graph{
+	model := models.NewGraphModel(&structs.GraphSet{
 		Name: "graph_by_model",
 	})
 
 	// create user schema
 	model.AddSchema(&structs.Schema{
-		Name:   "User",
+		Name:   "PrivilegeToUser",
 		DBType: ultipa.DBType_DBNODE,
 		Properties: []*structs.Property{
 			{

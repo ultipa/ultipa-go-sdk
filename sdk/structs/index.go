@@ -12,4 +12,6 @@ type Index struct {
 	Properties string
 	Schema     string
 	Status     string
+	Size       int
+	Type       string
 }

@@ -4,17 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"reflect"
+	"strings"
+	"sync"
+	"time"
+
 	ultipa "github.com/ultipa/ultipa-go-sdk/rpc"
 	"github.com/ultipa/ultipa-go-sdk/sdk/configuration"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils"
 	"github.com/ultipa/ultipa-go-sdk/sdk/utils/logger"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/metadata"
-	"log"
-	"reflect"
-	"strings"
-	"sync"
-	"time"
 )
 
 type GraphClusterInfo struct {
@@ -40,7 +41,7 @@ type ConnectionPool struct {
 func NewConnectionPool(config *configuration.UltipaConfig) (*ConnectionPool, error) {
 
 	if len(config.Hosts) < 1 {
-		return nil, errors.New("Error Hosts can not by empty")
+		return nil, errors.New("error Hosts can not by empty")
 	}
 
 	pool := &ConnectionPool{
@@ -226,7 +227,9 @@ func (pool *ConnectionPool) doRefreshClusterInfo(graphName string) error {
 			// 已经初始化后
 			conn = pool.GraphMgr.GetLeader(graphName)
 		}
-		logger.PrintInfo(fmt.Sprintf("refresh graph [%s] cluster info with connection to host [%s]", graphName, conn.Host))
+		if pool.Config.Debug {
+			logger.PrintDebug(fmt.Sprintf("refresh graph [%s] cluster info with connection to host [%s]", graphName, conn.Host))
+		}
 		err = pool.resolveClusterInfo(graphName, conn)
 		if err == nil {
 			return nil
@@ -238,7 +241,7 @@ func (pool *ConnectionPool) doRefreshClusterInfo(graphName string) error {
 	return err
 }
 
-//resolveClusterInfo resolve graphName cluster info with connection conn
+// resolveClusterInfo resolve graphName cluster info with connection conn
 func (pool *ConnectionPool) resolveClusterInfo(graphName string, conn *Connection) error {
 
 	ctx, cancel, err := pool.NewContext(&configuration.RequestConfig{GraphName: graphName})
@@ -356,7 +359,7 @@ func (pool *ConnectionPool) GetMasterConn(config *configuration.UltipaConfig) (*
 
 }
 
-//SetMasterConn (graphName , *conn) Set master client
+// SetMasterConn (graphName , *conn) Set master client
 func (pool *ConnectionPool) SetMasterConn(graphName string, conn *Connection) {
 	pool.GraphMgr.SetLeader(graphName, conn)
 }
@@ -462,7 +465,7 @@ func (pool *ConnectionPool) RunHeartBeat() {
 					})
 
 					if err != nil || (resp.Status.ErrorCode != ultipa.ErrorCode_SUCCESS) {
-						log.Printf("heart beat failed : ", conn.Host)
+						log.Printf("heart beat failed : %v\n", conn.Host)
 						continue
 					}
 				}

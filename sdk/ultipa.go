@@ -1,4 +1,4 @@
-//Package sdk provide Ultipa functions to drive ultipa servers
+// Package sdk provide Ultipa functions to drive ultipa servers
 package sdk
 
 import (
@@ -7,11 +7,10 @@ import (
 	"github.com/ultipa/ultipa-go-sdk/sdk/connection"
 )
 
-var (
-	Version = "v4.3.0"
-)
+// Version represents the current version of the SDK.
+const Version = "v4.5.0"
 
-// Create an Ultipa Client
+// NewUltipa Create an Ultipa Client
 func NewUltipa(config *configuration.UltipaConfig) (*api.UltipaAPI, error) {
 
 	config.FillDefault()
